@@ -8,11 +8,12 @@ module.exports = {
         const body = req.body;
         const salt = genSaltSync(10);
         let new_password = body.emp_password;
+        console.log(new_password);
         body.emp_password = hashSync(new_password, salt);
 
         employeeInsert(body, (err, results) => {
             if (err) {
-                return res.status(200).json({
+                return res.status(400).json({
                     success: 0,
                     message: err.message
                 });
