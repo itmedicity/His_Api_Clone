@@ -3,6 +3,7 @@ const { sign } = require("jsonwebtoken");
 const { employeeDelete, employeeGetById, employeeInsert, employeeUpdate, getEmployee } = require("../employee/emp.service");
 
 module.exports = {
+    //Test
     employeeInsert: (req, res) => {
         const body = req.body;
         const salt = genSaltSync(10);
