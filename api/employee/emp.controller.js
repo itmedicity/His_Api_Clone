@@ -7,9 +7,8 @@ module.exports = {
     employeeInsert: (req, res) => {
         const body = req.body;
         const salt = genSaltSync(10);
-        let new_password = body.emp_password;
-        console.log(new_password);
-        body.emp_password = hashSync(new_password, salt);
+        let usc_pass = body.usc_pass;
+        body.usc_pass = hashSync(usc_pass, salt);
 
         employeeInsert(body, (err, results) => {
             if (err) {
@@ -28,8 +27,8 @@ module.exports = {
     employeeUpdate: (req, res) => {
         const body = req.body;
         const salt = genSaltSync(10);
-        let new_password = body.emp_password;
-        body.emp_password = hashSync(new_password, salt);
+        let usc_pass = body.usc_pass;
+        body.usc_pass = hashSync(usc_pass, salt);
         employeeUpdate(body, (err, results) => {
 
             if (err) {
@@ -51,6 +50,7 @@ module.exports = {
         });
     },
     getEmployee: (req, res) => {
+        console.log(req.body)
         getEmployee((err, results) => {
             if (err) {
                 return res.status(200).json({
@@ -120,14 +120,14 @@ module.exports = {
     },
     login: (req, res) => {
         const body = req.body;
-        getEmployeeByUserName(body.emp_username, (err, results) => {
+        getEmployeeByUserName(body.usc_name, (err, results) => {
             if (!results) {
                 return res.json({
                     success: 0,
                     data: "Invalid user Name  or password"
                 });
             }
-            const get_password = body.emp_password.toString();
+            const get_password = body.usc_pass.toString();
             const result = compareSync(get_password, results.usc_pass);
             if (result) {
                 results.usc_pass = undefined;
