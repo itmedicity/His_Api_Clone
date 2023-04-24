@@ -3,6 +3,7 @@ const { sign } = require("jsonwebtoken");
 const { employeeDelete, employeeGetById, employeeInsert, employeeUpdate, getEmployee, getEmployeeByUserName } = require("../employee/emp.service");
 
 module.exports = {
+    //Test
     employeeInsert: (req, res) => {
         const body = req.body;
         const salt = genSaltSync(10);
@@ -19,7 +20,7 @@ module.exports = {
 
             return res.status(200).json({
                 success: 1,
-                message: results
+                message: "Data Inserted Successfully"
             });
         })
     },
