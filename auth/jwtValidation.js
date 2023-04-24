@@ -2,13 +2,14 @@ const jwt = require("jsonwebtoken");
 module.exports = {
     checkToken: (req, res, next) => {
         let token = req.get("authorization");
+        console.log(token)
         if (token) {
             // Remove Bearer from string
             token = token.slice(7);
-            // @ts-ignore
-            jwt.verify(token, process.env.JWT_KEY, (err, decoded) => {
+            console.log(token)
+            jwt.verify(token, "@dhj$&$(*)dndkm76$%#jdn(^$6GH%^#73*#*", (err, decoded) => {
                 if (err) {
-
+                    console.log(err)
                     return res.json({
                         status: 102,
                         message: "Invalid Token"
