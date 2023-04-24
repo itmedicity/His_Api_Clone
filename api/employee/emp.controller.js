@@ -1,6 +1,6 @@
 const { genSaltSync, hashSync, compareSync } = require("bcrypt");
 const { sign } = require("jsonwebtoken");
-const { employeeDelete, employeeGetById, employeeInsert, employeeUpdate, getEmployee } = require("../employee/emp.service");
+const { employeeDelete, employeeGetById, employeeInsert, employeeUpdate, getEmployee, getEmployeeByUserName } = require("../employee/emp.service");
 
 module.exports = {
     employeeInsert: (req, res) => {
@@ -114,6 +114,36 @@ module.exports = {
                 success: 2,
                 message: "Record Deleted Successfully"
             });
+        });
+    },
+    login: (req, res) => {
+        const body = req.body;
+        getEmployeeByUserName(body.emp_username, (err, results) => {
+            if (!results) {
+                return res.json({
+                    success: 0,
+                    data: "Invalid user Name  or password"
+                });
+            }
+            const get_password = body.emp_password.toString();
+            const result = compareSync(get_password, results.usc_pass);
+            if (result) {
+                results.usc_pass = undefined;
+                const jsontoken = sign({ result: results }, "@dhj$&$(*)dndkm76$%#jdn(^$6GH%^#73*#*", {
+                    expiresIn: "12h"
+                });
+                return res.json({
+                    success: 1,
+                    message: "login successfully",
+                    token: jsontoken,
+                    data: results
+                });
+            } else {
+                return res.json({
+                    success: 0,
+                    message: "error"
+                });
+            }
         });
     },
 }

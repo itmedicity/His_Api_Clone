@@ -99,5 +99,17 @@ module.exports = {
             }
         )
     },
+    getEmployeeByUserName: (userName, callBack) => {
+        pool.query(
+            `SELECT * FROM medi_ellider.hrm_employee WHERE usc_name = ?  AND usc_active = 1`,
+            [userName],
+            (error, results, fields) => {
+                if (error) {
+                    callBack(error);
+                }
+                return callBack(null, results[0]);
+            }
+        );
+    }
 
 }
