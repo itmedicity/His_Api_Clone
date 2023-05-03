@@ -1,6 +1,7 @@
 const { genSaltSync, hashSync, compareSync } = require("bcrypt");
 const { sign } = require("jsonwebtoken");
 const { employeeDelete, employeeGetById, employeeInsert, employeeUpdate, getEmployee, getEmployeeByUserName } = require("../employee/emp.service");
+const { add } = require("date-fns");
 
 module.exports = {
     //Test
@@ -138,7 +139,8 @@ module.exports = {
                     success: 1,
                     message: "login successfully",
                     token: jsontoken,
-                    data: results
+                    data: results,
+                    expireDate: add(new Date(), { hours: 12 })
                 });
             } else {
                 return res.json({
