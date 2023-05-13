@@ -26,7 +26,8 @@ module.exports = {
             if (Object.keys(results).length === 0) {
                 return res.status(200).json({
                     success: 2,
-                    message: "No Result"
+                    message: "No Result",
+                    data: []
                 });
             }
             return res.status(200).json({
@@ -48,7 +49,8 @@ module.exports = {
             if (Object.keys(results).length === 0) {
                 return res.status(200).json({
                     success: 2,
-                    message: "No Result"
+                    message: "No Result",
+                    data: []
                 });
             }
             return res.status(200).json({
@@ -70,7 +72,8 @@ module.exports = {
             if (Object.keys(results).length === 0) {
                 return res.status(200).json({
                     success: 2,
-                    message: "No Result"
+                    message: "No Result",
+                    data: []
                 });
             }
             return res.status(200).json({
@@ -92,7 +95,8 @@ module.exports = {
             if (Object.keys(results).length === 0) {
                 return res.status(200).json({
                     success: 2,
-                    message: "No Result"
+                    message: "No Result",
+                    data: []
                 });
             }
             return res.status(200).json({
@@ -114,7 +118,8 @@ module.exports = {
             if (Object.keys(results).length === 0) {
                 return res.status(200).json({
                     success: 2,
-                    message: "No Result"
+                    message: "No Result",
+                    data: []
                 });
             }
             return res.status(200).json({
@@ -136,7 +141,8 @@ module.exports = {
             if (Object.keys(results).length === 0) {
                 return res.status(200).json({
                     success: 2,
-                    message: "No Result"
+                    message: "No Result",
+                    data: []
                 });
             }
             return res.status(200).json({
@@ -158,7 +164,8 @@ module.exports = {
             if (Object.keys(results).length === 0) {
                 return res.status(200).json({
                     success: 2,
-                    message: "No Result"
+                    message: "No Result",
+                    data: []
                 });
             }
             return res.status(200).json({
@@ -180,7 +187,8 @@ module.exports = {
             if (Object.keys(results).length === 0) {
                 return res.status(200).json({
                     success: 2,
-                    message: "No Result"
+                    message: "No Result",
+                    data: []
                 });
             }
             return res.status(200).json({
@@ -202,7 +210,8 @@ module.exports = {
             if (Object.keys(results).length === 0) {
                 return res.status(200).json({
                     success: 2,
-                    message: "No Result"
+                    message: "No Result",
+                    data: []
                 });
             }
             return res.status(200).json({
@@ -224,7 +233,8 @@ module.exports = {
             if (Object.keys(results).length === 0) {
                 return res.status(200).json({
                     success: 2,
-                    message: "No Result"
+                    message: "No Result",
+                    data: []
                 });
             }
             return res.status(200).json({
@@ -246,7 +256,8 @@ module.exports = {
             if (Object.keys(results).length === 0) {
                 return res.status(200).json({
                     success: 2,
-                    message: "No Result"
+                    message: "No Result",
+                    data: []
                 });
             }
             return res.status(200).json({
@@ -268,7 +279,8 @@ module.exports = {
             if (Object.keys(results).length === 0) {
                 return res.status(200).json({
                     success: 2,
-                    message: "No Result"
+                    message: "No Result",
+                    data: []
                 });
             }
             return res.status(200).json({
