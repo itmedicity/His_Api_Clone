@@ -135,7 +135,7 @@ module.exports = {
                     message: err
                 });
             }
-            if (!results) {
+            if (results.length === 0) {
                 return res.json({
                     success: 1,
                     message: "Failed to Update"
