@@ -51,7 +51,6 @@ module.exports = {
         });
     },
     getEmployee: (req, res) => {
-        console.log(req.body)
         getEmployee((err, results) => {
             if (err) {
                 return res.status(200).json({
@@ -121,6 +120,7 @@ module.exports = {
     },
     login: (req, res) => {
         const body = req.body;
+        console.log(body)
         getEmployeeByUserName(body.usc_name, (err, results) => {
             if (!results) {
                 return res.json({

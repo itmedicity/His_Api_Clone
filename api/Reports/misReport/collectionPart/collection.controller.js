@@ -10,7 +10,9 @@ const {
     ipConsolidatedDiscount,
     ipPreviousDayDiscount,
     ipPreviousDayCollection,
-    unsettledAmount
+    unsettledAmount,
+    misGroup,
+    misGroupMast
 } = require('./collection.service')
 
 module.exports = {
@@ -286,6 +288,50 @@ module.exports = {
             return res.status(200).json({
                 success: 1,
                 message: "Unsettled Amount",
+                data: results
+            });
+        })
+    },
+    misGroup: (req, res) => {
+        misGroup((err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err.message
+                });
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Result",
+                    data: []
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                message: "mis group master",
+                data: results
+            });
+        })
+    },
+    misGroupMast: (req, res) => {
+        misGroupMast((err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err.message
+                });
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Result",
+                    data: []
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                message: "mis group master",
                 data: results
             });
         })
