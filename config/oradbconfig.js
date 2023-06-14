@@ -9,7 +9,6 @@ const oraConnection = async () => {
         poolMax: 4,
     });
 
-
 }
 
 const oraPool = async () => {

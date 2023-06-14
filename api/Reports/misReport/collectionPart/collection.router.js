@@ -9,7 +9,11 @@ const {
     getcreditInsuranceBillCollection,
     getipConsolidatedDiscount,
     getipPreviousDayDiscount,
-    getunsettledAmount
+    getunsettledAmount,
+    getipPreviousDayCollection,
+    getcreditInsuranceBill,
+    misGroup,
+    misGroupMast
 } = require('./collection.controller')
 
 const router = require('express').Router();
@@ -24,5 +28,9 @@ router.post('/creditInsuranceBillCollection', checkToken, getcreditInsuranceBill
 router.post('/ipConsolidatedDiscount', checkToken, getipConsolidatedDiscount);
 router.post('/ipPreviousDayDiscount', checkToken, getipPreviousDayDiscount);
 router.post('/unsettledAmount', checkToken, getunsettledAmount);
+router.post('/ipPreviousDayCollection', checkToken, getipPreviousDayCollection);
+router.post('/creditInsuranceBill', checkToken, getcreditInsuranceBill);
+router.get('/misGroup', checkToken, misGroup);
+router.get('/misMaster', checkToken, misGroupMast);
 
 module.exports = router;

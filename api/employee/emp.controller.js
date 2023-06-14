@@ -147,8 +147,7 @@ module.exports = {
             });
         });
     },
-
-    employeeUpdate: (req, res) => {
+  employeeUpdate: (req, res) => {
         const body = req.body;
         employeeUpdate(body, (err, results) => {
 
@@ -218,6 +217,7 @@ module.exports = {
     },
     login: (req, res) => {
         const body = req.body;
+        console.log(body)
         getEmployeeByUserName(body.usc_name, (err, results) => {
             if (!results) {
                 return res.json({
