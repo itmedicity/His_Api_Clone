@@ -1,12 +1,14 @@
 const router = require('express').Router();
-const { checkToken } = require("../../auth/jwtValidation");
-const { employeeDelete, employeeGetById, employeeInsert, employeeUpdate, getEmployee, login } = require('../employee/emp.controller');
+// const { checkToken } = require("../../auth/jwtValidation");
+const { employeeDelete, employeeGetById, employeeInsert, employeeUpdate, employeeResetPass, getEmployee, login, searchEmployee, viewEmployee } = require('../employee/emp.controller');
 
-router.post("/login", login);
-router.post('/', checkToken, employeeInsert);
-router.patch('/', checkToken, employeeUpdate);
-router.get('/', checkToken, getEmployee);
-router.get('/:id', checkToken, employeeGetById);
-router.delete('/', checkToken, employeeDelete);
-
+router.post('/login', login);
+router.post('/insert', employeeInsert);
+router.patch('/resetpass', employeeResetPass);
+router.patch('/update', employeeUpdate);
+router.get('/select', getEmployee);
+router.get('/view', viewEmployee);
+router.get('/:id', employeeGetById);
+router.delete('/', employeeDelete);
+router.post('/search', searchEmployee)
 module.exports = router;

@@ -1,35 +1,154 @@
 const { genSaltSync, hashSync, compareSync } = require("bcrypt");
 const { sign } = require("jsonwebtoken");
-const { employeeDelete, employeeGetById, employeeInsert, employeeUpdate, getEmployee, getEmployeeByUserName } = require("../employee/emp.service");
+const { employeeDelete, employeeGetById, employeeInsert, employeeResetPass, employeeUpdate, getEmployee, getEmployeeByUserName, EmployeeAlreadyExist, searchEmployee, viewEmployee } = require("../employee/emp.service");
 const { add } = require("date-fns");
 
 module.exports = {
     //Test
     employeeInsert: (req, res) => {
         const body = req.body;
-        const salt = genSaltSync(10);
-        let usc_pass = body.usc_pass;
-        body.usc_pass = hashSync(usc_pass, salt);
 
-        employeeInsert(body, (err, results) => {
+        EmployeeAlreadyExist(body, (err, results) => {
+
+            const value = JSON.parse(JSON.stringify(results))
+
+            if (Object.keys(value).length === 0) {
+
+                const salt = genSaltSync(10);
+                let usc_pass = body.usc_pass;
+                body.usc_pass = hashSync(usc_pass, salt);
+
+                employeeInsert(body, (err, results) => {
+                    if (err) {
+                        return res.status(400).json({
+                            success: 0,
+                            message: err.message
+                        });
+                    }
+
+                    return res.status(200).json({
+                        success: 1,
+                        message: "User Created Successfully"
+                    })
+                })
+            }
+            else {
+                return res.status(200).json({
+                    success: 7,
+                    message: "User Already Exist"
+                })
+            }
+        })
+    },
+
+
+
+    getEmployee: (req, res) => {
+
+        getEmployee((err, results) => {
+
+            // console.log(results);
             if (err) {
                 return res.status(200).json({
                     success: 0,
-                    message: err.message
+                    message: err
+                });
+            }
+
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No Results Found"
                 });
             }
 
             return res.status(200).json({
-                success: 1,
-                message: "Data Inserted Successfully"
+                success: 2,
+                data: results
             });
+        });
+    },
+
+    viewEmployee: (req, res) => {
+
+        viewEmployee((err, results) => {
+
+            // console.log(results);
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            if (results.length === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: "No Results Found"
+                });
+            }
+
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        });
+    },
+
+
+    searchEmployee: (req, res) => {
+
+        const body = req.body;
+
+        searchEmployee(body, (err, results) => {
+            // console.log(results);
+            if (err) {
+                return res.status(400).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (results.length === 0) {
+
+                return res.status(200).json({
+                    success: 1,
+                    message: 'No data found'
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            })
         })
     },
-    employeeUpdate: (req, res) => {
+
+    employeeResetPass: (req, res) => {
         const body = req.body;
         const salt = genSaltSync(10);
         let usc_pass = body.usc_pass;
         body.usc_pass = hashSync(usc_pass, salt);
+        employeeResetPass(body, (err, results) => {
+
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (results.length === 0) {
+                return res.json({
+                    success: 1,
+                    message: "Failed to Update"
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                message: "Data Updated Successfully"
+            });
+        });
+    },
+  employeeUpdate: (req, res) => {
+        const body = req.body;
         employeeUpdate(body, (err, results) => {
 
             if (err) {
@@ -40,35 +159,13 @@ module.exports = {
             }
             if (!results) {
                 return res.json({
-                    success: 0,
+                    success: 1,
                     message: "Failed to Update"
                 });
             }
             return res.status(200).json({
-                success: 1,
+                success: 2,
                 message: "Data Updated Successfully"
-            });
-        });
-    },
-    getEmployee: (req, res) => {
-        getEmployee((err, results) => {
-            if (err) {
-                return res.status(200).json({
-                    success: 10,
-                    message: err
-                });
-            }
-
-            if (!results) {
-                return res.status(200).json({
-                    success: 0,
-                    message: "No Results Found"
-                });
-            }
-
-            return res.status(200).json({
-                success: 1,
-                data: results
             });
         });
     },
@@ -125,7 +222,7 @@ module.exports = {
             if (!results) {
                 return res.json({
                     success: 0,
-                    data: "Invalid user Name  or password"
+                    message: "Invalid user Name  or password"
                 });
             }
             const get_password = body.usc_pass.toString();
@@ -144,7 +241,7 @@ module.exports = {
                 });
             } else {
                 return res.json({
-                    success: 0,
+                    success: 5,
                     message: "error"
                 });
             }
