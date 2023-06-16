@@ -20,7 +20,7 @@ module.exports = {
 
                 employeeInsert(body, (err, results) => {
                     if (err) {
-                        return res.status(400).json({
+                        return res.status(200).json({
                             success: 0,
                             message: err.message
                         });
@@ -147,7 +147,7 @@ module.exports = {
             });
         });
     },
-  employeeUpdate: (req, res) => {
+    employeeUpdate: (req, res) => {
         const body = req.body;
         employeeUpdate(body, (err, results) => {
 

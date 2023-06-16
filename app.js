@@ -11,6 +11,7 @@ const collection = require("./api/Reports/misReport/collectionPart/collection.ro
 const patientTypeDiscount = require("./api/Reports/misReport/PatientType/patientType.router")
 const pharmacy = require("./api/Reports/misReport/incomePart/pharmacyincome/pharmacy.router")
 const income = require("./api/Reports/misReport/incomePart/procedureIncome/proincome.router")
+const admissionList = require("./api/Reports/InpatientList/admissionList.router")
 
 app.use(express.json());
 
@@ -35,6 +36,7 @@ app.use("/api/collection", collection)
 app.use("/api/patientType", patientTypeDiscount)
 app.use("/api/pharmacy", pharmacy)
 app.use("/api/income", income)
+app.use("/api/admission", admissionList)
 
 app.listen(process.env.APP_PORT, (val) => {
     console.log(`Server Up and Running ${process.env.APP_PORT}`)
