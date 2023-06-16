@@ -4,7 +4,7 @@ const { employeeDelete, employeeGetById, employeeInsert, employeeResetPass, empl
 const { add } = require("date-fns");
 
 module.exports = {
-    //Test
+
     employeeInsert: (req, res) => {
         const body = req.body;
 
@@ -46,8 +46,6 @@ module.exports = {
     getEmployee: (req, res) => {
 
         getEmployee((err, results) => {
-
-            // console.log(results);
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -73,7 +71,6 @@ module.exports = {
 
         viewEmployee((err, results) => {
 
-            // console.log(results);
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -101,7 +98,6 @@ module.exports = {
         const body = req.body;
 
         searchEmployee(body, (err, results) => {
-            // console.log(results);
             if (err) {
                 return res.status(400).json({
                     success: 0,
@@ -217,7 +213,6 @@ module.exports = {
     },
     login: (req, res) => {
         const body = req.body;
-        console.log(body)
         getEmployeeByUserName(body.usc_name, (err, results) => {
             if (!results) {
                 return res.json({
