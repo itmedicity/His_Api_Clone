@@ -3,57 +3,41 @@ const { oracledb, connectionClose, oraConnection } = require('../../../../config
 
 module.exports = {
     //Advance Collection (C)
-    advanceCollection: async (data, callBack) => {
+    advanceCollectionTssh: async (data, callBack) => {
 
         let pool_ora = await oraConnection();
         let conn_ora = await pool_ora.getConnection();
+
+        const ipNumberList = data.ptno.join(',');
+        const fromDate = data.from;
+        const toDate = data.to;
+        const sql = ` SELECT SUM (NVL (ARN_AMOUNT, 0)) Amt, 0 tax
+                            FROM OPADVANCE
+                        WHERE NVL (ARC_CANCEL, 'N') = 'N'
+                                AND ARD_DATE >=  TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                AND ARD_DATE <=  TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                AND OPADVANCE.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                                AND OPADVANCE.IP_NO IN (${ipNumberList})
+                        UNION ALL
+                        SELECT SUM (NVL (ARN_AMOUNT, 0)) Amt, 0 tax
+                            FROM PHADVANCEENTRY
+                        WHERE (NVL (ARC_CANCEL, 'N') = 'N')
+                                AND ARD_DATE >=TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                AND PHADVANCEENTRY.ARC_MHCODE IN (SELECT MH_CODE FROM multihospital)
+                                AND ARD_DATE <=TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                AND PHADVANCEENTRY. ARC_TYPE = 'I'
+                        UNION ALL
+                        SELECT SUM (NVL (ARN_AMOUNT, 0)) Amt, 0 tax
+                            FROM IPADVANCE
+                        WHERE (NVL (ARC_CANCEL, 'N') = 'N')
+                                AND ARD_DATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                AND ARD_DATE <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                AND IPADVANCE.IAC_MHCODE IN (SELECT MH_CODE FROM multihospital)
+                                AND IPADVANCE.IP_NO IN (${ipNumberList})`;
+
         try {
-            const result = await conn_ora.execute(
-                `SELECT SUM (NVL (ARN_AMOUNT, 0)) Amt, 0 tax
-                        FROM OPADVANCE
-                    WHERE NVL (ARC_CANCEL, 'N') = 'N'
-                            AND ARD_DATE >=
-                                    TO_DATE (:date0, 'dd/MM/yyyy hh24:mi:ss')
-                            AND ARD_DATE <=
-                                    TO_DATE (:date1, 'dd/MM/yyyy hh24:mi:ss')
-                            AND OPADVANCE.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-                    UNION ALL
-                    SELECT SUM (NVL (ARN_AMOUNT, 0)) Amt, 0 tax
-                        FROM PHADVANCEENTRY
-                    WHERE (NVL (ARC_CANCEL, 'N') = 'N')
-                            AND ARD_DATE >=
-                                    TO_DATE (:date2, 'dd/MM/yyyy hh24:mi:ss')
-                            AND PHADVANCEENTRY.ARC_MHCODE IN (SELECT MH_CODE FROM multihospital)
-                            AND ARD_DATE <=
-                                    TO_DATE (:date3, 'dd/MM/yyyy hh24:mi:ss')
-                    UNION ALL
-                    SELECT SUM (NVL (ARN_AMOUNT, 0)) Amt, 0 tax
-                        FROM IPADVANCE
-                    WHERE (NVL (ARC_CANCEL, 'N') = 'N')
-                            AND ARD_DATE >=
-                                    TO_DATE (:date4, 'dd/MM/yyyy hh24:mi:ss')
-                            AND ARD_DATE <=
-                                    TO_DATE (:date5, 'dd/MM/yyyy hh24:mi:ss')
-                            AND IPADVANCE.IAC_MHCODE IN (SELECT MH_CODE FROM multihospital)
-                    UNION ALL
-                    SELECT SUM (NVL (ARN_AMOUNT, 0)) Amt, 0 tax
-                        FROM ADVANCEENTRY
-                    WHERE (NVL (ARC_CANCEL, 'N') = 'N')
-                            AND ARD_DATE >=
-                                    TO_DATE (:date6, 'dd/MM/yyyy hh24:mi:ss')
-                            AND ARD_DATE <=
-                                    TO_DATE (:date7, 'dd/MM/yyyy hh24:mi:ss')
-                            AND ADVANCEENTRY.ARC_MHCODE IN (SELECT MH_CODE FROM multihospital)`,
-                {
-                    date0: data.from,
-                    date1: data.to,
-                    date2: data.from,
-                    date3: data.to,
-                    date4: data.from,
-                    date5: data.to,
-                    date6: data.from,
-                    date7: data.to,
-                },
+            const result = await conn_ora.execute(sql,
+                {},
                 { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
             )
             await result.resultSet?.getRows((err, rows) => {
@@ -69,69 +53,57 @@ module.exports = {
             }
         }
     },
-    // Advance Refund (B)
-    advanceRefund: async (data, callBack) => {
+    advanceRefundTssh: async (data, callBack) => {
         let pool_ora = await oraConnection();
         let conn_ora = await pool_ora.getConnection();
+
+        const ipNumberList = data.ptno.join(',');
+        const fromDate = data.from;
+        const toDate = data.to;
+        const advanceRefndSql = `SELECT SUM (NVL (REFUNDOPADVANCE.RFN_AMT, 0)) Amt, 0 tax
+                FROM REFUNDOPADVANCE
+            WHERE REFUNDOPADVANCE.Rfc_Cancel = 'N'
+                    AND REFUNDOPADVANCE.Rfd_Date >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                    AND REFUNDOPADVANCE.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                    AND REFUNDOPADVANCE.Rfd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                    AND REFUNDOPADVANCE.AR_SLNO IN (SELECT AR_SLNO FROM OPADVANCE WHERE  IP_NO IN (${ipNumberList}))
+            HAVING SUM (NVL (REFUNDOPADVANCE.RFN_AMT, 0)) > 0
+            UNION ALL
+            SELECT SUM (NVL (REFUNDADVANCE.RFN_AMT, 0)) Amt, 0 tax
+                FROM REFUNDADVANCE
+            WHERE NVL (REFUNDADVANCE.RFC_CANCEL, 'N') = 'N'
+                    AND REFUNDADVANCE.Rfd_Date >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                    AND REFUNDADVANCE.RFC_MHCODE IN (SELECT MH_CODE FROM multihospital)
+                    AND REFUNDADVANCE.Rfd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                    AND REFUNDADVANCE.AR_SLNO IN (SELECT AR_SLNO FROM OPADVANCE WHERE  IP_NO IN (${ipNumberList}))
+            HAVING SUM (NVL (REFUNDADVANCE.RFN_AMT, 0)) > 0
+            UNION ALL
+            SELECT SUM ( (  NVL (Ipreceipt.irn_balance, 0) + NVL (Ipreceipt.IRN_REFCHEQ, 0) + NVL (Ipreceipt.irn_refcard, 0)))Amt,0 tax
+                FROM IPRECEIPT
+            WHERE DMC_TYPE = 'A' AND IRC_CANCEL IS NULL
+                    AND IPRECEIPT.IRD_DATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                    AND ipreceipt.IPC_MHCODE IN (SELECT MH_CODE FROM multihospital)
+                    AND IPRECEIPT.IRD_DATE <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                    AND IPRECEIPT.DMC_SLNO IN (SELECT DMC_SLNO 
+            FROM DISBILLMAST 
+            WHERE DMD_DATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss') 
+                    AND DMD_DATE <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss') 
+                    AND IP_NO IN (${ipNumberList}))
+            HAVING SUM (  (  NVL (Ipreceipt.irn_balance, 0) + NVL (Ipreceipt.IRN_REFCHEQ, 0)  + NVL (Ipreceipt.irn_refcard, 0))) > 0
+            UNION ALL
+            SELECT SUM (NVL (ADVANCERETURN.RAN_AMT, 0)) Amt, 0 tax
+                FROM ADVANCERETURN
+            WHERE (NVL (ADVANCERETURN.RAC_CANCEL, 'N') = 'N')
+                    AND ADVANCERETURN.RAD_DATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                    AND ADVANCERETURN.RAC_MHCODE IN (SELECT MH_CODE FROM multihospital)
+                    AND ADVANCERETURN.RAD_DATE <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                    AND ADVANCERETURN.AR_SLNO IN (SELECT AR_SLNO FROM OPADVANCE WHERE  IP_NO IN (${ipNumberList}))
+            HAVING SUM (NVL (ADVANCERETURN.RAN_AMT, 0)) > 0`;
+
         try {
             const result = await conn_ora.execute(
-                `SELECT SUM (NVL (REFUNDOPADVANCE.RFN_AMT, 0)) Amt, 0 tax
-                FROM REFUNDOPADVANCE
-               WHERE REFUNDOPADVANCE.Rfc_Cancel = 'N'
-                     AND REFUNDOPADVANCE.Rfd_Date >=
-                            TO_DATE (:date0, 'dd/MM/yyyy hh24:mi:ss')
-                     AND REFUNDOPADVANCE.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-                     AND REFUNDOPADVANCE.Rfd_Date <=
-                            TO_DATE (:date1, 'dd/MM/yyyy hh24:mi:ss')
-              HAVING SUM (NVL (REFUNDOPADVANCE.RFN_AMT, 0)) > 0
-              UNION ALL
-              SELECT SUM (NVL (REFUNDADVANCE.RFN_AMT, 0)) Amt, 0 tax
-                FROM REFUNDADVANCE
-               WHERE NVL (REFUNDADVANCE.RFC_CANCEL, 'N') = 'N'
-                     AND REFUNDADVANCE.Rfd_Date >=
-                            TO_DATE (:date2, 'dd/MM/yyyy hh24:mi:ss')
-                     AND REFUNDADVANCE.RFC_MHCODE IN (SELECT MH_CODE FROM multihospital)
-                     AND REFUNDADVANCE.Rfd_Date <=
-                            TO_DATE (:date3, 'dd/MM/yyyy hh24:mi:ss')
-              HAVING SUM (NVL (REFUNDADVANCE.RFN_AMT, 0)) > 0
-              UNION ALL
-              SELECT SUM (
-                        (  NVL (Ipreceipt.irn_balance, 0)
-                         + NVL (Ipreceipt.IRN_REFCHEQ, 0)
-                         + NVL (Ipreceipt.irn_refcard, 0)))
-                        Amt,
-                     0 tax
-                FROM IPRECEIPT
-               WHERE DMC_TYPE = 'A' AND IRC_CANCEL IS NULL
-                     AND IPRECEIPT.IRD_DATE >=
-                            TO_DATE (:date4, 'dd/MM/yyyy hh24:mi:ss')
-                     AND ipreceipt.IPC_MHCODE IN (SELECT MH_CODE FROM multihospital)
-                     AND IPRECEIPT.IRD_DATE <=
-                            TO_DATE (:date5, 'dd/MM/yyyy hh24:mi:ss')
-              HAVING SUM (
-                        (  NVL (Ipreceipt.irn_balance, 0)
-                         + NVL (Ipreceipt.IRN_REFCHEQ, 0)
-                         + NVL (Ipreceipt.irn_refcard, 0))) > 0
-              UNION ALL
-              SELECT SUM (NVL (ADVANCERETURN.RAN_AMT, 0)) Amt, 0 tax
-                FROM ADVANCERETURN
-               WHERE (NVL (ADVANCERETURN.RAC_CANCEL, 'N') = 'N')
-                     AND ADVANCERETURN.RAD_DATE >=
-                            TO_DATE (:date6, 'dd/MM/yyyy hh24:mi:ss')
-                     AND ADVANCERETURN.RAC_MHCODE IN (SELECT MH_CODE FROM multihospital)
-                     AND ADVANCERETURN.RAD_DATE <=
-                            TO_DATE (:date7, 'dd/MM/yyyy hh24:mi:ss')
-              HAVING SUM (NVL (ADVANCERETURN.RAN_AMT, 0)) > 0`,
-                {
-                    date0: data.from,
-                    date1: data.to,
-                    date2: data.from,
-                    date3: data.to,
-                    date4: data.from,
-                    date5: data.to,
-                    date6: data.from,
-                    date7: data.to,
-                },
+                advanceRefndSql,
+                {},
                 { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
             )
             await result.resultSet?.getRows((err, rows) => {
@@ -1188,5 +1160,5 @@ module.exports = {
                 await pool_ora.close();
             }
         }
-    },
+    }
 }
