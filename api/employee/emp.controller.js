@@ -1,19 +1,17 @@
 const { genSaltSync, hashSync, compareSync } = require("bcrypt");
 const { sign } = require("jsonwebtoken");
-const { employeeDelete, employeeGetById, employeeInsert, employeeResetPass, employeeUpdate, getEmployee, getEmployeeByUserName, EmployeeAlreadyExist, searchEmployee, viewEmployee } = require("../employee/emp.service");
+
+const { employeeDelete, employeeGetById, employeeInsert, employeeResetPass, employeeUpdate, getEmployee, getEmployeeByUserName, EmployeeAlreadyExist, searchEmployee, viewEmployee }
+    = require("../employee/emp.service");
+
 const { add } = require("date-fns");
 
 module.exports = {
-
     employeeInsert: (req, res) => {
         const body = req.body;
-
         EmployeeAlreadyExist(body, (err, results) => {
-
             const value = JSON.parse(JSON.stringify(results))
-
             if (Object.keys(value).length === 0) {
-
                 const salt = genSaltSync(10);
                 let usc_pass = body.usc_pass;
                 body.usc_pass = hashSync(usc_pass, salt);
@@ -68,9 +66,8 @@ module.exports = {
     },
 
     viewEmployee: (req, res) => {
-
         viewEmployee((err, results) => {
-
+            console.log(results);
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -94,9 +91,7 @@ module.exports = {
 
 
     searchEmployee: (req, res) => {
-
         const body = req.body;
-
         searchEmployee(body, (err, results) => {
             if (err) {
                 return res.status(400).json({
@@ -165,6 +160,7 @@ module.exports = {
             });
         });
     },
+
     employeeGetById: (req, res) => {
         const id = req.params.id;
         employeeGetById(id, (err, results) => {

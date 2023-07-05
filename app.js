@@ -6,6 +6,11 @@ const app = express();
 
 //IMPORT MODULES
 const emplyeeRoutes = require("./api/employee/emp.router");
+const oracleUserTable = require("./api/Reports/oraUsers/user.router");
+
+const usgroup = require("./api/newUsergroup/newgroup.router");
+const menugroup = require("./api/MenuGroup/menugroup.router");
+const userright = require("./api/userRights/userRights.router");
 const oracleUserTable = require("./api/Reports/oraUsers/user.router")
 //QMT
 const collection = require("./api/Reports/misReport/collectionPart/collection.router")
@@ -46,6 +51,11 @@ app.use("/api/income", income)
 app.use("/api/collectionTssh", collectionTssh)
 //GENERAL
 app.use("/api/admission", admissionList)
+app.use("/api/usergroup", usgroup)
+app.use("/api/menugroups", menugroup)
+app.use("/api/userrights", userright)
+
+
 
 app.listen(process.env.APP_PORT, (val) => {
     console.log(`Server Up and Running ${process.env.APP_PORT}`)
