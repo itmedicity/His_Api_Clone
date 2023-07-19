@@ -94,7 +94,7 @@ module.exports = {
         const body = req.body;
         searchEmployee(body, (err, results) => {
             if (err) {
-                return res.status(400).json({
+                return res.status(200).json({
                     success: 0,
                     message: err
                 })
@@ -188,14 +188,14 @@ module.exports = {
         const body = req.body;
         employeeDelete(body, (err, results) => {
             if (err) {
-                return res.status(400).json({
+                return res.status(200).json({
                     success: 0,
                     message: res.err
                 });
             }
 
             if (!results) {
-                return res.status(400).json({
+                return res.status(200).json({
                     success: 1,
                     message: "Record Not Found"
                 });
