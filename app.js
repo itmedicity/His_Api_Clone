@@ -11,7 +11,7 @@ const oracleUserTable = require("./api/Reports/oraUsers/user.router");
 const usgroup = require("./api/newUsergroup/newgroup.router");
 const menugroup = require("./api/MenuGroup/menugroup.router");
 const userright = require("./api/userRights/userRights.router");
-const oracleUserTable = require("./api/Reports/oraUsers/user.router")
+// const oracleUserTable = require("./api/Reports/oraUsers/user.router")
 //QMT
 const collection = require("./api/Reports/misReport/collectionPart/collection.router")
 const patientTypeDiscount = require("./api/Reports/misReport/PatientType/patientType.router")
@@ -22,6 +22,10 @@ const collectionTssh = require('./api/Reports/misReportTssh/collectionPart/colle
 
 //GENERAL PURPOSE
 const admissionList = require("./api/Reports/InpatientList/admissionList.router")
+
+//ROL SETTING
+const importMedicine = require("./api/MedicineDescription/medicine.router");
+const storerequest = require("./api/StoreRequisition/storereq.router");
 
 app.use(express.json());
 
@@ -54,6 +58,9 @@ app.use("/api/admission", admissionList)
 app.use("/api/usergroup", usgroup)
 app.use("/api/menugroups", menugroup)
 app.use("/api/userrights", userright)
+// ROL
+app.use("/api/importMedicines", importMedicine)
+app.use("/api/storerequest", storerequest)
 
 
 
