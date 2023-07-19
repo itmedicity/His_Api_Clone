@@ -6,8 +6,6 @@ const app = express();
 
 //IMPORT MODULES
 const emplyeeRoutes = require("./api/employee/emp.router");
-const oracleUserTable = require("./api/Reports/oraUsers/user.router");
-
 const usgroup = require("./api/newUsergroup/newgroup.router");
 const menugroup = require("./api/MenuGroup/menugroup.router");
 const userright = require("./api/userRights/userRights.router");
