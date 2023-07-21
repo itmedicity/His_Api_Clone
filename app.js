@@ -25,6 +25,7 @@ const admissionList = require("./api/Reports/InpatientList/admissionList.router"
 //ROL SETTING
 const importMedicine = require("./api/MedicineDescription/medicine.router");
 const storerequest = require("./api/StoreRequisition/storereq.router");
+const rolprocess = require("./api/process/rolProcess/rolProcess.router");
 
 app.use(express.json());
 
@@ -44,7 +45,7 @@ app.use((req, res, next) => {
 
 //MAP ROUTES
 app.use("/api/employee", emplyeeRoutes)
-app.use("/api/oraUser", oracleUserTable)
+// app.use("/api/oraUser", oracleUserTable)
 //QMT
 app.use("/api/collection", collection)
 app.use("/api/patientType", patientTypeDiscount)
@@ -60,6 +61,7 @@ app.use("/api/userrights", userright)
 // ROL
 app.use("/api/importMedicines", importMedicine)
 app.use("/api/storerequest", storerequest)
+app.use("/api/rolprocess", rolprocess)
 
 
 
