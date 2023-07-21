@@ -447,179 +447,138 @@ module.exports = {
     proIncomePart2Tmch: async (data, callBack) => {
         let pool_ora = await oraConnection();
         let conn_ora = await pool_ora.getConnection();
+
+        const ipNumberList = data.ptno.join(',');
+        const fromDate = data.from;
+        const toDate = data.to;
+
+        const sql = `SELECT Misincexpgroup.Dg_desc,
+                                Misincexpgroup.Dg_grcode AS Code,
+                                SUM (refundbilldetl.rfn_netamt) * -1 Amt,
+                                SUM (NVL (REFUNDBILLDETL.RFN_TOTTAX, 0)) * -1 tax,
+                                SUM ( NVL (refundbilldetl.rfn_netamt, 0) + NVL (refundbilldetl.rfn_disamt, 0)) * -1 GrossAmt,
+                                SUM (0) AS Comp,
+                                SUM (NVL (refundbilldetl.rfn_disamt, 0)) * -1 discount
+                        FROM Refundbilldetl,
+                                Refundbillmast,
+                                Billdetl,
+                                Opbillmast,
+                                Prodescription,
+                                Progroup,
+                                Misincexpdtl,
+                                Misincexpgroup
+                        WHERE  Refundbilldetl.Bmc_Slno = Billdetl.Bmc_Slno
+                                AND Billdetl.Opc_Slno = Opbillmast.Opc_Slno
+                                AND Refundbillmast.Rfc_Slno = Refundbilldetl.Rfc_Slno
+                                AND Refundbilldetl.Bmc_Cnt = Billdetl.Bmc_Cnt
+                                AND Refundbilldetl.Pd_Code = Prodescription.Pd_Code
+                                AND Prodescription.Pg_Code = Progroup.Pg_Code
+                                AND Misincexpdtl.dg_grcode = Misincexpgroup.dg_grcode
+                                AND Misincexpdtl.Dg_type = 'R'
+                                AND Misincexpdtl.Pc_code = Progroup.pc_code
+                                AND Refundbillmast.Rfc_Cacr IN ('O')
+                                AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
+                                AND NVL (Refundbilldetl.Rfc_Cancel, 'N') = 'N'
+                                AND Opbillmast.Opc_Cacr <> 'M'
+                                AND Opbillmast.Opd_date >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                AND Opbillmast.Opd_date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                        GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
+                        UNION ALL
+                        SELECT Misincexpgroup.Dg_desc,
+                                Misincexpgroup.Dg_grcode AS Code,
+                                SUM (refundbilldetl.rfn_netamt) * -1 Amt,
+                                SUM (NVL (REFUNDBILLDETL.RFN_TOTTAX, 0)) * -1 tax,
+                                SUM ( NVL (refundbilldetl.rfn_netamt, 0) + NVL (refundbilldetl.rfn_disamt, 0)) * -1GrossAmt,
+                                SUM (0) AS Comp,
+                                SUM (NVL (refundbilldetl.rfn_disamt, 0)) * -1 discount
+                        FROM Billmast,
+                                Refundbilldetl,
+                                Refundbillmast,
+                                Disbillmast,
+                                Prodescription,
+                                Progroup,
+                                Misincexpdtl,
+                                Misincexpgroup
+                        WHERE     Billmast.Bmc_Slno = Refundbilldetl.Bmc_Slno
+                                AND Billmast.Dmc_Slno = Disbillmast.Dmc_Slno
+                                AND Refundbilldetl.Pd_Code = Prodescription.Pd_code
+                                AND Prodescription.Pg_code = Progroup.Pg_code
+                                AND Refundbillmast.Rfc_Slno = Refundbilldetl.Rfc_Slno
+                                AND Misincexpdtl.dg_grcode = Misincexpgroup.dg_grcode
+                                AND Misincexpdtl.Dg_type = 'R'
+                                AND Misincexpdtl.Pc_code = Progroup.pc_code
+                                AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
+                                AND NVL (Refundbilldetl.Rfc_Cancel, 'N') = 'N'
+                                AND Refundbillmast.Rfc_Cacr IN ('I')
+                                AND Disbillmast.Dmc_Cacr <> 'M'
+                                AND Disbillmast.dmd_date >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                AND Disbillmast.dmd_date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                AND DISBILLMAST.IP_NO NOT IN (${ipNumberList})
+                                AND DISBILLMAST.MH_CODE NOT IN (SELECT MH_CODE FROM multihospital)
+                        GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
+                        UNION ALL
+                        SELECT Misincexpgroup.Dg_desc,
+                                Misincexpgroup.Dg_grcode AS Code,
+                                SUM (receiptdetl.rpn_netamt) Amt,
+                                SUM (NVL (Receiptdetl.RPN_TOTTAX, 0)) tax,
+                                SUM ( NVL (receiptdetl.rpn_netamt, 0) + NVL (receiptdetl.rpn_disamt, 0)) GrossAmt,
+                                SUM (0) AS Comp,
+                                SUM (NVL (receiptdetl.rpn_disamt, 0)) discount
+                        FROM Receiptdetl,
+                                Receiptmast,
+                                Prodescription,
+                                Progroup,
+                                Misincexpdtl,
+                                Misincexpgroup,
+                                Opbillmast
+                        WHERE     Receiptmast.RPC_SLNO = Receiptdetl.RPC_SLNO
+                                AND Receiptdetl.Opc_Slno = Opbillmast.Opc_Slno
+                                AND Receiptdetl.pd_code = Prodescription.pd_code
+                                AND Prodescription.pg_code = Progroup.pg_code
+                                AND Misincexpdtl.dg_grcode = Misincexpgroup.dg_grcode
+                                AND Misincexpdtl.Dg_type = 'R'
+                                AND Misincexpdtl.Pc_code = Progroup.pc_code
+                                AND Receiptmast.RPC_CANCEL IS NULL
+                                AND NVL (Opbillmast.Opn_cancel, 'N') = 'N'
+                                AND Opbillmast.Opc_Cacr <> 'M'
+                                AND Receiptmast.RPC_CAcr = 'O'
+                                AND Opbillmast.Opd_date >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                AND Opbillmast.Opd_date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                        GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
+                        UNION ALL
+                        SELECT Misincexpgroup.DG_DESC,
+                                Misincexpgroup.DG_GRCODE AS Code,
+                                SUM ( DECODE ( billmast.Bmc_Cacr, 'C', (Billdetl.pdn_rate * pdn_qty) - NVL (Billdetl.bmn_disamt, 0),'R', (Billdetl.pdn_rate * pdn_qty) - NVL (Billdetl.bmn_disamt, 0), 0)) Amt,
+                                SUM (NVL (Billdetl.BDN_TOTTAX, 0)) tax,
+                                SUM ( DECODE (billmast.Bmc_Cacr,   'C', (Billdetl.pdn_rate * pdn_qty),  'R', (Billdetl.pdn_rate * pdn_qty))) GrossAmt,
+                                SUM ( DECODE ( billmast.Bmc_Cacr,  'M', (Billdetl.pdn_rate * pdn_qty) - NVL (Billdetl.bmn_disamt, 0), 0)) AS Comp,
+                                SUM ( DECODE (billmast.Bmc_Cacr,   'C', (Billdetl.bmn_disamt),  'R', (Billdetl.bmn_disamt))) Discount
+                        FROM Billmast,
+                                Billdetl,
+                                Misincexpdtl,
+                                Prodescription,
+                                Progroup,
+                                Misincexpgroup
+                        WHERE     Billmast.Bmc_Slno = Billdetl.Bmc_Slno
+                                AND billmast.BMC_COLLCNCODE IS NULL
+                                AND Billdetl.pd_code = Prodescription.pd_code
+                                AND Prodescription.pg_code = Progroup.pg_code
+                                AND Progroup.pc_code = Misincexpdtl.pc_code
+                                AND Misincexpdtl.dg_grcode = Misincexpgroup.dg_grcode
+                                AND Misincexpdtl.Dg_type = 'R'
+                                AND Billmast.Bmc_Cacr IN ('C', 'R')
+                                AND NVL (Billmast.BMC_CANCEL, 'N') = 'N'
+                                AND Billmast.BMD_DATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                AND billmast.mh_code IN (SELECT MH_CODE FROM multihospital)
+                                AND Billmast.Bmd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                        GROUP BY Misincexpgroup.DG_GRCODE, Misincexpgroup.DG_DESC`;
+
         try {
             const result = await conn_ora.execute(
-                `SELECT Misincexpgroup.Dg_desc,
-                            Misincexpgroup.Dg_grcode AS Code,
-                            SUM (refundbilldetl.rfn_netamt) * -1 Amt,
-                            SUM (NVL (REFUNDBILLDETL.RFN_TOTTAX, 0)) * -1 tax,
-                            SUM (
-                            NVL (refundbilldetl.rfn_netamt, 0)
-                            + NVL (refundbilldetl.rfn_disamt, 0))
-                            * -1
-                            GrossAmt,
-                            SUM (0) AS Comp,
-                            SUM (NVL (refundbilldetl.rfn_disamt, 0)) * -1 discount
-                    FROM Refundbilldetl,
-                            Refundbillmast,
-                            Billdetl,
-                            Opbillmast,
-                            Prodescription,
-                            Progroup,
-                            Misincexpdtl,
-                            Misincexpgroup
-                    WHERE     Refundbilldetl.Bmc_Slno = Billdetl.Bmc_Slno
-                            AND Billdetl.Opc_Slno = Opbillmast.Opc_Slno
-                            AND Refundbillmast.Rfc_Slno = Refundbilldetl.Rfc_Slno
-                            AND Refundbilldetl.Bmc_Cnt = Billdetl.Bmc_Cnt
-                            AND Refundbilldetl.Pd_Code = Prodescription.Pd_Code
-                            AND Prodescription.Pg_Code = Progroup.Pg_Code
-                            AND Misincexpdtl.dg_grcode = Misincexpgroup.dg_grcode
-                            AND Misincexpdtl.Dg_type = 'R'
-                            AND Misincexpdtl.Pc_code = Progroup.pc_code
-                            AND Refundbillmast.Rfc_Cacr IN ('O')
-                            AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
-                            AND NVL (Refundbilldetl.Rfc_Cancel, 'N') = 'N'
-                            AND Opbillmast.Opc_Cacr <> 'M'
-                            AND Opbillmast.Opd_date >=
-                                TO_DATE (:date1, 'dd/MM/yyyy hh24:mi:ss')
-                            AND Opbillmast.Opd_date <=
-                                TO_DATE (:date2, 'dd/MM/yyyy hh24:mi:ss')
-                            AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-                GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
-                UNION ALL
-                    SELECT Misincexpgroup.Dg_desc,
-                            Misincexpgroup.Dg_grcode AS Code,
-                            SUM (refundbilldetl.rfn_netamt) * -1 Amt,
-                            SUM (NVL (REFUNDBILLDETL.RFN_TOTTAX, 0)) * -1 tax,
-                            SUM (
-                            NVL (refundbilldetl.rfn_netamt, 0)
-                            + NVL (refundbilldetl.rfn_disamt, 0))
-                            * -1
-                            GrossAmt,
-                            SUM (0) AS Comp,
-                            SUM (NVL (refundbilldetl.rfn_disamt, 0)) * -1 discount
-                    FROM Billmast,
-                            Refundbilldetl,
-                            Refundbillmast,
-                            Disbillmast,
-                            Prodescription,
-                            Progroup,
-                            Misincexpdtl,
-                            Misincexpgroup
-                    WHERE     Billmast.Bmc_Slno = Refundbilldetl.Bmc_Slno
-                            AND Billmast.Dmc_Slno = Disbillmast.Dmc_Slno
-                            AND Refundbilldetl.Pd_Code = Prodescription.Pd_code
-                            AND Prodescription.Pg_code = Progroup.Pg_code
-                            AND Refundbillmast.Rfc_Slno = Refundbilldetl.Rfc_Slno
-                            AND Misincexpdtl.dg_grcode = Misincexpgroup.dg_grcode
-                            AND Misincexpdtl.Dg_type = 'R'
-                            AND Misincexpdtl.Pc_code = Progroup.pc_code
-                            AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
-                            AND NVL (Refundbilldetl.Rfc_Cancel, 'N') = 'N'
-                            AND Refundbillmast.Rfc_Cacr IN ('I')
-                            AND Disbillmast.Dmc_Cacr <> 'M'
-                            AND Disbillmast.dmd_date >=
-                                TO_DATE (:date3, 'dd/MM/yyyy hh24:mi:ss')
-                            AND Disbillmast.dmd_date <=
-                                TO_DATE (:date4, 'dd/MM/yyyy hh24:mi:ss')
-                            AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-                GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
-                UNION ALL
-                    SELECT Misincexpgroup.Dg_desc,
-                            Misincexpgroup.Dg_grcode AS Code,
-                            SUM (receiptdetl.rpn_netamt) Amt,
-                            SUM (NVL (Receiptdetl.RPN_TOTTAX, 0)) tax,
-                            SUM (
-                            NVL (receiptdetl.rpn_netamt, 0) + NVL (receiptdetl.rpn_disamt, 0))
-                            GrossAmt,
-                            SUM (0) AS Comp,
-                            SUM (NVL (receiptdetl.rpn_disamt, 0)) discount
-                    FROM Receiptdetl,
-                            Receiptmast,
-                            Prodescription,
-                            Progroup,
-                            Misincexpdtl,
-                            Misincexpgroup,
-                            Opbillmast
-                    WHERE     Receiptmast.RPC_SLNO = Receiptdetl.RPC_SLNO
-                            AND Receiptdetl.Opc_Slno = Opbillmast.Opc_Slno
-                            AND Receiptdetl.pd_code = Prodescription.pd_code
-                            AND Prodescription.pg_code = Progroup.pg_code
-                            AND Misincexpdtl.dg_grcode = Misincexpgroup.dg_grcode
-                            AND Misincexpdtl.Dg_type = 'R'
-                            AND Misincexpdtl.Pc_code = Progroup.pc_code
-                            AND Receiptmast.RPC_CANCEL IS NULL
-                            AND NVL (Opbillmast.Opn_cancel, 'N') = 'N'
-                            AND Opbillmast.Opc_Cacr <> 'M'
-                            AND Receiptmast.RPC_CAcr = 'O'
-                            AND Opbillmast.Opd_date >=
-                                TO_DATE (:date5, 'dd/MM/yyyy hh24:mi:ss')
-                            AND Opbillmast.Opd_date <=
-                                TO_DATE (:date6, 'dd/MM/yyyy hh24:mi:ss')
-                            AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-                GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
-                UNION ALL
-                    SELECT Misincexpgroup.DG_DESC,
-                            Misincexpgroup.DG_GRCODE AS Code,
-                            SUM (
-                            DECODE (
-                                billmast.Bmc_Cacr,
-                                'C', (Billdetl.pdn_rate * pdn_qty)
-                                    - NVL (Billdetl.bmn_disamt, 0),
-                                'R', (Billdetl.pdn_rate * pdn_qty)
-                                    - NVL (Billdetl.bmn_disamt, 0),
-                                0))
-                            Amt,
-                            SUM (NVL (Billdetl.BDN_TOTTAX, 0)) tax,
-                            SUM (
-                            DECODE (billmast.Bmc_Cacr,
-                                    'C', (Billdetl.pdn_rate * pdn_qty),
-                                    'R', (Billdetl.pdn_rate * pdn_qty)))
-                            GrossAmt,
-                            SUM (
-                            DECODE (
-                                billmast.Bmc_Cacr,
-                                'M', (Billdetl.pdn_rate * pdn_qty)
-                                    - NVL (Billdetl.bmn_disamt, 0),
-                                0))
-                            AS Comp,
-                            SUM (
-                            DECODE (billmast.Bmc_Cacr,
-                                    'C', (Billdetl.bmn_disamt),
-                                    'R', (Billdetl.bmn_disamt)))
-                            Discount
-                    FROM Billmast,
-                            Billdetl,
-                            Misincexpdtl,
-                            Prodescription,
-                            Progroup,
-                            Misincexpgroup
-                    WHERE     Billmast.Bmc_Slno = Billdetl.Bmc_Slno
-                            AND billmast.BMC_COLLCNCODE IS NULL
-                            AND Billdetl.pd_code = Prodescription.pd_code
-                            AND Prodescription.pg_code = Progroup.pg_code
-                            AND Progroup.pc_code = Misincexpdtl.pc_code
-                            AND Misincexpdtl.dg_grcode = Misincexpgroup.dg_grcode
-                            AND Misincexpdtl.Dg_type = 'R'
-                            AND Billmast.Bmc_Cacr IN ('C', 'R')
-                            AND NVL (Billmast.BMC_CANCEL, 'N') = 'N'
-                            AND Billmast.BMD_DATE >=
-                                TO_DATE (:date7, 'dd/MM/yyyy hh24:mi:ss')
-                            AND billmast.mh_code IN (SELECT MH_CODE FROM multihospital)
-                            AND Billmast.Bmd_Date <=
-                                TO_DATE (:date8, 'dd/MM/yyyy hh24:mi:ss')
-                GROUP BY Misincexpgroup.DG_GRCODE, Misincexpgroup.DG_DESC`,
-                {
-                    date1: data.from,
-                    date2: data.to,
-                    date3: data.from,
-                    date4: data.to,
-                    date5: data.from,
-                    date6: data.to,
-                    date7: data.from,
-                    date8: data.to,
-                },
+                sql,
+                {},
                 { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
             )
             await result.resultSet?.getRows((err, rows) => {
@@ -637,12 +596,14 @@ module.exports = {
     proIncomePart3Tmch: async (data, callBack) => {
         let pool_ora = await oraConnection();
         let conn_ora = await pool_ora.getConnection();
-        try {
-            const result = await conn_ora.execute(
-                `SELECT Misincexpgroup.Dg_desc,
+
+        const ipNumberList = data.ptno.join(',');
+        const fromDate = data.from;
+        const toDate = data.to;
+
+        const sql = `SELECT Misincexpgroup.Dg_desc,
                             Misincexpgroup.Dg_grcode AS Code,
-                            SUM ( (Billdetl.pdn_rate * pdn_qty) - NVL (Billdetl.bmn_disamt, 0))
-                            Amt,
+                            SUM ( (Billdetl.pdn_rate * pdn_qty) - NVL (Billdetl.bmn_disamt, 0)) Amt,
                             SUM (NVL (Billdetl.BDN_TOTTAX, 0)) tax,
                             SUM ( (Billdetl.pdn_rate * pdn_qty)) GrossAmt,
                             SUM (0) AS Comp,
@@ -654,7 +615,7 @@ module.exports = {
                             Misincexpdtl,
                             Misincexpgroup,
                             Opbillmast
-                    WHERE     Billmast.Bmc_Slno = Billdetl.Bmc_Slno
+                    WHERE Billmast.Bmc_Slno = Billdetl.Bmc_Slno
                             AND Billdetl.Opc_Slno = Opbillmast.Opc_Slno
                             AND Billdetl.pd_code = Prodescription.pd_code
                             AND Prodescription.pg_code = Progroup.pg_code
@@ -665,49 +626,25 @@ module.exports = {
                             AND Billmast.Bmc_Cacr = 'O'
                             AND NVL (Billmast.BMC_CANCEL, 'N') = 'N'
                             AND NVL (Opbillmast.Opn_cancel, 'N') = 'N'
-                            AND Opbillmast.Opd_date >=
-                                TO_DATE (:date1, 'dd/MM/yyyy hh24:mi:ss')
-                            AND Opbillmast.Opd_date <=
-                                TO_DATE (:date2, 'dd/MM/yyyy hh24:mi:ss')
+                            AND Opbillmast.Opd_date >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                            AND Opbillmast.Opd_date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
                             AND billmast.mh_code IN (SELECT MH_CODE FROM multihospital)
-                GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
-                UNION ALL
+                    GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
+                    UNION ALL
                     SELECT Misincexpgroup.DG_DESC,
                             Misincexpgroup.DG_GRCODE AS Code,
-                            SUM (
-                            DECODE (
-                                billmast.Bmc_Cacr,
-                                'C', (Billdetl.pdn_rate * pdn_qty)
-                                    - NVL (Billdetl.bmn_disamt, 0),
-                                'R', (Billdetl.pdn_rate * pdn_qty)
-                                    - NVL (Billdetl.bmn_disamt, 0),
-                                0))
-                            Amt,
+                            SUM ( DECODE ( billmast.Bmc_Cacr,  'C', (Billdetl.pdn_rate * pdn_qty)  - NVL (Billdetl.bmn_disamt, 0), 'R', (Billdetl.pdn_rate * pdn_qty) - NVL (Billdetl.bmn_disamt, 0),  0))  Amt,
                             SUM (NVL (Billdetl.BDN_TOTTAX, 0)) tax,
-                            SUM (
-                            DECODE (billmast.Bmc_Cacr,
-                                    'C', (Billdetl.pdn_rate * pdn_qty),
-                                    'R', (Billdetl.pdn_rate * pdn_qty)))
-                            GrossAmt,
-                            SUM (
-                            DECODE (
-                                billmast.Bmc_Cacr,
-                                'M', (Billdetl.pdn_rate * pdn_qty)
-                                    - NVL (Billdetl.bmn_disamt, 0),
-                                0))
-                            AS Comp,
-                            SUM (
-                            DECODE (billmast.Bmc_Cacr,
-                                    'C', (Billdetl.bmn_disamt),
-                                    'R', (Billdetl.bmn_disamt)))
-                            Discount
+                            SUM ( DECODE (billmast.Bmc_Cacr,  'C', (Billdetl.pdn_rate * pdn_qty),  'R', (Billdetl.pdn_rate * pdn_qty))) GrossAmt,
+                            SUM ( DECODE ( billmast.Bmc_Cacr,  'M', (Billdetl.pdn_rate * pdn_qty)  - NVL (Billdetl.bmn_disamt, 0), 0)) AS Comp,
+                            SUM ( DECODE (billmast.Bmc_Cacr,  'C', (Billdetl.bmn_disamt),  'R', (Billdetl.bmn_disamt))) Discount
                     FROM Billmast,
                             Billdetl,
                             Misincexpdtl,
                             Prodescription,
                             Progroup,
                             Misincexpgroup
-                    WHERE     Billmast.Bmc_Slno = Billdetl.Bmc_Slno
+                    WHERE Billmast.Bmc_Slno = Billdetl.Bmc_Slno
                             AND billmast.BMC_COLLCNCODE IS NOT NULL
                             AND Billdetl.pd_code = Prodescription.pd_code
                             AND Prodescription.pg_code = Progroup.pg_code
@@ -716,17 +653,14 @@ module.exports = {
                             AND Misincexpdtl.Dg_type = 'R'
                             AND Billmast.Bmc_Cacr IN ('C', 'R')
                             AND NVL (Billmast.BMC_CANCEL, 'N') = 'N'
-                            AND Billmast.BMD_COLLDATE >=
-                                TO_DATE (:date3, 'dd/MM/yyyy hh24:mi:ss')
+                            AND Billmast.BMD_COLLDATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
                             AND billmast.mh_code IN (SELECT MH_CODE FROM multihospital)
-                            AND Billmast.BMD_COLLDATE <=
-                                TO_DATE (:date4, 'dd/MM/yyyy hh24:mi:ss')
-                GROUP BY Misincexpgroup.DG_GRCODE, Misincexpgroup.DG_DESC
-                UNION ALL
+                            AND Billmast.BMD_COLLDATE <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                    GROUP BY Misincexpgroup.DG_GRCODE, Misincexpgroup.DG_DESC
+                    UNION ALL
                     SELECT Misincexpgroup.Dg_desc,
                             Misincexpgroup.Dg_grcode AS Code,
-                            SUM ( (Billdetl.pdn_rate * pdn_qty) - NVL (Billdetl.bmn_disamt, 0))
-                            Amt,
+                            SUM ( (Billdetl.pdn_rate * pdn_qty) - NVL (Billdetl.bmn_disamt, 0)) Amt,
                             SUM (NVL (Billdetl.BDN_TOTTAX, 0)) tax,
                             SUM ( (Billdetl.pdn_rate * pdn_qty)) GrossAmt,
                             SUM (0) AS Comp,
@@ -738,7 +672,7 @@ module.exports = {
                             Misincexpdtl,
                             Misincexpgroup,
                             Disbillmast
-                    WHERE     Billmast.Bmc_Slno = Billdetl.Bmc_Slno
+                    WHERE Billmast.Bmc_Slno = Billdetl.Bmc_Slno
                             AND Billmast.Dmc_Slno = Disbillmast.Dmc_Slno
                             AND Billdetl.pd_code = Prodescription.pd_code
                             AND Prodescription.pg_code = Progroup.pg_code
@@ -749,20 +683,15 @@ module.exports = {
                             AND Billmast.Bmc_Cacr = 'I'
                             AND NVL (Billmast.BMC_CANCEL, 'N') = 'N'
                             AND NVL (Disbillmast.Dmc_cancel, 'N') = 'N'
-                            AND Disbillmast.dmd_date >=
-                                TO_DATE (:date5, 'dd/MM/yyyy hh24:mi:ss')
+                            AND Disbillmast.dmd_date >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
                             AND billmast.mh_code IN (SELECT MH_CODE FROM multihospital)
-                            AND Disbillmast.dmd_date <=
-                                TO_DATE (:date6, 'dd/MM/yyyy hh24:mi:ss')
-                GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc`,
-                {
-                    date1: data.from,
-                    date2: data.to,
-                    date3: data.from,
-                    date4: data.to,
-                    date5: data.from,
-                    date6: data.to
-                },
+                            AND Disbillmast.dmd_date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                            AND DISBILLMAST.IP_NO NOT IN (${ipNumberList})
+                    GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc`;
+        try {
+            const result = await conn_ora.execute(
+                sql,
+                {},
                 { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
             )
             await result.resultSet?.getRows((err, rows) => {
@@ -780,211 +709,156 @@ module.exports = {
     proIncomePart4Tmch: async (data, callBack) => {
         let pool_ora = await oraConnection();
         let conn_ora = await pool_ora.getConnection();
+
+        const fromDate = data.from;
+        const toDate = data.to;
+
+        const sql = ` SELECT Misincexpgroup.Dg_desc,
+                                Misincexpgroup.Dg_grcode AS Code,
+                                SUM ( DECODE (Receiptmast.RPC_CAcr,   'C', receiptdetl.rpn_netamt,  'R', receiptdetl.rpn_netamt,  0))  Amt,
+                                SUM (NVL (Receiptdetl.RPN_TOTTAX, 0)) tax,
+                                SUM ( DECODE (Receiptmast.RPC_CAcr,  'C', receiptdetl.rpn_netamt,  'R', receiptdetl.rpn_netamt,  0)  + NVL (receiptdetl.rpn_disamt, 0)) GrossAmt,
+                                SUM (DECODE (Receiptmast.rpc_cacr, 'M', receiptdetl.rpn_netamt, 0)) AS Comp,
+                                SUM (NVL (receiptdetl.rpn_disamt, 0)) discount
+                        FROM Receiptdetl,
+                                Receiptmast,
+                                Prodescription,
+                                Progroup,
+                                Misincexpdtl,
+                                Misincexpgroup
+                        WHERE receiptmast.RPC_COLLCNCODE IS NOT NULL
+                                AND Receiptmast.RPC_SLNO = Receiptdetl.RPC_SLNO
+                                AND Receiptdetl.pd_code = Prodescription.pd_code
+                                AND Prodescription.pg_code = Progroup.pg_code
+                                AND Misincexpdtl.dg_grcode = Misincexpgroup.dg_grcode
+                                AND Misincexpdtl.Dg_type = 'R'
+                                AND Misincexpdtl.Pc_code = Progroup.pc_code
+                                AND (NVL (RECEIPTMAST.RPC_CANCEL, 'N') = 'N')
+                                AND Receiptmast.RPC_CAcr IN ('C', 'R')
+                                AND Receiptmast.RPD_COLLDATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                AND Receiptmast.RPD_COLLDATE <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                        HAVING SUM ( DECODE (Receiptmast.RPC_CAcr,   'C', receiptdetl.rpn_netamt,  'R', receiptdetl.rpn_netamt, 0)) <> 0
+                        GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
+                        UNION ALL
+                        SELECT Misincexpgroup.Dg_desc,
+                                Misincexpgroup.Dg_grcode AS Code,
+                                SUM (Refundreceiptdetl.rpn_netamt) * -1 Amt,
+                                SUM (NVL (Refundreceiptdetl.RFN_TOTTAX, 0)) * -1 tax,
+                                SUM ( NVL (Refundreceiptdetl.rpn_netamt, 0)  + NVL (Refundreceiptdetl.rpn_disamt, 0)) * -1 GrossAmt,
+                                SUM (0) AS Comp,
+                                SUM (NVL (Refundreceiptdetl.rpn_disamt, 0)) * -1 discount
+                        FROM Refundreceiptdetl,
+                                Refundreceiptmast,
+                                Receiptdetl,
+                                Opbillmast,
+                                Prodescription,
+                                Progroup,
+                                Misincexpdtl,
+                                Misincexpgroup
+                        WHERE     Refundreceiptdetl.Rpc_Slno = Receiptdetl.Rpc_Slno
+                                AND Refundreceiptdetl.Rpc_Cnt = Receiptdetl.Rpc_Cnt
+                                AND Refundreceiptmast.Rfc_Slno = Refundreceiptdetl.Rfc_Slno
+                                AND Receiptdetl.Opc_Slno = Opbillmast.Opc_Slno
+                                AND Refundreceiptdetl.Pd_Code = Prodescription.Pd_Code
+                                AND Prodescription.Pg_Code = Progroup.Pg_Code
+                                AND Misincexpdtl.dg_grcode = Misincexpgroup.dg_grcode
+                                AND Misincexpdtl.Dg_type = 'R'
+                                AND Misincexpdtl.Pc_code = Progroup.pc_code
+                                AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
+                                AND NVL (Refundreceiptdetl.Rfc_Cancel, 'N') = 'N'
+                                AND Refundreceiptmast.Rfc_Cacr IN ('O')
+                                AND Opbillmast.Opc_Cacr <> 'M'
+                                AND Opbillmast.Opd_date >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                                AND Opbillmast.Opd_date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                        GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
+                        UNION ALL
+                        SELECT Misincexpgroup.Dg_desc,
+                                Misincexpgroup.Dg_grcode AS Code,
+                                SUM (Refundreceiptdetl.rpn_netamt) * -1 Amt,
+                                SUM (NVL (Refundreceiptdetl.RFN_TOTTAX, 0)) * -1 tax,
+                                SUM ( NVL (Refundreceiptdetl.rpn_netamt, 0) + NVL (Refundreceiptdetl.rpn_disamt, 0))  * -1 GrossAmt,
+                                SUM (0) AS Comp,
+                                SUM (NVL (Refundreceiptdetl.rpn_disamt, 0)) * -1 discount
+                        FROM Refundreceiptdetl,
+                                Refundreceiptmast,
+                                Prodescription,
+                                Progroup,
+                                Misincexpdtl,
+                                Misincexpgroup
+                        WHERE     Refundreceiptmast.Rfc_Slno = Refundreceiptdetl.Rfc_Slno
+                                AND Refundreceiptdetl.pd_code = Prodescription.pd_code
+                                AND Prodescription.pg_code = Progroup.pg_code
+                                AND Misincexpdtl.dg_grcode = Misincexpgroup.dg_grcode
+                                AND Misincexpdtl.Dg_type = 'R'
+                                AND Misincexpdtl.Pc_code = Progroup.pc_code
+                                AND Refundreceiptmast.Rfc_Cancel IS NULL
+                                AND Refundreceiptmast.Rfc_Cacr IN ('C', 'R')
+                                AND Refundreceiptdetl.Rfd_Date >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                AND Refundreceiptdetl.Rfd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                AND REFUNDRECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                        GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
+                        UNION ALL
+                        SELECT Misincexpgroup.Dg_desc,
+                                Misincexpgroup.Dg_grcode AS Code,
+                                SUM (refundbilldetl.rfn_netamt) * -1 Amt,
+                                SUM (NVL (REFUNDBILLDETL.RFN_TOTTAX, 0)) * -1 tax,
+                                SUM ( NVL (refundbilldetl.rfn_netamt, 0)  + NVL (refundbilldetl.rfn_disamt, 0))  * -1 GrossAmt,
+                                SUM (0) AS Comp,
+                                SUM (NVL (refundbilldetl.rfn_disamt, 0)) * -1 discount
+                        FROM refundbilldetl,
+                                refundbillmast,
+                                Prodescription,
+                                Progroup,
+                                Misincexpdtl,
+                                Misincexpgroup,
+                                Billmast
+                        WHERE     Billmast.Bmc_Slno = Refundbillmast.Bmc_Slno
+                                AND Refundbillmast.Rfc_Slno = Refundbilldetl.Rfc_Slno
+                                AND Refundbilldetl.pd_code = Prodescription.pd_code
+                                AND Prodescription.pg_code = Progroup.pg_code
+                                AND Misincexpdtl.dg_grcode = Misincexpgroup.dg_grcode
+                                AND Misincexpdtl.Dg_type = 'R'
+                                AND Misincexpdtl.Pc_code = Progroup.pc_code
+                                AND Refundbillmast.Rfc_Cancel IS NULL
+                                AND Refundbillmast.Rfc_Cacr IN ('C', 'R')
+                                AND Refundbilldetl.Rfd_Date >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                AND Refundbilldetl.Rfd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                AND billmast.mh_code IN (SELECT MH_CODE FROM multihospital)
+                        GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
+                        UNION ALL
+                        SELECT Misincexpgroup.Dg_desc,
+                                Misincexpgroup.Dg_grcode AS Code,
+                                SUM ( DECODE (Receiptmast.RPC_CAcr,  'C', receiptdetl.rpn_netamt, 'R', receiptdetl.rpn_netamt, 0)) Amt,
+                                SUM (NVL (Receiptdetl.RPN_TOTTAX, 0)) tax,
+                                SUM ( DECODE (Receiptmast.RPC_CAcr,   'C', receiptdetl.rpn_netamt,  'R', receiptdetl.rpn_netamt, 0)  + NVL (receiptdetl.rpn_disamt, 0)) GrossAmt,
+                                SUM (DECODE (Receiptmast.rpc_cacr, 'M', receiptdetl.rpn_netamt, 0)) AS Comp,
+                                SUM (NVL (receiptdetl.rpn_disamt, 0)) discount
+                        FROM Receiptdetl,
+                                Receiptmast,
+                                Prodescription,
+                                Progroup,
+                                Misincexpdtl,
+                                Misincexpgroup
+                        WHERE     receiptmast.RPC_COLLCNCODE IS NULL
+                                AND Receiptmast.RPC_SLNO = Receiptdetl.RPC_SLNO
+                                AND Receiptdetl.pd_code = Prodescription.pd_code
+                                AND Prodescription.pg_code = Progroup.pg_code
+                                AND Misincexpdtl.dg_grcode = Misincexpgroup.dg_grcode
+                                AND Misincexpdtl.Dg_type = 'R'
+                                AND Misincexpdtl.Pc_code = Progroup.pc_code
+                                AND (NVL (RECEIPTMAST.RPC_CANCEL, 'N') = 'N')
+                                AND Receiptmast.RPC_CAcr IN ('C', 'R')
+                                AND Receiptmast.RPD_DATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                AND Receiptmast.RPD_DATE <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                        GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc`;
+
         try {
             const result = await conn_ora.execute(
-                ` SELECT Misincexpgroup.Dg_desc,
-                        Misincexpgroup.Dg_grcode AS Code,
-                        SUM (
-                        DECODE (Receiptmast.RPC_CAcr,
-                                'C', receiptdetl.rpn_netamt,
-                                'R', receiptdetl.rpn_netamt,
-                                0))
-                        Amt,
-                        SUM (NVL (Receiptdetl.RPN_TOTTAX, 0)) tax,
-                        SUM (
-                        DECODE (Receiptmast.RPC_CAcr,
-                                'C', receiptdetl.rpn_netamt,
-                                'R', receiptdetl.rpn_netamt,
-                                0)
-                        + NVL (receiptdetl.rpn_disamt, 0))
-                        GrossAmt,
-                        SUM (DECODE (Receiptmast.rpc_cacr, 'M', receiptdetl.rpn_netamt, 0))
-                        AS Comp,
-                        SUM (NVL (receiptdetl.rpn_disamt, 0)) discount
-                FROM Receiptdetl,
-                        Receiptmast,
-                        Prodescription,
-                        Progroup,
-                        Misincexpdtl,
-                        Misincexpgroup
-                WHERE     receiptmast.RPC_COLLCNCODE IS NOT NULL
-                        AND Receiptmast.RPC_SLNO = Receiptdetl.RPC_SLNO
-                        AND Receiptdetl.pd_code = Prodescription.pd_code
-                        AND Prodescription.pg_code = Progroup.pg_code
-                        AND Misincexpdtl.dg_grcode = Misincexpgroup.dg_grcode
-                        AND Misincexpdtl.Dg_type = 'R'
-                        AND Misincexpdtl.Pc_code = Progroup.pc_code
-                        AND (NVL (RECEIPTMAST.RPC_CANCEL, 'N') = 'N')
-                        AND Receiptmast.RPC_CAcr IN ('C', 'R')
-                        AND Receiptmast.RPD_COLLDATE >=
-                            TO_DATE (:date1, 'dd/MM/yyyy hh24:mi:ss')
-                        AND Receiptmast.RPD_COLLDATE <=
-                            TO_DATE (:date2, 'dd/MM/yyyy hh24:mi:ss')
-                        AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-                HAVING SUM (
-                        DECODE (Receiptmast.RPC_CAcr,
-                                'C', receiptdetl.rpn_netamt,
-                                'R', receiptdetl.rpn_netamt,
-                                0)) <> 0
-            GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
-            UNION ALL
-                SELECT Misincexpgroup.Dg_desc,
-                        Misincexpgroup.Dg_grcode AS Code,
-                        SUM (Refundreceiptdetl.rpn_netamt) * -1 Amt,
-                        SUM (NVL (Refundreceiptdetl.RFN_TOTTAX, 0)) * -1 tax,
-                        SUM (
-                        NVL (Refundreceiptdetl.rpn_netamt, 0)
-                        + NVL (Refundreceiptdetl.rpn_disamt, 0))
-                        * -1
-                        GrossAmt,
-                        SUM (0) AS Comp,
-                        SUM (NVL (Refundreceiptdetl.rpn_disamt, 0)) * -1 discount
-                FROM Refundreceiptdetl,
-                        Refundreceiptmast,
-                        Receiptdetl,
-                        Opbillmast,
-                        Prodescription,
-                        Progroup,
-                        Misincexpdtl,
-                        Misincexpgroup
-                WHERE     Refundreceiptdetl.Rpc_Slno = Receiptdetl.Rpc_Slno
-                        AND Refundreceiptdetl.Rpc_Cnt = Receiptdetl.Rpc_Cnt
-                        AND Refundreceiptmast.Rfc_Slno = Refundreceiptdetl.Rfc_Slno
-                        AND Receiptdetl.Opc_Slno = Opbillmast.Opc_Slno
-                        AND Refundreceiptdetl.Pd_Code = Prodescription.Pd_Code
-                        AND Prodescription.Pg_Code = Progroup.Pg_Code
-                        AND Misincexpdtl.dg_grcode = Misincexpgroup.dg_grcode
-                        AND Misincexpdtl.Dg_type = 'R'
-                        AND Misincexpdtl.Pc_code = Progroup.pc_code
-                        AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
-                        AND NVL (Refundreceiptdetl.Rfc_Cancel, 'N') = 'N'
-                        AND Refundreceiptmast.Rfc_Cacr IN ('O')
-                        AND Opbillmast.Opc_Cacr <> 'M'
-                        AND Opbillmast.Opd_date >=
-                            TO_DATE (:date3, 'dd/MM/yyyy hh24:mi:ss')
-                        AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-                        AND Opbillmast.Opd_date <=
-                            TO_DATE (:date4, 'dd/MM/yyyy hh24:mi:ss')
-            GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
-            UNION ALL
-                SELECT Misincexpgroup.Dg_desc,
-                        Misincexpgroup.Dg_grcode AS Code,
-                        SUM (Refundreceiptdetl.rpn_netamt) * -1 Amt,
-                        SUM (NVL (Refundreceiptdetl.RFN_TOTTAX, 0)) * -1 tax,
-                        SUM (
-                        NVL (Refundreceiptdetl.rpn_netamt, 0)
-                        + NVL (Refundreceiptdetl.rpn_disamt, 0))
-                        * -1
-                        GrossAmt,
-                        SUM (0) AS Comp,
-                        SUM (NVL (Refundreceiptdetl.rpn_disamt, 0)) * -1 discount
-                FROM Refundreceiptdetl,
-                        Refundreceiptmast,
-                        Prodescription,
-                        Progroup,
-                        Misincexpdtl,
-                        Misincexpgroup
-                WHERE     Refundreceiptmast.Rfc_Slno = Refundreceiptdetl.Rfc_Slno
-                        AND Refundreceiptdetl.pd_code = Prodescription.pd_code
-                        AND Prodescription.pg_code = Progroup.pg_code
-                        AND Misincexpdtl.dg_grcode = Misincexpgroup.dg_grcode
-                        AND Misincexpdtl.Dg_type = 'R'
-                        AND Misincexpdtl.Pc_code = Progroup.pc_code
-                        AND Refundreceiptmast.Rfc_Cancel IS NULL
-                        AND Refundreceiptmast.Rfc_Cacr IN ('C', 'R')
-                        AND Refundreceiptdetl.Rfd_Date >=
-                            TO_DATE (:date5, 'dd/MM/yyyy hh24:mi:ss')
-                        AND Refundreceiptdetl.Rfd_Date <=
-                            TO_DATE (:date6, 'dd/MM/yyyy hh24:mi:ss')
-                        AND REFUNDRECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-            GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
-            UNION ALL
-                SELECT Misincexpgroup.Dg_desc,
-                        Misincexpgroup.Dg_grcode AS Code,
-                        SUM (refundbilldetl.rfn_netamt) * -1 Amt,
-                        SUM (NVL (REFUNDBILLDETL.RFN_TOTTAX, 0)) * -1 tax,
-                        SUM (
-                        NVL (refundbilldetl.rfn_netamt, 0)
-                        + NVL (refundbilldetl.rfn_disamt, 0))
-                        * -1
-                        GrossAmt,
-                        SUM (0) AS Comp,
-                        SUM (NVL (refundbilldetl.rfn_disamt, 0)) * -1 discount
-                FROM refundbilldetl,
-                        refundbillmast,
-                        Prodescription,
-                        Progroup,
-                        Misincexpdtl,
-                        Misincexpgroup,
-                        Billmast
-                WHERE     Billmast.Bmc_Slno = Refundbillmast.Bmc_Slno
-                        AND Refundbillmast.Rfc_Slno = Refundbilldetl.Rfc_Slno
-                        AND Refundbilldetl.pd_code = Prodescription.pd_code
-                        AND Prodescription.pg_code = Progroup.pg_code
-                        AND Misincexpdtl.dg_grcode = Misincexpgroup.dg_grcode
-                        AND Misincexpdtl.Dg_type = 'R'
-                        AND Misincexpdtl.Pc_code = Progroup.pc_code
-                        AND Refundbillmast.Rfc_Cancel IS NULL
-                        AND Refundbillmast.Rfc_Cacr IN ('C', 'R')
-                        AND Refundbilldetl.Rfd_Date >=
-                            TO_DATE (:date7, 'dd/MM/yyyy hh24:mi:ss')
-                        AND Refundbilldetl.Rfd_Date <=
-                            TO_DATE (:date8, 'dd/MM/yyyy hh24:mi:ss')
-                        AND billmast.mh_code IN (SELECT MH_CODE FROM multihospital)
-            GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
-            UNION ALL
-                SELECT Misincexpgroup.Dg_desc,
-                        Misincexpgroup.Dg_grcode AS Code,
-                        SUM (
-                        DECODE (Receiptmast.RPC_CAcr,
-                                'C', receiptdetl.rpn_netamt,
-                                'R', receiptdetl.rpn_netamt,
-                                0))
-                        Amt,
-                        SUM (NVL (Receiptdetl.RPN_TOTTAX, 0)) tax,
-                        SUM (
-                        DECODE (Receiptmast.RPC_CAcr,
-                                'C', receiptdetl.rpn_netamt,
-                                'R', receiptdetl.rpn_netamt,
-                                0)
-                        + NVL (receiptdetl.rpn_disamt, 0))
-                        GrossAmt,
-                        SUM (DECODE (Receiptmast.rpc_cacr, 'M', receiptdetl.rpn_netamt, 0))
-                        AS Comp,
-                        SUM (NVL (receiptdetl.rpn_disamt, 0)) discount
-                FROM Receiptdetl,
-                        Receiptmast,
-                        Prodescription,
-                        Progroup,
-                        Misincexpdtl,
-                        Misincexpgroup
-                WHERE     receiptmast.RPC_COLLCNCODE IS NULL
-                        AND Receiptmast.RPC_SLNO = Receiptdetl.RPC_SLNO
-                        AND Receiptdetl.pd_code = Prodescription.pd_code
-                        AND Prodescription.pg_code = Progroup.pg_code
-                        AND Misincexpdtl.dg_grcode = Misincexpgroup.dg_grcode
-                        AND Misincexpdtl.Dg_type = 'R'
-                        AND Misincexpdtl.Pc_code = Progroup.pc_code
-                        AND (NVL (RECEIPTMAST.RPC_CANCEL, 'N') = 'N')
-                        AND Receiptmast.RPC_CAcr IN ('C', 'R')
-                        AND Receiptmast.RPD_DATE >=
-                            TO_DATE (:date9, 'dd/MM/yyyy hh24:mi:ss')
-                        AND Receiptmast.RPD_DATE <=
-                            TO_DATE (:date10, 'dd/MM/yyyy hh24:mi:ss')
-                        AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-            GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc`,
-                {
-                    date1: data.from,
-                    date2: data.to,
-                    date3: data.from,
-                    date4: data.to,
-                    date5: data.from,
-                    date6: data.to,
-                    date7: data.from,
-                    date8: data.to,
-                    date9: data.from,
-                    date10: data.to
-                },
+                sql,
+                {},
                 { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
             )
             await result.resultSet?.getRows((err, rows) => {
@@ -1002,368 +876,337 @@ module.exports = {
     theaterIncomeTmch: async (data, callBack) => {
         let pool_ora = await oraConnection();
         let conn_ora = await pool_ora.getConnection();
+
+        const ipNumberList = data.ptno.join(',');
+        const fromDate = data.from;
+        const toDate = data.to;
+
+        const sql = `SELECT Misincexpgroup.Dg_desc,
+                                Misincexpgroup.Dg_grcode AS Code,
+                                SUM (NVL (srn_operation, 0) - (NVL (Patsurgery.srn_operdis, 0))) Amt,
+                                SUM (NVL (Patsurgery.SRN_OPERTOTTAX, 0)) tax,
+                                SUM (NVL (srn_operation, 0)) GrossAmt,
+                                SUM (NVL (Patsurgery.srn_operdis, 0)) Discount
+                        FROM Disbillmast,
+                                Patsurgery,
+                                Ipparam,
+                                Misincexpdtl,
+                                Misincexpgroup
+                        WHERE Patsurgery.Dmc_Slno = Disbillmast.Dmc_Slno
+                                AND Misincexpdtl.dg_grcode = Misincexpgroup.dg_grcode
+                                AND Misincexpdtl.Dg_type = 'R'
+                                AND Misincexpdtl.Pc_code = Ipparam.ipc_oper
+                                AND NVL (Patsurgery.srn_operation, 0) > 0
+                                AND NVL (Patsurgery.Src_Cancel, 'N') = 'N'
+                                AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
+                                AND Disbillmast.Dmc_Cacr <> 'M'
+                                AND Disbillmast.DMD_DATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                AND Disbillmast.Dmd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                AND DISBILLMAST.IP_NO NOT IN (${ipNumberList})
+                                AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                        GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
+                        UNION ALL
+                        SELECT Misincexpgroup.Dg_desc,
+                                Misincexpgroup.Dg_grcode,
+                                SUM (NVL (SRN_THEATER, 0) - (NVL (Patsurgery.SRN_THEARDIS, 0))) Amt,
+                                SUM (NVL (Patsurgery.SRN_THEATTOTTAX, 0)) tax,
+                                SUM (NVL (SRN_THEATER, 0)) GrossAmt,
+                                SUM (NVL (SRN_THEARDIS, 0)) Discount
+                        FROM Disbillmast,
+                                Patsurgery,
+                                Ipparam,
+                                Misincexpdtl,
+                                Misincexpgroup
+                        WHERE     Patsurgery.Dmc_Slno = Disbillmast.Dmc_Slno
+                                AND Misincexpdtl.dg_grcode = Misincexpgroup.dg_grcode
+                                AND Misincexpdtl.Dg_type = 'R'
+                                AND Misincexpdtl.Pc_code = Ipparam.ipc_ther
+                                AND NVL (Patsurgery.SRN_THEATER, 0) > 0
+                                AND NVL (Patsurgery.Src_Cancel, 'N') = 'N'
+                                AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
+                                AND Disbillmast.Dmc_Cacr <> 'M'
+                                AND Disbillmast.DMD_DATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                AND Disbillmast.Dmd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                AND DISBILLMAST.IP_NO NOT IN (${ipNumberList})
+                                AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                        GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
+                        UNION ALL
+                        SELECT Misincexpgroup.Dg_desc,
+                                Misincexpgroup.Dg_grcode,
+                                SUM (NVL (SRN_CHIEF, 0)) Amt,
+                                SUM (NVL (SRN_TOTTAX, 0)) tax,
+                                SUM (NVL (SRN_CHIEF, 0)) GrossAmt,
+                                SUM (0) Discount
+                        FROM Disbillmast,
+                                Patsurgery,
+                                Ipparam,
+                                Misincexpdtl,
+                                Misincexpgroup,
+                                PATSURGERYRESOURCESDETL
+                        WHERE     Patsurgery.Dmc_Slno = Disbillmast.Dmc_Slno
+                                AND PATSURGERYRESOURCESDETL.SR_SLNO = Patsurgery.SR_SLNO
+                                AND Misincexpdtl.dg_grcode = Misincexpgroup.dg_grcode
+                                AND Misincexpdtl.Dg_type = 'R'
+                                AND Misincexpdtl.Pc_code = Ipparam.ipc_CHIEF
+                                AND NVL (Patsurgery.SRN_CHIEF, 0) > 0
+                                AND NVL (Patsurgery.Src_Cancel, 'N') = 'N'
+                                AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
+                                AND Disbillmast.Dmc_Cacr <> 'M'
+                                AND Disbillmast.DMD_DATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                AND Disbillmast.Dmd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                AND DISBILLMAST.IP_NO NOT IN (${ipNumberList})
+                                AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                        GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
+                        UNION ALL
+                        SELECT Misincexpgroup.Dg_desc,
+                                Misincexpgroup.Dg_grcode,
+                                SUM (NVL (SRN_1STASST, 0)) Amt,
+                                SUM (NVL (SRN_TOTTAX, 0)) tax,
+                                SUM (NVL (SRN_1STASST, 0)) GrossAmt,
+                                SUM (0) Discount
+                        FROM Disbillmast,
+                                Patsurgery,
+                                Ipparam,
+                                Misincexpdtl,
+                                Misincexpgroup,
+                                PATSURGERYRESOURCESDETL
+                        WHERE     Patsurgery.Dmc_Slno = Disbillmast.Dmc_Slno
+                                AND PATSURGERYRESOURCESDETL.SR_SLNO = Patsurgery.SR_SLNO
+                                AND Misincexpdtl.dg_grcode = Misincexpgroup.dg_grcode
+                                AND Misincexpdtl.Dg_type = 'R'
+                                AND Misincexpdtl.Pc_code = Ipparam.ipc_1stasst
+                                AND NVL (Patsurgery.SRN_1STASST, 0) > 0
+                                AND NVL (Patsurgery.Src_Cancel, 'N') = 'N'
+                                AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
+                                AND Disbillmast.Dmc_Cacr <> 'M'
+                                AND Disbillmast.DMD_DATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                AND Disbillmast.Dmd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                AND DISBILLMAST.IP_NO IN (${ipNumberList})
+                                AND DISBILLMAST.MH_CODE NOT IN (SELECT MH_CODE FROM multihospital)
+                        GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
+                        UNION ALL
+                        SELECT Misincexpgroup.Dg_desc,
+                                Misincexpgroup.Dg_grcode,
+                                SUM (NVL (SRN_2NDASST, 0)) Amt,
+                                SUM (NVL (SRN_TOTTAX, 0)) tax,
+                                SUM (NVL (SRN_2NDASST, 0)) GrossAmt,
+                                SUM (0) Discount
+                        FROM Disbillmast,
+                                Patsurgery,
+                                Ipparam,
+                                Misincexpdtl,
+                                Misincexpgroup,
+                                PATSURGERYRESOURCESDETL
+                        WHERE     Patsurgery.Dmc_Slno = Disbillmast.Dmc_Slno
+                                AND PATSURGERYRESOURCESDETL.SR_SLNO = Patsurgery.SR_SLNO
+                                AND Misincexpdtl.dg_grcode = Misincexpgroup.dg_grcode
+                                AND Misincexpdtl.Dg_type = 'R'
+                                AND Misincexpdtl.Pc_code = Ipparam.Ipc_2NDASST
+                                AND NVL (Patsurgery.SRN_2NDASST, 0) > 0
+                                AND NVL (Patsurgery.Src_Cancel, 'N') = 'N'
+                                AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
+                                AND Disbillmast.Dmc_Cacr <> 'M'
+                                AND Disbillmast.DMD_DATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                AND Disbillmast.Dmd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                AND DISBILLMAST.IP_NO NOT IN (${ipNumberList})
+                                AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                        GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
+                        UNION ALL
+                        SELECT Misincexpgroup.Dg_desc,
+                                Misincexpgroup.Dg_grcode,
+                                SUM (NVL (SRN_3RDASST, 0)) Amt,
+                                SUM (NVL (SRN_TOTTAX, 0)) tax,
+                                SUM (NVL (SRN_3RDASST, 0)) GrossAmt,
+                                SUM (0) Discount
+                        FROM Disbillmast,
+                                Patsurgery,
+                                Ipparam,
+                                Misincexpdtl,
+                                Misincexpgroup,
+                                PATSURGERYRESOURCESDETL
+                        WHERE     Patsurgery.Dmc_Slno = Disbillmast.Dmc_Slno
+                                AND PATSURGERYRESOURCESDETL.SR_SLNO = Patsurgery.SR_SLNO
+                                AND Misincexpdtl.dg_grcode = Misincexpgroup.dg_grcode
+                                AND Misincexpdtl.Dg_type = 'R'
+                                AND Misincexpdtl.Pc_code = Ipparam.Ipc_3RDASST
+                                AND NVL (Patsurgery.SRN_3RDASST, 0) > 0
+                                AND NVL (Patsurgery.Src_Cancel, 'N') = 'N'
+                                AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
+                                AND Disbillmast.Dmc_Cacr <> 'M'
+                                AND Disbillmast.DMD_DATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                AND Disbillmast.Dmd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                AND DISBILLMAST.IP_NO NOT IN (${ipNumberList})
+                                AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                        GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
+                        UNION ALL
+                        SELECT Misincexpgroup.Dg_desc,
+                                Misincexpgroup.Dg_grcode,
+                                SUM (NVL (SRN_GUEST, 0)) Amt,
+                                SUM (NVL (SRN_TOTTAX, 0)) tax,
+                                SUM (NVL (SRN_GUEST, 0)) GrossAmt,
+                                SUM (0) Discount
+                        FROM Disbillmast,
+                                Patsurgery,
+                                Ipparam,
+                                Misincexpdtl,
+                                Misincexpgroup,
+                                PATSURGERYRESOURCESDETL
+                        WHERE     Patsurgery.Dmc_Slno = Disbillmast.Dmc_Slno
+                                AND PATSURGERYRESOURCESDETL.SR_SLNO = Patsurgery.SR_SLNO
+                                AND Misincexpdtl.dg_grcode = Misincexpgroup.dg_grcode
+                                AND Misincexpdtl.Dg_type = 'R'
+                                AND Misincexpdtl.Pc_code = Ipparam.Ipc_GUEST
+                                AND NVL (Patsurgery.SRN_GUEST, 0) > 0
+                                AND NVL (Patsurgery.Src_Cancel, 'N') = 'N'
+                                AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
+                                AND Disbillmast.Dmc_Cacr <> 'M'
+                                AND Disbillmast.DMD_DATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                AND Disbillmast.Dmd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                AND DISBILLMAST.IP_NO NOT IN (${ipNumberList})
+                                AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                        GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
+                        UNION ALL
+                        SELECT Misincexpgroup.Dg_desc,
+                                Misincexpgroup.Dg_grcode,
+                                SUM (NVL (SRN_ANTEST, 0) - NVL (Srn_antdis, 0)) Amt,
+                                SUM (NVL (SRN_TOTTAX, 0)) tax,
+                                SUM (NVL (SRN_ANTEST, 0)) GrossAmt,
+                                SUM (NVL (Srn_antdis, 0)) Discount
+                        FROM Disbillmast,
+                                Patsurgery,
+                                Ipparam,
+                                Misincexpdtl,
+                                Misincexpgroup,
+                                PATSURGERYRESOURCESDETL
+                        WHERE     Patsurgery.Dmc_Slno = Disbillmast.Dmc_Slno
+                                AND PATSURGERYRESOURCESDETL.SR_SLNO = Patsurgery.SR_SLNO
+                                AND Misincexpdtl.dg_grcode = Misincexpgroup.dg_grcode
+                                AND Misincexpdtl.Dg_type = 'R'
+                                AND Misincexpdtl.Pc_code = Ipparam.ipc_ANEST
+                                AND NVL (Patsurgery.SRN_ANTEST, 0) > 0
+                                AND NVL (Patsurgery.Src_Cancel, 'N') = 'N'
+                                AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
+                                AND Disbillmast.Dmc_Cacr <> 'M'
+                                AND Disbillmast.DMD_DATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                AND Disbillmast.Dmd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                AND DISBILLMAST.IP_NO NOT IN (${ipNumberList})
+                                AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                        GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
+                        UNION ALL
+                        SELECT Misincexpgroup.Dg_desc,
+                                Misincexpgroup.Dg_grcode,
+                                SUM (NVL (SRN_ANTEST2, 0)) Amt,
+                                SUM (NVL (SRN_TOTTAX, 0)) tax,
+                                SUM (NVL (SRN_ANTEST2, 0)) GrossAmt,
+                                SUM (0) Discount
+                        FROM Disbillmast,
+                                Patsurgery,
+                                Ipparam,
+                                Misincexpdtl,
+                                Misincexpgroup,
+                                PATSURGERYRESOURCESDETL
+                        WHERE     Patsurgery.Dmc_Slno = Disbillmast.Dmc_Slno
+                                AND PATSURGERYRESOURCESDETL.SR_SLNO = Patsurgery.SR_SLNO
+                                AND Misincexpdtl.dg_grcode = Misincexpgroup.dg_grcode
+                                AND Misincexpdtl.Dg_type = 'R'
+                                AND Misincexpdtl.Pc_code = Ipparam.Ipc_ANEST2
+                                AND NVL (Patsurgery.SRN_ANTEST2, 0) > 0
+                                AND NVL (Patsurgery.Src_Cancel, 'N') = 'N'
+                                AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
+                                AND Disbillmast.Dmc_Cacr <> 'M'
+                                AND Disbillmast.DMD_DATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                AND Disbillmast.Dmd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                AND DISBILLMAST.IP_NO NOT IN (${ipNumberList})
+                                AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                        GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
+                        UNION ALL
+                        SELECT Misincexpgroup.Dg_desc,
+                                Misincexpgroup.Dg_grcode,
+                                SUM (PATSUROTHER.Pdn_Amount) Amt,
+                                SUM (NVL (PATSUROTHER.PSN_TOTTAX, 0)) tax,
+                                SUM (
+                                NVL (PATSUROTHER.Pdn_Amount, 0) + NVL (PATSUROTHER.SRN_discount, 0))
+                                GrossAmt,
+                                SUM (NVL (PATSUROTHER.SRN_discount, 0)) Discount
+                        FROM Disbillmast,
+                                Patsurgery,
+                                Misincexpdtl,
+                                Misincexpgroup,
+                                patsurother,
+                                Prodescription,
+                                Progroup
+                        WHERE     Patsurgery.Dmc_Slno = Disbillmast.Dmc_Slno
+                                AND Patsurother.SR_SLNO = Patsurgery.SR_SLNO
+                                AND patsurother.pd_code = Prodescription.pd_code
+                                AND Prodescription.pg_Code = Progroup.pg_Code
+                                AND Misincexpdtl.dg_grcode = Misincexpgroup.dg_grcode
+                                AND Misincexpdtl.Dg_type = 'R'
+                                AND Misincexpdtl.Pc_code = Progroup.pc_code
+                                AND NVL (Patsurgery.Src_Cancel, 'N') = 'N'
+                                AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
+                                AND Disbillmast.Dmc_Cacr <> 'M'
+                                AND Disbillmast.DMD_DATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                AND Disbillmast.Dmd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                AND DISBILLMAST.IP_NO NOT IN (${ipNumberList})
+                                AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                                AND NVL (PATSUROTHER.Src_Cancel, 'N') = 'N'
+                        GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
+                        UNION ALL
+                        SELECT Misincexpgroup.Dg_desc,
+                                Misincexpgroup.Dg_grcode,
+                                SUM (PATSURDETL.SRN_AMOUNT - NVL (patsurdetl.srn_discount, 0)) Amt,
+                                SUM (NVL (Patsurdetl.PSN_TOTTAX, 0)) tax,
+                                SUM (PATSURDETL.SRN_AMOUNT) GrossAmt,
+                                SUM (NVL (patsurdetl.srn_discount, 0)) Discount
+                        FROM Disbillmast,
+                                Patsurgery,
+                                Misincexpdtl,
+                                Misincexpgroup,
+                                PATSURDETL
+                        WHERE     Patsurgery.Dmc_Slno = Disbillmast.Dmc_Slno
+                                AND PATSURDETL.SR_SLNO = Patsurgery.SR_SLNO
+                                AND Misincexpdtl.dg_grcode = Misincexpgroup.dg_grcode
+                                AND Misincexpdtl.Dg_type = 'R'
+                                AND Misincexpdtl.Pc_code = PATSURDETL.PC_CODE
+                                AND NVL (Patsurgery.Src_Cancel, 'N') = 'N'
+                                AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
+                                AND Disbillmast.Dmc_Cacr <> 'M'
+                                AND Disbillmast.DMD_DATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                AND Disbillmast.Dmd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                AND DISBILLMAST.IP_NO NOT IN (${ipNumberList})
+                                AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                                AND NVL (patsurdetl.Src_Cancel, 'N') = 'N'
+                        GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
+                        UNION ALL
+                        SELECT Misincexpgroup.Dg_Desc,
+                                Misincexpgroup.Dg_Grcode AS Code,
+                                SUM (NVL (Cmn_Netamt, 0) - NVL (Cmn_Outcoll, 0)) Amt,
+                                0 tax,
+                                SUM (NVL (Cmn_Netamt, 0) - NVL (Cmn_Outcoll, 0)) GrossAmt,
+                                SUM (0) AS Discount
+                        FROM Canbillmast,
+                                Disbillmast,
+                                Ipparam,
+                                Misincexpdtl,
+                                Misincexpgroup
+                        WHERE     Canbillmast.Dmc_Slno = Disbillmast.Dmc_Slno
+                                AND Ipparam.Ipc_Canteencode = Misincexpdtl.Pc_Code
+                                AND Misincexpdtl.Dg_Type = 'R'
+                                AND Misincexpdtl.Dg_Grcode = Misincexpgroup.Dg_Grcode
+                                AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
+                                AND NVL (Canbillmast.Cmc_Cancel, 'N') = 'N'
+                                AND Canbillmast.Cmc_Cacr = 'I'
+                                AND Disbillmast.Dmc_Cacr <> 'M'
+                                AND Disbillmast.Dmd_Date >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                AND Disbillmast.Dmd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                AND DISBILLMAST.IP_NO NOT IN (${ipNumberList})
+                                AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                        GROUP BY Misincexpgroup.Dg_Grcode, Misincexpgroup.Dg_Desc
+                        ORDER BY Dg_desc`;
         try {
             const result = await conn_ora.execute(
-                `SELECT Misincexpgroup.Dg_desc,
-                            Misincexpgroup.Dg_grcode AS Code,
-                            SUM (NVL (srn_operation, 0) - (NVL (Patsurgery.srn_operdis, 0))) Amt,
-                            SUM (NVL (Patsurgery.SRN_OPERTOTTAX, 0)) tax,
-                            SUM (NVL (srn_operation, 0)) GrossAmt,
-                            SUM (NVL (Patsurgery.srn_operdis, 0)) Discount
-                    FROM Disbillmast,
-                            Patsurgery,
-                            Ipparam,
-                            Misincexpdtl,
-                            Misincexpgroup
-                    WHERE     Patsurgery.Dmc_Slno = Disbillmast.Dmc_Slno
-                            AND Misincexpdtl.dg_grcode = Misincexpgroup.dg_grcode
-                            AND Misincexpdtl.Dg_type = 'R'
-                            AND Misincexpdtl.Pc_code = Ipparam.ipc_oper
-                            AND NVL (Patsurgery.srn_operation, 0) > 0
-                            AND NVL (Patsurgery.Src_Cancel, 'N') = 'N'
-                            AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
-                            AND Disbillmast.Dmc_Cacr <> 'M'
-                            AND Disbillmast.DMD_DATE >=
-                                TO_DATE (:date1, 'dd/MM/yyyy hh24:mi:ss')
-                            AND Disbillmast.Dmd_Date <=
-                                TO_DATE (:date2, 'dd/MM/yyyy hh24:mi:ss')
-                            AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-                GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
-                UNION ALL
-                    SELECT Misincexpgroup.Dg_desc,
-                            Misincexpgroup.Dg_grcode,
-                            SUM (NVL (SRN_THEATER, 0) - (NVL (Patsurgery.SRN_THEARDIS, 0))) Amt,
-                            SUM (NVL (Patsurgery.SRN_THEATTOTTAX, 0)) tax,
-                            SUM (NVL (SRN_THEATER, 0)) GrossAmt,
-                            SUM (NVL (SRN_THEARDIS, 0)) Discount
-                    FROM Disbillmast,
-                            Patsurgery,
-                            Ipparam,
-                            Misincexpdtl,
-                            Misincexpgroup
-                    WHERE     Patsurgery.Dmc_Slno = Disbillmast.Dmc_Slno
-                            AND Misincexpdtl.dg_grcode = Misincexpgroup.dg_grcode
-                            AND Misincexpdtl.Dg_type = 'R'
-                            AND Misincexpdtl.Pc_code = Ipparam.ipc_ther
-                            AND NVL (Patsurgery.SRN_THEATER, 0) > 0
-                            AND NVL (Patsurgery.Src_Cancel, 'N') = 'N'
-                            AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
-                            AND Disbillmast.Dmc_Cacr <> 'M'
-                            AND Disbillmast.DMD_DATE >=
-                                TO_DATE (:date3, 'dd/MM/yyyy hh24:mi:ss')
-                            AND Disbillmast.Dmd_Date <=
-                                TO_DATE (:date4, 'dd/MM/yyyy hh24:mi:ss')
-                            AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-                GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
-                UNION ALL
-                    SELECT Misincexpgroup.Dg_desc,
-                            Misincexpgroup.Dg_grcode,
-                            SUM (NVL (SRN_CHIEF, 0)) Amt,
-                            SUM (NVL (SRN_TOTTAX, 0)) tax,
-                            SUM (NVL (SRN_CHIEF, 0)) GrossAmt,
-                            SUM (0) Discount
-                    FROM Disbillmast,
-                            Patsurgery,
-                            Ipparam,
-                            Misincexpdtl,
-                            Misincexpgroup,
-                            PATSURGERYRESOURCESDETL
-                    WHERE     Patsurgery.Dmc_Slno = Disbillmast.Dmc_Slno
-                            AND PATSURGERYRESOURCESDETL.SR_SLNO = Patsurgery.SR_SLNO
-                            AND Misincexpdtl.dg_grcode = Misincexpgroup.dg_grcode
-                            AND Misincexpdtl.Dg_type = 'R'
-                            AND Misincexpdtl.Pc_code = Ipparam.ipc_CHIEF
-                            AND NVL (Patsurgery.SRN_CHIEF, 0) > 0
-                            AND NVL (Patsurgery.Src_Cancel, 'N') = 'N'
-                            AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
-                            AND Disbillmast.Dmc_Cacr <> 'M'
-                            AND Disbillmast.DMD_DATE >=
-                                TO_DATE (:date5, 'dd/MM/yyyy hh24:mi:ss')
-                            AND Disbillmast.Dmd_Date <=
-                                TO_DATE (:date6, 'dd/MM/yyyy hh24:mi:ss')
-                            AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-                GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
-                UNION ALL
-                    SELECT Misincexpgroup.Dg_desc,
-                            Misincexpgroup.Dg_grcode,
-                            SUM (NVL (SRN_1STASST, 0)) Amt,
-                            SUM (NVL (SRN_TOTTAX, 0)) tax,
-                            SUM (NVL (SRN_1STASST, 0)) GrossAmt,
-                            SUM (0) Discount
-                    FROM Disbillmast,
-                            Patsurgery,
-                            Ipparam,
-                            Misincexpdtl,
-                            Misincexpgroup,
-                            PATSURGERYRESOURCESDETL
-                    WHERE     Patsurgery.Dmc_Slno = Disbillmast.Dmc_Slno
-                            AND PATSURGERYRESOURCESDETL.SR_SLNO = Patsurgery.SR_SLNO
-                            AND Misincexpdtl.dg_grcode = Misincexpgroup.dg_grcode
-                            AND Misincexpdtl.Dg_type = 'R'
-                            AND Misincexpdtl.Pc_code = Ipparam.ipc_1stasst
-                            AND NVL (Patsurgery.SRN_1STASST, 0) > 0
-                            AND NVL (Patsurgery.Src_Cancel, 'N') = 'N'
-                            AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
-                            AND Disbillmast.Dmc_Cacr <> 'M'
-                            AND Disbillmast.DMD_DATE >=
-                                TO_DATE (:date7, 'dd/MM/yyyy hh24:mi:ss')
-                            AND Disbillmast.Dmd_Date <=
-                                TO_DATE (:date8, 'dd/MM/yyyy hh24:mi:ss')
-                            AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-                GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
-                UNION ALL
-                    SELECT Misincexpgroup.Dg_desc,
-                            Misincexpgroup.Dg_grcode,
-                            SUM (NVL (SRN_2NDASST, 0)) Amt,
-                            SUM (NVL (SRN_TOTTAX, 0)) tax,
-                            SUM (NVL (SRN_2NDASST, 0)) GrossAmt,
-                            SUM (0) Discount
-                    FROM Disbillmast,
-                            Patsurgery,
-                            Ipparam,
-                            Misincexpdtl,
-                            Misincexpgroup,
-                            PATSURGERYRESOURCESDETL
-                    WHERE     Patsurgery.Dmc_Slno = Disbillmast.Dmc_Slno
-                            AND PATSURGERYRESOURCESDETL.SR_SLNO = Patsurgery.SR_SLNO
-                            AND Misincexpdtl.dg_grcode = Misincexpgroup.dg_grcode
-                            AND Misincexpdtl.Dg_type = 'R'
-                            AND Misincexpdtl.Pc_code = Ipparam.Ipc_2NDASST
-                            AND NVL (Patsurgery.SRN_2NDASST, 0) > 0
-                            AND NVL (Patsurgery.Src_Cancel, 'N') = 'N'
-                            AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
-                            AND Disbillmast.Dmc_Cacr <> 'M'
-                            AND Disbillmast.DMD_DATE >=
-                                TO_DATE (:date9, 'dd/MM/yyyy hh24:mi:ss')
-                            AND Disbillmast.Dmd_Date <=
-                                TO_DATE (:date10, 'dd/MM/yyyy hh24:mi:ss')
-                            AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-                GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
-                UNION ALL
-                    SELECT Misincexpgroup.Dg_desc,
-                            Misincexpgroup.Dg_grcode,
-                            SUM (NVL (SRN_3RDASST, 0)) Amt,
-                            SUM (NVL (SRN_TOTTAX, 0)) tax,
-                            SUM (NVL (SRN_3RDASST, 0)) GrossAmt,
-                            SUM (0) Discount
-                    FROM Disbillmast,
-                            Patsurgery,
-                            Ipparam,
-                            Misincexpdtl,
-                            Misincexpgroup,
-                            PATSURGERYRESOURCESDETL
-                    WHERE     Patsurgery.Dmc_Slno = Disbillmast.Dmc_Slno
-                            AND PATSURGERYRESOURCESDETL.SR_SLNO = Patsurgery.SR_SLNO
-                            AND Misincexpdtl.dg_grcode = Misincexpgroup.dg_grcode
-                            AND Misincexpdtl.Dg_type = 'R'
-                            AND Misincexpdtl.Pc_code = Ipparam.Ipc_3RDASST
-                            AND NVL (Patsurgery.SRN_3RDASST, 0) > 0
-                            AND NVL (Patsurgery.Src_Cancel, 'N') = 'N'
-                            AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
-                            AND Disbillmast.Dmc_Cacr <> 'M'
-                            AND Disbillmast.DMD_DATE >=
-                                TO_DATE (:date11, 'dd/MM/yyyy hh24:mi:ss')
-                            AND Disbillmast.Dmd_Date <=
-                                TO_DATE (:date12, 'dd/MM/yyyy hh24:mi:ss')
-                            AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-                GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
-                UNION ALL
-                    SELECT Misincexpgroup.Dg_desc,
-                            Misincexpgroup.Dg_grcode,
-                            SUM (NVL (SRN_GUEST, 0)) Amt,
-                            SUM (NVL (SRN_TOTTAX, 0)) tax,
-                            SUM (NVL (SRN_GUEST, 0)) GrossAmt,
-                            SUM (0) Discount
-                    FROM Disbillmast,
-                            Patsurgery,
-                            Ipparam,
-                            Misincexpdtl,
-                            Misincexpgroup,
-                            PATSURGERYRESOURCESDETL
-                    WHERE     Patsurgery.Dmc_Slno = Disbillmast.Dmc_Slno
-                            AND PATSURGERYRESOURCESDETL.SR_SLNO = Patsurgery.SR_SLNO
-                            AND Misincexpdtl.dg_grcode = Misincexpgroup.dg_grcode
-                            AND Misincexpdtl.Dg_type = 'R'
-                            AND Misincexpdtl.Pc_code = Ipparam.Ipc_GUEST
-                            AND NVL (Patsurgery.SRN_GUEST, 0) > 0
-                            AND NVL (Patsurgery.Src_Cancel, 'N') = 'N'
-                            AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
-                            AND Disbillmast.Dmc_Cacr <> 'M'
-                            AND Disbillmast.DMD_DATE >=
-                                TO_DATE (:date13, 'dd/MM/yyyy hh24:mi:ss')
-                            AND Disbillmast.Dmd_Date <=
-                                TO_DATE (:date14, 'dd/MM/yyyy hh24:mi:ss')
-                            AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-                GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
-                UNION ALL
-                    SELECT Misincexpgroup.Dg_desc,
-                            Misincexpgroup.Dg_grcode,
-                            SUM (NVL (SRN_ANTEST, 0) - NVL (Srn_antdis, 0)) Amt,
-                            SUM (NVL (SRN_TOTTAX, 0)) tax,
-                            SUM (NVL (SRN_ANTEST, 0)) GrossAmt,
-                            SUM (NVL (Srn_antdis, 0)) Discount
-                    FROM Disbillmast,
-                            Patsurgery,
-                            Ipparam,
-                            Misincexpdtl,
-                            Misincexpgroup,
-                            PATSURGERYRESOURCESDETL
-                    WHERE     Patsurgery.Dmc_Slno = Disbillmast.Dmc_Slno
-                            AND PATSURGERYRESOURCESDETL.SR_SLNO = Patsurgery.SR_SLNO
-                            AND Misincexpdtl.dg_grcode = Misincexpgroup.dg_grcode
-                            AND Misincexpdtl.Dg_type = 'R'
-                            AND Misincexpdtl.Pc_code = Ipparam.ipc_ANEST
-                            AND NVL (Patsurgery.SRN_ANTEST, 0) > 0
-                            AND NVL (Patsurgery.Src_Cancel, 'N') = 'N'
-                            AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
-                            AND Disbillmast.Dmc_Cacr <> 'M'
-                            AND Disbillmast.DMD_DATE >=
-                                TO_DATE (:date15, 'dd/MM/yyyy hh24:mi:ss')
-                            AND Disbillmast.Dmd_Date <=
-                                TO_DATE (:date16, 'dd/MM/yyyy hh24:mi:ss')
-                            AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-                GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
-                UNION ALL
-                    SELECT Misincexpgroup.Dg_desc,
-                            Misincexpgroup.Dg_grcode,
-                            SUM (NVL (SRN_ANTEST2, 0)) Amt,
-                            SUM (NVL (SRN_TOTTAX, 0)) tax,
-                            SUM (NVL (SRN_ANTEST2, 0)) GrossAmt,
-                            SUM (0) Discount
-                    FROM Disbillmast,
-                            Patsurgery,
-                            Ipparam,
-                            Misincexpdtl,
-                            Misincexpgroup,
-                            PATSURGERYRESOURCESDETL
-                    WHERE     Patsurgery.Dmc_Slno = Disbillmast.Dmc_Slno
-                            AND PATSURGERYRESOURCESDETL.SR_SLNO = Patsurgery.SR_SLNO
-                            AND Misincexpdtl.dg_grcode = Misincexpgroup.dg_grcode
-                            AND Misincexpdtl.Dg_type = 'R'
-                            AND Misincexpdtl.Pc_code = Ipparam.Ipc_ANEST2
-                            AND NVL (Patsurgery.SRN_ANTEST2, 0) > 0
-                            AND NVL (Patsurgery.Src_Cancel, 'N') = 'N'
-                            AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
-                            AND Disbillmast.Dmc_Cacr <> 'M'
-                            AND Disbillmast.DMD_DATE >=
-                                TO_DATE (:date17, 'dd/MM/yyyy hh24:mi:ss')
-                            AND Disbillmast.Dmd_Date <=
-                                TO_DATE (:date18, 'dd/MM/yyyy hh24:mi:ss')
-                            AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-                GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
-                UNION ALL
-                    SELECT Misincexpgroup.Dg_desc,
-                            Misincexpgroup.Dg_grcode,
-                            SUM (PATSUROTHER.Pdn_Amount) Amt,
-                            SUM (NVL (PATSUROTHER.PSN_TOTTAX, 0)) tax,
-                            SUM (
-                            NVL (PATSUROTHER.Pdn_Amount, 0) + NVL (PATSUROTHER.SRN_discount, 0))
-                            GrossAmt,
-                            SUM (NVL (PATSUROTHER.SRN_discount, 0)) Discount
-                    FROM Disbillmast,
-                            Patsurgery,
-                            Misincexpdtl,
-                            Misincexpgroup,
-                            patsurother,
-                            Prodescription,
-                            Progroup
-                    WHERE     Patsurgery.Dmc_Slno = Disbillmast.Dmc_Slno
-                            AND Patsurother.SR_SLNO = Patsurgery.SR_SLNO
-                            AND patsurother.pd_code = Prodescription.pd_code
-                            AND Prodescription.pg_Code = Progroup.pg_Code
-                            AND Misincexpdtl.dg_grcode = Misincexpgroup.dg_grcode
-                            AND Misincexpdtl.Dg_type = 'R'
-                            AND Misincexpdtl.Pc_code = Progroup.pc_code
-                            AND NVL (Patsurgery.Src_Cancel, 'N') = 'N'
-                            AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
-                            AND Disbillmast.Dmc_Cacr <> 'M'
-                            AND Disbillmast.DMD_DATE >=
-                                TO_DATE (:date19, 'dd/MM/yyyy hh24:mi:ss')
-                            AND Disbillmast.Dmd_Date <=
-                                TO_DATE (:date20, 'dd/MM/yyyy hh24:mi:ss')
-                            AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-                            AND NVL (PATSUROTHER.Src_Cancel, 'N') = 'N'
-                GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
-                UNION ALL
-                    SELECT Misincexpgroup.Dg_desc,
-                            Misincexpgroup.Dg_grcode,
-                            SUM (PATSURDETL.SRN_AMOUNT - NVL (patsurdetl.srn_discount, 0)) Amt,
-                            SUM (NVL (Patsurdetl.PSN_TOTTAX, 0)) tax,
-                            SUM (PATSURDETL.SRN_AMOUNT) GrossAmt,
-                            SUM (NVL (patsurdetl.srn_discount, 0)) Discount
-                    FROM Disbillmast,
-                            Patsurgery,
-                            Misincexpdtl,
-                            Misincexpgroup,
-                            PATSURDETL
-                    WHERE     Patsurgery.Dmc_Slno = Disbillmast.Dmc_Slno
-                            AND PATSURDETL.SR_SLNO = Patsurgery.SR_SLNO
-                            AND Misincexpdtl.dg_grcode = Misincexpgroup.dg_grcode
-                            AND Misincexpdtl.Dg_type = 'R'
-                            AND Misincexpdtl.Pc_code = PATSURDETL.PC_CODE
-                            AND NVL (Patsurgery.Src_Cancel, 'N') = 'N'
-                            AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
-                            AND Disbillmast.Dmc_Cacr <> 'M'
-                            AND Disbillmast.DMD_DATE >=
-                                TO_DATE (:date21, 'dd/MM/yyyy hh24:mi:ss')
-                            AND Disbillmast.Dmd_Date <=
-                                TO_DATE (:date22, 'dd/MM/yyyy hh24:mi:ss')
-                            AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-                            AND NVL (patsurdetl.Src_Cancel, 'N') = 'N'
-                GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
-                UNION ALL
-                    SELECT Misincexpgroup.Dg_Desc,
-                            Misincexpgroup.Dg_Grcode AS Code,
-                            SUM (NVL (Cmn_Netamt, 0) - NVL (Cmn_Outcoll, 0)) Amt,
-                            0 tax,
-                            SUM (NVL (Cmn_Netamt, 0) - NVL (Cmn_Outcoll, 0)) GrossAmt,
-                            SUM (0) AS Discount
-                    FROM Canbillmast,
-                            Disbillmast,
-                            Ipparam,
-                            Misincexpdtl,
-                            Misincexpgroup
-                    WHERE     Canbillmast.Dmc_Slno = Disbillmast.Dmc_Slno
-                            AND Ipparam.Ipc_Canteencode = Misincexpdtl.Pc_Code
-                            AND Misincexpdtl.Dg_Type = 'R'
-                            AND Misincexpdtl.Dg_Grcode = Misincexpgroup.Dg_Grcode
-                            AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
-                            AND NVL (Canbillmast.Cmc_Cancel, 'N') = 'N'
-                            AND Canbillmast.Cmc_Cacr = 'I'
-                            AND Disbillmast.Dmc_Cacr <> 'M'
-                            AND Disbillmast.Dmd_Date >=
-                                TO_DATE (:date23, 'dd/MM/yyyy hh24:mi:ss')
-                            AND Disbillmast.Dmd_Date <=
-                                TO_DATE (:date24, 'dd/MM/yyyy hh24:mi:ss')
-                            AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-                GROUP BY Misincexpgroup.Dg_Grcode, Misincexpgroup.Dg_Desc
-                ORDER BY Dg_desc`,
-                {
-                    date1: data.from,
-                    date2: data.to,
-                    date3: data.from,
-                    date4: data.to,
-                    date5: data.from,
-                    date6: data.to,
-                    date7: data.from,
-                    date8: data.to,
-                    date9: data.from,
-                    date10: data.to,
-                    date11: data.from,
-                    date12: data.to,
-                    date13: data.from,
-                    date14: data.to,
-                    date15: data.from,
-                    date16: data.to,
-                    date17: data.from,
-                    date18: data.to,
-                    date19: data.from,
-                    date20: data.to,
-                    date21: data.from,
-                    date22: data.to,
-                    date23: data.from,
-                    date24: data.to,
-                },
+                sql,
+                {},
                 { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
             )
             await result.resultSet?.getRows((err, rows) => {
