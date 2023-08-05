@@ -5,16 +5,17 @@ module.exports = {
 
         pool.query(
             `INSERT INTO hrm_employee 
-                (us_code,usc_name,usc_pass,usc_alias,usc_first_name,usc_active) 
+                (us_code,usc_name,usc_pass,usc_alias,usc_first_name,usc_active,user_group_id) 
             VALUES 
-                (?,?,?,?,?,?)`,
+                (?,?,?,?,?,?,?)`,
             [
                 data.us_code,
                 data.usc_name,
                 data.usc_pass,
                 data.usc_alias,
                 data.usc_first_name,
-                data.usc_active
+                data.usc_active,
+                data.user_group_id
             ],
             (error, results, feilds) => {
                 if (error) {
@@ -41,7 +42,8 @@ module.exports = {
     },
     getEmployee: (callBack) => {
         pool.query(
-            `SELECT * FROM medi_ellider.hrm_employee `,
+            `SELECT emp_slno,us_code,usc_name,usc_pass,usc_alias,usc_first_name,usc_active,user_group.user_group_name,hrm_employee.user_group_id FROM medi_ellider.hrm_employee
+            left join user_group on user_group.user_group_id=hrm_employee.user_group_id order by hrm_employee.usc_name`,
             [],
             (error, results, feilds) => {
                 if (error) {
@@ -55,7 +57,8 @@ module.exports = {
 
     viewEmployee: (callBack) => {
         pool.query(
-            `SELECT * FROM medi_ellider.hrm_employee order by usc_name `,
+            `SELECT emp_slno,usc_name,usc_alias,usc_first_name,usc_active,user_group.user_group_name FROM medi_ellider.hrm_employee
+            left join user_group on user_group.user_group_id=hrm_employee.user_group_id`,
             [],
             (error, results, feilds) => {
                 if (error) {
@@ -68,7 +71,9 @@ module.exports = {
 
 
     searchEmployee: (data, callBack) => {
-        pool.query(`select * from hrm_employee where usc_name like ? and usc_alias like ? and usc_first_name like ? order by usc_name`,
+        pool.query(`select emp_slno,us_code,usc_name,usc_pass,usc_alias,usc_first_name,usc_active,user_group.user_group_name from medi_ellider.hrm_employee 
+        left join user_group on user_group.user_group_id=hrm_employee.user_group_id
+        where usc_name like ? and usc_alias like ? and usc_first_name like ? order by usc_name`,
             [
                 '%' + data.usc_name + '%',
                 '%' + data.usc_alias + '%',
@@ -91,7 +96,8 @@ module.exports = {
                     usc_pass = ?,
                     usc_alias = ?,
                     usc_first_name = ?,
-                    usc_active = ?
+                    usc_active = ?,
+                    user_group_id=?
                 WHERE emp_slno = ?`,
             [
                 data.usc_name,
@@ -99,6 +105,7 @@ module.exports = {
                 data.usc_alias,
                 data.usc_first_name,
                 data.usc_active,
+                data.user_group_id,
                 data.emp_slno
             ],
             (error, results, feilds) => {
@@ -118,13 +125,15 @@ module.exports = {
                     usc_name = ?,
                     usc_alias = ?,
                     usc_first_name = ?,
-                    usc_active = ?
+                    usc_active = ?,
+                    user_group_id=?
                 WHERE emp_slno = ?`,
             [
                 data.usc_name,
                 data.usc_alias,
                 data.usc_first_name,
                 data.usc_active,
+                data.user_group_id,
                 data.emp_slno
             ],
             (error, results, feilds) => {
@@ -135,7 +144,6 @@ module.exports = {
             }
         )
     },
-
 
     employeeGetById: (id, callBack) => {
         pool.query(

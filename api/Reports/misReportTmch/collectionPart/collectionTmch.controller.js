@@ -1,24 +1,24 @@
 const {
-    advanceCollectionTssh,
-    advanceRefundTssh,
-    advanceSettledTssh,
-    collectionAgainstSalePart1Tssh,
-    collectionAgainstSalePart2Tssh,
-    complimentoryTssh,
-    creditInsuranceBillCollectionTssh,
-    creditInsuranceBillTssh,
-    ipConsolidatedDiscountTssh,
-    ipPreviousDayDiscountTssh,
-    ipPreviousDayCollectionTssh,
+    advanceCollectionTmch,
+    advanceRefundTmch,
+    advanceSettledTmch,
+    collectionAgainstSalePart1Tmch,
+    collectionAgainstSalePart2Tmch,
+    complimentory,
+    creditInsuranceBillCollectionTmch,
+    creditInsuranceBillTmch,
+    ipConsolidatedDiscountTmch,
+    ipPreviousDayDiscountTmch,
+    ipPreviousDayCollectionTmch,
     unsettledAmount,
     misGroupMast,
     misGroup
-} = require('./collectionTssh.service')
+} = require('./collectionTmch.service')
 
 module.exports = {
-    getadvanceCollectionTssh: (req, res) => {
+    getadvanceCollectionTmch: (req, res) => {
         const body = req.body;
-        advanceCollectionTssh(body, (err, results) => {
+        advanceCollectionTmch(body, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -39,9 +39,9 @@ module.exports = {
             });
         })
     },
-    getadvanceRefundTssh: (req, res) => {
+    getadvanceRefundTmch: (req, res) => {
         const body = req.body;
-        advanceRefundTssh(body, (err, results) => {
+        advanceRefundTmch(body, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -62,9 +62,9 @@ module.exports = {
             });
         })
     },
-    getadvanceSettledTssh: (req, res) => {
+    getadvanceSettledTmch: (req, res) => {
         const body = req.body;
-        advanceSettledTssh(body, (err, results) => {
+        advanceSettledTmch(body, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -85,9 +85,9 @@ module.exports = {
             });
         })
     },
-    getcollectionAgainstSalePart1Tssh: (req, res) => {
+    getcollectionAgainstSalePart1Tmch: (req, res) => {
         const body = req.body;
-        collectionAgainstSalePart1Tssh(body, (err, results) => {
+        collectionAgainstSalePart1Tmch(body, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -108,9 +108,9 @@ module.exports = {
             });
         })
     },
-    getcollectionAgainstSalePart2Tssh: (req, res) => {
+    getcollectionAgainstSalePart2Tmch: (req, res) => {
         const body = req.body;
-        collectionAgainstSalePart2Tssh(body, (err, results) => {
+        collectionAgainstSalePart2Tmch(body, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -131,9 +131,9 @@ module.exports = {
             });
         })
     },
-    getcomplimentoryTssh: (req, res) => {
+    getcomplimentoryTmch: (req, res) => {
         const body = req.body;
-        complimentoryTssh(body, (err, results) => {
+        complimentory(body, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -154,9 +154,9 @@ module.exports = {
             });
         })
     },
-    getcreditInsuranceBillCollectionTssh: (req, res) => {
+    getcreditInsuranceBillCollectionTmch: (req, res) => {
         const body = req.body;
-        creditInsuranceBillCollectionTssh(body, (err, results) => {
+        creditInsuranceBillCollectionTmch(body, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -177,9 +177,9 @@ module.exports = {
             });
         })
     },
-    getcreditInsuranceBillTssh: (req, res) => {
+    getcreditInsuranceBillTmch: (req, res) => {
         const body = req.body;
-        creditInsuranceBillTssh(body, (err, results) => {
+        creditInsuranceBillTmch(body, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -200,9 +200,9 @@ module.exports = {
             });
         })
     },
-    getipConsolidatedDiscountTssh: (req, res) => {
+    getipConsolidatedDiscountTmch: (req, res) => {
         const body = req.body;
-        ipConsolidatedDiscountTssh(body, (err, results) => {
+        ipConsolidatedDiscountTmch(body, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -223,9 +223,9 @@ module.exports = {
             });
         })
     },
-    getipPreviousDayDiscountTssh: (req, res) => {
+    getipPreviousDayDiscountTmch: (req, res) => {
         const body = req.body;
-        ipPreviousDayDiscountTssh(body, (err, results) => {
+        ipPreviousDayDiscountTmch(body, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -246,9 +246,9 @@ module.exports = {
             });
         })
     },
-    getipPreviousDayCollectionTssh: (req, res) => {
+    getipPreviousDayCollectionTmch: (req, res) => {
         const body = req.body;
-        ipPreviousDayCollectionTssh(body, (err, results) => {
+        ipPreviousDayCollectionTmch(body, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,

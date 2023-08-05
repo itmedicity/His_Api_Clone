@@ -10,5 +10,5 @@ router.get('/select', getEmployee);
 router.get('/view', viewEmployee);
 router.get('/:id', employeeGetById);
 router.delete('/', employeeDelete);
-router.post('/search', searchEmployee)
+router.post('/search', searchEmployee);
 module.exports = router;
