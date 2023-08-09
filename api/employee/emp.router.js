@@ -1,6 +1,15 @@
 const router = require('express').Router();
 // const { checkToken } = require("../../auth/jwtValidation");
-const { employeeDelete, employeeGetById, employeeInsert, employeeUpdate, employeeResetPass, getEmployee, login, searchEmployee, viewEmployee } = require('../employee/emp.controller');
+const { employeeDelete,
+    employeeGetById,
+    employeeInsert,
+    employeeUpdate,
+    employeeResetPass,
+    getEmployee,
+    login,
+    searchEmployee,
+    viewEmployee,
+    getMenuRights } = require('../employee/emp.controller');
 
 router.post('/login', login);
 router.post('/insert', employeeInsert);
@@ -11,4 +20,5 @@ router.get('/view', viewEmployee);
 router.get('/:id', employeeGetById);
 router.delete('/', employeeDelete);
 router.post('/search', searchEmployee);
+router.get('/getmenu/:id', getMenuRights);
 module.exports = router;
