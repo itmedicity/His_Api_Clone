@@ -5,6 +5,7 @@ module.exports = {
     getAllPharmacySales: (req, res) => {
         const body = req.body;
         getAllPharmacySales(body, (err, results) => {
+
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -27,6 +28,7 @@ module.exports = {
     getOpCountMonthWise: (req, res) => {
         const body = req.body;
         getOpCountMonthWise(body, (err, results) => {
+
             if (err) {
                 return res.status(200).json({
                     success: 0,

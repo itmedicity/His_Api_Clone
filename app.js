@@ -9,7 +9,7 @@ const emplyeeRoutes = require("./api/employee/emp.router");
 const usgroup = require("./api/newUsergroup/newgroup.router");
 const menugroup = require("./api/MenuGroup/menugroup.router");
 const userright = require("./api/userRights/userRights.router");
-// const oracleUserTable = require("./api/Reports/oraUsers/user.router")
+const oracleUserTable = require("./api/Reports/oraUsers/user.router")
 //QMT
 const collection = require("./api/Reports/misReport/collectionPart/collection.router")
 const patientTypeDiscount = require("./api/Reports/misReport/PatientType/patientType.router")
@@ -25,6 +25,9 @@ const admissionList = require("./api/Reports/InpatientList/admissionList.router"
 const importMedicine = require("./api/MedicineDescription/medicine.router");
 const storerequest = require("./api/StoreRequisition/storereq.router");
 const rolprocess = require("./api/process/rolProcess/rolProcess.router");
+
+//REPORT
+const gstTaxPharmacy = require("./api/Reports/GstReportTaxAndPharmacy/taxAndPharmacy.router");
 
 app.use(express.json());
 
@@ -61,6 +64,9 @@ app.use("/api/userrights", userright)
 app.use("/api/importMedicines", importMedicine)
 app.use("/api/storerequest", storerequest)
 app.use("/api/rolprocess", rolprocess)
+
+//REPORT
+app.use("/api/pharmacytax", gstTaxPharmacy)
 
 
 

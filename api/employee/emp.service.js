@@ -192,6 +192,21 @@ module.exports = {
                 return callBack(null, results[0]);
             }
         );
-    }
+    },
+    getMenuRights: (id, callBack) => {
+
+        pool.query(
+            `call GET_MENULIST(?) `,
+            [id],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+
+                return callBack(null, results[0]);
+            }
+        );
+
+    },
 
 }
