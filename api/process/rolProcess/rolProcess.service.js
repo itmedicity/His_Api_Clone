@@ -15,24 +15,28 @@ module.exports = {
                         BMD_DATE,
                         OU_CODE,
                         IT_CODE,
+                        ITC_DESC,
                         SUM(BDN_QTY) QTY ,
                         MAX(ITN_MRP) MRP,
                         SUM(BDN_AMOUNT) TOTAL
-                    FROM (
-                            SELECT 
-                            TO_CHAR(BMD_DATE,'YYYY-MM') BMD_DATE,
-                                OU_CODE,
-                                IT_CODE,
-                                BDN_QTY,
-                                ITN_MRP,
-                                BDN_AMOUNT
-                            FROM PBILLDETL 
-                            WHERE PBILLDETL.BMD_DATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
-                            AND PBILLDETL.BMD_DATE <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
-                            AND PBILLDETL.BDC_CANCEL = 'N'
-                            AND PBILLDETL.OU_CODE IN  ('${ouCode}')
-                    ) MONTHTABLE
-                    GROUP BY OU_CODE,IT_CODE,BMD_DATE`;
+                     FROM (
+                     SELECT 
+                        TO_CHAR(BMD_DATE,'YYYY-MM') BMD_DATE,
+                        PBILLDETL.OU_CODE,
+                        PBILLDETL.IT_CODE,
+                        PBILLDETL.BDN_QTY,
+                        PBILLDETL.ITN_MRP,
+                        PBILLDETL.BDN_AMOUNT,
+                        MEDDESC.ITC_DESC
+                     FROM PBILLDETL 
+                        LEFT JOIN MEDDESC ON MEDDESC.IT_CODE=PBILLDETL.IT_CODE
+                     WHERE PBILLDETL.BMD_DATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                        AND PBILLDETL.BMD_DATE <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                        AND PBILLDETL.BDC_CANCEL = 'N'
+                        AND PBILLDETL.OU_CODE IN  ('${ouCode}')
+                       ) MONTHTABLE
+                     GROUP BY OU_CODE,IT_CODE,BMD_DATE,ITC_DESC
+                     ORDER BY ITC_DESC`;
         try {
             const result = await conn_ora.execute(
                 sql,
