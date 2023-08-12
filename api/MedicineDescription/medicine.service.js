@@ -7,7 +7,7 @@ module.exports = {
         let pool_ora = await oraConnection();
         let conn_ora = await pool_ora.getConnection();
         let checkMeddescAlreadyExist = (callBack) => {
-            pool.query(`select it_code from medicine_descriptions`,
+            pool.query(`select it_code,itc_desc from medicine_descriptions`,
                 [],
                 (error, result) => {
                     if (error) throw error;
@@ -16,9 +16,12 @@ module.exports = {
         }
         try {
             const result = await conn_ora.execute(
-                `select it_code,itc_desc,itc_alias,itn_pack,itn_strip,itc_status from meddesc where itc_status='Y'
-                 and ITD_DATE >= to_date(:date0, 'yyyy/mm/dd hh24:mi:ss') 
-                 and ITD_DATE <= to_date(:date1, 'yyyy/mm/dd hh24:mi:ss')`,
+                `select meddesc.it_code,itc_desc,itc_alias,itn_pack,itn_strip,itc_status from meddesc 
+                LEFT JOIN medstore ON medstore.it_code=meddesc.it_code
+                 where itc_status='Y'
+                 and ITD_DATE >= to_date(:date0, 'DD/MM/yyyy hh24:mi:ss') 
+                 and ITD_DATE <= to_date(:date1, 'DD/MM/yyyy hh24:mi:ss')
+                 and medstore.ST_CODE in('0124')`,
                 {
                     date0: data.date0,
                     date1: data.date1,
@@ -28,10 +31,12 @@ module.exports = {
             const medDescFromOra = await result.resultSet?.getRows();
 
             checkMeddescAlreadyExist((meddescFromSql) => {
-                const medId = meddescFromSql.map((val) => val.it_code);
-                let newMedArray = medDescFromOra?.filter((value) => {
-                    return medId.includes(value.IT_CODE) === true ? null : value
-                })
+
+                let newMedArray = medDescFromOra?.map((value) => {
+                    const medId = meddescFromSql.find((val) => val.it_code === value.IT_CODE && val.itc_desc === value.ITC_DESC);
+                    return medId === undefined ? value : null;
+                }).filter((val) => val !== null)
+
                 newMedArray && newMedArray?.map((value, index) => {
                     pool.query(`insert into medicine_descriptions (it_code,itc_desc,itc_alias,
                        itn_pack,itn_strip,itc_status) values (?,?,?,?,?,?)`,

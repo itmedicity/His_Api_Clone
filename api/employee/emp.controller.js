@@ -1,7 +1,17 @@
 const { genSaltSync, hashSync, compareSync } = require("bcrypt");
 const { sign } = require("jsonwebtoken");
 
-const { employeeDelete, employeeGetById, employeeInsert, employeeResetPass, employeeUpdate, getEmployee, getEmployeeByUserName, EmployeeAlreadyExist, searchEmployee, viewEmployee }
+const { employeeDelete,
+    employeeGetById,
+    employeeInsert,
+    employeeResetPass,
+    employeeUpdate,
+    getEmployee,
+    getEmployeeByUserName,
+    EmployeeAlreadyExist,
+    searchEmployee,
+    viewEmployee,
+    getMenuRights }
     = require("../employee/emp.service");
 
 const { add } = require("date-fns");
@@ -39,10 +49,7 @@ module.exports = {
         })
     },
 
-
-
     getEmployee: (req, res) => {
-
         getEmployee((err, results) => {
             if (err) {
                 return res.status(200).json({
@@ -67,7 +74,6 @@ module.exports = {
 
     viewEmployee: (req, res) => {
         viewEmployee((err, results) => {
-            console.log(results);
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -238,4 +244,29 @@ module.exports = {
             }
         });
     },
+
+    getMenuRights: (req, res) => {
+        const id = req.params.id;
+        getMenuRights(id, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+
+            if (!results) {
+                return res.status(200).json({
+                    success: 0,
+                    message: "No Record Found"
+                });
+            }
+
+            return res.status(200).json({
+                success: 1,
+                data: results
+            });
+        });
+    },
+
 }

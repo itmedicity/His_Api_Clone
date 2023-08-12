@@ -33,6 +33,9 @@ const importMedicine = require("./api/MedicineDescription/medicine.router");
 const storerequest = require("./api/StoreRequisition/storereq.router");
 const rolprocess = require("./api/process/rolProcess/rolProcess.router");
 
+//REPORT
+const gstTaxPharmacy = require("./api/Reports/GstReportTaxAndPharmacy/taxAndPharmacy.router");
+
 app.use(express.json());
 
 app.use((req, res, next) => {
@@ -76,6 +79,9 @@ app.use("/api/userrights", userright)
 app.use("/api/importMedicines", importMedicine)
 app.use("/api/storerequest", storerequest)
 app.use("/api/rolprocess", rolprocess)
+
+//REPORT
+app.use("/api/pharmacytax", gstTaxPharmacy)
 
 
 
