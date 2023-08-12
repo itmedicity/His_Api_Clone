@@ -2,15 +2,15 @@
 const { oracledb, connectionClose, oraConnection } = require('../../../../../config/oradbconfig');
 
 module.exports = {
-    proIncomePart1Tssh: async (data, callBack) => {
-        let pool_ora = await oraConnection();
-        let conn_ora = await pool_ora.getConnection();
+        proIncomePart1Tssh: async (data, callBack) => {
+                let pool_ora = await oraConnection();
+                let conn_ora = await pool_ora.getConnection();
 
-        const ipNumberList = data.ptno.join(',');
-        const fromDate = data.from;
-        const toDate = data.to;
+                const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(',')) || null;
+                const fromDate = data.from;
+                const toDate = data.to;
 
-        const sql = `SELECT Misincexpgroup.Dg_desc,
+                const sql = `SELECT Misincexpgroup.Dg_desc,
                                 Misincexpgroup.Dg_grcode AS Code,
                                 SUM (NVL (SVN_QTY * SVN_RATE, 0) - NVL (SVN_DISAMT, 0)) Amt,
                                 SUM (NVL (PATSERVICE.SVN_TOTTAX, 0)) tax,
@@ -426,33 +426,33 @@ module.exports = {
                                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                         ORDER BY Dg_desc`;
-        try {
-            const result = await conn_ora.execute(
-                sql,
-                {},
-                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-            )
-            await result.resultSet?.getRows((err, rows) => {
-                callBack(err, rows)
-            })
-        } catch (error) {
-            console.log(error)
-        } finally {
-            if (conn_ora) {
-                await conn_ora.close();
-                await pool_ora.close();
-            }
-        }
-    },
-    proIncomePart2Tssh: async (data, callBack) => {
-        let pool_ora = await oraConnection();
-        let conn_ora = await pool_ora.getConnection();
+                try {
+                        const result = await conn_ora.execute(
+                                sql,
+                                {},
+                                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
+                        )
+                        await result.resultSet?.getRows((err, rows) => {
+                                callBack(err, rows)
+                        })
+                } catch (error) {
+                        console.log(error)
+                } finally {
+                        if (conn_ora) {
+                                await conn_ora.close();
+                                await pool_ora.close();
+                        }
+                }
+        },
+        proIncomePart2Tssh: async (data, callBack) => {
+                let pool_ora = await oraConnection();
+                let conn_ora = await pool_ora.getConnection();
 
-        const ipNumberList = data.ptno.join(',');
-        const fromDate = data.from;
-        const toDate = data.to;
+                const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(',')) || null;
+                const fromDate = data.from;
+                const toDate = data.to;
 
-        const sql = ` SELECT Misincexpgroup.Dg_desc,
+                const sql = ` SELECT Misincexpgroup.Dg_desc,
                                 Misincexpgroup.Dg_grcode AS Code,
                                 SUM (refundbilldetl.rfn_netamt) * -1 Amt,
                                 SUM (NVL (REFUNDBILLDETL.RFN_TOTTAX, 0)) * -1 tax,
@@ -548,33 +548,33 @@ module.exports = {
                                 AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc`;
 
-        try {
-            const result = await conn_ora.execute(
-                sql,
-                {},
-                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-            )
-            await result.resultSet?.getRows((err, rows) => {
-                callBack(err, rows)
-            })
-        } catch (error) {
-            console.log(error)
-        } finally {
-            if (conn_ora) {
-                await conn_ora.close();
-                await pool_ora.close();
-            }
-        }
-    },
-    proIncomePart3Tssh: async (data, callBack) => {
-        let pool_ora = await oraConnection();
-        let conn_ora = await pool_ora.getConnection();
+                try {
+                        const result = await conn_ora.execute(
+                                sql,
+                                {},
+                                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
+                        )
+                        await result.resultSet?.getRows((err, rows) => {
+                                callBack(err, rows)
+                        })
+                } catch (error) {
+                        console.log(error)
+                } finally {
+                        if (conn_ora) {
+                                await conn_ora.close();
+                                await pool_ora.close();
+                        }
+                }
+        },
+        proIncomePart3Tssh: async (data, callBack) => {
+                let pool_ora = await oraConnection();
+                let conn_ora = await pool_ora.getConnection();
 
-        const ipNumberList = data.ptno.join(',');
-        const fromDate = data.from;
-        const toDate = data.to;
+                const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(',')) || null;
+                const fromDate = data.from;
+                const toDate = data.to;
 
-        const sql = `SELECT Misincexpgroup.Dg_desc,
+                const sql = `SELECT Misincexpgroup.Dg_desc,
                             Misincexpgroup.Dg_grcode AS Code,
                             SUM ( (Billdetl.pdn_rate * pdn_qty) - NVL (Billdetl.bmn_disamt, 0)) Amt,
                             SUM (NVL (Billdetl.BDN_TOTTAX, 0)) tax,
@@ -662,32 +662,32 @@ module.exports = {
                             AND DISBILLMAST.IP_NO IN (${ipNumberList})
                     GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc`;
 
-        try {
-            const result = await conn_ora.execute(
-                sql,
-                {},
-                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-            )
-            await result.resultSet?.getRows((err, rows) => {
-                callBack(err, rows)
-            })
-        } catch (error) {
-            console.log(error)
-        } finally {
-            if (conn_ora) {
-                await conn_ora.close();
-                await pool_ora.close();
-            }
-        }
-    },
-    proIncomePart4Tssh: async (data, callBack) => {
-        let pool_ora = await oraConnection();
-        let conn_ora = await pool_ora.getConnection();
+                try {
+                        const result = await conn_ora.execute(
+                                sql,
+                                {},
+                                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
+                        )
+                        await result.resultSet?.getRows((err, rows) => {
+                                callBack(err, rows)
+                        })
+                } catch (error) {
+                        console.log(error)
+                } finally {
+                        if (conn_ora) {
+                                await conn_ora.close();
+                                await pool_ora.close();
+                        }
+                }
+        },
+        proIncomePart4Tssh: async (data, callBack) => {
+                let pool_ora = await oraConnection();
+                let conn_ora = await pool_ora.getConnection();
 
-        const fromDate = data.from;
-        const toDate = data.to;
+                const fromDate = data.from;
+                const toDate = data.to;
 
-        const sql = `SELECT 
+                const sql = `SELECT 
                             '' DG_DESC,
                             0 CODE,
                             0 AMT,
@@ -697,33 +697,33 @@ module.exports = {
                             0 DISCOUNT
                     FROM Misincexpgroup
                     WHERE DG_TYPE = 'E'`;
-        try {
-            const result = await conn_ora.execute(
-                sql,
-                {},
-                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-            )
-            await result.resultSet?.getRows((err, rows) => {
-                callBack(err, rows)
-            })
-        } catch (error) {
-            console.log(error)
-        } finally {
-            if (conn_ora) {
-                await conn_ora.close();
-                await pool_ora.close();
-            }
-        }
-    },
-    theaterIncomeTssh: async (data, callBack) => {
-        let pool_ora = await oraConnection();
-        let conn_ora = await pool_ora.getConnection();
+                try {
+                        const result = await conn_ora.execute(
+                                sql,
+                                {},
+                                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
+                        )
+                        await result.resultSet?.getRows((err, rows) => {
+                                callBack(err, rows)
+                        })
+                } catch (error) {
+                        console.log(error)
+                } finally {
+                        if (conn_ora) {
+                                await conn_ora.close();
+                                await pool_ora.close();
+                        }
+                }
+        },
+        theaterIncomeTssh: async (data, callBack) => {
+                let pool_ora = await oraConnection();
+                let conn_ora = await pool_ora.getConnection();
 
-        const ipNumberList = data.ptno.join(',');
-        const fromDate = data.from;
-        const toDate = data.to;
+                const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(',')) || null;
+                const fromDate = data.from;
+                const toDate = data.to;
 
-        const sql = `SELECT Misincexpgroup.Dg_desc,
+                const sql = `SELECT Misincexpgroup.Dg_desc,
                                 Misincexpgroup.Dg_grcode AS Code,
                                 SUM (NVL (srn_operation, 0) - (NVL (Patsurgery.srn_operdis, 0))) Amt,
                                 SUM (NVL (Patsurgery.SRN_OPERTOTTAX, 0)) tax,
@@ -1045,23 +1045,23 @@ module.exports = {
                                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         GROUP BY Misincexpgroup.Dg_Grcode, Misincexpgroup.Dg_Desc
                         ORDER BY Dg_desc`;
-        try {
-            const result = await conn_ora.execute(
-                sql,
-                {},
-                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-            )
-            await result.resultSet?.getRows((err, rows) => {
-                callBack(err, rows)
-            })
-        } catch (error) {
-            console.log(error)
-        } finally {
-            if (conn_ora) {
-                await conn_ora.close();
-                await pool_ora.close();
-            }
-        }
-    },
+                try {
+                        const result = await conn_ora.execute(
+                                sql,
+                                {},
+                                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
+                        )
+                        await result.resultSet?.getRows((err, rows) => {
+                                callBack(err, rows)
+                        })
+                } catch (error) {
+                        console.log(error)
+                } finally {
+                        if (conn_ora) {
+                                await conn_ora.close();
+                                await pool_ora.close();
+                        }
+                }
+        },
 }
 

@@ -1,9 +1,9 @@
 const { checkToken } = require("../../../../auth/jwtValidation");
 
-const { getPatientTypeDiscount } = require("./patientType.controller");
+const { getpatientTypeDiscountTmch } = require("./patientTypeTmch.controller");
 
 const router = require('express').Router();
 
-router.post('/patientTypeDis', checkToken, getPatientTypeDiscount);
+router.post('/patientTypeDis', checkToken, getpatientTypeDiscountTmch);
 
 module.exports = router;

@@ -153,9 +153,9 @@ module.exports = {
                                     AND NVL (Mretdetl.Mrc_cancel, 'N') = 'N'
                                     AND NVL (mretmast.Mrc_cancel, 'N') = 'N'
                                     AND Mretdetl.MRC_CACR IN ('C', 'R')
-                                    AND Mretmast.MRD_RETDATE >= TO_DATE (${fromDate},'dd/MM/yyyy hh24:mi:ss')
+                                    AND Mretmast.MRD_RETDATE >= TO_DATE ('${fromDate}','dd/MM/yyyy hh24:mi:ss')
                                     AND MRETDETL.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-                                    AND Mretmast.Mrd_RETDate <= TO_DATE (${toDate},'dd/MM/yyyy hh24:mi:ss')) A`;
+                                    AND Mretmast.Mrd_RETDate <= TO_DATE ('${toDate}','dd/MM/yyyy hh24:mi:ss')) A`;
         try {
             const result = await conn_ora.execute(
                 sql,

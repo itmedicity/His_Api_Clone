@@ -8,7 +8,7 @@ module.exports = {
         let pool_ora = await oraConnection();
         let conn_ora = await pool_ora.getConnection();
 
-        const ipNumberList = data.ptno.join(',');
+        const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(',')) || null;;
         const fromDate = data.from;
         const toDate = data.to;
         const sql = ` SELECT SUM (NVL (ARN_AMOUNT, 0)) Amt, 0 tax
@@ -57,7 +57,7 @@ module.exports = {
         let pool_ora = await oraConnection();
         let conn_ora = await pool_ora.getConnection();
 
-        const ipNumberList = data.ptno.join(',');
+        const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(',')) || null;;
         const fromDate = data.from;
         const toDate = data.to;
         const advanceRefndSql = `SELECT SUM (NVL (REFUNDOPADVANCE.RFN_AMT, 0)) Amt, 0 tax
@@ -123,7 +123,7 @@ module.exports = {
         let pool_ora = await oraConnection();
         let conn_ora = await pool_ora.getConnection();
 
-        const ipNumberList = data.ptno.join(',');
+        const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(',')) || null;;
         const fromDate = data.from;
         const toDate = data.to;
 
@@ -385,7 +385,7 @@ module.exports = {
         let pool_ora = await oraConnection();
         let conn_ora = await pool_ora.getConnection();
 
-        const ipNumberList = data.ptno.join(',');
+        const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(',')) || null;;
         const fromDate = data.from;
         const toDate = data.to;
 
@@ -446,7 +446,7 @@ module.exports = {
         let pool_ora = await oraConnection();
         let conn_ora = await pool_ora.getConnection();
 
-        const ipNumberList = data.ptno.join(',');
+        const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(',')) || null;;
         const fromDate = data.from;
         const toDate = data.to;
 
@@ -543,7 +543,7 @@ module.exports = {
         let pool_ora = await oraConnection();
         let conn_ora = await pool_ora.getConnection();
 
-        const ipNumberList = data.ptno.join(',');
+        const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(',')) || null;;
         const fromDate = data.from;
         const toDate = data.to;
 
@@ -585,7 +585,7 @@ module.exports = {
         let pool_ora = await oraConnection();
         let conn_ora = await pool_ora.getConnection();
 
-        const ipNumberList = data.ptno.join(',');
+        const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(',')) || null;;
         const fromDate = data.from;
         const toDate = data.to;
 
@@ -624,7 +624,7 @@ module.exports = {
         let pool_ora = await oraConnection();
         let conn_ora = await pool_ora.getConnection();
 
-        const ipNumberList = data.ptno.join(',');
+        const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(',')) || null;;
         const fromDate = data.from;
         const toDate = data.to;
 
@@ -643,7 +643,7 @@ module.exports = {
                             AND Disbillmast.Dmd_date < TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
                             AND Ipreceipt.Dmc_type IN ('C', 'R')
                             AND IRD_DATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
-                            AND ird_date <= TO_DATE ("${toDate}", 'dd/MM/yyyy hh24:mi:ss')
+                            AND ird_date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
                             AND Disbillmast.IP_NO IN (${ipNumberList})
                             AND Irc_cancel IS NULL`;
         try {
@@ -671,7 +671,7 @@ module.exports = {
         let pool_ora = await oraConnection();
         let conn_ora = await pool_ora.getConnection();
 
-        const ipNumberList = data.ptno.join(',');
+        const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(',')) || null;;
         const fromDate = data.from;
         const toDate = data.to;
 

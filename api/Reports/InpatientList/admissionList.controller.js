@@ -4,7 +4,14 @@ const {
     checkPatientInserted,
     getTsshPatientDateWise,
     deleteIPNumberFromTssh,
-    getPatientData
+    getPatientData,
+    getTsshPatientList,
+    getTotalPatientList,
+    getDischargePatientList,
+    notDischargedPatientListTssh,
+    getLastDischargeUpdateDate,
+    updateDischargedPatient,
+    updateLastDischargeDate
 } = require('./admissionList.service');
 
 module.exports = {
@@ -134,5 +141,153 @@ module.exports = {
             });
         })
     },
-
+    getTsshPatientList: (req, res) => {
+        const body = req.body;
+        getTsshPatientList(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err.message
+                });
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Result",
+                    data: []
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                message: "Get Tssh Patient List",
+                data: results
+            });
+        })
+    },
+    getTotalPatientList: (req, res) => {
+        const body = req.body;
+        getTotalPatientList(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err.message
+                });
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Result",
+                    data: []
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                message: "GET TOTAL PATIENT LIST",
+                data: results
+            });
+        })
+    },
+    getDischargePatientList: (req, res) => {
+        const body = req.body;
+        getDischargePatientList(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err.message
+                });
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Result",
+                    data: []
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                message: "Get The Discharged Patient List",
+                data: results
+            });
+        })
+    },
+    notDischargedPatientListTssh: (req, res) => {
+        notDischargedPatientListTssh((err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err.message
+                });
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Result",
+                    data: []
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                message: "Get The Discharged Patient List",
+                data: results
+            });
+        })
+    },
+    getLastDischargeUpdateDate: (req, res) => {
+        getLastDischargeUpdateDate((err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err.message
+                });
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Result",
+                    data: []
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                message: "Last discharge updated dates",
+                data: results
+            });
+        })
+    },
+    updateDischargedPatient: (req, res) => {
+        const body = req.body;
+        updateDischargedPatient(body)
+            .then((mesge) => {
+                return res.status(200).json({
+                    success: 1,
+                    message: mesge
+                });
+            }).catch((e) => {
+                return res.status(200).json({
+                    success: 0,
+                    message: e.sqlMessage
+                });
+            })
+    },
+    updateLastDischargeDate: (req, res) => {
+        const body = req.body;
+        updateLastDischargeDate(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err.message
+                });
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Result",
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                message: "Update The last dicharge uipdated date",
+            });
+        })
+    },
 }

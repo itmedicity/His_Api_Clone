@@ -12,7 +12,7 @@ module.exports = {
         const fromDate = data.from;
         const toDate = data.to;
 
-        const sql = ` SELECT SUM (NVL (ARN_AMOUNT, 0)) Amt, 0 tax
+        const sql = `SELECT SUM (NVL (ARN_AMOUNT, 0)) Amt, 0 tax
                             FROM OPADVANCE
                         WHERE NVL (ARC_CANCEL, 'N') = 'N'
                                 AND ARD_DATE >=  TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
@@ -36,8 +36,10 @@ module.exports = {
                                 AND IPADVANCE.IAC_MHCODE IN (SELECT MH_CODE FROM multihospital)
                                 AND IPADVANCE.IP_NO NOT IN (${ipNumberList})`;
 
+
         try {
-            const result = await conn_ora.execute(sql,
+            const result = await conn_ora.execute(
+                sql,
                 {},
                 { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
             )
@@ -686,9 +688,9 @@ module.exports = {
                         WHERE Ipreceipt.Dmc_slno = Disbillmast.Dmc_slno
                             AND Disbillmast.Dmd_date < TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
                             AND Ipreceipt.Dmc_type IN ('C', 'R')
-                            AND IRD_DATE >= TO_DATE (${fromDate}, 'dd/MM/yyyy hh24:mi:ss')
+                            AND IRD_DATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-                            AND IRD_DATE <= TO_DATE (${toDate}, 'dd/MM/yyyy hh24:mi:ss')
+                            AND IRD_DATE <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
                             AND Disbillmast.IP_NO NOT IN (${ipNumberList})
                             AND NVL (Irc_cancel, 'N') = 'N'`;
 
@@ -735,7 +737,7 @@ module.exports = {
                             AND Disbillmast.Dmd_date < TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
                             AND Ipreceipt.Dmc_type IN ('C', 'R')
                             AND IRD_DATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
-                            AND ird_date <= TO_DATE ("${toDate}", 'dd/MM/yyyy hh24:mi:ss')
+                            AND ird_date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
                             AND Disbillmast.IP_NO IN (${ipNumberList})
                             AND Irc_cancel IS NULL`;
 

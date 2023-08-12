@@ -1,9 +1,9 @@
-const { patientTypeDiscount } = require("../../misReport/PatientType/patientType.service")
+const { patientTypeDiscountTmch } = require("./patientTypeTmch.service")
 
 module.exports = {
-    getPatientTypeDiscount: (req, res) => {
+    getpatientTypeDiscountTmch: (req, res) => {
         const body = req.body;
-        patientTypeDiscount(body, (err, results) => {
+        patientTypeDiscountTmch(body, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
