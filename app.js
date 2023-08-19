@@ -29,6 +29,13 @@ const rolprocess = require("./api/process/rolProcess/rolProcess.router");
 //REPORT
 const gstTaxPharmacy = require("./api/Reports/GstReportTaxAndPharmacy/taxAndPharmacy.router");
 
+// count
+const count = require("./api/OPCount/opcount.router");
+
+
+// MELIORA
+const elliderData = require("./api/MelioraEllider/elliderData.router");
+
 app.use(express.json());
 
 app.use((req, res, next) => {
@@ -68,7 +75,11 @@ app.use("/api/rolprocess", rolprocess)
 //REPORT
 app.use("/api/pharmacytax", gstTaxPharmacy)
 
+// count
+app.use("/api/opcount", count)
 
+// MELIORA
+app.use("/api/melioraEllider", elliderData)
 
 app.listen(process.env.APP_PORT, (val) => {
     console.log(`Server Up and Running ${process.env.APP_PORT}`)
