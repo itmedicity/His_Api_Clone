@@ -30,7 +30,10 @@ const rolprocess = require("./api/process/rolProcess/rolProcess.router");
 const gstTaxPharmacy = require("./api/Reports/GstReportTaxAndPharmacy/taxAndPharmacy.router");
 
 // count
-const count = require("./api/OPCount/opcount.router");
+const opcount = require("./api/OPCount/opcount.router");
+const ipcount = require("./api/IPCount/ipcount.router");
+
+const dashboard = require("./api/DashBoard/dashBoard.router");
 
 
 // MELIORA
@@ -76,7 +79,9 @@ app.use("/api/rolprocess", rolprocess)
 app.use("/api/pharmacytax", gstTaxPharmacy)
 
 // count
-app.use("/api/opcount", count)
+app.use("/api/opcount", opcount)
+app.use("/api/ipcount", ipcount)
+app.use("/api/dashboard", dashboard)
 
 // MELIORA
 app.use("/api/melioraEllider", elliderData)

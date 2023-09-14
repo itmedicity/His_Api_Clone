@@ -1,25 +1,24 @@
-const { getOpCountDayWise,
-    getOpCountMonthWise,
-    getOpCountYearWise,
-    getOpCountDeptDayWise,
-    getOpCountDeptMonthWise,
-    getOpCountDeptYearWise,
-    getOpDoctorDayWise,
-    getOpDoctorMonthWise,
-    getOpDoctorYearWise,
-    getOpGenderDayWise,
-    getOpGenderMonthWise,
-    getOpGenderYearWise,
-    getOpRegionDayWise,
-    getOpRegionMonthWise,
-    getOpRegionYearWise,
-
-} = require('./opcount.service')
+const {
+    getIpCountDayWise,
+    getIpCountMonthWise,
+    getIpCountYearWise,
+    getIpCountDeptDayWise,
+    getIpCountDeptMonthWise,
+    getIpCountDepYearWise,
+    getIpDoctorDayWise,
+    getIpDoctorMonthWise,
+    getIpDoctorYearWise,
+    getIpGenderDayWise,
+    getIpGenderMonthWise,
+    getIpGenderYearWise,
+    getIpRegionDayWise,
+    getIpRegionMonthWise,
+    getIpRegionYearWise
+} = require('./ipcount.service')
 
 module.exports = {
-    getOpCountDayWise: (req, res) => {
-        // const body = req.body;
-        getOpCountDayWise((err, results) => {
+    getIpCountDayWise: (req, res) => {
+        getIpCountDayWise((err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -34,14 +33,13 @@ module.exports = {
             }
             return res.status(200).json({
                 success: 2,
-                message: "Op Count Updated"
+                message: "IP Count Updated"
             });
         });
     },
 
-
-    getOpCountMonthWise: (req, res) => {
-        getOpCountMonthWise((err, results) => {
+    getIpCountMonthWise: (req, res) => {
+        getIpCountMonthWise((err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -56,14 +54,13 @@ module.exports = {
             }
             return res.status(200).json({
                 success: 2,
-                message: "Op Count Updated"
+                message: "IP Count Updated"
             });
         });
     },
 
-
-    getOpCountYearWise: (req, res) => {
-        getOpCountYearWise((err, results) => {
+    getIpCountYearWise: (req, res) => {
+        getIpCountYearWise((err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -78,13 +75,12 @@ module.exports = {
             }
             return res.status(200).json({
                 success: 2,
-                message: "Op Count Updated"
+                message: "IP Count Updated"
             });
         });
     },
-
-    getOpCountDeptDayWise: (req, res) => {
-        getOpCountDeptDayWise((err, results) => {
+    getIpCountDeptDayWise: (req, res) => {
+        getIpCountDeptDayWise((err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -99,14 +95,12 @@ module.exports = {
             }
             return res.status(200).json({
                 success: 2,
-                message: "Op Count Updated"
+                message: "IP Count Updated"
             });
         });
     },
-
-
-    getOpCountDeptMonthWise: (req, res) => {
-        getOpCountDeptMonthWise((err, results) => {
+    getIpCountDeptMonthWise: (req, res) => {
+        getIpCountDeptMonthWise((err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -121,13 +115,14 @@ module.exports = {
             }
             return res.status(200).json({
                 success: 2,
-                message: "Op Count Updated"
+                message: "IP Count Updated"
             });
         });
     },
 
-    getOpCountDeptYearWise: (req, res) => {
-        getOpCountDeptYearWise((err, results) => {
+
+    getIpCountDepYearWise: (req, res) => {
+        getIpCountDepYearWise((err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -142,13 +137,13 @@ module.exports = {
             }
             return res.status(200).json({
                 success: 2,
-                message: "Op Count Updated"
+                message: "IP Count Updated"
             });
         });
     },
 
-    getOpDoctorDayWise: (req, res) => {
-        getOpDoctorDayWise((err, results) => {
+    getIpDoctorDayWise: (req, res) => {
+        getIpDoctorDayWise((err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -163,13 +158,13 @@ module.exports = {
             }
             return res.status(200).json({
                 success: 2,
-                message: "Op Count Updated"
+                message: "Ip Count Updated"
             });
         });
     },
 
-    getOpDoctorMonthWise: (req, res) => {
-        getOpDoctorMonthWise((err, results) => {
+    getIpDoctorMonthWise: (req, res) => {
+        getIpDoctorMonthWise((err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -184,13 +179,13 @@ module.exports = {
             }
             return res.status(200).json({
                 success: 2,
-                message: "Op Count Updated"
+                message: "Ip Count Updated"
             });
         });
     },
 
-    getOpDoctorYearWise: (req, res) => {
-        getOpDoctorYearWise((err, results) => {
+    getIpDoctorYearWise: (req, res) => {
+        getIpDoctorYearWise((err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -205,15 +200,15 @@ module.exports = {
             }
             return res.status(200).json({
                 success: 2,
-                message: "Op Count Updated"
+                message: "Ip Count Updated"
             });
         });
     },
 
 
 
-    getOpGenderDayWise: (req, res) => {
-        getOpGenderDayWise((err, results) => {
+    getIpGenderDayWise: (req, res) => {
+        getIpGenderDayWise((err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -228,14 +223,14 @@ module.exports = {
             }
             return res.status(200).json({
                 success: 2,
-                message: "Op Count Updated"
+                message: "Ip Count Updated"
             });
         });
     },
 
 
-    getOpGenderMonthWise: (req, res) => {
-        getOpGenderMonthWise((err, results) => {
+    getIpGenderMonthWise: (req, res) => {
+        getIpGenderMonthWise((err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -250,14 +245,14 @@ module.exports = {
             }
             return res.status(200).json({
                 success: 2,
-                message: "Op Count Updated"
+                message: "Ip Count Updated"
             });
         });
     },
 
 
-    getOpGenderYearWise: (req, res) => {
-        getOpGenderYearWise((err, results) => {
+    getIpGenderYearWise: (req, res) => {
+        getIpGenderYearWise((err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -272,13 +267,13 @@ module.exports = {
             }
             return res.status(200).json({
                 success: 2,
-                message: "Op Count Updated"
+                message: "Ip Count Updated"
             });
         });
     },
 
-    getOpRegionDayWise: (req, res) => {
-        getOpRegionDayWise((err, results) => {
+    getIpRegionDayWise: (req, res) => {
+        getIpRegionDayWise((err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -293,13 +288,13 @@ module.exports = {
             }
             return res.status(200).json({
                 success: 2,
-                message: "Op Count Updated"
+                message: "Ip Count Updated"
             });
         });
     },
 
-    getOpRegionMonthWise: (req, res) => {
-        getOpRegionMonthWise((err, results) => {
+    getIpRegionMonthWise: (req, res) => {
+        getIpRegionMonthWise((err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -314,12 +309,12 @@ module.exports = {
             }
             return res.status(200).json({
                 success: 2,
-                message: "Op Count Updated"
+                message: "Ip Count Updated"
             });
         });
     },
-    getOpRegionYearWise: (req, res) => {
-        getOpRegionYearWise((err, results) => {
+    getIpRegionYearWise: (req, res) => {
+        getIpRegionYearWise((err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -334,10 +329,11 @@ module.exports = {
             }
             return res.status(200).json({
                 success: 2,
-                message: "Op Count Updated"
+                message: "Ip Count Updated"
             });
         });
     },
+
 
 
 }
