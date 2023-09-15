@@ -54,7 +54,6 @@ module.exports = {
                         });
                 })
             })
-
             return callBack(null, result)
         }
         catch (error) {
