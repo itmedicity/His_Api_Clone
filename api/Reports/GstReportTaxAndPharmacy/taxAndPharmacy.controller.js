@@ -64,7 +64,6 @@ module.exports = {
     getInPatientMedSale: (req, res) => {
         const body = req.body;
         getInPatientMedSale(body, (err, results) => {
-            // console.log(results);
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -89,7 +88,6 @@ module.exports = {
     getInPatientMedReturn: (req, res) => {
         const body = req.body;
         getInPatientMedReturn(body, (err, results) => {
-            // console.log(results);
             if (err) {
                 return res.status(200).json({
                     success: 0,
