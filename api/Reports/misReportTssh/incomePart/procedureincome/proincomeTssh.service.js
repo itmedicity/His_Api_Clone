@@ -515,7 +515,7 @@ module.exports = {
                                 AND Disbillmast.dmd_date >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
                                 AND Disbillmast.dmd_date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
                                 AND DISBILLMAST.IP_NO IN (${ipNumberList})
-                                AND DISBILLMAST.MH_CODE NOT IN (SELECT MH_CODE FROM multihospital)
+                                AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                         UNION ALL
                         SELECT Misincexpgroup.Dg_desc,

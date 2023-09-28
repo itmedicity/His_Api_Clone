@@ -11,7 +11,8 @@ const {
     notDischargedPatientListTssh,
     getLastDischargeUpdateDate,
     updateDischargedPatient,
-    updateLastDischargeDate
+    updateLastDischargeDate,
+    getDischargedipNoFromMysql
 } = require('./admissionList.service');
 
 module.exports = {
@@ -287,6 +288,27 @@ module.exports = {
             return res.status(200).json({
                 success: 1,
                 message: "Update The last dicharge uipdated date",
+            });
+        })
+    },
+    getDischargedipNoFromMysql: (req, res) => {
+        const body = req.body;
+        getDischargedipNoFromMysql(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err.message
+                });
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Result",
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results,
             });
         })
     },

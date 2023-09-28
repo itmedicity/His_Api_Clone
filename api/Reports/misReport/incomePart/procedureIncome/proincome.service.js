@@ -501,7 +501,7 @@ module.exports = {
         let conn_ora = await pool_ora.getConnection();
         try {
             const result = await conn_ora.execute(
-                `  SELECT Misincexpgroup.Dg_desc,
+                `SELECT Misincexpgroup.Dg_desc,
                             Misincexpgroup.Dg_grcode AS Code,
                             SUM (refundbilldetl.rfn_netamt) * -1 Amt,
                             SUM (NVL (REFUNDBILLDETL.RFN_TOTTAX, 0)) * -1 tax,

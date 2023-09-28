@@ -8,7 +8,7 @@ module.exports = {
         let pool_ora = await oraConnection();
         let conn_ora = await pool_ora.getConnection();
 
-        const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(',')) || null;;
+        const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(',')) || null;
         const fromDate = data.from;
         const toDate = data.to;
         const sql = ` SELECT SUM (NVL (ARN_AMOUNT, 0)) Amt, 0 tax
@@ -198,80 +198,22 @@ module.exports = {
         let pool_ora = await oraConnection();
         let conn_ora = await pool_ora.getConnection();
 
+        const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(',')) || null;
         const fromDate = data.from;
         const toDate = data.to;
 
-        const sql = `SELECT SUM ( NVL (receiptmast.RPN_CASH, 0) + NVL (receiptmast.RPN_CARD, 0) + NVL (receiptmast.RPN_CHEQUE, 0)) AS Amt
-                        FROM receiptmast
-                        WHERE receiptmast.RPC_CACR IN ('I')
-                            AND receiptmast.RPC_CANCEL IS NULL
-                            AND receiptmast.RPC_COLLCNCODE IS NULL
-                            AND receiptmast.RPD_DATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
-                            AND receiptmast.RPD_DATE <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
-                            AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-                        UNION ALL
-                        SELECT SUM ( NVL (Opbillmast.OPN_CASH, 0) + NVL (Opbillmast.OPN_CARD, 0) + NVL (Opbillmast.OPN_CHEQUE, 0)) AS Amt
-                        FROM Opbillmast
-                        WHERE Opbillmast.OPC_CACR IN ('I') AND Opbillmast.OPN_CANCEL IS NULL
-                            AND Opbillmast.OPD_DATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
-                            AND Opbillmast.OPD_DATE <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
-                            AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-                        UNION ALL
-                        SELECT SUM ( NVL (billmast.BMN_CASH, 0)  + NVL (billmast.BMN_CARD, 0) + NVL (billmast.BMN_CHEQUE, 0)) AS Amt
-                        FROM billmast
-                        WHERE billmast.Bmc_Cacr IN ('I')
-                            AND billmast.BMC_CANCEL IS NULL
-                            AND BILLMAST.BMC_COLLCNCODE IS NULL
-                            AND billmast.BMD_DATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
-                            AND billmast.BMD_DATE <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
-                            AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-                        UNION ALL
-                        SELECT SUM ( NVL (Pbillmast.BMN_CARD, 0) + NVL (Pbillmast.BMN_CASH, 0) + NVL (Pbillmast.BMN_CHEQUE, 0)) AS Amt
-                        FROM Pbillmast
-                        WHERE     Pbillmast.Bmc_Cacr IN ('I')
-                            AND Pbillmast.bmc_cancel = 'N'
-                            AND pbillmast.BMC_COLLCNCODE IS NULL
-                            AND Pbillmast.BMD_DATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
-                            AND Pbillmast.BMD_DATE <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
-                            AND pbillmast.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-                        UNION ALL
-                        SELECT SUM ( NVL (ipreceipt.irn_amount, 0) + NVL (ipreceipt.irn_card, 0) + NVL (ipreceipt.irn_cheque, 0) + NVL (ipreceipt.irn_neft, 0)) - SUM (NVL (irn_balance, 0) + NVL (IRN_REFCHEQ, 0) + NVL (IPRECEIPT.IRN_REFCARD, 0)) Amt
+        const sql = ` SELECT 
+                            SUM ( NVL (ipreceipt.irn_amount, 0) + NVL (ipreceipt.irn_card, 0) + NVL (ipreceipt.irn_cheque, 0) + NVL (ipreceipt.irn_neft, 0)) - SUM (NVL (irn_balance, 0) + NVL (IRN_REFCHEQ, 0) + NVL (IPRECEIPT.IRN_REFCARD, 0)) Amt
                         FROM IPRECEIPT, Disbillmast
                         WHERE Disbillmast.Dmc_Slno = IPRECEIPT.Dmc_Slno
-                            AND IPRECEIPT.DMC_TYPE IN ('I')
+                            AND IPRECEIPT.DMC_TYPE IN ('C', 'R')
                             AND DMD_DATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
                             AND DMD_DATE <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
                             AND IRC_CANCEL IS NULL
                             AND IRD_DATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             AND IRD_DATE <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
-                        UNION ALL
-                        SELECT SUM ( NVL (billmast.BMN_CASH, 0) + NVL (billmast.BMN_CARD, 0) + NVL (billmast.BMN_CHEQUE, 0)) AS Amt
-                        FROM billmast
-                        WHERE     billmast.Bmc_Cacr IN ('I')
-                            AND billmast.BMC_CANCEL IS NULL
-                            AND BILLMAST.BMC_COLLCNCODE IS NOT NULL
-                            AND BILLMAST.BMD_COLLDATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
-                            AND BILLMAST.BMD_COLLDATE <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
-                            AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-                        UNION ALL
-                        SELECT SUM ( NVL (receiptmast.RPN_CASH, 0) + NVL (receiptmast.RPN_CARD, 0)+ NVL (receiptmast.RPN_CHEQUE, 0)) AS Amt
-                        FROM receiptmast
-                        WHERE     receiptmast.RPC_CACR IN ('I')
-                            AND receiptmast.RPC_CANCEL IS NULL
-                            AND receiptmast.RPC_COLLCNCODE IS NOT NULL
-                            AND receiptmast.RPD_COLLDATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
-                            AND receiptmast.RPD_COLLDATE <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
-                            AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-                        UNION ALL
-                        SELECT SUM ( NVL (Pbillmast.BMN_CARD, 0) + NVL (Pbillmast.BMN_CASH, 0)+ NVL (Pbillmast.BMN_CHEQUE, 0)) AS Amt
-                        FROM Pbillmast
-                        WHERE     Pbillmast.Bmc_Cacr IN ('I')
-                            AND NVL (Pbillmast.bmc_cancel, 'N') = 'N'
-                            AND pbillmast.BMC_COLLCNCODE IS NOT NULL
-                            AND Pbillmast.BMD_COLLDATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
-                            AND Pbillmast.BMD_COLLDATE <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
-                            AND pbillmast.MH_CODE IN (SELECT MH_CODE FROM multihospital)`;
+                            AND DISBILLMAST.IP_NO IN  (${ipNumberList})`;
 
         try {
             const result = await conn_ora.execute(
@@ -297,21 +239,20 @@ module.exports = {
         let pool_ora = await oraConnection();
         let conn_ora = await pool_ora.getConnection();
 
+        const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(',')) || null;
         const fromDate = data.from;
         const toDate = data.to;
 
         const sql = `SELECT 
-                SUM ( NVL (Refundreceiptmast.RFN_CASH, 0) + NVL (Refundreceiptmast.RFN_CARD, 0) + NVL (Refundreceiptmast.RFN_CHEQUE, 0)) * -1 AS Amt,
-                SUM (NVL (Refundreceiptmast.RFN_TOTTAX, 0)) * -1 tax
-            FROM Refundreceiptmast
-            WHERE     Refundreceiptmast.Rfc_Cacr IN ('I')
-                AND Refundreceiptmast.Rfc_Cancel IS NULL
-                AND Refundreceiptmast.RFC_RETCNCODE IS NULL
-                AND Refundreceiptmast.Roc_Slno IS NULL
-                AND (   NVL (Refundreceiptmast.RFN_CASH, 0) > 0 OR NVL (Refundreceiptmast.RFN_CARD, 0) > 0 OR NVL (Refundreceiptmast.RFN_CHEQUE, 0) > 0)
-                AND Refundreceiptmast.Rfd_Date >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
-                AND Refundreceiptmast.Rfd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
-                AND REFUNDRECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)`;
+                        SUM (NVL (IPRECEIPTrefund.irf_cash, 0) + NVL (IPRECEIPTrefund.irf_card, 0) + NVL (IPRECEIPTrefund.irf_cheque, 0))  * -1 AS Amt,
+                        0 tax
+                    FROM IPRECEIPTrefund
+                    WHERE IRF_CACR IN ('C') AND IRF_CANCEL IS NULL
+                        AND (NVL (IPRECEIPTrefund.irf_cash, 0) > 0 OR NVL (IPRECEIPTrefund.irf_card, 0) > 0  OR NVL (IPRECEIPTrefund.irf_cheque, 0) > 0)
+                        AND IRF_DATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                        AND IRF_DATE <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                        AND ipreceiptrefund.IRC_MHCODE IN (SELECT MH_CODE FROM multihospital)
+                        AND IPRECEIPTREFUND.IP_NO IN (${ipNumberList})`;
         try {
             const result = await conn_ora.execute(
                 sql,
@@ -397,13 +338,13 @@ module.exports = {
                             AND RECPCOLLECTIONMAST.RCD_DATE <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
                             AND RECPCOLLECTIONMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             AND RECPCOLLECTIONMAST.RCC_CANCEL IS NULL
-                            AND RECPCOLLECTIONMAST.RCC_SLNO IN (
+                            AND RECPCOLLECTIONMAST.RCC_SLNO NOT IN (
                                 SELECT 
                                     RCC_SLNO 
                                 FROM RECPCOLLECTIONDETL 
                                 WHERE RECPCOLLECTIONDETL.RCD_DATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
                                 AND RECPCOLLECTIONDETL.RCD_DATE <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss') 
-                                AND RECPCOLLECTIONDETL.IP_NO IN (${ipNumberList}) 
+                                AND RECPCOLLECTIONDETL.IP_NO NOT IN (${ipNumberList}) 
                             )
                         HAVING SUM ( NVL (RECPCOLLECTIONMAST.RCN_CASH, 0) + NVL (RECPCOLLECTIONMAST.RCN_CHK, 0) + NVL (RECPCOLLECTIONMAST.RCN_DD, 0)  + NVL (RECPCOLLECTIONMAST.RCN_Card, 0) + NVL (RECPCOLLECTIONMAST.RCN_NEFT, 0)) > 0
                         UNION ALL
@@ -415,14 +356,13 @@ module.exports = {
                             AND RECPCOLLECTIONMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             AND Recpcollectionmast.Rfd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
                             AND NVL (Rcc_Cancel, 'N') = 'N'
-                            AND RECPCOLLECTIONMAST.RCC_SLNO IN (
+                            AND RECPCOLLECTIONMAST.RCC_SLNO NOT IN (
                                 SELECT 
                                     RCC_SLNO 
                                 FROM RECPCOLLECTIONDETL 
                                 WHERE RECPCOLLECTIONDETL.RCD_DATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
                                 AND RECPCOLLECTIONDETL.RCD_DATE <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss') 
-                                AND RECPCOLLECTIONDETL.IP_NO IN  (${ipNumberList})
-                            )`;
+                                AND RECPCOLLECTIONDETL.IP_NO NOT IN  (${ipNumberList}))`;
         try {
             const result = await conn_ora.execute(
                 sql,
@@ -451,31 +391,6 @@ module.exports = {
         const toDate = data.to;
 
         const sql = `SELECT 
-                                SUM (NVL (BMN_CREDIT, 0)) AS Amt,
-                                SUM (NVL (billmast.BMN_TOTTAX, 0)) Tax
-                        FROM billmast
-                        WHERE billmast.Bmc_Cacr IN ('R')
-                                AND NVL (billmast.BMC_CANCEL, 'N') = 'N'
-                                AND BILLMAST.BMC_COLLCNCODE IS NULL
-                                AND billmast.BMD_DATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND Billmast.Bmd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND billmast.mh_code IN (SELECT MH_CODE FROM multihospital)
-                                AND BILLMAST.IP_NO IN (${ipNumberList})
-                        UNION ALL
-                        SELECT 
-                                SUM ( NVL (Pbillmast.BMN_CREDIT, 0) + NVL (PBILLMAST.BMN_SALETAXCR, 0) + NVL (PBILLMAST.BMN_CESSCR, 0)) AS Amt,
-                                SUM ( NVL (BMN_SALETAXCH, 0) + NVL (BMN_SALETAXCR, 0) + NVL (BMN_CESSCH, 0)  + NVL (BMN_CESSCR, 0)) Tax
-                        FROM Pbillmast
-                        WHERE Pbillmast.Bmc_Cacr = 'R'
-                                AND NVL (Pbillmast.bmc_cancel, 'N') = 'N'
-                                AND pbillmast.BMC_COLLCNCODE IS NULL
-                                AND NVL (Bmn_credit, 0) <> 0
-                                AND Pbillmast.BMD_DATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND Pbillmast.BMD_DATE <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND pbillmast.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-                                AND pbillmast.IP_NO IN (${ipNumberList})
-                        UNION ALL
-                        SELECT 
                                 SUM (NVL (Disbillmast.DMN_FINALCREDIT, 0)) + SUM (NVL (dmn_copayded_credit, 0))  Amt,
                                 SUM ( DECODE ( NVL (Disbillmast.Dmc_Cancel, 'N'), 'N',   NVL (DMN_SALESTAXCH, 0) + NVL (DMN_SALESTAXCR, 0) + NVL (DMN_CESSCH, 0)  + NVL (DMN_CESSCR, 0), 0)) TAX
                         FROM Disbillmast
@@ -483,42 +398,7 @@ module.exports = {
                                 AND DMD_DATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
                                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 AND DMD_DATE <=  TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND IP_NO IN (${ipNumberList})
-                        UNION ALL
-                        SELECT 
-                                SUM (NVL (BMN_CREDIT, 0)) AS Amt,
-                                SUM (NVL (billmast.BMN_TOTTAX, 0)) Tax
-                        FROM billmast
-                        WHERE billmast.Bmc_Cacr IN ('R')
-                                AND NVL (billmast.BMC_CANCEL, 'N') = 'N'
-                                AND BILLMAST.BMC_COLLCNCODE IS NOT NULL
-                                AND BILLMAST.BMD_COLLDATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND BILLMAST.BMD_COLLDATE <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND billmast.mh_code IN (SELECT MH_CODE FROM multihospital)
-                                AND BILLMAST.IP_NO IN (${ipNumberList})
-                        UNION ALL
-                        SELECT 
-                                SUM (  NVL (Pbillmast.BMN_CREDIT, 0) + NVL (PBILLMAST.BMN_SALETAXCR, 0) + NVL (PBILLMAST.BMN_CESSCR, 0)) AS Amt,
-                                SUM ( NVL (BMN_SALETAXCH, 0) + NVL (BMN_SALETAXCR, 0)  + NVL (BMN_CESSCH, 0) + NVL (BMN_CESSCR, 0)) Tax
-                        FROM Pbillmast
-                        WHERE Pbillmast.Bmc_Cacr = 'R'
-                                AND NVL (Pbillmast.bmc_cancel, 'N') = 'N'
-                                AND pbillmast.BMC_COLLCNCODE IS NOT NULL
-                                AND Pbillmast.BMD_COLLDATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND Pbillmast.BMD_COLLDATE <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND pbillmast.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-                                AND pbillmast.IP_NO IN (${ipNumberList})
-                        UNION ALL
-                        SELECT 
-                                SUM (NVL (RPN_CREDIT, 0)) AS Amt,
-                                SUM (NVL (receiptmast.RPN_TOTTAX, 0)) Tax
-                        FROM receiptmast
-                        WHERE receiptmast.RPC_CACR IN ('I')
-                                AND NVL (receiptmast.RPC_CANCEL, 'N') = 'N'
-                                AND receiptmast.RPC_COLLCNCODE IS NOT NULL
-                                AND receiptmast.RPD_COLLDATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND receiptmast.RPD_COLLDATE <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)`;
+                                AND IP_NO IN (${ipNumberList})`;
 
         try {
             const result = await conn_ora.execute(
