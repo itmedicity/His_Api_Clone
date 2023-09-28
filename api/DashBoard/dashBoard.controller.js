@@ -1,217 +1,242 @@
 const {
-    getGstReportOfPharmacy,
-    getGstReportPharmacyWise,
-    getSumOfAmountTaxDisc,
-    getInPatientMedReturn,
-    getInPatientMedReturnSum,
-    getInPatientMedSale,
-    getOpCreditPharmSale,
-    getGstReportPharmCollection,
-} = require('./taxAndPharmacy.service');
+    getOPCountYear,
+    getIPCountYear,
+    getOPCountMonth,
+    getIPCountMonth,
+    getOPCountDay,
+    getIPCountDay,
+    getOPCurrentYear,
+    getIPCurrentYear,
+    getOPCurrentMonthDayWise,
+    getIPCurrentMonthDayWise } = require('./dashBoard.service')
 
 module.exports = {
 
-    getGstReportOfPharmacy: (req, res) => {
+    getOPCountYear: (req, res) => {
         const body = req.body;
-        getGstReportOfPharmacy(body, (err, results) => {
+        getOPCountYear(body, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
-                    message: err.message
+                    message: err
                 });
             }
             if (Object.keys(results).length === 0) {
                 return res.status(200).json({
-                    success: 2,
-                    message: "No Result",
+                    success: 1,
                     data: []
                 });
             }
             return res.status(200).json({
-                success: 1,
-                message: "Gst Reports",
+                success: 2,
                 data: results
             });
         })
+
     },
 
-
-    getGstReportPharmacyWise: (req, res) => {
+    getIPCountYear: (req, res) => {
         const body = req.body;
-        getGstReportPharmacyWise(body, (err, results) => {
-
+        getIPCountYear(body, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
-                    message: err.message
+                    message: err
                 });
             }
             if (Object.keys(results).length === 0) {
                 return res.status(200).json({
-                    success: 2,
-                    message: "No Result",
+                    success: 1,
                     data: []
                 });
             }
             return res.status(200).json({
-                success: 1,
-                message: "Gst Reports",
+                success: 2,
                 data: results
             });
         })
+
     },
 
-    getInPatientMedSale: (req, res) => {
+    getOPCurrentYear: (req, res) => {
         const body = req.body;
-        getInPatientMedSale(body, (err, results) => {
-            // console.log(results);
+        getOPCurrentYear(body, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
-                    message: err.message
+                    message: err
                 });
             }
             if (Object.keys(results).length === 0) {
                 return res.status(200).json({
-                    success: 2,
-                    message: "No Result",
+                    success: 1,
                     data: []
                 });
             }
             return res.status(200).json({
-                success: 1,
-                message: "Gst Reports",
+                success: 2,
                 data: results
             });
         })
-    },
 
-    getInPatientMedReturn: (req, res) => {
+    },
+    getIPCurrentYear: (req, res) => {
         const body = req.body;
-        getInPatientMedReturn(body, (err, results) => {
-            // console.log(results);
+        getIPCurrentYear(body, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
-                    message: err.message
+                    message: err
                 });
             }
             if (Object.keys(results).length === 0) {
                 return res.status(200).json({
-                    success: 2,
-                    message: "No Result",
+                    success: 1,
                     data: []
                 });
             }
             return res.status(200).json({
-                success: 1,
-                message: "Gst Reports",
+                success: 2,
                 data: results
             });
         })
     },
-
-
-    getSumOfAmountTaxDisc: (req, res) => {
+    getOPCountMonth: (req, res) => {
         const body = req.body;
-        getSumOfAmountTaxDisc(body, (err, results) => {
+        getOPCountMonth(body, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
-                    message: err.message
+                    message: err
                 });
             }
             if (Object.keys(results).length === 0) {
                 return res.status(200).json({
-                    success: 2,
-                    message: "No Result",
+                    success: 1,
                     data: []
                 });
             }
             return res.status(200).json({
-                success: 1,
-                message: "Gst Reports",
+                success: 2,
                 data: results
             });
         })
-    },
 
-    getInPatientMedReturnSum: (req, res) => {
+    },
+    getIPCountMonth: (req, res) => {
         const body = req.body;
-        getInPatientMedReturnSum(body, (err, results) => {
+        getIPCountMonth(body, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
-                    message: err.message
+                    message: err
                 });
             }
             if (Object.keys(results).length === 0) {
                 return res.status(200).json({
-                    success: 2,
-                    message: "No Result",
+                    success: 1,
                     data: []
                 });
             }
             return res.status(200).json({
-                success: 1,
-                message: "Gst Reports",
+                success: 2,
                 data: results
             });
         })
+
     },
 
-
-
-
-
-    getOpCreditPharmSale: (req, res) => {
+    getOPCurrentMonthDayWise: (req, res) => {
         const body = req.body;
-        getOpCreditPharmSale(body, (err, results) => {
+        getOPCurrentMonthDayWise(body, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
-                    message: err.message
+                    message: err
                 });
             }
             if (Object.keys(results).length === 0) {
                 return res.status(200).json({
-                    success: 2,
-                    message: "No Result",
+                    success: 1,
                     data: []
                 });
             }
             return res.status(200).json({
-                success: 1,
-                message: "Gst Reports",
+                success: 2,
                 data: results
             });
         })
+
     },
 
-
-
-
-    getGstReportPharmCollection: (req, res) => {
+    getIPCurrentMonthDayWise: (req, res) => {
         const body = req.body;
-        getGstReportPharmCollection(body, (err, results) => {
+        getIPCurrentMonthDayWise(body, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
-                    message: err.message
+                    message: err
                 });
             }
             if (Object.keys(results).length === 0) {
                 return res.status(200).json({
-                    success: 2,
-                    message: "No Result",
+                    success: 1,
                     data: []
                 });
             }
             return res.status(200).json({
-                success: 1,
-                message: "Gst Reports",
+                success: 2,
                 data: results
             });
         })
+
     },
+
+    getOPCountDay: (req, res) => {
+        const body = req.body;
+        getOPCountDay(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    data: []
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        })
+
+    },
+
+    getIPCountDay: (req, res) => {
+        const body = req.body;
+        getIPCountDay(body, (err, results) => {
+
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                });
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    data: []
+                });
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results
+            });
+        })
+
+    },
+
 }
