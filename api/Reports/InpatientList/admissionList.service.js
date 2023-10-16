@@ -322,4 +322,33 @@ module.exports = {
             }
         )
     },
+    getIpadmissChecks: async (data, callBack) => {
+
+        let pool_ora = await oraConnection();
+        let conn_ora = await pool_ora.getConnection();
+        try {
+            const result = await conn_ora.execute(
+                ` SELECT
+                 IP_NO ,IPD_DISC
+                  FROM IPADMISS
+                   WHERE IP_NO=:ptno AND  IPD_DISC IS NULL  AND IPC_PTFLAG='N'`,
+                {
+                    ptno: data,
+                },
+                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
+            )
+            await result.resultSet?.getRows((err, rows) => {
+                callBack(err, rows)
+            })
+
+        } catch (error) {
+            console.log(error)
+        } finally {
+            if (conn_ora) {
+                await conn_ora.close();
+                await pool_ora.close();
+            }
+        }
+    },
+
 }

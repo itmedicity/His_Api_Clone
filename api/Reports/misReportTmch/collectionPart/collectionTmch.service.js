@@ -35,8 +35,6 @@ module.exports = {
                                 AND ARD_DATE <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
                                 AND IPADVANCE.IAC_MHCODE IN (SELECT MH_CODE FROM multihospital)
                                 AND IPADVANCE.IP_NO NOT IN (${ipNumberList})`;
-
-
         try {
             const result = await conn_ora.execute(
                 sql,

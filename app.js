@@ -10,21 +10,28 @@ const usgroup = require("./api/newUsergroup/newgroup.router");
 const menugroup = require("./api/MenuGroup/menugroup.router");
 const userright = require("./api/userRights/userRights.router");
 const oracleUserTable = require("./api/Reports/oraUsers/user.router")
+
 //QMT
 const collection = require("./api/Reports/misReport/collectionPart/collection.router")
 const patientTypeDiscount = require("./api/Reports/misReport/PatientType/patientType.router")
 const pharmacy = require("./api/Reports/misReport/incomePart/pharmacyincome/pharmacy.router")
 const income = require("./api/Reports/misReport/incomePart/procedureIncome/proincome.router")
+// QMT income part details
+const incomeDetlPart = require("./api/Reports/misReport/MisDetlRpt/incomePart/income.router")
+const collectionDetlPart = require("./api/Reports/misReport/MisDetlRpt/collectionPart/misCollectonPart.router")
+
 //TSSH
 const collectionTssh = require('./api/Reports/misReportTssh/collectionPart/collectionTssh.router')
 const patientTypeDiscountTssh = require("./api/Reports/misReportTssh/PatientType/patientTypeTssh.router")
 const pharmacyTssh = require("./api/Reports/misReportTssh/incomePart/pharmacyincome/pharmacyTssh.router")
 const incomeTssh = require("./api/Reports/misReportTssh/incomePart/procedureincome/proincomeTssh.router")
+
 //TMCH
 const collectionTmch = require('./api/Reports/misReportTmch/collectionPart/collectionTmch.router')
 const patientTypeDiscountTmch = require("./api/Reports/misReportTmch/PatientType/patientTypeTmch.router")
 const pharmacyTmch = require("./api/Reports/misReportTmch/incomePart/pharmacyincome/pharmacyTmch.router")
 const incomeTmch = require("./api/Reports/misReportTmch/incomePart/procedureIncome/proincomeTmch.router")
+
 //GENERAL PURPOSE
 const admissionList = require("./api/Reports/InpatientList/admissionList.router")
 
@@ -39,11 +46,9 @@ const gstTaxPharmacy = require("./api/Reports/GstReportTaxAndPharmacy/taxAndPhar
 // count
 const opcount = require("./api/OPCount/opcount.router");
 const ipcount = require("./api/IPCount/ipcount.router");
-
 const dashboard = require("./api/DashBoard/dashBoard.router");
 
-
-// MELIORA
+// TO MELIORA
 const elliderData = require("./api/MelioraEllider/elliderData.router");
 
 app.use(express.json());
@@ -65,26 +70,33 @@ app.use((req, res, next) => {
 //MAP ROUTES
 app.use("/api/employee", emplyeeRoutes)
 app.use("/api/oraUser", oracleUserTable)
+
 //QMT
 app.use("/api/collection", collection)
 app.use("/api/patientType", patientTypeDiscount)
 app.use("/api/pharmacy", pharmacy)
 app.use("/api/income", income)
+app.use("/api/incomeDetl", incomeDetlPart)
+app.use("/api/collectionDetlPart", collectionDetlPart)
+
 //TSSH
 app.use("/api/collectionTssh", collectionTssh)
 app.use("/api/patientTypeTssh", patientTypeDiscountTssh)
 app.use("/api/pharmacyTssh", pharmacyTssh)
 app.use("/api/incomeTssh", incomeTssh)
+
 //TMCH
 app.use("/api/collectionTmch", collectionTmch)
 app.use("/api/patientTypeTmch", patientTypeDiscountTmch)
 app.use("/api/pharmacyTmch", pharmacyTmch)
 app.use("/api/incomeTmch", incomeTmch)
+
 //GENERAL
 app.use("/api/admission", admissionList)
 app.use("/api/usergroup", usgroup)
 app.use("/api/menugroups", menugroup)
 app.use("/api/userrights", userright)
+
 // ROL
 app.use("/api/importMedicines", importMedicine)
 app.use("/api/storerequest", storerequest)
