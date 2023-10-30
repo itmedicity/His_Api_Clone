@@ -546,7 +546,7 @@ module.exports = {
             }
         }
     },
-    //	Credit/Insurance Bill
+    //	Credit/Insurance Bills
     creditInsuranceBillTmch: async (data, callBack) => {
         let pool_ora = await oraConnection();
         let conn_ora = await pool_ora.getConnection();

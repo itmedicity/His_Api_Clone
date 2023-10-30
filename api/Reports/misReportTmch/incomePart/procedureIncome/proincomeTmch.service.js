@@ -5,6 +5,7 @@ module.exports = {
         proIncomePart1Tmch: async (data, callBack) => {
                 let pool_ora = await oraConnection();
                 let conn_ora = await pool_ora.getConnection();
+
                 const ipNumberList = data.ptno.join(',');
                 const fromDate = data.from;
                 const toDate = data.to;

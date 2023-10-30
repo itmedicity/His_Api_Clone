@@ -1,27 +1,30 @@
 const {
-    ipAdmissionList,
-    insertTsshPatient,
-    checkPatientInserted,
-    getTsshPatientDateWise,
-    deleteIPNumberFromTssh,
-    getPatientData,
-    getTsshPatientList,
-    getTotalPatientList,
-    getDischargePatientList,
-    notDischargedPatientListTssh,
-    getLastDischargeUpdateDate,
-    updateDischargedPatient,
-    updateLastDischargeDate,
-    getDischargedipNoFromMysql,
-    getIpadmissChecks,
-    insertAsRemoveTmcPatient,
-    getTsshIpNoFromMysql
-} = require('./admissionList.service');
+    bedIncome,
+    nsIncome,
+    roomRentIncome,
+    otherIncome,
+    consultingIncome,
+    anesthetiaIncome,
+    surgeonIncome,
+    theaterIncome,
+    cardiologyIncome,
+    disPosibleItemIncome,
+    icuIncome,
+    icuprocedureIncome,
+    radiologyIncome,
+    laboratoryIncome,
+    mriIncome,
+    dietIncome,
+    pharmacyIncomePart1,
+    pharmacyIncomePart2,
+    pharmacyIncomePart3,
+    pharmacyIncomePart4
+} = require('../incomePart/income.service')
 
 module.exports = {
-    getIpAdmissionList: (req, res) => {
+    bedIncome: (req, res) => {
         const body = req.body;
-        ipAdmissionList(body, (err, results) => {
+        bedIncome(body, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -37,84 +40,14 @@ module.exports = {
             }
             return res.status(200).json({
                 success: 1,
-                message: "Admission List",
+                message: "bedIncome",
                 data: results
             });
         })
     },
-    insertTsshPat: (req, res) => {
+    nsIncome: (req, res) => {
         const body = req.body;
-
-        checkPatientInserted(body, (err, results) => {
-
-            if (err === null) {
-                if (results.length === 0) {
-                    insertTsshPatient(body, (err, results) => {
-                        if (err) {
-                            return res.status(200).json({
-                                success: 0,
-                                message: err.message
-                            });
-                        }
-
-                        return res.status(200).json({
-                            success: 1,
-                            message: "Patient Transfer To TSSH"
-                        });
-                    })
-
-                } else {
-                    return res.status(200).json({
-                        success: 2,
-                        message: "Patient Already Transfer"
-                    });
-                }
-            } else {
-                return res.status(200).json({
-                    success: 0,
-                    message: err.message
-                });
-            }
-        })
-    },
-    removeAsTmchPatient: (req, res) => {
-        const body = req.body;
-
-        checkPatientInserted(body, (err, results) => {
-
-            if (err === null) {
-                if (results.length === 0) {
-                    insertAsRemoveTmcPatient(body, (err, results) => {
-                        if (err) {
-                            return res.status(200).json({
-                                success: 0,
-                                message: err.message
-                            });
-                        }
-
-                        return res.status(200).json({
-                            success: 1,
-                            message: "Patient Grouped From TMCH"
-                        });
-                    })
-
-                } else {
-                    return res.status(200).json({
-                        success: 2,
-                        message: "Patient Already Grouped"
-                    });
-                }
-            } else {
-                return res.status(200).json({
-                    success: 0,
-                    message: err.message
-                });
-            }
-        })
-    },
-    getTsshPatientDateWise: (req, res) => {
-        const body = req.body;
-        getTsshPatientDateWise(body, (err, results) => {
+        nsIncome(body, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -130,36 +63,14 @@ module.exports = {
             }
             return res.status(200).json({
                 success: 1,
-                message: "Tssh Patient List",
+                message: "nsIncome",
                 data: results
             });
         })
     },
-    deleteIPNumberFromTssh: (req, res) => {
+    roomRentIncome: (req, res) => {
         const body = req.body;
-        deleteIPNumberFromTssh(body, (err, results) => {
-            if (err) {
-                return res.status(200).json({
-                    success: 0,
-                    message: err.message
-                });
-            }
-            if (Object.keys(results).length === 0) {
-                return res.status(200).json({
-                    success: 2,
-                    message: "No Result",
-                });
-            }
-            return res.status(200).json({
-                success: 1,
-                message: "Patient Removed From TSSH ",
-                data: results
-            });
-        })
-    },
-    getPatientData: (req, res) => {
-        const id = req.params.id;
-        getPatientData(id, (err, results) => {
+        roomRentIncome(body, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -175,14 +86,14 @@ module.exports = {
             }
             return res.status(200).json({
                 success: 1,
-                message: "Patient Infomation",
+                message: "roomRentIncome",
                 data: results
             });
         })
     },
-    getTsshPatientList: (req, res) => {
+    otherIncome: (req, res) => {
         const body = req.body;
-        getTsshPatientList(body, (err, results) => {
+        otherIncome(body, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -198,14 +109,14 @@ module.exports = {
             }
             return res.status(200).json({
                 success: 1,
-                message: "Get Tssh Patient List",
+                message: "otherIncome",
                 data: results
             });
         })
     },
-    getTotalPatientList: (req, res) => {
+    consultingIncome: (req, res) => {
         const body = req.body;
-        getTotalPatientList(body, (err, results) => {
+        consultingIncome(body, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -221,14 +132,14 @@ module.exports = {
             }
             return res.status(200).json({
                 success: 1,
-                message: "GET TOTAL PATIENT LIST",
+                message: "consultingIncome",
                 data: results
             });
         })
     },
-    getDischargePatientList: (req, res) => {
+    anesthetiaIncome: (req, res) => {
         const body = req.body;
-        getDischargePatientList(body, (err, results) => {
+        anesthetiaIncome(body, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -244,13 +155,14 @@ module.exports = {
             }
             return res.status(200).json({
                 success: 1,
-                message: "Get The Discharged Patient List",
+                message: "anesthetiaIncome",
                 data: results
             });
         })
     },
-    notDischargedPatientListTssh: (req, res) => {
-        notDischargedPatientListTssh((err, results) => {
+    surgeonIncome: (req, res) => {
+        const body = req.body;
+        surgeonIncome(body, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -266,13 +178,14 @@ module.exports = {
             }
             return res.status(200).json({
                 success: 1,
-                message: "Get The Discharged Patient List",
+                message: "surgeonIncome",
                 data: results
             });
         })
     },
-    getLastDischargeUpdateDate: (req, res) => {
-        getLastDischargeUpdateDate((err, results) => {
+    theaterIncome: (req, res) => {
+        const body = req.body;
+        theaterIncome(body, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -288,92 +201,14 @@ module.exports = {
             }
             return res.status(200).json({
                 success: 1,
-                message: "Last discharge updated dates",
+                message: "theaterIncome",
                 data: results
             });
         })
     },
-    updateDischargedPatient: (req, res) => {
+    cardiologyIncome: (req, res) => {
         const body = req.body;
-        updateDischargedPatient(body)
-            .then((mesge) => {
-                return res.status(200).json({
-                    success: 1,
-                    message: mesge
-                });
-            }).catch((e) => {
-                return res.status(200).json({
-                    success: 0,
-                    message: e.sqlMessage
-                });
-            })
-    },
-    updateLastDischargeDate: (req, res) => {
-        const body = req.body;
-        updateLastDischargeDate(body, (err, results) => {
-            if (err) {
-                return res.status(200).json({
-                    success: 0,
-                    message: err.message
-                });
-            }
-            if (Object.keys(results).length === 0) {
-                return res.status(200).json({
-                    success: 2,
-                    message: "No Result",
-                });
-            }
-            return res.status(200).json({
-                success: 1,
-                message: "Update The last dicharge uipdated date",
-            });
-        })
-    },
-    getDischargedipNoFromMysql: (req, res) => {
-        const body = req.body;
-        getDischargedipNoFromMysql(body, (err, results) => {
-            if (err) {
-                return res.status(200).json({
-                    success: 0,
-                    message: err.message
-                });
-            }
-            if (Object.keys(results).length === 0) {
-                return res.status(200).json({
-                    success: 2,
-                    message: "No Result",
-                });
-            }
-            return res.status(200).json({
-                success: 1,
-                data: results,
-            });
-        })
-    },
-    getTsshIpNoFromMysql: (req, res) => {
-        const body = req.body;
-        getTsshIpNoFromMysql(body, (err, results) => {
-            if (err) {
-                return res.status(200).json({
-                    success: 0,
-                    message: err.message
-                });
-            }
-            if (Object.keys(results).length === 0) {
-                return res.status(200).json({
-                    success: 2,
-                    message: "No Result",
-                });
-            }
-            return res.status(200).json({
-                success: 1,
-                data: results,
-            });
-        })
-    },
-    getIpadmissChecks: (req, res) => {
-        const id = req.params.id;
-        getIpadmissChecks(id, (err, results) => {
+        cardiologyIncome(body, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -389,7 +224,260 @@ module.exports = {
             }
             return res.status(200).json({
                 success: 1,
-                message: "Patient Infomation",
+                message: "cardiologyIncome",
+                data: results
+            });
+        })
+    },
+    disPosibleItemIncome: (req, res) => {
+        const body = req.body;
+        disPosibleItemIncome(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err.message
+                });
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Result",
+                    data: []
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                message: "disPosibleItemIncome",
+                data: results
+            });
+        })
+    },
+    icuIncome: (req, res) => {
+        const body = req.body;
+        icuIncome(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err.message
+                });
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Result",
+                    data: []
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                message: "icuIncome",
+                data: results
+            });
+        })
+    },
+    icuprocedureIncome: (req, res) => {
+        const body = req.body;
+        icuprocedureIncome(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err.message
+                });
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Result",
+                    data: []
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                message: "icuprocedureIncome",
+                data: results
+            });
+        })
+    },
+    radiologyIncome: (req, res) => {
+        const body = req.body;
+        radiologyIncome(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err.message
+                });
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Result",
+                    data: []
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                message: "radiologyIncome",
+                data: results
+            });
+        })
+    },
+    laboratoryIncome: (req, res) => {
+        const body = req.body;
+        laboratoryIncome(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err.message
+                });
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Result",
+                    data: []
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                message: "laboratoryIncome",
+                data: results
+            });
+        })
+    },
+    mriIncome: (req, res) => {
+        const body = req.body;
+        mriIncome(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err.message
+                });
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Result",
+                    data: []
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                message: "mriIncome",
+                data: results
+            });
+        })
+    },
+    dietIncome: (req, res) => {
+        const body = req.body;
+        dietIncome(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err.message
+                });
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Result",
+                    data: []
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                message: "dietIncome",
+                data: results
+            });
+        })
+    },
+    pharmacyIncomePart1: (req, res) => {
+        const body = req.body;
+        pharmacyIncomePart1(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err.message
+                });
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Result",
+                    data: []
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                message: "pharmacyIncomePart1",
+                data: results
+            });
+        })
+    },
+    pharmacyIncomePart2: (req, res) => {
+        const body = req.body;
+        pharmacyIncomePart2(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err.message
+                });
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Result",
+                    data: []
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                message: "pharmacyIncomePart2",
+                data: results
+            });
+        })
+    },
+    pharmacyIncomePart3: (req, res) => {
+        const body = req.body;
+        pharmacyIncomePart3(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err.message
+                });
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Result",
+                    data: []
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                message: "pharmacyIncomePart3",
+                data: results
+            });
+        })
+    },
+    pharmacyIncomePart4: (req, res) => {
+        const body = req.body;
+        pharmacyIncomePart4(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err.message
+                });
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Result",
+                    data: []
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                message: "pharmacyIncomePart4",
                 data: results
             });
         })

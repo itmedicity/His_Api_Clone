@@ -25,12 +25,18 @@ const collectionTssh = require('./api/Reports/misReportTssh/collectionPart/colle
 const patientTypeDiscountTssh = require("./api/Reports/misReportTssh/PatientType/patientTypeTssh.router")
 const pharmacyTssh = require("./api/Reports/misReportTssh/incomePart/pharmacyincome/pharmacyTssh.router")
 const incomeTssh = require("./api/Reports/misReportTssh/incomePart/procedureincome/proincomeTssh.router")
+// TSSH income part details
+const incomeDetlPartTssh = require("./api/Reports/misReportTssh/MisDetlRpt/incomePart/income.router")
+const collectionDetlPartTssh = require("./api/Reports/misReportTssh/MisDetlRpt/collectionPart/misCollectonPart.router")
 
 //TMCH
 const collectionTmch = require('./api/Reports/misReportTmch/collectionPart/collectionTmch.router')
 const patientTypeDiscountTmch = require("./api/Reports/misReportTmch/PatientType/patientTypeTmch.router")
 const pharmacyTmch = require("./api/Reports/misReportTmch/incomePart/pharmacyincome/pharmacyTmch.router")
 const incomeTmch = require("./api/Reports/misReportTmch/incomePart/procedureIncome/proincomeTmch.router")
+// TMCH income part details
+const incomeDetlPartTmch = require("./api/Reports/misReportTmch/MisDetlRpt/incomePart/income.router")
+const collectionDetlPartTmch = require("./api/Reports/misReportTmch/MisDetlRpt/collectionPart/misCollectonPart.router")
 
 //GENERAL PURPOSE
 const admissionList = require("./api/Reports/InpatientList/admissionList.router")
@@ -84,12 +90,16 @@ app.use("/api/collectionTssh", collectionTssh)
 app.use("/api/patientTypeTssh", patientTypeDiscountTssh)
 app.use("/api/pharmacyTssh", pharmacyTssh)
 app.use("/api/incomeTssh", incomeTssh)
+app.use("/api/incomeDetlTssh", incomeDetlPartTssh)
+app.use("/api/collectionDetlPartTssh", collectionDetlPartTssh)
 
 //TMCH
 app.use("/api/collectionTmch", collectionTmch)
 app.use("/api/patientTypeTmch", patientTypeDiscountTmch)
 app.use("/api/pharmacyTmch", pharmacyTmch)
 app.use("/api/incomeTmch", incomeTmch)
+app.use("/api/incomeDetlTmch", incomeDetlPartTmch)
+app.use("/api/collectionDetlPartTmch", collectionDetlPartTmch)
 
 //GENERAL
 app.use("/api/admission", admissionList)

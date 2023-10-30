@@ -59,6 +59,27 @@ module.exports = {
             }
         )
     },
+    insertAsRemoveTmcPatient: (data, callBack) => {
+        pool.query(
+            `INSERT INTO tssh_ipadmiss 
+                (date,ip_no,op_no,dis_status,dis_date,tmch_status) 
+            VALUES (?,?,?,?,?,?)`,
+            [
+                data.date,
+                data.ip_no,
+                data.op_no,
+                data.disStatus,
+                data.disDate,
+                data.status
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results)
+            }
+        )
+    },
     checkPatientInserted: (data, callBack) => {
         pool.query(
             `SELECT 
@@ -300,15 +321,41 @@ module.exports = {
     getDischargedipNoFromMysql: (data, callBack) => {
         pool.query(
             `SELECT 
+                ip_no,tmch_status
+            FROM tssh_ipadmiss
+            WHERE dis_status = 'N' AND dis_date IS NULL AND date  < ?
+            UNION
+            SELECT 
+                ip_no,tmch_status
+            FROM tssh_ipadmiss
+            WHERE dis_date >= ?
+            AND dis_date <= ?`,
+            [
+                data.to,
+                data.from,
+                data.to,
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results)
+            }
+        )
+    },
+    getTsshIpNoFromMysql: (data, callBack) => {
+        pool.query(
+            `SELECT 
                 ip_no
             FROM tssh_ipadmiss
             WHERE dis_status = 'N' AND dis_date IS NULL AND date  < ?
+            AND tmch_status = 0
             UNION
             SELECT 
                 ip_no
             FROM tssh_ipadmiss
             WHERE dis_date >= ?
-            AND dis_date <= ?`,
+            AND dis_date <= ? AND tmch_status = 0`,
             [
                 data.to,
                 data.from,
