@@ -4,7 +4,8 @@ const {
     checkPatientInserted,
     getTsshPatientDateWise,
     deleteIPNumberFromTssh,
-    getPatientData
+    getPatientData,
+    getIpadmissChecks
 } = require('./admissionList.service');
 
 module.exports = {
@@ -114,6 +115,29 @@ module.exports = {
     getPatientData: (req, res) => {
         const id = req.params.id;
         getPatientData(id, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err.message
+                });
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Result",
+                    data: []
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                message: "Patient Infomation",
+                data: results
+            });
+        })
+    },
+    getIpadmissChecks: (req, res) => {
+        const id = req.params.id;
+        getIpadmissChecks(id, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,

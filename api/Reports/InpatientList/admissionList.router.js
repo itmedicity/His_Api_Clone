@@ -4,7 +4,8 @@ const {
     insertTsshPat,
     getTsshPatientDateWise,
     deleteIPNumberFromTssh,
-    getPatientData
+    getPatientData,
+    getIpadmissChecks
 } = require('./admissionList.controller');
 
 const router = require('express').Router();
@@ -15,4 +16,5 @@ router.post('/getTsshPatientList', checkToken, getTsshPatientDateWise);
 router.post('/removePatiet', checkToken, deleteIPNumberFromTssh);
 router.get('/patientInfo/:id', getPatientData);
 
+router.get('/getIpadmissChecks/:id', getIpadmissChecks);
 module.exports = router;
