@@ -18,7 +18,7 @@ const {
 
 const router = require('express').Router();
 
-router.post('/advanceCollectionTssh', getadvanceCollectionTmch);
+router.post('/advanceCollection', getadvanceCollectionTmch);
 router.post('/advanceRefund', checkToken, getadvanceRefundTmch);
 router.post('/advanceSettled', checkToken, getadvanceSettledTmch);
 router.post('/collectionagainSaleTotal', checkToken, getcollectionAgainstSalePart1Tmch);
