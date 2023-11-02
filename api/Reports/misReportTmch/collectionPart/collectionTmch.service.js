@@ -495,38 +495,57 @@ module.exports = {
         const toDate = data.to;
 
         const sql = `SELECT 
-                        SUM (NVL (RECPCOLLECTIONMAST.RCN_CASH, 0) + NVL (RECPCOLLECTIONMAST.RCN_CHK, 0) + NVL (RECPCOLLECTIONMAST.RCN_DD, 0) + NVL (RECPCOLLECTIONMAST.RCN_Card, 0) + NVL (RECPCOLLECTIONMAST.RCN_NEFT, 0)) Amt,
-                        0 tax
-                    FROM RECPCOLLECTIONMAST
-                    WHERE RECPCOLLECTIONMAST.RCD_DATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
-                        AND RECPCOLLECTIONMAST.RCD_DATE <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
-                        AND RECPCOLLECTIONMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-                        AND RECPCOLLECTIONMAST.RCC_CANCEL IS NULL
-                        AND RECPCOLLECTIONMAST.RCC_SLNO IN (
-                            SELECT 
-                                RCC_SLNO 
-                            FROM RECPCOLLECTIONDETL 
-                            WHERE RECPCOLLECTIONDETL.RCD_DATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
-                            AND RECPCOLLECTIONDETL.RCD_DATE <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss') 
-                            AND RECPCOLLECTIONDETL.IP_NO NOT IN (${ipNumberList}) 
-                        )
-                    HAVING SUM ( NVL (RECPCOLLECTIONMAST.RCN_CASH, 0) + NVL (RECPCOLLECTIONMAST.RCN_CHK, 0) + NVL (RECPCOLLECTIONMAST.RCN_DD, 0)  + NVL (RECPCOLLECTIONMAST.RCN_Card, 0) + NVL (RECPCOLLECTIONMAST.RCN_NEFT, 0)) > 0
-                    UNION ALL
-                    SELECT 
-                        (SUM (NVL (Recpcollectionmast.Rfn_Cash, 0)) + SUM (NVL (Recpcollectionmast.Rfn_Chk, 0)) + SUM (NVL (Recpcollectionmast.Rfn_Dd, 0)) + SUM (NVL (Recpcollectionmast.Rfn_Card, 0))) * -1 Amt,
-                        0 tax
-                    FROM Recpcollectionmast
-                    WHERE Recpcollectionmast.Rfd_Date >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
-                        AND RECPCOLLECTIONMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-                        AND Recpcollectionmast.Rfd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
-                        AND NVL (Rcc_Cancel, 'N') = 'N'
-                        AND RECPCOLLECTIONMAST.RCC_SLNO IN (
-                            SELECT 
-                                RCC_SLNO 
-                            FROM RECPCOLLECTIONDETL 
-                            WHERE RECPCOLLECTIONDETL.RCD_DATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
-                            AND RECPCOLLECTIONDETL.RCD_DATE <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss') 
-                            AND RECPCOLLECTIONDETL.IP_NO NOT IN  (${ipNumberList}))`;
+                            SUM (NVL (RECPCOLLECTIONMAST.RCN_CASH, 0) + NVL (RECPCOLLECTIONMAST.RCN_CHK, 0) + NVL (RECPCOLLECTIONMAST.RCN_DD, 0) + NVL (RECPCOLLECTIONMAST.RCN_Card, 0) + NVL (RECPCOLLECTIONMAST.RCN_NEFT, 0)) Amt,
+                            0 tax
+                        FROM RECPCOLLECTIONMAST
+                        WHERE RECPCOLLECTIONMAST.RCD_DATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                            AND RECPCOLLECTIONMAST.RCD_DATE <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                            AND RECPCOLLECTIONMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                            AND RECPCOLLECTIONMAST.RCC_CANCEL IS NULL
+                            AND RECPCOLLECTIONMAST.RCC_SLNO IN (
+                                SELECT 
+                                    RCC_SLNO 
+                                FROM RECPCOLLECTIONDETL 
+                                WHERE RECPCOLLECTIONDETL.RCD_DATE >= TO_DATE ('${fromDate}','dd/MM/yyyy hh24:mi:ss')
+                                AND RECPCOLLECTIONDETL.RCD_DATE <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss') 
+                                AND RECPCOLLECTIONDETL.MODULES <> 'IPC'
+                            )
+                        HAVING SUM ( NVL (RECPCOLLECTIONMAST.RCN_CASH, 0) + NVL (RECPCOLLECTIONMAST.RCN_CHK, 0) + NVL (RECPCOLLECTIONMAST.RCN_DD, 0)  + NVL (RECPCOLLECTIONMAST.RCN_Card, 0) + NVL (RECPCOLLECTIONMAST.RCN_NEFT, 0)) > 0
+                        UNION ALL
+                        SELECT 
+                            SUM (NVL (RECPCOLLECTIONMAST.RCN_CASH, 0) + NVL (RECPCOLLECTIONMAST.RCN_CHK, 0) + NVL (RECPCOLLECTIONMAST.RCN_DD, 0) + NVL (RECPCOLLECTIONMAST.RCN_Card, 0) + NVL (RECPCOLLECTIONMAST.RCN_NEFT, 0)) Amt,
+                            0 tax
+                        FROM RECPCOLLECTIONMAST
+                        WHERE RECPCOLLECTIONMAST.RCD_DATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                            AND RECPCOLLECTIONMAST.RCD_DATE <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                            AND RECPCOLLECTIONMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                            AND RECPCOLLECTIONMAST.RCC_CANCEL IS NULL
+                            AND RECPCOLLECTIONMAST.RCC_SLNO IN (
+                                SELECT 
+                                    RCC_SLNO 
+                                FROM RECPCOLLECTIONDETL 
+                                WHERE RECPCOLLECTIONDETL.RCD_DATE >= TO_DATE ('${fromDate}','dd/MM/yyyy hh24:mi:ss')
+                                AND RECPCOLLECTIONDETL.RCD_DATE <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss') 
+                                AND RECPCOLLECTIONDETL.MODULES = 'IPC'
+                                AND RECPCOLLECTIONDETL.IP_NO NOT IN (${ipNumberList}) 
+                            )
+                        HAVING SUM ( NVL (RECPCOLLECTIONMAST.RCN_CASH, 0) + NVL (RECPCOLLECTIONMAST.RCN_CHK, 0) + NVL (RECPCOLLECTIONMAST.RCN_DD, 0)  + NVL (RECPCOLLECTIONMAST.RCN_Card, 0) + NVL (RECPCOLLECTIONMAST.RCN_NEFT, 0)) > 0
+                        UNION ALL
+                        SELECT 
+                            (SUM (NVL (Recpcollectionmast.Rfn_Cash, 0)) + SUM (NVL (Recpcollectionmast.Rfn_Chk, 0)) + SUM (NVL (Recpcollectionmast.Rfn_Dd, 0)) + SUM (NVL (Recpcollectionmast.Rfn_Card, 0))) * -1 Amt,
+                            0 tax
+                        FROM Recpcollectionmast
+                        WHERE Recpcollectionmast.Rfd_Date >= TO_DATE ('${fromDate}',' dd/MM/yyyy hh24:mi:ss')
+                            AND RECPCOLLECTIONMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                            AND Recpcollectionmast.Rfd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                            AND NVL (Rcc_Cancel, 'N') = 'N'
+                            AND RECPCOLLECTIONMAST.RCC_SLNO IN (
+                                SELECT 
+                                    RCC_SLNO 
+                                FROM RECPCOLLECTIONDETL 
+                                WHERE RECPCOLLECTIONDETL.RCD_DATE >= TO_DATE ('${fromDate}',' dd/MM/yyyy hh24:mi:ss')
+                                AND RECPCOLLECTIONDETL.RCD_DATE <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss') 
+                                AND RECPCOLLECTIONDETL.IP_NO NOT IN  (${ipNumberList}))`;
 
         try {
             const result = await conn_ora.execute(
