@@ -1087,7 +1087,7 @@ module.exports = {
                             NVL (RCN_NEFT, 0) Bankamt,
                             INITCAP (Rcc_Bank) Bank,
                             INITCAP (Cuc_name) Customer,
-                            INITCAP (Usc_name) UserName,
+                            INITCAP (Usc_name) UserName
                     FROM Recpcollectionmast X, Customer Y, Users Z,Recpcollectiondetl R
                     WHERE X.Cu_code = Y.Cu_code
                             AND X.Us_code = Z.Us_code(+)

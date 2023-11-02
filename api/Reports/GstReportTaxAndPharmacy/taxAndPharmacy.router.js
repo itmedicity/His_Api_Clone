@@ -9,7 +9,8 @@ const {
     getInPatientMedReturnSum,
     getInPatientMedSale,
     getOpCreditPharmSale,
-    getGstReportPharmCollection } = require('./taxAndPharmacy.controller');
+    getGstReportPharmCollection
+} = require('./taxAndPharmacy.controller');
 
 router.post('/viewreport', checkToken, getGstReportOfPharmacy);
 
