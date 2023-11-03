@@ -157,6 +157,7 @@ module.exports = {
     getcreditInsuranceBillCollectionTmch: (req, res) => {
         const body = req.body;
         creditInsuranceBillCollectionTmch(body, (err, results) => {
+            console.log(results)
             if (err) {
                 return res.status(200).json({
                     success: 0,
