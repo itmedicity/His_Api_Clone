@@ -400,8 +400,7 @@ module.exports = {
                         GROUP BY Patient.Ptc_ptname,
                                 Patient.Pt_no,
                                 Ar_no,
-                                Usc_name
-                        UNION ALL`;
+                                Usc_name`;
         try {
             const result = await conn_ora.execute(
                 sql,
