@@ -323,6 +323,11 @@ module.exports = {
             `SELECT 
                 ip_no,tmch_status
             FROM tssh_ipadmiss
+            WHERE dis_status = 'Y' AND date  <= ? and dis_date > ?
+            UNION
+            SELECT 
+                ip_no,tmch_status
+            FROM tssh_ipadmiss
             WHERE dis_status = 'N' AND dis_date IS NULL AND date  < ?
             UNION
             SELECT 
@@ -331,6 +336,8 @@ module.exports = {
             WHERE dis_date >= ?
             AND dis_date <= ?`,
             [
+                data.to,
+                data.to,
                 data.to,
                 data.from,
                 data.to,
@@ -346,6 +353,11 @@ module.exports = {
     getTsshIpNoFromMysql: (data, callBack) => {
         pool.query(
             `SELECT 
+				ip_no,tmch_status
+            FROM tssh_ipadmiss
+            WHERE dis_status = 'Y' AND date  <= ? and dis_date > ?
+			UNION
+            SELECT 
                 ip_no
             FROM tssh_ipadmiss
             WHERE dis_status = 'N' AND dis_date IS NULL AND date  < ?
@@ -357,6 +369,8 @@ module.exports = {
             WHERE dis_date >= ?
             AND dis_date <= ? AND tmch_status = 0`,
             [
+                data.to,
+                data.to,
                 data.to,
                 data.from,
                 data.to,
