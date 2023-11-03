@@ -356,15 +356,16 @@ module.exports = {
 				ip_no,tmch_status
             FROM tssh_ipadmiss
             WHERE dis_status = 'Y' AND date  <= ? and dis_date > ?
+            AND tmch_status = 0
 			UNION
             SELECT 
-                ip_no
+                ip_no,tmch_status
             FROM tssh_ipadmiss
             WHERE dis_status = 'N' AND dis_date IS NULL AND date  < ?
             AND tmch_status = 0
             UNION
             SELECT 
-                ip_no
+                ip_no,tmch_status
             FROM tssh_ipadmiss
             WHERE dis_date >= ?
             AND dis_date <= ? AND tmch_status = 0`,
