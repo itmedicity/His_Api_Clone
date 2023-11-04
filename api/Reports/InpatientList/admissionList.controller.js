@@ -15,7 +15,9 @@ const {
     getDischargedipNoFromMysql,
     getIpadmissChecks,
     insertAsRemoveTmcPatient,
-    getTsshIpNoFromMysql
+    getTsshIpNoFromMysql,
+    getIpReceiptPatientInfo,
+    getDischargedIpInfoFromMysql
 } = require('./admissionList.service');
 
 module.exports = {
@@ -391,6 +393,50 @@ module.exports = {
                 success: 1,
                 message: "Patient Infomation",
                 data: results
+            });
+        })
+    },
+    getIpReceiptPatientInfo: (req, res) => {
+        const body = req.body;
+        getIpReceiptPatientInfo(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err.message
+                });
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Result",
+                    data: []
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                message: "ip receipt details",
+                data: results
+            });
+        })
+    },
+    getDischargedIpInfoFromMysql: (req, res) => {
+        const body = req.body;
+        getDischargedIpInfoFromMysql(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err.message
+                });
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Result",
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results,
             });
         })
     },
