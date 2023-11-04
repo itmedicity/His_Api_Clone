@@ -16,8 +16,9 @@ const {
     getDischargedipNoFromMysql,
     // getIpadmissChecks,
     removeAsTmchPatient,
-    getTsshIpNoFromMysql
-
+    getTsshIpNoFromMysql,
+    getIpReceiptPatientInfo,
+    getDischargedIpInfoFromMysql
 } = require('./admissionList.controller');
 
 const router = require('express').Router();
@@ -40,8 +41,13 @@ router.post('/UpdateLastDischargeDates', checkToken, updateLastDischargeDate);
 router.post('/getIpNumber', checkToken, getDischargedipNoFromMysql);
 router.post('/getIpNumberTssh', checkToken, getTsshIpNoFromMysql);
 
+
 // router.get('/getIpadmissChecks/:id', getIpadmissChecks);
 
+router.post('/getIpReceiptInfo', checkToken, getIpReceiptPatientInfo);
+router.post('/getIpDischargedPatientInfo', checkToken, getDischargedIpInfoFromMysql);
+
+router.get('/getIpadmissChecks/:id', getIpadmissChecks);
 
 
 module.exports = router;

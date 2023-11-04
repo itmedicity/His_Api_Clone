@@ -412,5 +412,59 @@ module.exports = {
             }
         }
     },
+    getIpReceiptPatientInfo: async (data, callBack) => {
+        // GET DISCHARGE INFO FROM ORACLE 
+        let pool_ora = await oraConnection();
+        let conn_ora = await pool_ora.getConnection();
+
+        const fromDate = data.from;
+        const toDate = data.to;
+
+        const sql = `SELECT 
+                        IPADMISS.IP_NO,
+                        TO_CHAR(IPADMISS.IPD_DATE,'YYYY-MM-DD hh24:mi:ss' ) ADMISSION
+                    FROM IPRECEIPT,IPADMISS
+                    WHERE IPRECEIPT.DMC_SLNO =  IPADMISS.DMC_SLNO
+                    AND IRC_CANCEL IS NULL
+                    AND IRD_DATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')  
+                    AND  IRD_DATE <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')`;
+        try {
+            const result = await conn_ora.execute(
+                sql,
+                {},
+                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
+            )
+            await result.resultSet?.getRows((err, rows) => {
+                callBack(err, rows)
+            })
+        } catch (error) {
+            console.log(error)
+        } finally {
+            if (conn_ora) {
+                await conn_ora.close();
+                await pool_ora.close();
+            }
+        }
+    },
+    getDischargedIpInfoFromMysql: (data, callBack) => {
+        pool.query(
+            `SELECT 
+                ip_no
+            FROM tssh_ipadmiss
+            WHERE dis_status = 'Y' 
+            AND date BETWEEN ? AND ?
+            AND tmch_status = 0`,
+            [
+                data.from,
+                data.to
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results)
+            }
+        )
+    },
 
 }
