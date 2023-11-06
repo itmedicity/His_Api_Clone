@@ -204,7 +204,7 @@ module.exports = {
         let pool_ora = await oraConnection();
         let conn_ora = await pool_ora.getConnection();
 
-        const ipNumberList = data.ipNoColl.join(',');
+        const ipNumberList = data.ptno.join(',');
         const fromDate = data.from;
         const toDate = data.to;
 
@@ -307,7 +307,7 @@ module.exports = {
         let pool_ora = await oraConnection();
         let conn_ora = await pool_ora.getConnection();
 
-        const ipNumberList = data.ipNoColl.join(',');
+        const ipNumberList = data.ptno.join(',');
         const fromDate = data.from;
         const toDate = data.to;
 
