@@ -203,8 +203,9 @@ module.exports = {
     collectionAgainstSalePart1Tmch: async (data, callBack) => {
         let pool_ora = await oraConnection();
         let conn_ora = await pool_ora.getConnection();
-        console.log(data.ipNoColl)
-        const ipNumberList = data.ipNoColl.join(',');
+
+        const ipNumberList = data.ptno.join(',');
+
         const fromDate = data.from;
         const toDate = data.to;
 
@@ -306,8 +307,8 @@ module.exports = {
     collectionAgainstSalePart2Tmch: async (data, callBack) => {
         let pool_ora = await oraConnection();
         let conn_ora = await pool_ora.getConnection();
-        console.log(data.ipNoColl)
-        const ipNumberList = data.ipNoColl.join(',');
+
+        const ipNumberList = data.ptno.join(',');
         const fromDate = data.from;
         const toDate = data.to;
 
