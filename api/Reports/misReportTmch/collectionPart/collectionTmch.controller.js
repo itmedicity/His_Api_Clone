@@ -1,3 +1,5 @@
+// @ts-nocheck
+const moment = require('moment/moment');
 const {
     advanceCollectionTmch,
     advanceRefundTmch,
@@ -12,7 +14,9 @@ const {
     ipPreviousDayCollectionTmch,
     unsettledAmount,
     misGroupMast,
-    misGroup
+    misGroup,
+    getIpReceiptPatientIpInfo,
+    getDischargedIpInfoMysql
 } = require('./collectionTmch.service')
 
 module.exports = {
