@@ -1,4 +1,5 @@
 // @ts-ignore
+const pool = require('../../../../config/dbconfig');
 const { oracledb, connectionClose, oraConnection } = require('../../../../config/oradbconfig');
 
 module.exports = {
@@ -767,7 +768,7 @@ module.exports = {
         let pool_ora = await oraConnection();
         let conn_ora = await pool_ora.getConnection();
 
-        const ipNumberList = data.ptno.join(',');
+        const ipNumberList = data.ipNoColl.join(',');
         const fromDate = data.from;
         const toDate = data.to;
 
@@ -932,5 +933,63 @@ module.exports = {
                 await pool_ora.close();
             }
         }
-    }
+    },
+    getIpReceiptPatientIpInfo: async (data) => {
+        // GET DISCHARGE INFO FROM ORACLE 
+        let pool_ora = await oraConnection();
+        let conn_ora = await pool_ora.getConnection();
+
+        const fromDate = data.from;
+        const toDate = data.to;
+
+        const sql = `SELECT 
+                        DISBILLMAST.IP_NO,
+                        IPADMISS.IPD_DATE
+                    FROM IPRECEIPT,DISBILLMAST,IPADMISS
+                    WHERE IPRECEIPT.DMC_SLNO =  DISBILLMAST.DMC_SLNO
+                    AND IPRECEIPT.DMC_SLNO = IPADMISS.DMC_SLNO
+                    AND IRC_CANCEL IS NULL
+                    AND Disbillmast.Dmd_date < TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                    AND IRD_DATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')  
+                    AND  IRD_DATE <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                    GROUP BY DISBILLMAST.IP_NO,IPADMISS.IPD_DATE`;
+        try {
+            return await conn_ora.execute(
+                sql,
+                {},
+                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
+            ).then((e) => {
+                return e.resultSet?.getRows()
+            })
+        } catch (error) {
+            console.log(error)
+        } finally {
+            if (conn_ora) {
+                await conn_ora.close();
+                await pool_ora.close();
+            }
+        }
+    },
+    getDischargedIpInfoMysql: (from, to, callBack) => {
+        console.log(from, to)
+        pool.query(
+            `SELECT 
+                ip_no
+            FROM tssh_ipadmiss
+            WHERE dis_status = 'Y' 
+            AND date BETWEEN ? AND ?
+            AND tmch_status = 0`,
+            [
+                from,
+                to
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return error
+                }
+                console.log(results)
+                return results
+            }
+        )
+    },
 }
