@@ -39,25 +39,29 @@ module.exports = {
             }
         }
     },
-    insertTsshPatient: (data, callBack) => {
-        pool.query(
-            `INSERT INTO tssh_ipadmiss 
-                (date,ip_no,op_no,dis_status,dis_date) 
-            VALUES (?,?,?,?,?)`,
-            [
-                data.date,
-                data.ip_no,
-                data.op_no,
-                data.disStatus,
-                data.disDate
-            ],
-            (error, results, feilds) => {
-                if (error) {
-                    return callBack(error);
-                }
-                return callBack(null, results)
-            }
-        )
+    insertTsshPatient: (body) => {
+        return Promise.all(body.map((e) => {
+            console.log(e)
+
+            return new Promise((resolve, reject) => {
+                pool.query(
+                    `INSERT INTO tssh_ipadmiss 
+                        (date,ip_no,op_no,dis_status,dis_date)
+                    VALUES (?)`,
+                    [
+                        e
+                    ],
+                    (error, results, fields) => {
+                        console.log(results)
+                        console.log(error)
+                        if (error) {
+                            return reject(error)
+                        }
+                        return resolve(results)
+                    }
+                )
+            })
+        }))
     },
     insertAsRemoveTmcPatient: (data, callBack) => {
         pool.query(
@@ -114,9 +118,9 @@ module.exports = {
     },
     deleteIPNumberFromTssh: (data, callBack) => {
         pool.query(
-            `DELETE FROM tssh_ipadmiss WHERE ip_no = ?`,
+            `DELETE FROM tssh_ipadmiss WHERE ip_slno IN (?)`,
             [
-                data.ip_no
+                data
             ],
             (error, results, feilds) => {
                 if (error) {
