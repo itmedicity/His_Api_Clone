@@ -470,5 +470,58 @@ module.exports = {
             }
         )
     },
-
+    getTsshIpNoFromMysqlGrouping: (data, callBack) => { //For grouping
+        pool.query(
+            `SELECT 
+				ip_no,tmch_status
+            FROM tssh_ipadmiss
+            WHERE dis_status = 'Y' AND date  <= ? and dis_date > ?
+            AND tmch_status = 1
+			UNION
+            SELECT 
+                ip_no,tmch_status
+            FROM tssh_ipadmiss
+            WHERE dis_status = 'N' AND dis_date IS NULL AND date  < ?
+            AND tmch_status = 1
+            UNION
+            SELECT 
+                ip_no,tmch_status
+            FROM tssh_ipadmiss
+            WHERE dis_date >= ?
+            AND dis_date <= ? AND tmch_status = 1`,
+            [
+                data.to,
+                data.to,
+                data.to,
+                data.from,
+                data.to,
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results)
+            }
+        )
+    },
+    getDischargedIpInfoFromMysqlGrouped: (data, callBack) => {
+        pool.query(
+            `SELECT 
+                ip_no
+            FROM tssh_ipadmiss
+            WHERE dis_status = 'Y' 
+            AND date BETWEEN ? AND ?
+            AND tmch_status = 1`,
+            [
+                data.from,
+                data.to
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results)
+            }
+        )
+    },
 }

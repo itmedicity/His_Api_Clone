@@ -17,7 +17,9 @@ const {
     insertAsRemoveTmcPatient,
     getTsshIpNoFromMysql,
     getIpReceiptPatientInfo,
-    getDischargedIpInfoFromMysql
+    getDischargedIpInfoFromMysql,
+    getTsshIpNoFromMysqlGrouping,
+    getDischargedIpInfoFromMysqlGrouped
 } = require('./admissionList.service');
 
 module.exports = {
@@ -419,6 +421,48 @@ module.exports = {
     getDischargedIpInfoFromMysql: (req, res) => {
         const body = req.body;
         getDischargedIpInfoFromMysql(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err.message
+                });
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Result",
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results,
+            });
+        })
+    },
+    getTsshIpNoFromMysqlGrouping: (req, res) => {
+        const body = req.body;
+        getTsshIpNoFromMysqlGrouping(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err.message
+                });
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Result",
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results,
+            });
+        })
+    },
+    getDischargedIpInfoFromMysqlGrouped: (req, res) => {
+        const body = req.body;
+        getDischargedIpInfoFromMysqlGrouped(body, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
