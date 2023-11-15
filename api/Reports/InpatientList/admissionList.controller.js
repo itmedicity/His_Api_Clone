@@ -18,7 +18,9 @@ const {
     insertAsRemoveTmcPatient,
     getTsshIpNoFromMysql,
     getIpReceiptPatientInfo,
-    getDischargedIpInfoFromMysql
+    getDischargedIpInfoFromMysql,
+    getTsshIpNoFromMysqlGrouping,
+    getDischargedIpInfoFromMysqlGrouped
 } = require('./admissionList.service');
 
 module.exports = {
@@ -45,27 +47,24 @@ module.exports = {
             });
         })
     },
-    insertTsshPat: (req, res) => {
+    insertTsshPat: async (req, res) => {
         const body = req.body;
 
         checkPatientInserted(body, (err, results) => {
 
             if (err === null) {
                 if (results.length === 0) {
-                    insertTsshPatient(body, (err, results) => {
-                        if (err) {
-                            return res.status(200).json({
-                                success: 0,
-                                message: err.message
-                            });
-                        }
-
+                    insertTsshPatient(body).then(reslt => {
+                        return res.status(200).json({
+                            success: 0,
+                            message: err.message
+                        })
+                    }).catch(eor => {
                         return res.status(200).json({
                             success: 1,
                             message: "Patient Transfer To TSSH"
                         });
                     })
-
                 } else {
                     return res.status(200).json({
                         success: 2,
@@ -143,19 +142,19 @@ module.exports = {
         deleteIPNumberFromTssh(body, (err, results) => {
             if (err) {
                 return res.status(200).json({
-                    success: 0,
-                    message: err.message
+                    succ: 0,
+                    msage: err.message
                 });
             }
             if (Object.keys(results).length === 0) {
                 return res.status(200).json({
-                    success: 2,
-                    message: "No Result",
+                    succ: 2,
+                    msage: "No Result",
                 });
             }
             return res.status(200).json({
-                success: 1,
-                message: "Patient Removed From TSSH ",
+                succ: 1,
+                msage: "Patient Removed From TSSH ",
                 data: results
             });
         })
@@ -423,6 +422,48 @@ module.exports = {
     getDischargedIpInfoFromMysql: (req, res) => {
         const body = req.body;
         getDischargedIpInfoFromMysql(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err.message
+                });
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Result",
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results,
+            });
+        })
+    },
+    getTsshIpNoFromMysqlGrouping: (req, res) => {
+        const body = req.body;
+        getTsshIpNoFromMysqlGrouping(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err.message
+                });
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Result",
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results,
+            });
+        })
+    },
+    getDischargedIpInfoFromMysqlGrouped: (req, res) => {
+        const body = req.body;
+        getDischargedIpInfoFromMysqlGrouped(body, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,

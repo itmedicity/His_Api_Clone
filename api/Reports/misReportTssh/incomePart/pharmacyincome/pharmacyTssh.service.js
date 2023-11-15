@@ -35,7 +35,8 @@ module.exports = {
         let pool_ora = await oraConnection();
         let conn_ora = await pool_ora.getConnection();
 
-        const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(',')) || null;
+        const group = data?.group;
+        const ipNumberList = group === 1 ? [] : (data?.ptno?.length > 0 && data.ptno.join(',')) || null;
         const fromDate = data.from;
         const toDate = data.to;
 
@@ -110,7 +111,9 @@ module.exports = {
         let pool_ora = await oraConnection();
         let conn_ora = await pool_ora.getConnection();
 
-        const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(',')) || null;
+        const group = data?.group;
+        const ipNumberList = group === 1 ? [] : (data?.ptno?.length > 0 && data.ptno.join(',')) || null;
+        // const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(',')) || null;
         const fromDate = data.from;
         const toDate = data.to;
 
@@ -154,7 +157,9 @@ module.exports = {
         let pool_ora = await oraConnection();
         let conn_ora = await pool_ora.getConnection();
 
-        const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(',')) || null;
+        const group = data?.group;
+        const ipNumberList = group === 1 ? [] : (data?.ptno?.length > 0 && data.ptno.join(',')) || null;
+        // const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(',')) || null;
         const fromDate = data.from;
         const toDate = data.to;
 
