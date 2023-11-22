@@ -668,5 +668,30 @@ module.exports = {
                 await pool_ora.close();
             }
         }
-    }
+    },
+    creditInsuranceBillRefund: async (data, callBack) => {
+        let pool_ora = await oraConnection();
+        let conn_ora = await pool_ora.getConnection();
+
+        const fromDate = data.from;
+        const toDate = data.to;
+
+        try {
+            const result = await conn_ora.execute(
+                `SELECT 0 AMT,0 TAX FROM DUAL`,
+                {},
+                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
+            )
+            await result.resultSet?.getRows((err, rows) => {
+                callBack(err, rows)
+            })
+        } catch (error) {
+            console.log(error)
+        } finally {
+            if (conn_ora) {
+                await conn_ora.close();
+                await pool_ora.close();
+            }
+        }
+    },
 }

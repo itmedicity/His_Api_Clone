@@ -12,7 +12,8 @@ const {
     ipPreviousDayCollectionTssh,
     unsettledAmount,
     misGroupMast,
-    misGroup
+    misGroup,
+    creditInsuranceBillRefund
 } = require('./collectionTssh.service')
 
 module.exports = {
@@ -332,6 +333,29 @@ module.exports = {
             return res.status(200).json({
                 success: 1,
                 message: "mis group master",
+                data: results
+            });
+        })
+    },
+    getcreditInsuranceBillRefund: (req, res) => {
+        const body = req.body;
+        creditInsuranceBillRefund(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err.message
+                });
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Result",
+                    data: []
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                message: "credit Insurance Bill",
                 data: results
             });
         })

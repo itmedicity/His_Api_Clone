@@ -13,7 +13,8 @@ const {
     getipPreviousDayCollectionTssh,
     getunsettledAmount,
     misGroup,
-    misGroupMast
+    misGroupMast,
+    getcreditInsuranceBillRefund
 } = require('./collectionTssh.controller')
 
 const router = require('express').Router();
@@ -30,6 +31,7 @@ router.post('/ipPreviousDayDiscount', checkToken, getipPreviousDayDiscountTssh);
 router.post('/unsettledAmount', checkToken, getunsettledAmount);
 router.post('/ipPreviousDayCollection', checkToken, getipPreviousDayCollectionTssh);
 router.post('/creditInsuranceBill', checkToken, getcreditInsuranceBillTssh);
+router.post('/creditInsuranceBillRefundTssh', checkToken, getcreditInsuranceBillRefund);
 router.get('/misGroup', checkToken, misGroup);
 router.get('/misMaster', checkToken, misGroupMast);
 
