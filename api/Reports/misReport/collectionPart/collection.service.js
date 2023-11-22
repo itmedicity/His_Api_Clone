@@ -1189,4 +1189,144 @@ module.exports = {
             }
         }
     },
+    creditInsuranceBillRefund: async (data, callBack) => {
+        let pool_ora = await oraConnection();
+        let conn_ora = await pool_ora.getConnection();
+
+        const fromDate = data.from;
+        const toDate = data.to;
+
+        try {
+            const result = await conn_ora.execute(
+                `SELECT SUM (NVL (Refundreceiptmast.RPN_RTCREDIT, 0)) * -1 AS Amt,
+                        SUM (NVL (Refundreceiptmast.RFN_TOTTAX, 0)) * -1 tax
+                FROM Refundreceiptmast
+                WHERE     Refundreceiptmast.Rfc_Cacr IN ('R')
+                        AND NVL (Refundreceiptmast.Rfc_Cancel, 'N') = 'N'
+                        AND NVL (Refundreceiptmast.RPN_RTCREDIT, 0) > 0
+                        AND Refundreceiptmast.Roc_Slno IS NULL
+                        AND Refundreceiptmast.Rfd_Date >=
+                            TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                        AND Refundreceiptmast.Rfd_Date <=
+                            TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                        AND REFUNDRECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                UNION ALL
+                SELECT SUM (NVL (refundbillmast.BMN_RTCREDIT, 0)) * -1 AS Amt,
+                        SUM (NVL (refundbillmast.RFN_TOTTAX, 0)) * -1 tax
+                FROM refundbillmast
+                WHERE     refundbillmast.Rfc_Cacr IN ('R')
+                        AND NVL (refundbillmast.Rfc_Cancel, 'N') = 'N'
+                        AND refundbillmast.RFC_RETCNCODE IS NULL
+                        AND NVL (refundbillmast.BMN_RTCREDIT, 0) > 0
+                        AND RefundBillmast.Roc_Slno IS NULL
+                        AND refundbillmast.Rfd_Date >=
+                            TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                        AND refundbillmast.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                        AND refundbillmast.Rfd_Date <=
+                            TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                HAVING SUM (NVL (refundbillmast.BMN_RTCREDIT, 0)) > 0
+                UNION ALL
+                SELECT SUM (
+                            NVL (Mretmast.BMN_RTCREDIT, 0)
+                        + NVL (MRETMAST.MRN_SALETAXCR, 0)
+                        + NVL (MRETMAST.MRN_CESSCR, 0))
+                        * -1
+                        AS Amt,
+                        SUM (
+                            NVL (MRN_SALETAXCH, 0)
+                        + NVL (MRN_SALETAXCR, 0)
+                        + NVL (MRN_CESSCH, 0)
+                        + NVL (MRN_CESSCR, 0))
+                        * -1
+                        Tax
+                FROM Mretmast
+                WHERE     Mretmast.MRC_CACR IN ('R')
+                        AND NVL (Mretmast.MRC_CANCEL, 'N') = 'N'
+                        AND NVL (Mretmast.BMN_RTCREDIT, 0) > 0
+                        AND Mretmast.MRC_RETCNCODE IS NULL
+                        AND Mretmast.MRD_DATE >=
+                            TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                        AND Mretmast.MRD_DATE <=
+                            TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                        AND MRETMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                UNION ALL
+                SELECT SUM (DECODE (Opbillrefundmast.Roc_Cacr, 'R', NVL (Ron_Credit, 0), 0))
+                        * -1
+                        AMT,
+                        SUM (NVL (opbillrefundmast.RON_TOTTAX, 0) * -1) Tax
+                FROM Opbillrefundmast
+                WHERE (NVL (Roc_Cancel, 'N') = 'N')
+                        AND Opbillrefundmast.Rod_Date >=
+                            TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                        AND Opbillrefundmast.Rod_Date <=
+                            TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                        AND OPBILLREFUNDMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                        AND (DECODE (Opbillrefundmast.Roc_Cacr, 'R', Ron_Credit, 0)) <> 0
+                UNION ALL
+                SELECT SUM (NVL (Rin_Credit, 0)) * -1 Amt,
+                        SUM (NVL (IPREFUNDMAST.RIN_TOTTAX, 0) * -1) Tax
+                FROM Iprefundmast
+                WHERE     Ric_Cacr IN ('R')
+                        AND NVL (Ric_Cancel, 'N') = 'N'
+                        AND Dmc_Slno IS NOT NULL
+                        AND Rid_Date >=
+                            TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                        AND IPREFUNDMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                        AND Rid_Date <=
+                            TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                UNION ALL
+                SELECT SUM (NVL (refundbillmast.BMN_RTCREDIT, 0)) * -1 AS Amt,
+                        SUM (NVL (refundbillmast.RFN_TOTTAX, 0)) * -1 tax
+                FROM refundbillmast
+                WHERE     refundbillmast.Rfc_Cacr IN ('R')
+                        AND refundbillmast.Rfc_Cancel IS NULL
+                        AND NVL (refundbillmast.BMN_RTCREDIT, 0) <> 0
+                        AND RefundBillmast.Roc_Slno IS NULL
+                        AND refundbillmast.RFC_RETCNCODE IS NOT NULL
+                        AND refundbillmast.RFD_RETDATE >=
+                            TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                        AND refundbillmast.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                        AND refundbillmast.RFD_RETDATE <=
+                            TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                HAVING SUM (NVL (refundbillmast.BMN_RTCREDIT, 0)) > 0
+                UNION ALL
+                SELECT SUM (
+                            NVL (Mretmast.BMN_RTCREDIT, 0)
+                        + NVL (MRETMAST.MRN_SALETAXCR, 0)
+                        + NVL (MRETMAST.MRN_CESSCR, 0))
+                        * -1
+                        AS Amt,
+                        SUM (
+                            NVL (MRN_SALETAXCH, 0)
+                        + NVL (MRN_SALETAXCR, 0)
+                        + NVL (MRN_CESSCH, 0)
+                        + NVL (MRN_CESSCR, 0))
+                        * -1
+                        Tax
+                FROM Mretmast
+                WHERE     Mretmast.MRC_CACR IN ('R')
+                        AND NVL (Mretmast.MRC_CANCEL, 'N') = 'N'
+                        AND NVL (Mretmast.BMN_RTCREDIT, 0) <> 0
+                        AND Mretmast.MRC_RETCNCODE IS NOT NULL
+                        AND Mretmast.MRD_RETDATE >=
+                            TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                        AND Mretmast.MRD_RETDATE <=
+                            TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                        AND MRETMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)`,
+                {},
+                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
+            )
+            await result.resultSet?.getRows((err, rows) => {
+                callBack(err, rows)
+            })
+        } catch (error) {
+            console.log(error)
+        } finally {
+            if (conn_ora) {
+                await conn_ora.close();
+                await pool_ora.close();
+            }
+        }
+    },
+
 }
