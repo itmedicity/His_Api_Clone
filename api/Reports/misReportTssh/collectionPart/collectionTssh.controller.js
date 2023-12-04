@@ -13,7 +13,8 @@ const {
     unsettledAmount,
     misGroupMast,
     misGroup,
-    creditInsuranceBillRefund
+    creditInsuranceBillRefund,
+    getIpNumberFromPreviousDayCollection
 } = require('./collectionTssh.service')
 
 module.exports = {
@@ -240,11 +241,52 @@ module.exports = {
                     data: []
                 });
             }
-            return res.status(200).json({
-                success: 1,
-                message: "get ip Previous Day Discount",
-                data: results
-            });
+            // return res.status(200).json({
+            //     success: 1,
+            //     message: "get ip Previous Day Discount",
+            //     data: results
+            // });
+            if (results) {
+                const ipNumber = results?.map((e) => e.IP_NO);
+                let datas = {
+                    ipno: ipNumber,
+                    group: body.group
+                }
+
+                getIpNumberFromPreviousDayCollection(datas, (err, getResult) => {
+                    if (err) {
+                        return res.status(200).json({
+                            success: 0,
+                            message: err.message
+                        });
+                    }
+                    if (Object.keys(getResult).length === 0) {
+                        return res.status(200).json({
+                            success: 2,
+                            message: "No Result",
+                            data: []
+                        });
+                    }
+
+                    if (getResult) {
+                        const notInclPat = results?.filter((e) => getResult?.find(v => v.ip_no === e.IP_NO))
+                        if (Object.keys(getResult).length === 0) {
+                            return res.status(200).json({
+                                success: 1,
+                                message: "ip Previous Day Collection",
+                                data: []
+                            });
+                        } else {
+                            return res.status(200).json({
+                                success: 1,
+                                message: "ip Previous Day Collection",
+                                data: notInclPat
+                                // data: notInclPat?.reduce((accumulator, currentValue) => accumulator + currentValue.DISCOUNT, 0)
+                            });
+                        }
+                    }
+                })
+            }
         })
     },
     getipPreviousDayCollectionTssh: (req, res) => {
@@ -263,11 +305,46 @@ module.exports = {
                     data: []
                 });
             }
-            return res.status(200).json({
-                success: 1,
-                message: "ip Previous Day Collection",
-                data: results
-            });
+            if (results) {
+                const ipNumber = results?.map((e) => e.IP_NO);
+                let datas = {
+                    ipno: ipNumber,
+                    group: body.group
+                }
+
+                getIpNumberFromPreviousDayCollection(datas, (err, getResult) => {
+                    if (err) {
+                        return res.status(200).json({
+                            success: 0,
+                            message: err.message
+                        });
+                    }
+                    if (Object.keys(getResult).length === 0) {
+                        return res.status(200).json({
+                            success: 2,
+                            message: "No Result",
+                            data: []
+                        });
+                    }
+
+                    if (getResult) {
+                        const notInclPat = results?.filter((e) => getResult?.find(v => v.ip_no === e.IP_NO))
+                        if (Object.keys(getResult).length === 0) {
+                            return res.status(200).json({
+                                success: 1,
+                                message: "ip Previous Day Collection",
+                                data: []
+                            });
+                        } else {
+                            return res.status(200).json({
+                                success: 1,
+                                message: "ip Previous Day Collection",
+                                data: notInclPat
+                            });
+                        }
+                    }
+                })
+            }
         })
     },
     getunsettledAmount: (req, res) => {

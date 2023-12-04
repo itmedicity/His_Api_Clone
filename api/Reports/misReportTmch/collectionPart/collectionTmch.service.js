@@ -759,7 +759,7 @@ module.exports = {
         const fromDate = data.from;
         const toDate = data.to;
 
-        const sql = `SELECT SUM (NVL (Irn_Discount, 0)) Discount
+        const sql = `SELECT SUM (NVL (Irn_Discount, 0)) Discount,DISBILLMAST.IP_NO
                         FROM ipreceipt, Disbillmast
                         WHERE Ipreceipt.Dmc_slno = Disbillmast.Dmc_slno
                             AND Disbillmast.Dmd_date < TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
@@ -767,8 +767,8 @@ module.exports = {
                             AND IRD_DATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             AND IRD_DATE <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
-                            AND Disbillmast.IP_NO NOT IN (${ipNumberList})
-                            AND NVL (Irc_cancel, 'N') = 'N'`;
+                            AND NVL (Irc_cancel, 'N') = 'N' 
+                            group by DISBILLMAST.IP_NO`;
 
         try {
             const result = await conn_ora.execute(
@@ -798,7 +798,8 @@ module.exports = {
         const fromDate = data.from;
         const toDate = data.to;
 
-        const sql = `SELECT SUM (
+        const sql = `SELECT 
+                        SUM (
                         (  NVL (Ipreceipt.irn_amount, 0)
                         + NVL (Ipreceipt.irn_cheque, 0)
                         + NVL (Ipreceipt.irn_card, 0)
@@ -807,15 +808,16 @@ module.exports = {
                         + NVL (Ipreceipt.IRN_REFCHEQ, 0)
                         + NVL (Ipreceipt.irn_refcard, 0))
                         + NVL (Ipreceipt.irn_discount, 0)) Amt,
-                        0 tax
+                        0 tax,
+                        DISBILLMAST.IP_NO
                         FROM ipreceipt, Disbillmast
                     WHERE Ipreceipt.Dmc_Slno = Disbillmast.Dmc_Slno
                             AND Disbillmast.Dmd_date < TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
                             AND Ipreceipt.Dmc_type IN ('C', 'R')
                             AND IRD_DATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
                             AND ird_date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
-                            AND Disbillmast.IP_NO NOT IN (${ipNumberList})
-                            AND Irc_cancel IS NULL`;
+                            AND Irc_cancel IS NULL 
+                            group by  DISBILLMAST.IP_NO`;
 
         try {
             const result = await conn_ora.execute(
@@ -997,7 +999,6 @@ module.exports = {
         }
     },
     getDischargedIpInfoMysql: (from, to, callBack) => {
-        console.log(from, to)
         pool.query(
             `SELECT 
                 ip_no
@@ -1013,7 +1014,6 @@ module.exports = {
                 if (error) {
                     return error
                 }
-                console.log(results)
                 return results
             }
         )
@@ -1158,4 +1158,20 @@ module.exports = {
             }
         }
     },
+    getIpNumberFromPreviousDayCollection: (data, callBack) => {
+
+        const sql = `SELECT ip_no,dis_status,tmch_status
+        FROM tssh_ipadmiss 
+        WHERE ip_no IN ('${data}')`;
+        pool.query(
+            sql,
+            [],
+            (error, results, feilds) => {
+                if (error) {
+                    return error
+                }
+                return callBack(null, results)
+            }
+        )
+    }
 }
