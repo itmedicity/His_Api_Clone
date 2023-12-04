@@ -245,12 +245,9 @@ module.exports = {
                     data: []
                 });
             }
-            // return res.status(200).json({
-            //     success: 1,
-            //     message: "get ip Previous Day Discount",
-            //     data: results
-            // });
+
             if (results) {
+
                 const ipNumber = results?.map((e) => e.IP_NO);
 
                 getIpNumberFromPreviousDayCollection(ipNumber, (err, getResult) => {
@@ -260,28 +257,32 @@ module.exports = {
                             message: err.message
                         });
                     }
+
+
                     if (Object.keys(getResult).length === 0) {
                         return res.status(200).json({
-                            success: 2,
-                            message: "No Result",
-                            data: []
+                            success: 1,
+                            message: "ip Previous Day Collection",
+                            data: results
                         });
                     }
 
+
                     if (getResult) {
-                        const notInclPat = results?.filter((e) => getResult?.find(v => v.ip_no !== e.IP_NO))
-                        if (Object.keys(getResult).length === 0) {
+                        let array = Object.values(JSON.parse(JSON.stringify(getResult)))
+                        const notInclPat = results?.filter((e) => !array?.map(e => e.ip_no).includes(e.IP_NO))
+
+                        if (Object.keys(notInclPat).length === 0) {
                             return res.status(200).json({
                                 success: 1,
                                 message: "ip Previous Day Collection",
-                                data: []
+                                data: results
                             });
                         } else {
                             return res.status(200).json({
                                 success: 1,
                                 message: "ip Previous Day Collection",
                                 data: notInclPat,
-                                // data: notInclPat?.reduce((accumulator, currentValue) => accumulator + currentValue.DISCOUNT, 0)
                             });
                         }
                     }
@@ -317,14 +318,16 @@ module.exports = {
                     }
                     if (Object.keys(getResult).length === 0) {
                         return res.status(200).json({
-                            success: 2,
+                            success: 1,
                             message: "No Result",
-                            data: []
+                            data: results
                         });
                     }
 
                     if (getResult) {
-                        const notInclPat = results?.filter((e) => getResult?.find(v => v.ip_no !== e.IP_NO))
+                        let array = Object.values(JSON.parse(JSON.stringify(getResult)))
+                        const notInclPat = results?.filter((e) => !array?.map(e => e.ip_no).includes(e.IP_NO))
+
                         if (Object.keys(getResult).length === 0) {
                             return res.status(200).json({
                                 success: 1,

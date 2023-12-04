@@ -234,6 +234,7 @@ module.exports = {
                     message: err.message
                 });
             }
+
             if (Object.keys(results).length === 0) {
                 return res.status(200).json({
                     success: 2,
@@ -241,13 +242,10 @@ module.exports = {
                     data: []
                 });
             }
-            // return res.status(200).json({
-            //     success: 1,
-            //     message: "get ip Previous Day Discount",
-            //     data: results
-            // });
+
             if (results) {
                 const ipNumber = results?.map((e) => e.IP_NO);
+
                 let datas = {
                     ipno: ipNumber,
                     group: body.group
@@ -281,7 +279,6 @@ module.exports = {
                                 success: 1,
                                 message: "ip Previous Day Collection",
                                 data: notInclPat
-                                // data: notInclPat?.reduce((accumulator, currentValue) => accumulator + currentValue.DISCOUNT, 0)
                             });
                         }
                     }
