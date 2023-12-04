@@ -1162,7 +1162,8 @@ module.exports = {
 
         const sql = `SELECT ip_no,dis_status,tmch_status
         FROM tssh_ipadmiss 
-        WHERE ip_no IN ('${data}')`;
+        WHERE ip_no IN (${data})`;
+
         pool.query(
             sql,
             [],

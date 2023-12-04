@@ -699,7 +699,7 @@ module.exports = {
 
         const sql = `SELECT ip_no,dis_status,tmch_status
         FROM tssh_ipadmiss 
-        WHERE ip_no IN ('${data.ipno}') AND tmch_status = ${data.group}`;
+        WHERE ip_no IN (${data.ipno}) AND tmch_status = ${data.group}`;
         pool.query(
             sql,
             [],
