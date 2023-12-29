@@ -741,7 +741,8 @@ module.exports = {
                             AND IRD_DATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             AND IRD_DATE <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
-                            AND NVL (Irc_cancel, 'N') = 'N' 
+                            AND NVL (Irc_cancel, 'N') = 'N'
+                            AND Disbillmast.IP_NO NOT IN (${ipNumberList})
                             group by DISBILLMAST.IP_NO`;
 
         try {

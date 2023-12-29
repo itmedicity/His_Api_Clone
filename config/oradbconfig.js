@@ -11,6 +11,7 @@ const oraConnection = async () => {
 
 }
 
+
 const oraPool = async () => {
     let oraclePool = await oraConnection()
     return await oraclePool.getConnection()

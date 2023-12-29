@@ -524,4 +524,132 @@ module.exports = {
             }
         )
     },
+    getTmcIncomeReport: (data, callBack) => {
+        pool.query(
+            `SELECT 
+                SUM(bed) bed,
+                SUM(ns) ns,
+                SUM(room) room,
+                SUM(others) others,
+                SUM(consulting) consulting,
+                SUM(anesthesia) anesthesia,
+                SUM(operation) operation,
+                SUM(theater) theater,
+                SUM(theaterInstment) theaterInstment,
+                SUM(cardiology) cardiology,
+                SUM(disposible) disposible,
+                SUM(icu) icu,
+                SUM(icuProc) icuProc,
+                SUM(radiology) radiology,
+                SUM(lab) lab,
+                SUM(bloodbank) bloodbank,
+                SUM(mri) mri,
+                SUM(diet) diet,
+                SUM(pha_sale) pha_sale,
+                SUM(pha_discount) pha_discount,
+                SUM(pha_tax) pha_tax,
+                SUM(pha_gross) pha_gross,
+                SUM(ip_consolidate_discount) ip_consolidate_discount,
+                SUM(pettycash) pettycash,
+                SUM(tax) tax,
+                SUM(collectionagainsale) collectionagainsale,
+                SUM(advanceSettled) advanceSettled,
+                SUM(creditinsurancebill) creditinsurancebill,
+                SUM(unsettledAmount) unsettledAmount,
+                SUM(roundOff) roundOff,
+                SUM(gra_collection) gra_collection,
+                SUM(gra_net) gra_net,
+                SUM(gra_tax) gra_tax,
+                SUM(gra_discount) gra_discount,
+                SUM(gra_gross) gra_gross,
+                SUM(insuranceBillDisct) insuranceBillDisct,
+                SUM(insuranceWriteOff) insuranceWriteOff,
+                SUM(Complimentary) Complimentary,
+                SUM(previousDayDiscount) previousDayDiscount,
+                SUM(advanceRefund) advanceRefund,
+                SUM(advanceCollction) advanceCollction,
+                SUM(insuranceBillCollection) insuranceBillCollection,
+                SUM(previousDayCollection) previousDayCollection,
+                SUM(counterCollection) counterCollection,
+                SUM(general) general,
+                SUM(otherType) otherType,
+                SUM(discountTotal) discountTotal
+            FROM tmc_income 
+            WHERE DATE BETWEEN ? AND ?`,
+            [
+                data.from,
+                data.to
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results)
+            }
+        )
+    },
+    getTsshIncomeReport: (data, callBack) => {
+        pool.query(
+            `SELECT 
+                SUM(bed) bed,
+                SUM(ns) ns,
+                SUM(room) room,
+                SUM(others) others,
+                SUM(consulting) consulting,
+                SUM(anesthesia) anesthesia,
+                SUM(operation) operation,
+                SUM(theater) theater,
+                SUM(theaterInstment) theaterInstment,
+                SUM(cardiology) cardiology,
+                SUM(disposible) disposible,
+                SUM(icu) icu,
+                SUM(icuProc) icuProc,
+                SUM(radiology) radiology,
+                SUM(lab) lab,
+                SUM(bloodbank) bloodbank,
+                SUM(mri) mri,
+                SUM(diet) diet,
+                SUM(pha_sale) pha_sale,
+                SUM(pha_discount) pha_discount,
+                SUM(pha_tax) pha_tax,
+                SUM(pha_gross) pha_gross,
+                SUM(ip_consolidate_discount) ip_consolidate_discount,
+                SUM(pettycash) pettycash,
+                SUM(tax) tax,
+                SUM(collectionagainsale) collectionagainsale,
+                SUM(advanceSettled) advanceSettled,
+                SUM(creditinsurancebill) creditinsurancebill,
+                SUM(unsettledAmount) unsettledAmount,
+                SUM(roundOff) roundOff,
+                SUM(gra_collection) gra_collection,
+                SUM(gra_net) gra_net,
+                SUM(gra_tax) gra_tax,
+                SUM(gra_discount) gra_discount,
+                SUM(gra_gross) gra_gross,
+                SUM(insuranceBillDisct) insuranceBillDisct,
+                SUM(insuranceWriteOff) insuranceWriteOff,
+                SUM(Complimentary) Complimentary,
+                SUM(previousDayDiscount) previousDayDiscount,
+                SUM(advanceRefund) advanceRefund,
+                SUM(advanceCollction) advanceCollction,
+                SUM(insuranceBillCollection) insuranceBillCollection,
+                SUM(previousDayCollection) previousDayCollection,
+                SUM(counterCollection) counterCollection,
+                SUM(general) general,
+                SUM(otherType) otherType,
+                SUM(discountTotal) discountTotal
+            FROM tssh_income 
+            WHERE DATE BETWEEN ? AND ?`,
+            [
+                data.from,
+                data.to
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results)
+            }
+        )
+    },
 }
