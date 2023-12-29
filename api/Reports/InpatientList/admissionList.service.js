@@ -524,6 +524,28 @@ module.exports = {
             }
         )
     },
+    getGroupedPatientList: (data, callBack) => {
+        pool.query(
+            `SELECT 
+                date,
+                ip_no,
+                op_no,
+                dis_status,
+                dis_date
+            FROM medi_ellider.tssh_ipadmiss
+            WHERE tmch_status = ? AND date = ?`,
+            [
+                data.status,
+                data.date
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results)
+            }
+        )
+    },
     getTmcIncomeReport: (data, callBack) => {
         pool.query(
             `SELECT 

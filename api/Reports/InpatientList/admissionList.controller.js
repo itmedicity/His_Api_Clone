@@ -5,6 +5,7 @@ const {
     getTsshPatientDateWise,
     deleteIPNumberFromTssh,
     getPatientData,
+    getIpadmissChecks,
     getTsshPatientList,
     getTotalPatientList,
     getDischargePatientList,
@@ -13,13 +14,14 @@ const {
     updateDischargedPatient,
     updateLastDischargeDate,
     getDischargedipNoFromMysql,
-    getIpadmissChecks,
+    // getIpadmissChecks,
     insertAsRemoveTmcPatient,
     getTsshIpNoFromMysql,
     getIpReceiptPatientInfo,
     getDischargedIpInfoFromMysql,
     getTsshIpNoFromMysqlGrouping,
     getDischargedIpInfoFromMysqlGrouped,
+    getGroupedPatientList,
     getTmcIncomeReport,
     getTsshIncomeReport
 } = require('./admissionList.service');
@@ -465,6 +467,27 @@ module.exports = {
     getDischargedIpInfoFromMysqlGrouped: (req, res) => {
         const body = req.body;
         getDischargedIpInfoFromMysqlGrouped(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err.message
+                });
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Result",
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results,
+            });
+        })
+    },
+    getGroupedPatientList: (req, res) => {
+        const body = req.body;
+        getGroupedPatientList(body, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,

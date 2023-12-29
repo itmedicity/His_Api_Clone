@@ -5,6 +5,7 @@ const {
     getTsshPatientDateWise,
     deleteIPNumberFromTssh,
     getPatientData,
+    getIpadmissChecks,
     getTsshPatientList,
     getTotalPatientList,
     getDischargePatientList,
@@ -13,13 +14,14 @@ const {
     updateDischargedPatient,
     updateLastDischargeDate,
     getDischargedipNoFromMysql,
-    getIpadmissChecks,
+    // getIpadmissChecks,
     removeAsTmchPatient,
     getTsshIpNoFromMysql,
     getIpReceiptPatientInfo,
     getDischargedIpInfoFromMysql,
     getTsshIpNoFromMysqlGrouping,
     getDischargedIpInfoFromMysqlGrouped,
+    getGroupedPatientList,
     getTmcIncomeReport,
     getTsshIncomeReport
 } = require('./admissionList.controller');
@@ -33,6 +35,7 @@ router.post('/getTsshPatientList', checkToken, getTsshPatientDateWise);
 router.post('/removePatiet', checkToken, deleteIPNumberFromTssh);
 router.get('/patientInfo/:id', getPatientData);
 
+router.get('/getIpadmissChecks/:id', getIpadmissChecks);
 router.post('/getTsshPatient', checkToken, getTsshPatientList);
 router.post('/getTotalPatientList', checkToken, getTotalPatientList);
 router.post('/getDischargePtFromOracle', checkToken, getDischargePatientList);
@@ -45,6 +48,10 @@ router.post('/getIpNumberTssh', checkToken, getTsshIpNoFromMysql);
 //Grouped Router
 router.post('/getIpNumberTmchGrouped', checkToken, getTsshIpNoFromMysqlGrouping);
 router.post('/getIpDischargedPatientInfo', checkToken, getDischargedIpInfoFromMysql);
+router.post('/getGroupedPatientList', checkToken, getGroupedPatientList);
+
+
+// router.get('/getIpadmissChecks/:id', getIpadmissChecks);
 
 router.post('/getIpReceiptInfo', checkToken, getIpReceiptPatientInfo);
 router.post('/getIpDischargedPatientInfoGrouped', checkToken, getDischargedIpInfoFromMysqlGrouped);
