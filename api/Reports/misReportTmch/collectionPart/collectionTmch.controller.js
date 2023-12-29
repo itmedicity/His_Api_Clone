@@ -325,7 +325,6 @@ module.exports = {
                     }
 
                     if (getResult) {
-                        // const notInclPat = results?.filter((e) => getResult?.find(v => v.ip_no !== e.IP_NO))
                         let array = Object.values(JSON.parse(JSON.stringify(getResult)))
                         const notInclPat = results?.filter((e) => !array?.map(e => e.ip_no).includes(e.IP_NO))
 

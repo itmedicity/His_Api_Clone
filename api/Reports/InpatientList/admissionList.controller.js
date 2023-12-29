@@ -21,7 +21,9 @@ const {
     getDischargedIpInfoFromMysql,
     getTsshIpNoFromMysqlGrouping,
     getDischargedIpInfoFromMysqlGrouped,
-    getGroupedPatientList
+    getGroupedPatientList,
+    getTmcIncomeReport,
+    getTsshIncomeReport
 } = require('./admissionList.service');
 
 module.exports = {
@@ -486,6 +488,48 @@ module.exports = {
     getGroupedPatientList: (req, res) => {
         const body = req.body;
         getGroupedPatientList(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err.message
+                });
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Result",
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results,
+            });
+        })
+    },
+    getTmcIncomeReport: (req, res) => {
+        const body = req.body;
+        getTmcIncomeReport(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err.message
+                });
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Result",
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results,
+            });
+        })
+    },
+    getTsshIncomeReport: (req, res) => {
+        const body = req.body;
+        getTsshIncomeReport(body, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
