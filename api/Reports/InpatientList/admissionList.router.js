@@ -54,5 +54,6 @@ router.get('/getIpadmissChecks/:id', getIpadmissChecks);
 //GET TMC INCOME
 router.post('/getTmcIncome', checkToken, getTmcIncomeReport);
 router.post('/getTsshIncome', checkToken, getTsshIncomeReport);
+// router.post('/getTsshIncome', checkToken, getTsshIncomeReport);
 
 module.exports = router;
