@@ -324,7 +324,7 @@ module.exports = {
     },
     getDischargedipNoFromMysql: (data, callBack) => {
         pool.query(
-            `SELECT 
+            `SELECT
                 ip_no,tmch_status
             FROM tssh_ipadmiss
             WHERE dis_status = 'Y' AND date  <= ? and dis_date > ?
@@ -456,8 +456,7 @@ module.exports = {
                 ip_no
             FROM tssh_ipadmiss
             WHERE dis_status = 'Y' 
-            AND date BETWEEN ? AND ?
-            AND tmch_status = 0`,
+            AND date BETWEEN ? AND ?`,
             [
                 data.from,
                 data.to

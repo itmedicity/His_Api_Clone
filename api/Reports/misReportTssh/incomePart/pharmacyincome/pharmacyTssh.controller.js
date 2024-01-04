@@ -4,7 +4,8 @@ const {
     phamracyTsshSalePart2,
     phamracyTsshReturnPart2,
     phamracyTsshSalePart3,
-    phamracyTsshReturnPart3
+    phamracyTsshReturnPart3,
+    pharmacyRoundOffAmntTssh
 } = require('./pharmacyTssh.service')
 
 module.exports = {
@@ -136,6 +137,28 @@ module.exports = {
             return res.status(200).json({
                 success: 1,
                 message: "Pharmacy Sale",
+                data: results
+            });
+        })
+    },
+    pharmacyRoundOffAmntTssh: (req, res) => {
+        const body = req.body;
+        pharmacyRoundOffAmntTssh(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err.message
+                });
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Result"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                message: "Round Off",
                 data: results
             });
         })

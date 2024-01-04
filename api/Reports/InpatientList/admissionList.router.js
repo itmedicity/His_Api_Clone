@@ -50,7 +50,6 @@ router.post('/getIpNumberTmchGrouped', checkToken, getTsshIpNoFromMysqlGrouping)
 router.post('/getIpDischargedPatientInfo', checkToken, getDischargedIpInfoFromMysql);
 router.post('/getGroupedPatientList', checkToken, getGroupedPatientList);
 
-
 // router.get('/getIpadmissChecks/:id', getIpadmissChecks);
 
 router.post('/getIpReceiptInfo', checkToken, getIpReceiptPatientInfo);
