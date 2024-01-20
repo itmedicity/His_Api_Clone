@@ -1,25 +1,30 @@
 const {
-    advanceCollection,
-    advanceRefund,
-    advanceSettled,
-    collectionAgainstSalePart1,
-    collectionAgainstSalePart2,
-    complimentory,
-    creditInsuranceBillCollection,
-    creditInsuranceBill,
-    ipConsolidatedDiscount,
-    ipPreviousDayDiscount,
-    ipPreviousDayCollection,
-    unsettledAmount,
-    misGroup,
-    misGroupMast,
-    creditInsuranceBillRefund
-} = require('./collection.service')
+    bedIncome,
+    nsIncome,
+    roomRentIncome,
+    otherIncome,
+    consultingIncome,
+    anesthetiaIncome,
+    surgeonIncome,
+    theaterIncome,
+    cardiologyIncome,
+    disPosibleItemIncome,
+    icuIncome,
+    icuprocedureIncome,
+    radiologyIncome,
+    laboratoryIncome,
+    mriIncome,
+    dietIncome,
+    pharmacyIncomePart1,
+    pharmacyIncomePart2,
+    pharmacyIncomePart3,
+    pharmacyIncomePart4
+} = require('../incomePart/income.service')
 
 module.exports = {
-    getadvanceCollection: (req, res) => {
+    bedIncome: (req, res) => {
         const body = req.body;
-        advanceCollection(body, (err, results) => {
+        bedIncome(body, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -35,14 +40,14 @@ module.exports = {
             }
             return res.status(200).json({
                 success: 1,
-                message: "advance Collection",
+                message: "bedIncome",
                 data: results
             });
         })
     },
-    getAdvanceRefund: (req, res) => {
+    nsIncome: (req, res) => {
         const body = req.body;
-        advanceRefund(body, (err, results) => {
+        nsIncome(body, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -58,14 +63,14 @@ module.exports = {
             }
             return res.status(200).json({
                 success: 1,
-                message: "advance Refund",
+                message: "nsIncome",
                 data: results
             });
         })
     },
-    getAdvanceSettled: (req, res) => {
+    roomRentIncome: (req, res) => {
         const body = req.body;
-        advanceSettled(body, (err, results) => {
+        roomRentIncome(body, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -81,14 +86,14 @@ module.exports = {
             }
             return res.status(200).json({
                 success: 1,
-                message: "advance Settled",
+                message: "roomRentIncome",
                 data: results
             });
         })
     },
-    getcollectionAgainstSaleTotal: (req, res) => {
+    otherIncome: (req, res) => {
         const body = req.body;
-        collectionAgainstSalePart1(body, (err, results) => {
+        otherIncome(body, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -104,14 +109,14 @@ module.exports = {
             }
             return res.status(200).json({
                 success: 1,
-                message: "get collection Against Sale Total",
+                message: "otherIncome",
                 data: results
             });
         })
     },
-    getcollectionAgainstSaleDeduction: (req, res) => {
+    consultingIncome: (req, res) => {
         const body = req.body;
-        collectionAgainstSalePart2(body, (err, results) => {
+        consultingIncome(body, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -127,14 +132,14 @@ module.exports = {
             }
             return res.status(200).json({
                 success: 1,
-                message: "get collection Against Sale Deduction",
+                message: "consultingIncome",
                 data: results
             });
         })
     },
-    getComplimentory: (req, res) => {
+    anesthetiaIncome: (req, res) => {
         const body = req.body;
-        complimentory(body, (err, results) => {
+        anesthetiaIncome(body, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -150,14 +155,14 @@ module.exports = {
             }
             return res.status(200).json({
                 success: 1,
-                message: "complimentory",
+                message: "anesthetiaIncome",
                 data: results
             });
         })
     },
-    getcreditInsuranceBillCollection: (req, res) => {
+    surgeonIncome: (req, res) => {
         const body = req.body;
-        creditInsuranceBillCollection(body, (err, results) => {
+        surgeonIncome(body, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -173,14 +178,14 @@ module.exports = {
             }
             return res.status(200).json({
                 success: 1,
-                message: "credit Insurance Bill Collection",
+                message: "surgeonIncome",
                 data: results
             });
         })
     },
-    getcreditInsuranceBill: (req, res) => {
+    theaterIncome: (req, res) => {
         const body = req.body;
-        creditInsuranceBill(body, (err, results) => {
+        theaterIncome(body, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -196,14 +201,14 @@ module.exports = {
             }
             return res.status(200).json({
                 success: 1,
-                message: "credit Insurance Bill",
+                message: "theaterIncome",
                 data: results
             });
         })
     },
-    getipConsolidatedDiscount: (req, res) => {
+    cardiologyIncome: (req, res) => {
         const body = req.body;
-        ipConsolidatedDiscount(body, (err, results) => {
+        cardiologyIncome(body, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -219,14 +224,14 @@ module.exports = {
             }
             return res.status(200).json({
                 success: 1,
-                message: "ip Consolidated Discount",
+                message: "cardiologyIncome",
                 data: results
             });
         })
     },
-    getipPreviousDayDiscount: (req, res) => {
+    disPosibleItemIncome: (req, res) => {
         const body = req.body;
-        ipPreviousDayDiscount(body, (err, results) => {
+        disPosibleItemIncome(body, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -242,14 +247,14 @@ module.exports = {
             }
             return res.status(200).json({
                 success: 1,
-                message: "get ip Previous Day Discount",
+                message: "disPosibleItemIncome",
                 data: results
             });
         })
     },
-    getipPreviousDayCollection: (req, res) => {
+    icuIncome: (req, res) => {
         const body = req.body;
-        ipPreviousDayCollection(body, (err, results) => {
+        icuIncome(body, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -265,14 +270,14 @@ module.exports = {
             }
             return res.status(200).json({
                 success: 1,
-                message: "ip Previous Day Collection",
+                message: "icuIncome",
                 data: results
             });
         })
     },
-    getunsettledAmount: (req, res) => {
+    icuprocedureIncome: (req, res) => {
         const body = req.body;
-        unsettledAmount(body, (err, results) => {
+        icuprocedureIncome(body, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -288,58 +293,14 @@ module.exports = {
             }
             return res.status(200).json({
                 success: 1,
-                message: "Unsettled Amount",
+                message: "icuprocedureIncome",
                 data: results
             });
         })
     },
-    misGroup: (req, res) => {
-        misGroup((err, results) => {
-            if (err) {
-                return res.status(200).json({
-                    success: 0,
-                    message: err.message
-                });
-            }
-            if (Object.keys(results).length === 0) {
-                return res.status(200).json({
-                    success: 2,
-                    message: "No Result",
-                    data: []
-                });
-            }
-            return res.status(200).json({
-                success: 1,
-                message: "mis group master",
-                data: results
-            });
-        })
-    },
-    misGroupMast: (req, res) => {
-        misGroupMast((err, results) => {
-            if (err) {
-                return res.status(200).json({
-                    success: 0,
-                    message: err.message
-                });
-            }
-            if (Object.keys(results).length === 0) {
-                return res.status(200).json({
-                    success: 2,
-                    message: "No Result",
-                    data: []
-                });
-            }
-            return res.status(200).json({
-                success: 1,
-                message: "mis group master",
-                data: results
-            });
-        })
-    },
-    getcreditInsuranceBillRefund: (req, res) => {
+    radiologyIncome: (req, res) => {
         const body = req.body;
-        creditInsuranceBillRefund(body, (err, results) => {
+        radiologyIncome(body, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -355,7 +316,168 @@ module.exports = {
             }
             return res.status(200).json({
                 success: 1,
-                message: "credit Insurance Bill",
+                message: "radiologyIncome",
+                data: results
+            });
+        })
+    },
+    laboratoryIncome: (req, res) => {
+        const body = req.body;
+        laboratoryIncome(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err.message
+                });
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Result",
+                    data: []
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                message: "laboratoryIncome",
+                data: results
+            });
+        })
+    },
+    mriIncome: (req, res) => {
+        const body = req.body;
+        mriIncome(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err.message
+                });
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Result",
+                    data: []
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                message: "mriIncome",
+                data: results
+            });
+        })
+    },
+    dietIncome: (req, res) => {
+        const body = req.body;
+        dietIncome(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err.message
+                });
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Result",
+                    data: []
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                message: "dietIncome",
+                data: results
+            });
+        })
+    },
+    pharmacyIncomePart1: (req, res) => {
+        const body = req.body;
+        pharmacyIncomePart1(body, (err, results) => {
+            // if (err) {
+            //     return res.status(200).json({
+            //         success: 0,
+            //         message: err.message
+            //     });
+            // }
+            // if (Object.keys(results).length === 0) {
+            //     return res.status(200).json({
+            //         success: 2,
+            //         message: "No Result",
+            //         data: []
+            //     });
+            // }
+            return res.status(200).json({
+                success: 1,
+                message: "pharmacyIncomePart1",
+                data: []
+            });
+        })
+    },
+    pharmacyIncomePart2: (req, res) => {
+        const body = req.body;
+        pharmacyIncomePart2(body, (err, results) => {
+            // if (err) {
+            //     return res.status(200).json({
+            //         success: 0,
+            //         message: err.message
+            //     });
+            // }
+            // if (Object.keys(results).length === 0) {
+            //     return res.status(200).json({
+            //         success: 2,
+            //         message: "No Result",
+            //         data: []
+            //     });
+            // }
+            return res.status(200).json({
+                success: 1,
+                message: "pharmacyIncomePart1",
+                data: []
+            });
+        })
+    },
+    pharmacyIncomePart3: (req, res) => {
+        const body = req.body;
+        pharmacyIncomePart3(body, (err, results) => {
+            // if (err) {
+            //     return res.status(200).json({
+            //         success: 0,
+            //         message: err.message
+            //     });
+            // }
+            // if (Object.keys(results).length === 0) {
+            //     return res.status(200).json({
+            //         success: 2,
+            //         message: "No Result",
+            //         data: []
+            //     });
+            // }
+            return res.status(200).json({
+                success: 1,
+                message: "pharmacyIncomePart1",
+                data: []
+            });
+        })
+    },
+    pharmacyIncomePart4: (req, res) => {
+        const body = req.body;
+        pharmacyIncomePart4(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err.message
+                });
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Result",
+                    data: []
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                message: "pharmacyIncomePart4",
                 data: results
             });
         })

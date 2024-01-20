@@ -1,23 +1,180 @@
+// @ts-nocheck
 const {
+    creditInsuranceBillDetlPart1,
+    creditInsuranceBillDetlPart2,
+    creditInsuranceBillDetlPart3,
+    creditInsuranceBillDetlPart4,
+    creditInsuranceBillDetlPart5,
+    creditInsuranceBillDetlPart6,
+    unSettledAmountDetl,
     advanceCollection,
-    advanceRefund,
-    advanceSettled,
-    collectionAgainstSalePart1,
-    collectionAgainstSalePart2,
-    complimentory,
-    creditInsuranceBillCollection,
-    creditInsuranceBill,
-    ipConsolidatedDiscount,
-    ipPreviousDayDiscount,
-    ipPreviousDayCollection,
-    unsettledAmount,
-    misGroup,
-    misGroupMast,
-    creditInsuranceBillRefund
-} = require('./collection.service')
+    creditInsuranceBillCollection1,
+    creditInsuranceBillCollection2
+} = require('../collectionPart/misCollectionPart.service');
 
 module.exports = {
-    getadvanceCollection: (req, res) => {
+    creditInsuranceBillDetlPart1: (req, res) => {
+        const body = req.body;
+        creditInsuranceBillDetlPart1(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err.message
+                });
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Result",
+                    data: []
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                message: "creditInsuranceBillDetlPart1",
+                data: results
+            });
+        })
+    },
+    creditInsuranceBillDetlPart2: (req, res) => {
+        const body = req.body;
+        creditInsuranceBillDetlPart2(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err.message
+                });
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Result",
+                    data: []
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                message: "creditInsuranceBillDetlPart2",
+                data: results
+            });
+        })
+    },
+    creditInsuranceBillDetlPart3: (req, res) => {
+        const body = req.body;
+        creditInsuranceBillDetlPart3(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err.message
+                });
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Result",
+                    data: []
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                message: "creditInsuranceBillDetlPart3",
+                data: results
+            });
+        })
+    },
+    creditInsuranceBillDetlPart4: (req, res) => {
+        const body = req.body;
+        creditInsuranceBillDetlPart4(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err.message
+                });
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Result",
+                    data: []
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                message: "creditInsuranceBillDetlPart4",
+                data: results
+            });
+        })
+    },
+    creditInsuranceBillDetlPart5: (req, res) => {
+        const body = req.body;
+        creditInsuranceBillDetlPart5(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err.message
+                });
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Result",
+                    data: []
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                message: "creditInsuranceBillDetlPart5",
+                data: results
+            });
+        })
+    },
+    creditInsuranceBillDetlPart6: (req, res) => {
+        const body = req.body;
+        creditInsuranceBillDetlPart6(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err.message
+                });
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Result",
+                    data: []
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                message: "creditInsuranceBillDetlPart6",
+                data: results
+            });
+        })
+    },
+    unSettledAmountDetl: (req, res) => {
+        const body = req.body;
+        unSettledAmountDetl(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err.message
+                });
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Result",
+                    data: []
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                message: "unSettledAmountDetl",
+                data: results
+            });
+        })
+    },
+    advanceCollection: (req, res) => {
         const body = req.body;
         advanceCollection(body, (err, results) => {
             if (err) {
@@ -35,14 +192,14 @@ module.exports = {
             }
             return res.status(200).json({
                 success: 1,
-                message: "advance Collection",
+                message: "advanceCollection",
                 data: results
             });
         })
     },
-    getAdvanceRefund: (req, res) => {
+    creditInsuranceBillCollection1: (req, res) => {
         const body = req.body;
-        advanceRefund(body, (err, results) => {
+        creditInsuranceBillCollection1(body, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -58,14 +215,14 @@ module.exports = {
             }
             return res.status(200).json({
                 success: 1,
-                message: "advance Refund",
+                message: "creditInsuranceBillCollection1",
                 data: results
             });
         })
     },
-    getAdvanceSettled: (req, res) => {
+    creditInsuranceBillCollection2: (req, res) => {
         const body = req.body;
-        advanceSettled(body, (err, results) => {
+        creditInsuranceBillCollection2(body, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -81,281 +238,7 @@ module.exports = {
             }
             return res.status(200).json({
                 success: 1,
-                message: "advance Settled",
-                data: results
-            });
-        })
-    },
-    getcollectionAgainstSaleTotal: (req, res) => {
-        const body = req.body;
-        collectionAgainstSalePart1(body, (err, results) => {
-            if (err) {
-                return res.status(200).json({
-                    success: 0,
-                    message: err.message
-                });
-            }
-            if (Object.keys(results).length === 0) {
-                return res.status(200).json({
-                    success: 2,
-                    message: "No Result",
-                    data: []
-                });
-            }
-            return res.status(200).json({
-                success: 1,
-                message: "get collection Against Sale Total",
-                data: results
-            });
-        })
-    },
-    getcollectionAgainstSaleDeduction: (req, res) => {
-        const body = req.body;
-        collectionAgainstSalePart2(body, (err, results) => {
-            if (err) {
-                return res.status(200).json({
-                    success: 0,
-                    message: err.message
-                });
-            }
-            if (Object.keys(results).length === 0) {
-                return res.status(200).json({
-                    success: 2,
-                    message: "No Result",
-                    data: []
-                });
-            }
-            return res.status(200).json({
-                success: 1,
-                message: "get collection Against Sale Deduction",
-                data: results
-            });
-        })
-    },
-    getComplimentory: (req, res) => {
-        const body = req.body;
-        complimentory(body, (err, results) => {
-            if (err) {
-                return res.status(200).json({
-                    success: 0,
-                    message: err.message
-                });
-            }
-            if (Object.keys(results).length === 0) {
-                return res.status(200).json({
-                    success: 2,
-                    message: "No Result",
-                    data: []
-                });
-            }
-            return res.status(200).json({
-                success: 1,
-                message: "complimentory",
-                data: results
-            });
-        })
-    },
-    getcreditInsuranceBillCollection: (req, res) => {
-        const body = req.body;
-        creditInsuranceBillCollection(body, (err, results) => {
-            if (err) {
-                return res.status(200).json({
-                    success: 0,
-                    message: err.message
-                });
-            }
-            if (Object.keys(results).length === 0) {
-                return res.status(200).json({
-                    success: 2,
-                    message: "No Result",
-                    data: []
-                });
-            }
-            return res.status(200).json({
-                success: 1,
-                message: "credit Insurance Bill Collection",
-                data: results
-            });
-        })
-    },
-    getcreditInsuranceBill: (req, res) => {
-        const body = req.body;
-        creditInsuranceBill(body, (err, results) => {
-            if (err) {
-                return res.status(200).json({
-                    success: 0,
-                    message: err.message
-                });
-            }
-            if (Object.keys(results).length === 0) {
-                return res.status(200).json({
-                    success: 2,
-                    message: "No Result",
-                    data: []
-                });
-            }
-            return res.status(200).json({
-                success: 1,
-                message: "credit Insurance Bill",
-                data: results
-            });
-        })
-    },
-    getipConsolidatedDiscount: (req, res) => {
-        const body = req.body;
-        ipConsolidatedDiscount(body, (err, results) => {
-            if (err) {
-                return res.status(200).json({
-                    success: 0,
-                    message: err.message
-                });
-            }
-            if (Object.keys(results).length === 0) {
-                return res.status(200).json({
-                    success: 2,
-                    message: "No Result",
-                    data: []
-                });
-            }
-            return res.status(200).json({
-                success: 1,
-                message: "ip Consolidated Discount",
-                data: results
-            });
-        })
-    },
-    getipPreviousDayDiscount: (req, res) => {
-        const body = req.body;
-        ipPreviousDayDiscount(body, (err, results) => {
-            if (err) {
-                return res.status(200).json({
-                    success: 0,
-                    message: err.message
-                });
-            }
-            if (Object.keys(results).length === 0) {
-                return res.status(200).json({
-                    success: 2,
-                    message: "No Result",
-                    data: []
-                });
-            }
-            return res.status(200).json({
-                success: 1,
-                message: "get ip Previous Day Discount",
-                data: results
-            });
-        })
-    },
-    getipPreviousDayCollection: (req, res) => {
-        const body = req.body;
-        ipPreviousDayCollection(body, (err, results) => {
-            if (err) {
-                return res.status(200).json({
-                    success: 0,
-                    message: err.message
-                });
-            }
-            if (Object.keys(results).length === 0) {
-                return res.status(200).json({
-                    success: 2,
-                    message: "No Result",
-                    data: []
-                });
-            }
-            return res.status(200).json({
-                success: 1,
-                message: "ip Previous Day Collection",
-                data: results
-            });
-        })
-    },
-    getunsettledAmount: (req, res) => {
-        const body = req.body;
-        unsettledAmount(body, (err, results) => {
-            if (err) {
-                return res.status(200).json({
-                    success: 0,
-                    message: err.message
-                });
-            }
-            if (Object.keys(results).length === 0) {
-                return res.status(200).json({
-                    success: 2,
-                    message: "No Result",
-                    data: []
-                });
-            }
-            return res.status(200).json({
-                success: 1,
-                message: "Unsettled Amount",
-                data: results
-            });
-        })
-    },
-    misGroup: (req, res) => {
-        misGroup((err, results) => {
-            if (err) {
-                return res.status(200).json({
-                    success: 0,
-                    message: err.message
-                });
-            }
-            if (Object.keys(results).length === 0) {
-                return res.status(200).json({
-                    success: 2,
-                    message: "No Result",
-                    data: []
-                });
-            }
-            return res.status(200).json({
-                success: 1,
-                message: "mis group master",
-                data: results
-            });
-        })
-    },
-    misGroupMast: (req, res) => {
-        misGroupMast((err, results) => {
-            if (err) {
-                return res.status(200).json({
-                    success: 0,
-                    message: err.message
-                });
-            }
-            if (Object.keys(results).length === 0) {
-                return res.status(200).json({
-                    success: 2,
-                    message: "No Result",
-                    data: []
-                });
-            }
-            return res.status(200).json({
-                success: 1,
-                message: "mis group master",
-                data: results
-            });
-        })
-    },
-    getcreditInsuranceBillRefund: (req, res) => {
-        const body = req.body;
-        creditInsuranceBillRefund(body, (err, results) => {
-            if (err) {
-                return res.status(200).json({
-                    success: 0,
-                    message: err.message
-                });
-            }
-            if (Object.keys(results).length === 0) {
-                return res.status(200).json({
-                    success: 2,
-                    message: "No Result",
-                    data: []
-                });
-            }
-            return res.status(200).json({
-                success: 1,
-                message: "credit Insurance Bill",
+                message: "creditInsuranceBillCollection2",
                 data: results
             });
         })

@@ -13,6 +13,7 @@ const {
     getipPreviousDayCollection,
     getcreditInsuranceBill,
     misGroup,
+    getcreditInsuranceBillRefund,
     misGroupMast
 } = require('./collection.controller')
 
@@ -30,6 +31,7 @@ router.post('/ipPreviousDayDiscount', checkToken, getipPreviousDayDiscount);
 router.post('/unsettledAmount', checkToken, getunsettledAmount);
 router.post('/ipPreviousDayCollection', checkToken, getipPreviousDayCollection);
 router.post('/creditInsuranceBill', checkToken, getcreditInsuranceBill);
+router.post('/creditInsuranceBillRefund', checkToken, getcreditInsuranceBillRefund);
 router.get('/misGroup', checkToken, misGroup);
 router.get('/misMaster', checkToken, misGroupMast);
 
