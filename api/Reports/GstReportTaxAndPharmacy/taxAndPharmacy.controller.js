@@ -7,6 +7,10 @@ const {
     getInPatientMedSale,
     getOpCreditPharmSale,
     getGstReportPharmCollection,
+    tsshPharmacyGstRptOne,
+    tsshPharmacyGstRptTwo,
+    tsshPharmacyGstRptthree,
+    tsshPharmacyGstRptFour
 } = require('./taxAndPharmacy.service');
 
 module.exports = {
@@ -194,6 +198,100 @@ module.exports = {
     getGstReportPharmCollection: (req, res) => {
         const body = req.body;
         getGstReportPharmCollection(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err.message
+                });
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Result",
+                    data: []
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                message: "Gst Reports",
+                data: results
+            });
+        })
+    },
+
+    // TSSH PHARMACY REPORTS
+    tsshPharmacyGstRptOne: (req, res) => {
+        const body = req.body;
+        tsshPharmacyGstRptOne(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err.message
+                });
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Result",
+                    data: []
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                message: "Gst Reports",
+                data: results
+            });
+        })
+    },
+    tsshPharmacyGstRptTwo: (req, res) => {
+        const body = req.body;
+        tsshPharmacyGstRptTwo(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err.message
+                });
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Result",
+                    data: []
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                message: "Gst Reports",
+                data: results
+            });
+        })
+    },
+    tsshPharmacyGstRptthree: (req, res) => {
+        const body = req.body;
+        tsshPharmacyGstRptthree(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err.message
+                });
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Result",
+                    data: []
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                message: "Gst Reports",
+                data: results
+            });
+        })
+    },
+    tsshPharmacyGstRptFour: (req, res) => {
+        const body = req.body;
+        tsshPharmacyGstRptFour(body, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
