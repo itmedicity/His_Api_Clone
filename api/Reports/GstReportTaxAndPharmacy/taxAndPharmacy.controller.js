@@ -10,7 +10,9 @@ const {
     tsshPharmacyGstRptOne,
     tsshPharmacyGstRptTwo,
     tsshPharmacyGstRptthree,
-    tsshPharmacyGstRptFour
+    tsshPharmacyGstRptFour,
+    collectionTmch,
+    pharmacySaleGst
 } = require('./taxAndPharmacy.service');
 
 module.exports = {
@@ -309,6 +311,49 @@ module.exports = {
                 success: 1,
                 message: "Gst Reports",
                 data: results
+            });
+        })
+    },
+    //COLLECTION TMCH
+    collectionTmch: (req, res) => {
+        const body = req.body;
+        collectionTmch(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err.message
+                });
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Result",
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results,
+            });
+        })
+    },
+    pharmacySaleGst: (req, res) => {
+        const body = req.body;
+        pharmacySaleGst(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err.message
+                });
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Result",
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results,
             });
         })
     },

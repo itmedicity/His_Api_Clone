@@ -1,3 +1,4 @@
+const pool = require('../../../config/dbconfig');
 const { oraConnection, oracledb } = require('../../../config/oradbconfig')
 
 module.exports = {
@@ -1022,5 +1023,53 @@ TO_DATE('${toDate}', 'dd/MM/yyyy hh24:mi:ss')`;
                 await pool_ora.close();
             }
         }
+    },
+
+    //COLLLECTION REPORTS
+    collectionTmch: (data, callBack) => {
+        pool.query(
+            `SELECT 
+                code,name,SUM(amount) amount
+            FROM collection 
+            WHERE date BETWEEN ? AND ?
+            GROUP BY code,name`,
+            [
+                data.from,
+                data.to
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results)
+            }
+        )
+    },
+    pharmacySaleGst: (data, callBack) => {
+        pool.query(
+            `SELECT 
+                sum(ip) ip,
+                sum(op_0) op0,
+                sum(op_5) op5,
+                sum(op_12) op12,
+                sum(op_18) op18,
+                sum(op_28) op28,
+                sum(tax_5) tax5,
+                sum(tax_12) tax12,
+                sum(tax_18) tax18,
+                sum(tax_28) tax28
+            FROM pharmacysalegst
+            WHERE date BETWEEN ? AND ?`,
+            [
+                data.from,
+                data.to
+            ],
+            (error, results, feilds) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results)
+            }
+        )
     },
 }
