@@ -776,8 +776,10 @@ TO_DATE('${toDate}', 'dd/MM/yyyy hh24:mi:ss')`;
                             Mretdetl.ITN_ACTMRP ACTMRP,
                             Mretdetl.MRN_QTY QTY,
                             Mretdetl.MRN_LOOSE LOOSE,
-                            Mretdetl.MRN_AMOUNT AMNT,
+                            (Mretdetl.MRN_AMOUNT*-1) AMNT,
                             Mretdetl.ITN_ORIGINALMRP ORIGINALMRP,
+                            MRETDETL.MRN_DISAMT DIS,
+                            MRETDETL.MRN_SALETAX TAXAMT,
                             Mretdetl.MRC_ACTTXCODE TAX,
                             TAX.TXC_DESC
                     FROM Mretdetl, Pbillmast, Disbillmast,MEDDESC,TAX
@@ -829,10 +831,12 @@ TO_DATE('${toDate}', 'dd/MM/yyyy hh24:mi:ss')`;
                         PBILLDETL.ITN_MRP MRP,
                         PBILLDETL.ITN_ACTMRP ACTMRP,
                         PBILLDETL.BDN_QTY QTY,
-                        PBILLDETL.BDN_LOOSE,
-                        PBILLDETL.BDN_AMOUNT,
-                        PBILLDETL.ITN_ORIGINALMRP,
-                        PBILLDETL.PBC_ACTTXCODE,
+                        PBILLDETL.BDN_LOOSE LOOSE,
+                        PBILLDETL.BDN_AMOUNT AMNT,
+                        PBILLDETL.ITN_ORIGINALMRP ORIGINALMRP,
+                        PBILLDETL.BMN_DISAMT DIS,
+                        PBILLDETL.BMN_SALETAX TAXAMT,
+                        PBILLDETL.PBC_ACTTXCODE TAX,
                         TAX.TXC_DESC
                     FROM Pbillmast, Disbillmast, Pbilldetl,MEDDESC,TAX
                     WHERE  pbillmast.bmc_slno = pbilldetl.bmc_slno
@@ -883,10 +887,12 @@ TO_DATE('${toDate}', 'dd/MM/yyyy hh24:mi:ss')`;
                             PBILLDETL.ITN_MRP MRP,
                             PBILLDETL.ITN_ACTMRP ACTMRP,
                             PBILLDETL.BDN_QTY QTY,
-                            PBILLDETL.BDN_LOOSE,
-                            PBILLDETL.BDN_AMOUNT,
-                            PBILLDETL.ITN_ORIGINALMRP,
-                            PBILLDETL.PBC_ACTTXCODE,
+                            PBILLDETL.BDN_LOOSE LOOSE,
+                            PBILLDETL.BDN_AMOUNT AMNT,
+                            PBILLDETL.ITN_ORIGINALMRP ORIGINALMRP,
+                            PBILLDETL.BMN_DISAMT DIS,
+                            PBILLDETL.BMN_SALETAX TAXAMT,
+                            PBILLDETL.PBC_ACTTXCODE TAX,
                             TAX.TXC_DESC
                     FROM Pbillmast, Pbilldetl, Opbillmast,MEDDESC,TAX
                     WHERE     Pbilldetl.Bmc_Slno = Pbillmast.Bmc_Slno
