@@ -19,8 +19,8 @@ module.exports = {
                 `select meddesc.it_code,itc_desc,itc_alias,itn_pack,itn_strip,itc_status from meddesc 
                 LEFT JOIN medstore ON medstore.it_code=meddesc.it_code
                  where itc_status='Y'
-                 and ITD_DATE >= to_date(:date0, 'DD/MM/yyyy hh24:mi:ss') 
-                 and ITD_DATE <= to_date(:date1, 'DD/MM/yyyy hh24:mi:ss')
+                 and ITD_DATE >= to_date(:date0, 'dd/MM/yyyy hh24:mi:ss') 
+                 and ITD_DATE <= to_date(:date1, 'dd/MM/yyyy hh24:mi:ss')
                  and medstore.ST_CODE in('0124')`,
                 {
                     date0: data.date0,
@@ -29,9 +29,7 @@ module.exports = {
                 { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
             )
             const medDescFromOra = await result.resultSet?.getRows();
-
             checkMeddescAlreadyExist((meddescFromSql) => {
-
                 let newMedArray = medDescFromOra?.map((value) => {
                     const medId = meddescFromSql.find((val) => val.it_code === value.IT_CODE && val.itc_desc === value.ITC_DESC);
                     return medId === undefined ? value : null;
