@@ -10,7 +10,7 @@ module.exports = {
                     message: err
                 })
             }
-            if (results.length === 0) {
+            if (Object.keys(results).length === 0) {
                 return res.status(200).json({
                     success: 2,
                     message: "No Report Found"
