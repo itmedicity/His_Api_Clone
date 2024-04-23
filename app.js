@@ -56,6 +56,7 @@ const dashboard = require("./api/DashBoard/dashBoard.router");
 
 // TO MELIORA
 const elliderData = require("./api/MelioraEllider/elliderData.router");
+const censusData = require("./api/DailyCensusReport/censusreport.router")
 
 app.use(express.json());
 
@@ -122,6 +123,8 @@ app.use("/api/dashboard", dashboard)
 
 // MELIORA
 app.use("/api/melioraEllider", elliderData)
+app.use("/api/dailyCensus", censusData)
+
 
 app.listen(process.env.APP_PORT, (val) => {
     console.log(`Server Up and Running ${process.env.APP_PORT}`)
