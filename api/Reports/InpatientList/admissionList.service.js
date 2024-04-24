@@ -675,11 +675,11 @@ module.exports = {
     },
     getIpNumberTsshGrouped: (data, callBack) => {
         pool.query(
-            `SELECT 
-				ip_no,tmch_status
+            `SELECT
+                ip_no,tmch_status
             FROM tssh_ipadmiss
             WHERE dis_status = 'Y' AND date  <= ? and dis_date > ?
-			UNION
+            UNION
             SELECT 
                 ip_no,tmch_status
             FROM tssh_ipadmiss

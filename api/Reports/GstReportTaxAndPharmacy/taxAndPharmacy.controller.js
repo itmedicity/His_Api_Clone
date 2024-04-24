@@ -14,7 +14,8 @@ const {
     tsshPharmacyGstRptFour,
     collectionTmch,
     pharmacySaleGst,
-    tmchGstReport
+    tmchGstReport,
+    tsshGstReports
 } = require('./taxAndPharmacy.service');
 
 module.exports = {
@@ -362,6 +363,22 @@ module.exports = {
     tmchGstReport: async (req, res) => {
         const body = req.body;
         const tmchReportGst = await tmchGstReport(body);
+        const { status, message, data } = await tmchReportGst
+        if (status === 1) {
+            return res.status(200).json({
+                success: 1,
+                data: data
+            });
+        } else {
+            return res.status(200).json({
+                success: 0,
+                message: message
+            });
+        }
+    },
+    tsshGstReport: async (req, res) => {
+        const body = req.body;
+        const tmchReportGst = await tsshGstReports(body);
         const { status, message, data } = await tmchReportGst
         if (status === 1) {
             return res.status(200).json({

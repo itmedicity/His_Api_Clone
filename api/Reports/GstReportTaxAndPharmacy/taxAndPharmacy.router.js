@@ -16,7 +16,8 @@ const {
     tsshPharmacyGstRptFour,
     collectionTmch,
     pharmacySaleGst,
-    tmchGstReport
+    tmchGstReport,
+    tsshGstReport
 } = require('./taxAndPharmacy.controller');
 
 router.post('/viewreport', checkToken, getGstReportOfPharmacy);
@@ -39,5 +40,6 @@ router.post('/collectionTmch', checkToken, collectionTmch);
 router.post('/pharmacySaleGst', checkToken, pharmacySaleGst);
 
 router.post('/tmchGstReport', checkToken, tmchGstReport);
+router.post('/tsshGstReport', checkToken, tsshGstReport);
 
 module.exports = router;

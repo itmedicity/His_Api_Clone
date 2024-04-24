@@ -93,6 +93,7 @@ module.exports = {
                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         AND Disbillmast.Dmd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
                         AND DISBILLMAST.IP_NO NOT IN (${ipNumberList})`;
+
         try {
             const result = await conn_ora.execute(
                 sql,
@@ -156,6 +157,8 @@ module.exports = {
                                     AND Mretmast.MRD_RETDATE >= TO_DATE ('${fromDate}','dd/MM/yyyy hh24:mi:ss')
                                     AND MRETDETL.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     AND Mretmast.Mrd_RETDate <= TO_DATE ('${toDate}','dd/MM/yyyy hh24:mi:ss')) A`;
+
+
         try {
             const result = await conn_ora.execute(
                 sql,
@@ -199,6 +202,8 @@ module.exports = {
                                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 AND Disbillmast.Dmd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
                                 AND Disbillmast.IP_NO NOT IN (${ipNumberList})`;
+
+
         try {
             const result = await conn_ora.execute(
                 sql,
@@ -242,6 +247,8 @@ module.exports = {
                             AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             AND Opbillmast.Opd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
                             AND PBILLMAST.IP_NO NOT IN (${ipNumberList})`;
+
+
         try {
             const result = await conn_ora.execute(
                 sql,
@@ -280,6 +287,8 @@ module.exports = {
                                 AND Iprefundmast.Rid_Date >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
                                 AND IPREFUNDMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 AND Iprefundmast.Rid_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')`;
+
+        console.log(sql)
 
         try {
             const result = await conn_ora.execute(
