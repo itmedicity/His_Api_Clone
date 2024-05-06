@@ -1099,7 +1099,8 @@ TO_DATE('${toDate}', 'dd/MM/yyyy hh24:mi:ss')`;
                             PBILLDETL.BMN_DISAMT DIS,
                             PBILLDETL.BMN_SALETAX TAXAMT,
                             PBILLDETL.PBC_ACTTXCODE TAX,
-                            TAX.TXC_DESC
+                            TAX.TXC_DESC,
+                            'OP' STATUS
                         FROM Pbillmast, Pbilldetl,MEDDESC,TAX
                         WHERE  Pbilldetl.Bmc_Slno = Pbillmast.Bmc_Slno
                             AND pbillmast.BMC_COLLCNCODE IS NULL
@@ -1124,7 +1125,8 @@ TO_DATE('${toDate}', 'dd/MM/yyyy hh24:mi:ss')`;
                             (MRETDETL.MRN_DISAMT*-1 ) DIS,
                             (MRETDETL.MRN_SALETAX * -1) TAXAMT,
                             Mretdetl.MRC_ACTTXCODE TAX,
-                            TAX.TXC_DESC
+                            TAX.TXC_DESC,
+                            'OP' STATUS
                         FROM Mretdetl, Pbilldetl, mretmast,MEDDESC,TAX
                         WHERE Pbilldetl.Bmc_Slno = Mretdetl.Bmc_Slno
                             AND Pbilldetl.IT_CODE = Mretdetl.It_code
@@ -1141,6 +1143,7 @@ TO_DATE('${toDate}', 'dd/MM/yyyy hh24:mi:ss')`;
                             AND Mretdetl.Mrd_Date <= TO_DATE ('${toDate}','dd/MM/yyyy hh24:mi:ss')
                             AND MEDDESC.IT_CODE = MRETDETL.IT_CODE
                             AND TAX.TX_CODE = MRETDETL.MRC_ACTTXCODE`;
+
             try {
 
                 const result = await conn_ora.execute(
@@ -1188,7 +1191,8 @@ TO_DATE('${toDate}', 'dd/MM/yyyy hh24:mi:ss')`;
                                 (MRETDETL.MRN_DISAMT*-1 ) DIS,
                                 (MRETDETL.MRN_SALETAX * -1) TAXAMT,
                                 Mretdetl.MRC_ACTTXCODE TAX,
-                                TAX.TXC_DESC
+                                TAX.TXC_DESC,
+                                'IP' STATUS
                         FROM Mretdetl, Pbillmast, Disbillmast,MEDDESC,TAX
                         WHERE Pbillmast.Bmc_Slno = Mretdetl.Bmc_Slno
                             AND Pbillmast.Dmc_Slno = Disbillmast.Dmc_Slno
@@ -1202,6 +1206,7 @@ TO_DATE('${toDate}', 'dd/MM/yyyy hh24:mi:ss')`;
                             AND MEDDESC.IT_CODE = MRETDETL.IT_CODE
                             AND TAX.TX_CODE = MRETDETL.MRC_ACTTXCODE
                             AND DISBILLMAST.IP_NO NOT IN (${ipNumberListString})`;
+            // console.log(sql)
 
             try {
                 const result = await conn_ora.execute(
@@ -1249,7 +1254,8 @@ TO_DATE('${toDate}', 'dd/MM/yyyy hh24:mi:ss')`;
                                 PBILLDETL.BMN_DISAMT DIS,
                                 PBILLDETL.BMN_SALETAX TAXAMT,
                                 PBILLDETL.PBC_ACTTXCODE TAX,
-                                TAX.TXC_DESC
+                                TAX.TXC_DESC,
+                                'OP' STATUS
                         FROM Pbillmast, Pbilldetl,MEDDESC,TAX
                         WHERE Pbilldetl.Bmc_Slno = Pbillmast.Bmc_Slno
                                 AND pbillmast.BMC_COLLCNCODE IS NOT NULL
@@ -1274,7 +1280,8 @@ TO_DATE('${toDate}', 'dd/MM/yyyy hh24:mi:ss')`;
                                 (MRETDETL.MRN_DISAMT*-1 ) DIS,
                                 (MRETDETL.MRN_SALETAX * -1) TAXAMT,
                                 Mretdetl.MRC_ACTTXCODE TAX,
-                                TAX.TXC_DESC
+                                TAX.TXC_DESC,
+                                'OP' STATUS
                         FROM Mretdetl, Pbilldetl, mretmast,MEDDESC,TAX
                         WHERE Pbilldetl.Bmc_Slno = Mretdetl.Bmc_Slno
                                 AND Pbilldetl.IT_CODE = Mretdetl.It_code
@@ -1336,7 +1343,8 @@ TO_DATE('${toDate}', 'dd/MM/yyyy hh24:mi:ss')`;
                             PBILLDETL.BMN_DISAMT DIS,
                             PBILLDETL.BMN_SALETAX TAXAMT,
                             PBILLDETL.PBC_ACTTXCODE TAX,
-                            TAX.TXC_DESC
+                            TAX.TXC_DESC,
+                            'IP' STATUS
                         FROM Pbillmast, Disbillmast, Pbilldetl,MEDDESC,TAX
                         WHERE     pbillmast.bmc_slno = pbilldetl.bmc_slno
                                 AND Pbillmast.Dmc_Slno = Disbillmast.Dmc_Slno
@@ -1395,7 +1403,8 @@ TO_DATE('${toDate}', 'dd/MM/yyyy hh24:mi:ss')`;
                             PBILLDETL.BMN_DISAMT DIS,
                             PBILLDETL.BMN_SALETAX TAXAMT,
                             PBILLDETL.PBC_ACTTXCODE TAX,
-                            TAX.TXC_DESC
+                            TAX.TXC_DESC,
+                            'IP' STATUS
                         FROM Pbillmast, Pbilldetl, Opbillmast,MEDDESC,TAX
                         WHERE Pbilldetl.Bmc_Slno = Pbillmast.Bmc_Slno
                             AND Pbilldetl.Opc_Slno = Opbillmast.Opc_Slno
@@ -1468,7 +1477,8 @@ TO_DATE('${toDate}', 'dd/MM/yyyy hh24:mi:ss')`;
                             (MRETDETL.MRN_DISAMT*-1 ) DIS,
                             (MRETDETL.MRN_SALETAX * -1) TAXAMT,
                             Mretdetl.MRC_ACTTXCODE TAX,
-                            TAX.TXC_DESC
+                            TAX.TXC_DESC,
+                            'IP' STATUS
                         FROM Mretdetl, Pbillmast, Disbillmast,MEDDESC,TAX
                         WHERE Pbillmast.Bmc_Slno = Mretdetl.Bmc_Slno
                         AND Pbillmast.Dmc_Slno = Disbillmast.Dmc_Slno
@@ -1528,7 +1538,8 @@ TO_DATE('${toDate}', 'dd/MM/yyyy hh24:mi:ss')`;
                             PBILLDETL.BMN_DISAMT DIS,
                             PBILLDETL.BMN_SALETAX TAXAMT,
                             PBILLDETL.PBC_ACTTXCODE TAX,
-                            TAX.TXC_DESC
+                            TAX.TXC_DESC,
+                            'IP' STATUS
                         FROM Pbillmast, Disbillmast, Pbilldetl,MEDDESC,TAX
                         WHERE  pbillmast.bmc_slno = pbilldetl.bmc_slno
                                 AND Pbillmast.Dmc_Slno = Disbillmast.Dmc_Slno
@@ -1588,7 +1599,8 @@ TO_DATE('${toDate}', 'dd/MM/yyyy hh24:mi:ss')`;
                             PBILLDETL.BMN_DISAMT DIS,
                             PBILLDETL.BMN_SALETAX TAXAMT,
                             PBILLDETL.PBC_ACTTXCODE TAX,
-                            TAX.TXC_DESC
+                            TAX.TXC_DESC,
+                            'IP' STATUS
                         FROM Pbillmast, Pbilldetl, Opbillmast,MEDDESC,TAX
                         WHERE     Pbilldetl.Bmc_Slno = Pbillmast.Bmc_Slno
                                 AND Pbilldetl.Opc_Slno = Opbillmast.Opc_Slno
