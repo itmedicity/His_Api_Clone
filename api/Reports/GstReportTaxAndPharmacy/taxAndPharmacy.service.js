@@ -1100,8 +1100,11 @@ TO_DATE('${toDate}', 'dd/MM/yyyy hh24:mi:ss')`;
                             PBILLDETL.BMN_SALETAX TAXAMT,
                             PBILLDETL.PBC_ACTTXCODE TAX,
                             TAX.TXC_DESC,
-                            'OP' STATUS
-                        FROM Pbillmast, Pbilldetl,MEDDESC,TAX
+                            'OP' STATUS,
+                            PBILLMAST.BM_NO BILLNO,
+                            TO_CHAR(PBILLMAST.BMD_DATE ,'DD-MM-YYYY hh24:mm:ss')BILDATE,
+                            OUTLET.OUC_DESC OU
+                        FROM Pbillmast, Pbilldetl,MEDDESC,TAX,OUTLET
                         WHERE  Pbilldetl.Bmc_Slno = Pbillmast.Bmc_Slno
                             AND pbillmast.BMC_COLLCNCODE IS NULL
                             AND NVL (Pbillmast.Bmc_cancel, 'N') = 'N'
@@ -1110,6 +1113,7 @@ TO_DATE('${toDate}', 'dd/MM/yyyy hh24:mi:ss')`;
                             AND Pbillmast.Bmd_Date <= TO_DATE ('${toDate}','dd/MM/yyyy hh24:mi:ss')
                             AND MEDDESC.IT_CODE = Pbilldetl.IT_CODE
                             AND TAX.TX_CODE = PBILLDETL.PBC_ACTTXCODE
+                            AND OUTLET.OU_CODE = PBILLMAST.OU_CODE
                             AND pbillmast.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         UNION ALL
                         SELECT 
@@ -1126,8 +1130,11 @@ TO_DATE('${toDate}', 'dd/MM/yyyy hh24:mi:ss')`;
                             (MRETDETL.MRN_SALETAX * -1) TAXAMT,
                             Mretdetl.MRC_ACTTXCODE TAX,
                             TAX.TXC_DESC,
-                            'OP' STATUS
-                        FROM Mretdetl, Pbilldetl, mretmast,MEDDESC,TAX
+                            'OP' STATUS,
+                            MRETDETL.MR_NO BILLNO,
+                            TO_CHAR(MRETDETL.MRD_DATE ,'DD-MM-YYYY hh24:mm:ss')BILDATE,
+                            OUTLET.OUC_DESC OU
+                        FROM Mretdetl, Pbilldetl, mretmast,MEDDESC,TAX,OUTLET
                         WHERE Pbilldetl.Bmc_Slno = Mretdetl.Bmc_Slno
                             AND Pbilldetl.IT_CODE = Mretdetl.It_code
                             AND Pbilldetl.ITC_DOCNO = Mretdetl.Itc_docno
@@ -1142,8 +1149,9 @@ TO_DATE('${toDate}', 'dd/MM/yyyy hh24:mi:ss')`;
                             AND MRETDETL.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             AND Mretdetl.Mrd_Date <= TO_DATE ('${toDate}','dd/MM/yyyy hh24:mi:ss')
                             AND MEDDESC.IT_CODE = MRETDETL.IT_CODE
+                            AND MRETDETL.OU_CODE = OUTLET.OU_CODE
                             AND TAX.TX_CODE = MRETDETL.MRC_ACTTXCODE`;
-
+            // console.log(sql)
             try {
 
                 const result = await conn_ora.execute(
@@ -1192,8 +1200,11 @@ TO_DATE('${toDate}', 'dd/MM/yyyy hh24:mi:ss')`;
                                 (MRETDETL.MRN_SALETAX * -1) TAXAMT,
                                 Mretdetl.MRC_ACTTXCODE TAX,
                                 TAX.TXC_DESC,
-                                'IP' STATUS
-                        FROM Mretdetl, Pbillmast, Disbillmast,MEDDESC,TAX
+                                'IP' STATUS,
+                                MRETDETL.MR_NO BILLNO,
+                                TO_CHAR(MRETDETL.MRD_DATE ,'DD-MM-YYYY hh24:mm:ss')BILDATE,
+                                OUTLET.OUC_DESC OU
+                        FROM Mretdetl, Pbillmast, Disbillmast,MEDDESC,TAX,OUTLET
                         WHERE Pbillmast.Bmc_Slno = Mretdetl.Bmc_Slno
                             AND Pbillmast.Dmc_Slno = Disbillmast.Dmc_Slno
                             AND Mretdetl.MRC_CACR IN ('I')
@@ -1205,6 +1216,7 @@ TO_DATE('${toDate}', 'dd/MM/yyyy hh24:mi:ss')`;
                             AND Disbillmast.Dmd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
                             AND MEDDESC.IT_CODE = MRETDETL.IT_CODE
                             AND TAX.TX_CODE = MRETDETL.MRC_ACTTXCODE
+                            AND MRETDETL.OU_CODE = OUTLET.OU_CODE
                             AND DISBILLMAST.IP_NO NOT IN (${ipNumberListString})`;
             // console.log(sql)
 
@@ -1255,8 +1267,11 @@ TO_DATE('${toDate}', 'dd/MM/yyyy hh24:mi:ss')`;
                                 PBILLDETL.BMN_SALETAX TAXAMT,
                                 PBILLDETL.PBC_ACTTXCODE TAX,
                                 TAX.TXC_DESC,
-                                'OP' STATUS
-                        FROM Pbillmast, Pbilldetl,MEDDESC,TAX
+                                'OP' STATUS,
+                                PBILLMAST.BM_NO BILLNO,
+                                TO_CHAR(PBILLMAST.BMD_DATE,'DD-MM-YYYY hh24:mm:ss')BILDATE,
+                                OUTLET.OUC_DESC OU
+                        FROM Pbillmast, Pbilldetl,MEDDESC,TAX,OUTLET
                         WHERE Pbilldetl.Bmc_Slno = Pbillmast.Bmc_Slno
                                 AND pbillmast.BMC_COLLCNCODE IS NOT NULL
                                 AND NVL (Pbillmast.Bmc_cancel, 'N') = 'N'
@@ -1264,6 +1279,7 @@ TO_DATE('${toDate}', 'dd/MM/yyyy hh24:mi:ss')`;
                                 AND Pbillmast.BMD_COLLDATE >= TO_DATE ('${fromDate}','dd/MM/yyyy hh24:mi:ss')
                                 AND Pbillmast.BMD_COLLDATE <= TO_DATE ('${toDate}','dd/MM/yyyy hh24:mi:ss')
                                 AND MEDDESC.IT_CODE = Pbilldetl.IT_CODE
+                                AND OUTLET.OU_CODE = PBILLMAST.OU_CODE
                                 AND TAX.TX_CODE = PBILLDETL.PBC_ACTTXCODE
                                 AND pbillmast.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         UNION ALL
@@ -1281,8 +1297,11 @@ TO_DATE('${toDate}', 'dd/MM/yyyy hh24:mi:ss')`;
                                 (MRETDETL.MRN_SALETAX * -1) TAXAMT,
                                 Mretdetl.MRC_ACTTXCODE TAX,
                                 TAX.TXC_DESC,
-                                'OP' STATUS
-                        FROM Mretdetl, Pbilldetl, mretmast,MEDDESC,TAX
+                                'OP' STATUS,
+                                MRETDETL.MR_NO BILLNO,
+                                TO_CHAR(MRETDETL.MRD_DATE,'DD-MM-YYYY hh24:mm:ss')BILDATE,
+                                OUTLET.OUC_DESC OU
+                        FROM Mretdetl, Pbilldetl, mretmast,MEDDESC,TAX,OUTLET
                         WHERE Pbilldetl.Bmc_Slno = Mretdetl.Bmc_Slno
                                 AND Pbilldetl.IT_CODE = Mretdetl.It_code
                                 AND Pbilldetl.ITC_DOCNO = Mretdetl.Itc_docno
@@ -1297,7 +1316,9 @@ TO_DATE('${toDate}', 'dd/MM/yyyy hh24:mi:ss')`;
                                 AND MRETDETL.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 AND Mretmast.Mrd_RETDate <= TO_DATE ('${toDate}','dd/MM/yyyy hh24:mi:ss')
                                 AND MEDDESC.IT_CODE = MRETDETL.IT_CODE
+                                AND MRETDETL.OU_CODE = OUTLET.OU_CODE
                                 AND TAX.TX_CODE = MRETDETL.MRC_ACTTXCODE`;
+            // console.log(sql)
 
             try {
                 const result = await conn_ora.execute(
@@ -1344,8 +1365,11 @@ TO_DATE('${toDate}', 'dd/MM/yyyy hh24:mi:ss')`;
                             PBILLDETL.BMN_SALETAX TAXAMT,
                             PBILLDETL.PBC_ACTTXCODE TAX,
                             TAX.TXC_DESC,
-                            'IP' STATUS
-                        FROM Pbillmast, Disbillmast, Pbilldetl,MEDDESC,TAX
+                            'IP' STATUS,
+                            PBILLMAST.BM_NO BILLNO,
+                            TO_CHAR(PBILLMAST.BMD_DATE,'DD-MM-YYYY hh24:mm:ss')BILDATE,
+                            OUTLET.OUC_DESC OU
+                        FROM Pbillmast, Disbillmast, Pbilldetl,MEDDESC,TAX,OUTLET
                         WHERE     pbillmast.bmc_slno = pbilldetl.bmc_slno
                                 AND Pbillmast.Dmc_Slno = Disbillmast.Dmc_Slno
                                 AND NVL (Pbillmast.Bmc_cancel, 'N') = 'N'
@@ -1357,7 +1381,9 @@ TO_DATE('${toDate}', 'dd/MM/yyyy hh24:mi:ss')`;
                                 AND Disbillmast.Dmd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
                                 AND MEDDESC.IT_CODE = Pbilldetl.IT_CODE
                                 AND TAX.TX_CODE = PBILLDETL.PBC_ACTTXCODE
+                                AND OUTLET.OU_CODE = PBILLMAST.OU_CODE
                                 AND Disbillmast.IP_NO NOT IN (${ipNumberListString})`;
+            // console.log(sql)
             try {
                 const result = await conn_ora.execute(
                     sql,
@@ -1404,8 +1430,11 @@ TO_DATE('${toDate}', 'dd/MM/yyyy hh24:mi:ss')`;
                             PBILLDETL.BMN_SALETAX TAXAMT,
                             PBILLDETL.PBC_ACTTXCODE TAX,
                             TAX.TXC_DESC,
-                            'IP' STATUS
-                        FROM Pbillmast, Pbilldetl, Opbillmast,MEDDESC,TAX
+                            'IP' STATUS,
+                            PBILLMAST.BM_NO BILLNO,
+                            TO_CHAR(PBILLMAST.BMD_DATE,'DD-MM-YYYY hh24:mm:ss')BILDATE,
+                            OUTLET.OUC_DESC OU
+                        FROM Pbillmast, Pbilldetl, Opbillmast,MEDDESC,TAX,OUTLET
                         WHERE Pbilldetl.Bmc_Slno = Pbillmast.Bmc_Slno
                             AND Pbilldetl.Opc_Slno = Opbillmast.Opc_Slno
                             AND NVL (Pbillmast.Bmc_cancel, 'N') = 'N'
@@ -1417,7 +1446,9 @@ TO_DATE('${toDate}', 'dd/MM/yyyy hh24:mi:ss')`;
                             AND Opbillmast.Opd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
                             AND MEDDESC.IT_CODE = Pbilldetl.IT_CODE
                             AND TAX.TX_CODE = PBILLDETL.PBC_ACTTXCODE
+                            AND OUTLET.OU_CODE = PBILLMAST.OU_CODE
                             AND PBILLMAST.IP_NO NOT IN (${ipNumberListString})`;
+            // console.log(sql)
             try {
                 const result = await conn_ora.execute(
                     sql,
@@ -1478,8 +1509,11 @@ TO_DATE('${toDate}', 'dd/MM/yyyy hh24:mi:ss')`;
                             (MRETDETL.MRN_SALETAX * -1) TAXAMT,
                             Mretdetl.MRC_ACTTXCODE TAX,
                             TAX.TXC_DESC,
-                            'IP' STATUS
-                        FROM Mretdetl, Pbillmast, Disbillmast,MEDDESC,TAX
+                            'IP' STATUS,
+                            MRETDETL.MR_NO BILLNO,
+                            TO_CHAR(MRETDETL.MRD_DATE,'DD-MM-YYYY hh24:mm:ss')BILDATE,
+                            OUTLET.OUC_DESC OU
+                        FROM Mretdetl, Pbillmast, Disbillmast,MEDDESC,TAX,OUTLET
                         WHERE Pbillmast.Bmc_Slno = Mretdetl.Bmc_Slno
                         AND Pbillmast.Dmc_Slno = Disbillmast.Dmc_Slno
                         AND Mretdetl.MRC_CACR IN ('I')
@@ -1491,7 +1525,9 @@ TO_DATE('${toDate}', 'dd/MM/yyyy hh24:mi:ss')`;
                         AND Disbillmast.Dmd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
                         AND MEDDESC.IT_CODE = MRETDETL.IT_CODE
                         AND TAX.TX_CODE = MRETDETL.MRC_ACTTXCODE
+                        AND MRETDETL.OU_CODE = OUTLET.OU_CODE
                         AND DISBILLMAST.IP_NO IN (${ipNumberListString})`;
+
             try {
 
                 const result = await conn_ora.execute(
@@ -1539,8 +1575,11 @@ TO_DATE('${toDate}', 'dd/MM/yyyy hh24:mi:ss')`;
                             PBILLDETL.BMN_SALETAX TAXAMT,
                             PBILLDETL.PBC_ACTTXCODE TAX,
                             TAX.TXC_DESC,
-                            'IP' STATUS
-                        FROM Pbillmast, Disbillmast, Pbilldetl,MEDDESC,TAX
+                            'IP' STATUS,
+                            PBILLMAST.BM_NO BILLNO,
+                            TO_CHAR(PBILLMAST.BMD_DATE,'DD-MM-YYYY hh24:mm:ss')BILDATE,
+                            OUTLET.OUC_DESC OU
+                        FROM Pbillmast, Disbillmast, Pbilldetl,MEDDESC,TAX,OUTLET
                         WHERE  pbillmast.bmc_slno = pbilldetl.bmc_slno
                                 AND Pbillmast.Dmc_Slno = Disbillmast.Dmc_Slno
                                 AND NVL (Pbillmast.Bmc_cancel, 'N') = 'N'
@@ -1552,6 +1591,7 @@ TO_DATE('${toDate}', 'dd/MM/yyyy hh24:mi:ss')`;
                                 AND Disbillmast.Dmd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
                                 AND MEDDESC.IT_CODE = Pbilldetl.IT_CODE
                                 AND TAX.TX_CODE = PBILLDETL.PBC_ACTTXCODE
+                                AND OUTLET.OU_CODE = PBILLMAST.OU_CODE
                                 AND Disbillmast.IP_NO IN (${ipNumberListString})`;
             try {
 
@@ -1600,8 +1640,11 @@ TO_DATE('${toDate}', 'dd/MM/yyyy hh24:mi:ss')`;
                             PBILLDETL.BMN_SALETAX TAXAMT,
                             PBILLDETL.PBC_ACTTXCODE TAX,
                             TAX.TXC_DESC,
-                            'IP' STATUS
-                        FROM Pbillmast, Pbilldetl, Opbillmast,MEDDESC,TAX
+                            'IP' STATUS,
+                            PBILLMAST.BM_NO BILLNO,
+                            TO_CHAR(PBILLMAST.BMD_DATE,'DD-MM-YYYY hh24:mm:ss')BILDATE,
+                            OUTLET.OUC_DESC OU
+                        FROM Pbillmast, Pbilldetl, Opbillmast,MEDDESC,TAX,OUTLET
                         WHERE     Pbilldetl.Bmc_Slno = Pbillmast.Bmc_Slno
                                 AND Pbilldetl.Opc_Slno = Opbillmast.Opc_Slno
                                 AND NVL (Pbillmast.Bmc_cancel, 'N') = 'N'
@@ -1613,6 +1656,7 @@ TO_DATE('${toDate}', 'dd/MM/yyyy hh24:mi:ss')`;
                                 AND Opbillmast.Opd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
                                 AND MEDDESC.IT_CODE = Pbilldetl.IT_CODE
                                 AND TAX.TX_CODE = PBILLDETL.PBC_ACTTXCODE
+                                AND OUTLET.OU_CODE = PBILLMAST.OU_CODE
                                 AND PBILLMAST.IP_NO IN (${ipNumberListString})`;
             try {
 
