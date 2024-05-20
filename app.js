@@ -57,6 +57,10 @@ const dashboard = require("./api/DashBoard/dashBoard.router");
 // TO MELIORA
 const elliderData = require("./api/MelioraEllider/elliderData.router");
 const censusData = require("./api/DailyCensusReport/censusreport.router")
+const qiPatientList = require("./api/QIPatientList/getPatientList.router")
+// supplier
+
+const supplier = require("./api/SupplierDetails/supplier.router")
 
 app.use(express.json());
 
@@ -124,6 +128,8 @@ app.use("/api/dashboard", dashboard)
 // MELIORA
 app.use("/api/melioraEllider", elliderData)
 app.use("/api/dailyCensus", censusData)
+app.use("/api/qualityIndicator", qiPatientList)
+app.use("/api/supplierList", supplier)
 
 
 app.listen(process.env.APP_PORT, (val) => {
