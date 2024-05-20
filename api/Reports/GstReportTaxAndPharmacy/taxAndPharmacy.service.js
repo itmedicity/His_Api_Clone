@@ -858,8 +858,8 @@ TO_DATE('${toDate}', 'dd/MM/yyyy hh24:mi:ss')`;
                 {},
                 { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
             )
-            await result.resultSet?.getRows((err, rows) => {
-                callBack(err, rows)
+            result.resultSet?.getRows((err, rows) => {
+                callBack(err, rows);
             })
         } catch (error) {
             console.log(error)
@@ -876,7 +876,6 @@ TO_DATE('${toDate}', 'dd/MM/yyyy hh24:mi:ss')`;
 
         const group = data?.group;
         const ipNumberList = group === 1 ? null : (data?.ptno?.length > 0 && data.ptno.join(',')) || null;
-        // const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(',')) || null;
         const fromDate = data.from;
         const toDate = data.to;
 
@@ -914,8 +913,8 @@ TO_DATE('${toDate}', 'dd/MM/yyyy hh24:mi:ss')`;
                 {},
                 { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
             )
-            await result.resultSet?.getRows((err, rows) => {
-                callBack(err, rows)
+            result.resultSet?.getRows((err, rows) => {
+                callBack(err, rows);
             })
         } catch (error) {
             console.log(error)
@@ -1018,8 +1017,8 @@ TO_DATE('${toDate}', 'dd/MM/yyyy hh24:mi:ss')`;
                 {},
                 { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
             )
-            await result.resultSet?.getRows((err, rows) => {
-                callBack(err, rows)
+            result.resultSet?.getRows((err, rows) => {
+                callBack(err, rows);
             })
         } catch (error) {
             console.log(error)
@@ -1078,4 +1077,624 @@ TO_DATE('${toDate}', 'dd/MM/yyyy hh24:mi:ss')`;
             }
         )
     },
+    tmchGstReport: async (data) => {
+        //GST FIRST REPORTS
+        const reportTmch_One = new Promise(async (resolve, reject) => {
+            let pool_ora = await oraConnection();
+            let conn_ora = await pool_ora.getConnection();
+
+            const ipNumberListString = data?.ptno?.map(item => `'${item}'`).join(',') || null;
+            const fromDate = data.from;
+            const toDate = data.to;
+            const sql = `SELECT 
+                            PBILLDETL.IT_CODE CODE,
+                            MEDDESC.ITC_DESC,
+                            PBILLDETL.ITN_PRATE PRATE,
+                            PBILLDETL.ITN_MRP MRP,
+                            PBILLDETL.ITN_ACTMRP ACTMRP,
+                            PBILLDETL.BDN_QTY QTY,
+                            PBILLDETL.BDN_LOOSE LOOSE,
+                            NVL(PBILLDETL.BDN_AMOUNT,0) AMNT,
+                            PBILLDETL.ITN_ORIGINALMRP ORIGINALMRP,
+                            PBILLDETL.BMN_DISAMT DIS,
+                            PBILLDETL.BMN_SALETAX TAXAMT,
+                            PBILLDETL.PBC_ACTTXCODE TAX,
+                            TAX.TXC_DESC,
+                            'OP' STATUS,
+                            PBILLMAST.BM_NO BILLNO,
+                            TO_CHAR(PBILLMAST.BMD_DATE ,'DD-MM-YYYY hh24:mm:ss')BILDATE,
+                            OUTLET.OUC_DESC OU
+                        FROM Pbillmast, Pbilldetl,MEDDESC,TAX,OUTLET
+                        WHERE  Pbilldetl.Bmc_Slno = Pbillmast.Bmc_Slno
+                            AND pbillmast.BMC_COLLCNCODE IS NULL
+                            AND NVL (Pbillmast.Bmc_cancel, 'N') = 'N'
+                            AND Pbillmast.Bmc_Cacr IN ('C', 'R', 'M')
+                            AND Pbillmast.BMD_DATE >= TO_DATE ('${fromDate}','dd/MM/yyyy hh24:mi:ss')
+                            AND Pbillmast.Bmd_Date <= TO_DATE ('${toDate}','dd/MM/yyyy hh24:mi:ss')
+                            AND MEDDESC.IT_CODE = Pbilldetl.IT_CODE
+                            AND TAX.TX_CODE = PBILLDETL.PBC_ACTTXCODE
+                            AND OUTLET.OU_CODE = PBILLMAST.OU_CODE
+                            AND pbillmast.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                        UNION ALL
+                        SELECT 
+                            Mretdetl.IT_CODE CODE,
+                            MEDDESC.ITC_DESC,
+                            Mretdetl.ITN_PRATE PRATE,
+                            Mretdetl.ITN_MRP MRP,
+                            Mretdetl.ITN_ACTMRP ACTMRP,
+                            Mretdetl.MRN_QTY QTY,
+                            Mretdetl.MRN_LOOSE LOOSE,
+                            (NVL (Mretdetl.MRN_AMOUNT, 0) - NVL (Mretdetl.MRN_DISAMT, 0)) *-1   AMNT,
+                            Mretdetl.ITN_ORIGINALMRP ORIGINALMRP,
+                            (MRETDETL.MRN_DISAMT*-1 ) DIS,
+                            (MRETDETL.MRN_SALETAX * -1) TAXAMT,
+                            Mretdetl.MRC_ACTTXCODE TAX,
+                            TAX.TXC_DESC,
+                            'OP' STATUS,
+                            MRETDETL.MR_NO BILLNO,
+                            TO_CHAR(MRETDETL.MRD_DATE ,'DD-MM-YYYY hh24:mm:ss')BILDATE,
+                            OUTLET.OUC_DESC OU
+                        FROM Mretdetl, Pbilldetl, mretmast,MEDDESC,TAX,OUTLET
+                        WHERE Pbilldetl.Bmc_Slno = Mretdetl.Bmc_Slno
+                            AND Pbilldetl.IT_CODE = Mretdetl.It_code
+                            AND Pbilldetl.ITC_DOCNO = Mretdetl.Itc_docno
+                            AND mretmast.mrc_slno = Mretdetl.mrc_slno 
+                            AND Pbilldetl.ITC_DOCTYPE = Mretdetl.Itc_Doctype
+                            AND Mretmast.mrc_retcncode IS NULL
+                            AND Pbilldetl.Itc_Slno = Mretdetl.Itc_slno
+                            AND NVL (Mretdetl.Mrc_cancel, 'N') = 'N'
+                            AND NVL (mretmast.Mrc_cancel, 'N') = 'N'
+                            AND Mretdetl.MRC_CACR IN ('C', 'R')
+                            AND Mretdetl.MRD_DATE >= TO_DATE ('${fromDate}','dd/MM/yyyy hh24:mi:ss')
+                            AND MRETDETL.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                            AND Mretdetl.Mrd_Date <= TO_DATE ('${toDate}','dd/MM/yyyy hh24:mi:ss')
+                            AND MEDDESC.IT_CODE = MRETDETL.IT_CODE
+                            AND MRETDETL.OU_CODE = OUTLET.OU_CODE
+                            AND TAX.TX_CODE = MRETDETL.MRC_ACTTXCODE`;
+            // console.log(sql)
+            try {
+
+                const result = await conn_ora.execute(
+                    sql,
+                    {},
+                    { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
+                )
+
+                result.resultSet?.getRows((err, rows) => {
+                    if (err) {
+                        reject({ status: 0, message: err, data: [] })
+                    } else {
+                        resolve({ status: 1, message: err, data: rows })
+                    }
+                })
+            } catch (error) {
+                reject({ status: 0, message: error, data: [] })
+            } finally {
+                if (conn_ora) {
+                    await conn_ora.close();
+                    await pool_ora.close();
+                }
+            }
+        })
+
+        /// SECOND REPORT
+        const reportTmch_Two = new Promise(async (resolve, reject) => {
+            let pool_ora = await oraConnection();
+            let conn_ora = await pool_ora.getConnection();
+
+            const ipNumberListString = data?.ptno?.map(item => `'${item}'`).join(',') || null;
+            const fromDate = data.from;
+            const toDate = data.to;
+
+            const sql = `SELECT
+                                Mretdetl.IT_CODE CODE,
+                                MEDDESC.ITC_DESC,
+                                Mretdetl.ITN_PRATE PRATE,
+                                Mretdetl.ITN_MRP MRP,
+                                Mretdetl.ITN_ACTMRP ACTMRP,
+                                Mretdetl.MRN_QTY QTY,
+                                Mretdetl.MRN_LOOSE LOOSE,
+                                (NVL (Mretdetl.MRN_AMOUNT, 0) - NVL (Mretdetl.MRN_DISAMT, 0)) *-1   AMNT,
+                                Mretdetl.ITN_ORIGINALMRP ORIGINALMRP,
+                                (MRETDETL.MRN_DISAMT*-1 ) DIS,
+                                (MRETDETL.MRN_SALETAX * -1) TAXAMT,
+                                Mretdetl.MRC_ACTTXCODE TAX,
+                                TAX.TXC_DESC,
+                                'IP' STATUS,
+                                MRETDETL.MR_NO BILLNO,
+                                TO_CHAR(MRETDETL.MRD_DATE ,'DD-MM-YYYY hh24:mm:ss')BILDATE,
+                                OUTLET.OUC_DESC OU
+                        FROM Mretdetl, Pbillmast, Disbillmast,MEDDESC,TAX,OUTLET
+                        WHERE Pbillmast.Bmc_Slno = Mretdetl.Bmc_Slno
+                            AND Pbillmast.Dmc_Slno = Disbillmast.Dmc_Slno
+                            AND Mretdetl.MRC_CACR IN ('I')
+                            AND NVL (Mretdetl.Mrc_cancel, 'N') = 'N'
+                            AND NVL (Dmc_Cancel, 'N') = 'N'
+                            AND Disbillmast.Dmc_Cacr <> 'M'
+                            AND Disbillmast.Dmd_date >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                            AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                            AND Disbillmast.Dmd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                            AND MEDDESC.IT_CODE = MRETDETL.IT_CODE
+                            AND TAX.TX_CODE = MRETDETL.MRC_ACTTXCODE
+                            AND MRETDETL.OU_CODE = OUTLET.OU_CODE
+                            AND DISBILLMAST.IP_NO NOT IN (${ipNumberListString})`;
+            // console.log(sql)
+
+            try {
+                const result = await conn_ora.execute(
+                    sql,
+                    {},
+                    { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
+                )
+                result.resultSet?.getRows((err, rows) => {
+                    if (err) {
+                        reject({ status: 0, message: err, data: [] })
+                    } else {
+                        resolve({ status: 1, message: err, data: rows })
+                    }
+                })
+            } catch (error) {
+                reject({ status: 0, message: error, data: [] })
+            } finally {
+                if (conn_ora) {
+                    await conn_ora.close();
+                    await pool_ora.close();
+                }
+            }
+        })
+
+        // THIR REPORTS
+
+        const reportTmch_Three = new Promise(async (resolve, reject) => {
+            let pool_ora = await oraConnection();
+            let conn_ora = await pool_ora.getConnection();
+
+            const ipNumberListString = data?.ptno?.map(item => `'${item}'`).join(',') || null;
+            const fromDate = data.from;
+            const toDate = data.to;
+
+            const sql = `SELECT 
+                                PBILLDETL.IT_CODE CODE,
+                                MEDDESC.ITC_DESC,
+                                PBILLDETL.ITN_PRATE PRATE,
+                                PBILLDETL.ITN_MRP MRP,
+                                PBILLDETL.ITN_ACTMRP ACTMRP,
+                                PBILLDETL.BDN_QTY QTY,
+                                PBILLDETL.BDN_LOOSE LOOSE,
+                                NVL(PBILLDETL.BDN_AMOUNT,0) AMNT,
+                                PBILLDETL.ITN_ORIGINALMRP ORIGINALMRP,
+                                PBILLDETL.BMN_DISAMT DIS,
+                                PBILLDETL.BMN_SALETAX TAXAMT,
+                                PBILLDETL.PBC_ACTTXCODE TAX,
+                                TAX.TXC_DESC,
+                                'OP' STATUS,
+                                PBILLMAST.BM_NO BILLNO,
+                                TO_CHAR(PBILLMAST.BMD_DATE,'DD-MM-YYYY hh24:mm:ss')BILDATE,
+                                OUTLET.OUC_DESC OU
+                        FROM Pbillmast, Pbilldetl,MEDDESC,TAX,OUTLET
+                        WHERE Pbilldetl.Bmc_Slno = Pbillmast.Bmc_Slno
+                                AND pbillmast.BMC_COLLCNCODE IS NOT NULL
+                                AND NVL (Pbillmast.Bmc_cancel, 'N') = 'N'
+                                AND Pbillmast.Bmc_Cacr IN ('C', 'R', 'M')
+                                AND Pbillmast.BMD_COLLDATE >= TO_DATE ('${fromDate}','dd/MM/yyyy hh24:mi:ss')
+                                AND Pbillmast.BMD_COLLDATE <= TO_DATE ('${toDate}','dd/MM/yyyy hh24:mi:ss')
+                                AND MEDDESC.IT_CODE = Pbilldetl.IT_CODE
+                                AND OUTLET.OU_CODE = PBILLMAST.OU_CODE
+                                AND TAX.TX_CODE = PBILLDETL.PBC_ACTTXCODE
+                                AND pbillmast.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                        UNION ALL
+                        SELECT 
+                                Mretdetl.IT_CODE CODE,
+                                MEDDESC.ITC_DESC,
+                                Mretdetl.ITN_PRATE PRATE,
+                                Mretdetl.ITN_MRP MRP,
+                                Mretdetl.ITN_ACTMRP ACTMRP,
+                                Mretdetl.MRN_QTY QTY,
+                                Mretdetl.MRN_LOOSE LOOSE,
+                                (NVL (Mretdetl.MRN_AMOUNT, 0) - NVL (Mretdetl.MRN_DISAMT, 0)) *-1   AMNT,
+                                Mretdetl.ITN_ORIGINALMRP ORIGINALMRP,
+                                (MRETDETL.MRN_DISAMT*-1 ) DIS,
+                                (MRETDETL.MRN_SALETAX * -1) TAXAMT,
+                                Mretdetl.MRC_ACTTXCODE TAX,
+                                TAX.TXC_DESC,
+                                'OP' STATUS,
+                                MRETDETL.MR_NO BILLNO,
+                                TO_CHAR(MRETDETL.MRD_DATE,'DD-MM-YYYY hh24:mm:ss')BILDATE,
+                                OUTLET.OUC_DESC OU
+                        FROM Mretdetl, Pbilldetl, mretmast,MEDDESC,TAX,OUTLET
+                        WHERE Pbilldetl.Bmc_Slno = Mretdetl.Bmc_Slno
+                                AND Pbilldetl.IT_CODE = Mretdetl.It_code
+                                AND Pbilldetl.ITC_DOCNO = Mretdetl.Itc_docno
+                                AND mretmast.mrc_slno = Mretdetl.mrc_slno
+                                AND Pbilldetl.ITC_DOCTYPE = Mretdetl.Itc_Doctype
+                                AND Mretmast.mrc_retcncode IS NOT NULL
+                                AND Pbilldetl.Itc_Slno = Mretdetl.Itc_slno
+                                AND NVL (Mretdetl.Mrc_cancel, 'N') = 'N'
+                                AND NVL (mretmast.Mrc_cancel, 'N') = 'N'
+                                AND Mretdetl.MRC_CACR IN ('C', 'R')
+                                AND Mretmast.MRD_RETDATE >= TO_DATE ('${fromDate}','dd/MM/yyyy hh24:mi:ss')
+                                AND MRETDETL.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                                AND Mretmast.Mrd_RETDate <= TO_DATE ('${toDate}','dd/MM/yyyy hh24:mi:ss')
+                                AND MEDDESC.IT_CODE = MRETDETL.IT_CODE
+                                AND MRETDETL.OU_CODE = OUTLET.OU_CODE
+                                AND TAX.TX_CODE = MRETDETL.MRC_ACTTXCODE`;
+            // console.log(sql)
+
+            try {
+                const result = await conn_ora.execute(
+                    sql,
+                    {},
+                    { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
+                )
+                result.resultSet?.getRows((err, rows) => {
+                    if (err) {
+                        reject({ status: 0, message: err, data: [] })
+                    } else {
+                        resolve({ status: 1, message: err, data: rows })
+                    }
+                })
+            } catch (error) {
+                reject({ status: 0, message: error, data: [] })
+            } finally {
+                if (conn_ora) {
+                    await conn_ora.close();
+                    await pool_ora.close();
+                }
+            }
+        })
+
+        const reportTmch_Four = new Promise(async (resolve, reject) => {
+            let pool_ora = await oraConnection();
+            let conn_ora = await pool_ora.getConnection();
+
+            const ipNumberListString = data?.ptno?.map(item => `'${item}'`).join(',') || null;
+            const fromDate = data.from;
+            const toDate = data.to;
+
+            const sql = `SELECT
+                            PBILLDETL.IT_CODE CODE,
+                            MEDDESC.ITC_DESC,
+                            PBILLDETL.ITN_PRATE PRATE,
+                            PBILLDETL.ITN_MRP MRP,
+                            PBILLDETL.ITN_ACTMRP ACTMRP,
+                            PBILLDETL.BDN_QTY QTY,
+                            PBILLDETL.BDN_LOOSE LOOSE,
+                            NVL(PBILLDETL.BDN_AMOUNT,0) AMNT,
+                            PBILLDETL.ITN_ORIGINALMRP ORIGINALMRP,
+                            PBILLDETL.BMN_DISAMT DIS,
+                            PBILLDETL.BMN_SALETAX TAXAMT,
+                            PBILLDETL.PBC_ACTTXCODE TAX,
+                            TAX.TXC_DESC,
+                            'IP' STATUS,
+                            PBILLMAST.BM_NO BILLNO,
+                            TO_CHAR(PBILLMAST.BMD_DATE,'DD-MM-YYYY hh24:mm:ss')BILDATE,
+                            OUTLET.OUC_DESC OU
+                        FROM Pbillmast, Disbillmast, Pbilldetl,MEDDESC,TAX,OUTLET
+                        WHERE     pbillmast.bmc_slno = pbilldetl.bmc_slno
+                                AND Pbillmast.Dmc_Slno = Disbillmast.Dmc_Slno
+                                AND NVL (Pbillmast.Bmc_cancel, 'N') = 'N'
+                                AND Pbillmast.Bmc_Cacr = 'I'
+                                AND NVL (Dmc_Cancel, 'N') = 'N'
+                                AND Disbillmast.Dmc_Cacr <> 'M'
+                                AND Disbillmast.Dmd_date >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                                AND Disbillmast.Dmd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                AND MEDDESC.IT_CODE = Pbilldetl.IT_CODE
+                                AND TAX.TX_CODE = PBILLDETL.PBC_ACTTXCODE
+                                AND OUTLET.OU_CODE = PBILLMAST.OU_CODE
+                                AND Disbillmast.IP_NO NOT IN (${ipNumberListString})`;
+            // console.log(sql)
+            try {
+                const result = await conn_ora.execute(
+                    sql,
+                    {},
+                    { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
+                )
+                result.resultSet?.getRows((err, rows) => {
+                    if (err) {
+                        reject({ status: 0, message: err, data: [] })
+                    } else {
+                        resolve({ status: 1, message: err, data: rows })
+                    }
+                })
+            } catch (error) {
+                reject({ status: 0, message: error, data: [] })
+            } finally {
+                if (conn_ora) {
+                    await conn_ora.close();
+                    await pool_ora.close();
+                }
+            }
+        })
+
+
+        const reportTmch_Five = new Promise(async (resolve, reject) => {
+            let pool_ora = await oraConnection();
+            let conn_ora = await pool_ora.getConnection();
+
+            const ipNumberListString = data?.ptno?.map(item => `'${item}'`).join(',') || null;
+            const fromDate = data.from;
+            const toDate = data.to;
+
+            const sql = `SELECT 
+                            PBILLDETL.IT_CODE CODE,
+                            MEDDESC.ITC_DESC,
+                            PBILLDETL.ITN_PRATE PRATE,
+                            PBILLDETL.ITN_MRP MRP,
+                            PBILLDETL.ITN_ACTMRP ACTMRP,
+                            PBILLDETL.BDN_QTY QTY,
+                            PBILLDETL.BDN_LOOSE LOOSE,
+                            NVL(PBILLDETL.BDN_AMOUNT,0) AMNT,
+                            PBILLDETL.ITN_ORIGINALMRP ORIGINALMRP,
+                            PBILLDETL.BMN_DISAMT DIS,
+                            PBILLDETL.BMN_SALETAX TAXAMT,
+                            PBILLDETL.PBC_ACTTXCODE TAX,
+                            TAX.TXC_DESC,
+                            'IP' STATUS,
+                            PBILLMAST.BM_NO BILLNO,
+                            TO_CHAR(PBILLMAST.BMD_DATE,'DD-MM-YYYY hh24:mm:ss')BILDATE,
+                            OUTLET.OUC_DESC OU
+                        FROM Pbillmast, Pbilldetl, Opbillmast,MEDDESC,TAX,OUTLET
+                        WHERE Pbilldetl.Bmc_Slno = Pbillmast.Bmc_Slno
+                            AND Pbilldetl.Opc_Slno = Opbillmast.Opc_Slno
+                            AND NVL (Pbillmast.Bmc_cancel, 'N') = 'N'
+                            AND Pbillmast.Bmc_Cacr = 'O'
+                            AND Opbillmast.Opc_Cacr <> 'M'
+                            AND NVL (Opbillmast.Opn_cancel, 'N') = 'N'
+                            AND Opbillmast.Opd_date >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                            AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                            AND Opbillmast.Opd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                            AND MEDDESC.IT_CODE = Pbilldetl.IT_CODE
+                            AND TAX.TX_CODE = PBILLDETL.PBC_ACTTXCODE
+                            AND OUTLET.OU_CODE = PBILLMAST.OU_CODE
+                            AND PBILLMAST.IP_NO NOT IN (${ipNumberListString})`;
+            // console.log(sql)
+            try {
+                const result = await conn_ora.execute(
+                    sql,
+                    {},
+                    { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
+                )
+                result.resultSet?.getRows((err, rows) => {
+                    if (err) {
+                        reject({ status: 0, message: err, data: [] })
+                    } else {
+                        resolve({ status: 1, message: err, data: rows })
+                    }
+                })
+            } catch (error) {
+                reject({ status: 0, message: error, data: [] })
+            } finally {
+                if (conn_ora) {
+                    await conn_ora.close();
+                    await pool_ora.close();
+                }
+            }
+        })
+
+        //call all promise data
+        return await Promise.all([reportTmch_One, reportTmch_Two, reportTmch_Three, reportTmch_Four, reportTmch_Five]).then((result) => {
+            const resultChcek = result?.find(e => e.status === 0)
+            const fiterdResult = result?.filter((e) => e.status === 1)?.map(e => e.data)?.flat()
+            if (resultChcek === undefined) {
+                return { status: 1, message: 'success', data: fiterdResult }
+            } else {
+                return { status: 0, message: resultChcek.message, data: [] }
+            }
+        }).catch((error) => {
+            return { status: 0, message: error, data: [] }
+        })
+
+    },
+    tsshGstReports: async (data) => {
+
+        const reportTssh_One = new Promise(async (resolve, reject) => {
+            let pool_ora = await oraConnection();
+            let conn_ora = await pool_ora.getConnection();
+
+            const ipNumberListString = data?.ptno?.map(item => `'${item}'`).join(',') || null;
+            const fromDate = data.from;
+            const toDate = data.to;
+            const sql = `SELECT 
+                            Mretdetl.IT_CODE CODE,
+                            MEDDESC.ITC_DESC,
+                            Mretdetl.ITN_PRATE PRATE,
+                            Mretdetl.ITN_MRP MRP,
+                            Mretdetl.ITN_ACTMRP ACTMRP,
+                            Mretdetl.MRN_QTY QTY,
+                            Mretdetl.MRN_LOOSE LOOSE,
+                            (NVL (Mretdetl.MRN_AMOUNT, 0) - NVL (Mretdetl.MRN_DISAMT, 0)) *-1   AMNT,
+                            Mretdetl.ITN_ORIGINALMRP ORIGINALMRP,
+                            (MRETDETL.MRN_DISAMT*-1 ) DIS,
+                            (MRETDETL.MRN_SALETAX * -1) TAXAMT,
+                            Mretdetl.MRC_ACTTXCODE TAX,
+                            TAX.TXC_DESC,
+                            'IP' STATUS,
+                            MRETDETL.MR_NO BILLNO,
+                            TO_CHAR(MRETDETL.MRD_DATE,'DD-MM-YYYY hh24:mm:ss')BILDATE,
+                            OUTLET.OUC_DESC OU
+                        FROM Mretdetl, Pbillmast, Disbillmast,MEDDESC,TAX,OUTLET
+                        WHERE Pbillmast.Bmc_Slno = Mretdetl.Bmc_Slno
+                        AND Pbillmast.Dmc_Slno = Disbillmast.Dmc_Slno
+                        AND Mretdetl.MRC_CACR IN ('I')
+                        AND NVL (Mretdetl.Mrc_cancel, 'N') = 'N'
+                        AND NVL (Dmc_Cancel, 'N') = 'N'
+                        AND Disbillmast.Dmc_Cacr <> 'M'
+                        AND Disbillmast.Dmd_date >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                        AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                        AND Disbillmast.Dmd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                        AND MEDDESC.IT_CODE = MRETDETL.IT_CODE
+                        AND TAX.TX_CODE = MRETDETL.MRC_ACTTXCODE
+                        AND MRETDETL.OU_CODE = OUTLET.OU_CODE
+                        AND DISBILLMAST.IP_NO IN (${ipNumberListString})`;
+
+            try {
+
+                const result = await conn_ora.execute(
+                    sql,
+                    {},
+                    { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
+                )
+
+                result.resultSet?.getRows((err, rows) => {
+                    if (err) {
+                        reject({ status: 0, message: err, data: [] })
+                    } else {
+                        resolve({ status: 1, message: err, data: rows })
+                    }
+                })
+            } catch (error) {
+                reject({ status: 0, message: error, data: [] })
+            } finally {
+                if (conn_ora) {
+                    await conn_ora.close();
+                    await pool_ora.close();
+                }
+            }
+        })
+
+
+        const reportTssh_Two = new Promise(async (resolve, reject) => {
+            let pool_ora = await oraConnection();
+            let conn_ora = await pool_ora.getConnection();
+
+            const ipNumberListString = data?.ptno?.map(item => `'${item}'`).join(',') || null;
+            const fromDate = data.from;
+            const toDate = data.to;
+            const sql = `SELECT 
+                            PBILLDETL.IT_CODE CODE,
+                            MEDDESC.ITC_DESC,
+                            PBILLDETL.ITN_PRATE PRATE,
+                            PBILLDETL.ITN_MRP MRP,
+                            PBILLDETL.ITN_ACTMRP ACTMRP,
+                            PBILLDETL.BDN_QTY QTY,
+                            PBILLDETL.BDN_LOOSE LOOSE,
+                            NVL(PBILLDETL.BDN_AMOUNT,0) AMNT,
+                            PBILLDETL.ITN_ORIGINALMRP ORIGINALMRP,
+                            PBILLDETL.BMN_DISAMT DIS,
+                            PBILLDETL.BMN_SALETAX TAXAMT,
+                            PBILLDETL.PBC_ACTTXCODE TAX,
+                            TAX.TXC_DESC,
+                            'IP' STATUS,
+                            PBILLMAST.BM_NO BILLNO,
+                            TO_CHAR(PBILLMAST.BMD_DATE,'DD-MM-YYYY hh24:mm:ss')BILDATE,
+                            OUTLET.OUC_DESC OU
+                        FROM Pbillmast, Disbillmast, Pbilldetl,MEDDESC,TAX,OUTLET
+                        WHERE  pbillmast.bmc_slno = pbilldetl.bmc_slno
+                                AND Pbillmast.Dmc_Slno = Disbillmast.Dmc_Slno
+                                AND NVL (Pbillmast.Bmc_cancel, 'N') = 'N'
+                                AND Pbillmast.Bmc_Cacr = 'I'
+                                AND NVL (Dmc_Cancel, 'N') = 'N'
+                                AND Disbillmast.Dmc_Cacr <> 'M'
+                                AND Disbillmast.Dmd_date >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                                AND Disbillmast.Dmd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                AND MEDDESC.IT_CODE = Pbilldetl.IT_CODE
+                                AND TAX.TX_CODE = PBILLDETL.PBC_ACTTXCODE
+                                AND OUTLET.OU_CODE = PBILLMAST.OU_CODE
+                                AND Disbillmast.IP_NO IN (${ipNumberListString})`;
+            try {
+
+                const result = await conn_ora.execute(
+                    sql,
+                    {},
+                    { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
+                )
+
+                result.resultSet?.getRows((err, rows) => {
+                    if (err) {
+                        reject({ status: 0, message: err, data: [] })
+                    } else {
+                        resolve({ status: 1, message: err, data: rows })
+                    }
+                })
+            } catch (error) {
+                reject({ status: 0, message: error, data: [] })
+            } finally {
+                if (conn_ora) {
+                    await conn_ora.close();
+                    await pool_ora.close();
+                }
+            }
+        })
+
+
+        const reportTssh_Three = new Promise(async (resolve, reject) => {
+            let pool_ora = await oraConnection();
+            let conn_ora = await pool_ora.getConnection();
+
+            const ipNumberListString = data?.ptno?.map(item => `'${item}'`).join(',') || null;
+            const fromDate = data.from;
+            const toDate = data.to;
+            const sql = `SELECT 
+                            PBILLDETL.IT_CODE CODE,
+                            MEDDESC.ITC_DESC,
+                            PBILLDETL.ITN_PRATE PRATE,
+                            PBILLDETL.ITN_MRP MRP,
+                            PBILLDETL.ITN_ACTMRP ACTMRP,
+                            PBILLDETL.BDN_QTY QTY,
+                            PBILLDETL.BDN_LOOSE LOOSE,
+                            NVL(PBILLDETL.BDN_AMOUNT,0) AMNT,
+                            PBILLDETL.ITN_ORIGINALMRP ORIGINALMRP,
+                            PBILLDETL.BMN_DISAMT DIS,
+                            PBILLDETL.BMN_SALETAX TAXAMT,
+                            PBILLDETL.PBC_ACTTXCODE TAX,
+                            TAX.TXC_DESC,
+                            'IP' STATUS,
+                            PBILLMAST.BM_NO BILLNO,
+                            TO_CHAR(PBILLMAST.BMD_DATE,'DD-MM-YYYY hh24:mm:ss')BILDATE,
+                            OUTLET.OUC_DESC OU
+                        FROM Pbillmast, Pbilldetl, Opbillmast,MEDDESC,TAX,OUTLET
+                        WHERE     Pbilldetl.Bmc_Slno = Pbillmast.Bmc_Slno
+                                AND Pbilldetl.Opc_Slno = Opbillmast.Opc_Slno
+                                AND NVL (Pbillmast.Bmc_cancel, 'N') = 'N'
+                                AND Pbillmast.Bmc_Cacr = 'O'
+                                AND Opbillmast.Opc_Cacr <> 'M'
+                                AND NVL (Opbillmast.Opn_cancel, 'N') = 'N'
+                                AND Opbillmast.Opd_date >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                                AND Opbillmast.Opd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                AND MEDDESC.IT_CODE = Pbilldetl.IT_CODE
+                                AND TAX.TX_CODE = PBILLDETL.PBC_ACTTXCODE
+                                AND OUTLET.OU_CODE = PBILLMAST.OU_CODE
+                                AND PBILLMAST.IP_NO IN (${ipNumberListString})`;
+            try {
+
+                const result = await conn_ora.execute(
+                    sql,
+                    {},
+                    { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
+                )
+
+                result.resultSet?.getRows((err, rows) => {
+                    if (err) {
+                        reject({ status: 0, message: err, data: [] })
+                    } else {
+                        resolve({ status: 1, message: err, data: rows })
+                    }
+                })
+            } catch (error) {
+                reject({ status: 0, message: error, data: [] })
+            } finally {
+                if (conn_ora) {
+                    await conn_ora.close();
+                    await pool_ora.close();
+                }
+            }
+        })
+
+
+        //call all promise data
+        return await Promise.all([reportTssh_One, reportTssh_Two, reportTssh_Three]).then((result) => {
+            const resultChcek = result?.find(e => e.status === 0)
+            const fiterdResult = result?.filter((e) => e.status === 1)?.map(e => e.data)?.flat()
+            if (resultChcek === undefined) {
+                return { status: 1, message: 'success', data: fiterdResult }
+            } else {
+                return { status: 0, message: resultChcek.message, data: [] }
+            }
+        }).catch((error) => {
+            return { status: 0, message: error, data: [] }
+        })
+    }
 }
