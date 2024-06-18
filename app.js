@@ -61,6 +61,7 @@ const qiPatientList = require("./api/QIPatientList/getPatientList.router")
 // supplier
 
 const supplier = require("./api/SupplierDetails/supplier.router")
+const procedure = require("./api/ProcedureList/procedure.router")
 
 app.use(express.json());
 
@@ -130,6 +131,8 @@ app.use("/api/melioraEllider", elliderData)
 app.use("/api/dailyCensus", censusData)
 app.use("/api/qualityIndicator", qiPatientList)
 app.use("/api/supplierList", supplier)
+app.use("/api/procedureList", procedure)
+
 
 
 app.listen(process.env.APP_PORT, (val) => {
