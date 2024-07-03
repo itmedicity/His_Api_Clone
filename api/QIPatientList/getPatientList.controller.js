@@ -1,5 +1,6 @@
 
-const { GetElliderPatientList, GetIPPatientList, GetEndoscopyIPInfo } = require('./getPatientsList.service')
+const { GetElliderPatientList, GetIPPatientList, GetEndoscopyIPInfo, GetInitialAssessmentDetails,
+    GetEndoscopyPatientsQI } = require('./getPatientsList.service')
 module.exports = {
     GetElliderPatientList: (req, res) => {
         const body = req.body;
@@ -70,4 +71,51 @@ module.exports = {
             })
         })
     },
+
+    GetInitialAssessmentDetails: (req, res) => {
+        const body = req.body;
+        GetInitialAssessmentDetails(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Data Found"
+
+                })
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            })
+        })
+    },
+
+    GetEndoscopyPatientsQI: (req, res) => {
+        const body = req.body;
+        GetEndoscopyPatientsQI(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Data Found"
+
+                })
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results
+            })
+        })
+    },
+
 }
