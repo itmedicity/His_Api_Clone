@@ -43,4 +43,26 @@ module.exports = {
         });
     },
 
+
+    // getPendingPODetails: (req, res) => {
+    //     const { offset, limit } = req.query;
+    //     getPendingPODetails(parseInt(offset, 10), parseInt(limit, 10), (err, results) => {
+    //         if (err) {
+    //             return res.status(200).json({
+    //                 success: 0,
+    //                 message: err.message
+    //             });
+    //         }
+    //         if (!results || results.length === 0) {
+    //             return res.status(200).json({
+    //                 success: 1
+    //             });
+    //         }
+    //         return res.status(200).json({
+    //             success: 2,
+    //             data: results
+    //         });
+    //     });
+    // },
+
 }

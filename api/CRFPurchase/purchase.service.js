@@ -67,7 +67,8 @@ module.exports = {
                        PORDDETL.PDN_ORIGINALMRP,
                        MEDDESC.ITC_DESC,
                        TAX.TXC_DESC,
-                       PORDDETL.PDN_TAXAMT
+                       PORDDETL.PDN_TAXAMT,
+                       PORDMAST.PON_TOTAPPROVALSCOMP AS APPROVAL
                    FROM 
                        PORDMAST,
                        STORE,
@@ -84,7 +85,7 @@ module.exports = {
                        AND PORDMAST.POC_CANCEL IS NULL
                        AND PORDMAST.POC_CLOSE IS NULL
                        AND PORDDETL.POC_CANCEL IS NULL
-                       AND EXTRACT(YEAR FROM PORDMAST.POD_DATE) = EXTRACT(YEAR FROM SYSDATE)`,
+                       AND EXTRACT(YEAR FROM PORDMAST.POD_DATE) = EXTRACT(YEAR FROM SYSDATE) `,
                 {},
                 { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
             )
@@ -101,5 +102,64 @@ module.exports = {
             }
         }
     },
+
+    // getPendingPODetails: async (offset, limit, callBack) => {
+    //     let pool_ora;
+    //     let conn_ora;
+    //     try {
+    //         pool_ora = await oraConnection();
+    //         conn_ora = await pool_ora.getConnection();
+    //         const result = await conn_ora.execute(
+    //             `SELECT 
+    //                    PORDMAST.PO_NO,
+    //                    PORDMAST.POD_DATE,
+    //                    PORDMAST.POC_TYPE,
+    //                    STORE.STC_DESC,
+    //                    SUPPLIER.SUC_NAME,
+    //                    PORDMAST.POD_VALIDUPTO AS PO_EXPIRY,
+    //                    PORDMAST.POC_DELIVERY,
+    //                    PORDMAST.PON_AMOUNT,
+    //                    PORDMAST.POD_EDD AS EXPECTED_DATE,
+    //                    PORDDETL.IT_CODE,
+    //                    PORDDETL.PDN_QTY,
+    //                    PORDDETL.PDN_RATE,
+    //                    PORDDETL.PDN_ORIGINALMRP,
+    //                    MEDDESC.ITC_DESC,
+    //                    TAX.TXC_DESC,
+    //                    PORDDETL.PDN_TAXAMT
+    //                FROM 
+    //                    PORDMAST
+    //                    JOIN STORE ON PORDMAST.ST_CODE = STORE.ST_CODE
+    //                    JOIN SUPPLIER ON PORDMAST.SU_CODE = SUPPLIER.SU_CODE
+    //                    JOIN PORDDETL ON PORDMAST.POC_SLNO = PORDDETL.POC_SLNO
+    //                    JOIN MEDDESC ON PORDDETL.IT_CODE = MEDDESC.IT_CODE
+    //                    JOIN TAX ON PORDDETL.TX_CODE = TAX.TX_CODE
+    //                WHERE
+    //                   PORDMAST.POC_CANCEL IS NULL
+    //                   AND PORDMAST.POC_CLOSE IS NULL
+    //                   AND PORDDETL.POC_CANCEL IS NULL
+    //                  OFFSET :offset ROWS FETCH NEXT :limit ROWS ONLY`,
+    //             {
+    //                 offset: parseInt(offset, 10),
+    //                 limit: parseInt(limit, 10)
+    //             },
+    //             { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
+    //         );
+    //         const hisData = await result.resultSet.getRows();
+    //         callBack(null, hisData);
+    //         console.log(hisData);
+
+    //     } catch (error) {
+    //         callBack(error);
+    //     } finally {
+    //         if (conn_ora) {
+    //             await conn_ora.close();
+    //         }
+    //         if (pool_ora) {
+    //             await pool_ora.close();
+    //         }
+    //     }
+    // }
+
 }
 
