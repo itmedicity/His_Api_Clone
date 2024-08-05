@@ -24,7 +24,8 @@ module.exports = {
     },
 
     getPendingPODetails: (req, res) => {
-        getPendingPODetails((err, results) => {
+        const body = req.body;
+        getPendingPODetails(body, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,

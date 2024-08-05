@@ -46,7 +46,8 @@ module.exports = {
             }
         }
     },
-    getPendingPODetails: async (callBack) => {
+    getPendingPODetails: async (data, callBack) => {
+        const ponumber = data.ponumber
         let pool_ora = await oraConnection();
         let conn_ora = await pool_ora.getConnection();
         try {
@@ -85,11 +86,13 @@ module.exports = {
                        AND PORDMAST.POC_CANCEL IS NULL
                        AND PORDMAST.POC_CLOSE IS NULL
                        AND PORDDETL.POC_CANCEL IS NULL
-                       AND EXTRACT(YEAR FROM PORDMAST.POD_DATE) = EXTRACT(YEAR FROM SYSDATE) `,
+                       AND PORDMAST.PO_NO IN (${ponumber})
+                       AND EXTRACT(YEAR FROM PORDMAST.POD_DATE) = EXTRACT(YEAR FROM SYSDATE)`,
                 {},
                 { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
             )
             const hisData = await result.resultSet?.getRows();
+
             return callBack(null, hisData)
         }
         catch (error) {
