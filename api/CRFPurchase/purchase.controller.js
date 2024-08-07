@@ -34,11 +34,11 @@ module.exports = {
             }
             if (Object.keys(results).length === 0) {
                 return res.status(200).json({
-                    success: 1,
+                    success: 2,
                 });
             }
             return res.status(200).json({
-                success: 2,
+                success: 1,
                 data: results
             });
         });
