@@ -39,6 +39,42 @@ module.exports = {
         }
 
     },
+    getActiveSupplierList: async (callBack) => {
+        let pool_ora = await oraConnection();
+        let conn_ora = await pool_ora.getConnection();
+        const sql = `SELECT
+                           SUPPLIER.SU_CODE,SUC_NAME,SUC_ALIAS,SUC_STATUS
+                     FROM
+                           SUPPLIER
+                        LEFT JOIN PORDMAST ON PORDMAST.SU_CODE=SUPPLIER.SU_CODE
+                     WHERE
+                           SUC_STATUS='Y' AND PORDMAST.ST_CODE IN ('C001','C002','C003','C004','0037')
+                           AND PORDMAST.POC_CANCEL IS NULL AND PORDMAST.POC_CLOSE IS NULL
+                           AND PORDMAST.POD_DATE >= ADD_MONTHS(SYSDATE, -12)
+                           AND PORDMAST.PON_TOTAPPROVALSCOMP=4
+                     GROUP BY  SUPPLIER.SU_CODE,SUC_NAME,SUC_ALIAS,SUC_STATUS
+                     ORDER BY SUC_NAME`;
+        try {
+            const result = await conn_ora.execute(
+                sql,
+                {},
+                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
+            )
+            await result.resultSet?.getRows((err, rows) => {
+                callBack(err, rows)
+            })
+        }
+        catch (error) {
+            return callBack(error)
+        } finally {
+            if (conn_ora) {
+                await conn_ora.close();
+                await pool_ora.close();
+            }
+        }
+
+    },
+
 }
 
 
