@@ -115,6 +115,7 @@ module.exports = {
         let pool_ora = await oraConnection();
         let conn_ora = await pool_ora.getConnection();
 
+
         try {
             const result = await conn_ora.execute(
                 ` TRUNCATE TABLE rol_setting`,
