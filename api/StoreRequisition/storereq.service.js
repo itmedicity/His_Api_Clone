@@ -69,7 +69,8 @@ module.exports = {
         let pool_ora = await oraConnection();
         let conn_ora = await pool_ora.getConnection();
 
-        const sql = `INSERT INTO rol_setting VALUES 
+        const sql = `INSERT INTO rol_setting (OU_CODE,IT_CODE,ITN_NAME,ITN_MAXQTY,ITN_MINQTY,ITN_MINLVL,ITN_MEDLVL,
+        ITN_MAXLVL,STATUS) VALUES 
                         (
                         :OU_CODE,
                         :IT_CODE,
@@ -113,6 +114,7 @@ module.exports = {
     truncateRolSetting: async (callBack) => {
         let pool_ora = await oraConnection();
         let conn_ora = await pool_ora.getConnection();
+
 
         try {
             const result = await conn_ora.execute(

@@ -28,7 +28,6 @@ const incomeTssh = require("./api/Reports/misReportTssh/incomePart/procedureinco
 // TSSH income part details
 const incomeDetlPartTssh = require("./api/Reports/misReportTssh/MisDetlRpt/incomePart/income.router")
 const collectionDetlPartTssh = require("./api/Reports/misReportTssh/MisDetlRpt/collectionPart/misCollectonPart.router")
-
 //TMCH
 const collectionTmch = require('./api/Reports/misReportTmch/collectionPart/collectionTmch.router')
 const patientTypeDiscountTmch = require("./api/Reports/misReportTmch/PatientType/patientTypeTmch.router")
@@ -37,31 +36,27 @@ const incomeTmch = require("./api/Reports/misReportTmch/incomePart/procedureInco
 // TMCH income part details
 const incomeDetlPartTmch = require("./api/Reports/misReportTmch/MisDetlRpt/incomePart/income.router")
 const collectionDetlPartTmch = require("./api/Reports/misReportTmch/MisDetlRpt/collectionPart/misCollectonPart.router")
-
 //GENERAL PURPOSE
 const admissionList = require("./api/Reports/InpatientList/admissionList.router")
-
 //ROL SETTING
 const importMedicine = require("./api/MedicineDescription/medicine.router");
 const storerequest = require("./api/StoreRequisition/storereq.router");
 const rolprocess = require("./api/process/rolProcess/rolProcess.router");
-
 //REPORT
 const gstTaxPharmacy = require("./api/Reports/GstReportTaxAndPharmacy/taxAndPharmacy.router");
-
 // count
 const opcount = require("./api/OPCount/opcount.router");
 const ipcount = require("./api/IPCount/ipcount.router");
 const dashboard = require("./api/DashBoard/dashBoard.router");
-
 // TO MELIORA
 const elliderData = require("./api/MelioraEllider/elliderData.router");
 const censusData = require("./api/DailyCensusReport/censusreport.router")
 const qiPatientList = require("./api/QIPatientList/getPatientList.router")
 // supplier
-
 const supplier = require("./api/SupplierDetails/supplier.router")
 const procedure = require("./api/ProcedureList/procedure.router")
+//CRF Purchase
+const crfpo = require("./api/CRFPurchase/purchase.router")
 
 app.use(express.json());
 
@@ -132,6 +127,7 @@ app.use("/api/dailyCensus", censusData)
 app.use("/api/qualityIndicator", qiPatientList)
 app.use("/api/supplierList", supplier)
 app.use("/api/procedureList", procedure)
+app.use("/api/crfpurchase", crfpo)
 
 
 
