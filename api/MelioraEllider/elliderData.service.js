@@ -37,19 +37,18 @@ module.exports = {
         }
 
     },
-
     getNursingStation: async (callBack) => {
         let pool_ora = await oraConnection();
         let conn_ora = await pool_ora.getConnection();
         const sql = `SELECT 
-                           NS_CODE,
-                           NSC_DESC,
-                           NSC_ALIAS
-                     FROM 
-                           NURSTATION
-                     WHERE 
-                           NSC_STATUS='Y'
-                     ORDER BY NSC_DESC`;
+                        NS_CODE,
+                        NSC_DESC,
+                        NSC_ALIAS
+                    FROM 
+                        NURSTATION
+                    WHERE 
+                        NSC_STATUS='Y'
+                    ORDER BY NSC_DESC`;
         try {
             const result = await conn_ora.execute(
                 sql,
@@ -192,10 +191,10 @@ module.exports = {
                            PTC_LOPHONE,                  
                            RE_CODE,                     
                            PTC_RELATION,                 
-                           RC_CODE,                      
+                           IPADMISS.RC_CODE,                      
                            IPADMISS.BD_CODE,                     
                            IPADMISS.DO_CODE,                      
-                           RS_CODE,                      
+                           IPADMISS.RS_CODE,                      
                            IPD_PART,                    
                            IPD_DISC,                    
                            IPC_STATUS,                  
@@ -285,7 +284,7 @@ module.exports = {
                            IPC_IPBILLREMARK,             
                            IPC_BLREMARKUSER,           
                            IPC_FATHERNAME,              
-                           RG_CODE,                      
+                           IPADMISS.RG_CODE,                      
                            IPC_MLC,                      
                            IPC_INHOUSE,                  
                            UT_CODE,                      
@@ -309,15 +308,47 @@ module.exports = {
                            IPC_REFDOCODE ,               
                            IPC_REFHOCODE,                
                            PKC_STATUS,                  
-                           VRQ_SLNO                     
+                           VRQ_SLNO,
+                           BED.BDC_NO,
+                           BED.NS_CODE,
+                           BED.RT_CODE,
+                           BED.BDC_OCCUP,
+                           BED.BDN_OCCNO,
+                           BED.BDC_STATUS,
+                           BED.HKD_CLEANINGREQ,
+                           BED.RM_CODE,
+                           BED.BDC_MHCODE,
+                           BED.BDC_VIPBED,
+                           NURSTATION.NS_CODE,
+                           ADMNREASON.RSC_DESC,
+                           ADMNREASON.RSC_ALIAS,
+                           ADMNREASON.RSC_STATUS,
+                           ROOMTYPE.RTC_DESC,
+                           ROOMTYPE.RTC_ALIAS,
+                           ROOMTYPE.RTC_STATUS,
+                           ROOMTYPE.ICU,
+                           ROOMTYPE.RTC_MHCODE,
+                           ROOMCATEGORY.RCC_DESC,
+                           ROOMCATEGORY.RCC_ALIAS,
+                           ROOMCATEGORY.RCC_STATUS,
+                           ROOMCATEGORY.RCC_MHCODE,
+                           ROOMMASTER.RMC_DESC,
+                           ROOMMASTER.RMC_ALIAS,
+                           ROOMMASTER.RMC_STATUS,
+                           ROOMMASTER.RMC_MHCODE
+
                     FROM 
-                           IPADMISS,BED,NURSTATION
+                           IPADMISS,BED,NURSTATION,ADMNREASON,ROOMTYPE,ROOMCATEGORY,ROOMMASTER
                     WHERE 
                            BED.BD_CODE=IPADMISS.BD_CODE
                        AND NURSTATION.NS_CODE=BED.NS_CODE
                        AND IPADMISS.IPC_PTFLAG = 'N'
+                       AND IPADMISS.RS_CODE = ADMNREASON.RS_CODE
+                       AND ROOMTYPE.RC_CODE = ROOMCATEGORY.RC_CODE
+                       AND BED.RM_CODE = ROOMMASTER.RM_CODE
                        AND IPADMISS.IPC_STATUS IS NULL
                        AND NURSTATION.NS_CODE =:NS_CODE
+                       AND BED.RT_CODE = ROOMTYPE.RT_CODE
                        ORDER BY IPADMISS.IP_NO`;
         try {
             const result = await conn_ora.execute(
@@ -528,8 +559,230 @@ module.exports = {
             }
         }
     },
-
-
-
+    getNursingBed: async (data, callBack) => {
+        let pool_ora = await oraConnection();
+        let conn_ora = await pool_ora.getConnection();
+        const sql = `SELECT 
+         N.NS_CODE,  
+         N.NSC_DESC,
+         N.NSC_STATUS,
+         BD.BDC_NO,
+         BD.BD_CODE,
+         BD.BDC_OCCUP,
+         BD.BDC_VIPBED,
+         BD.RT_CODE,
+         BD.BDC_STATUS,
+         BD.HKD_CLEANINGREQ,
+         BD.RM_CODE,
+         BD.BDC_MHCODE,
+         R.RTC_DESC,
+         R.RC_CODE,
+         R.RTC_STATUS,
+         C.RCC_DESC,
+         R.ICU,
+         R.RTC_MHCODE,
+         SUM(BD.BDN_OCCNO) "OCCU",
+         DECODE(R.ICU,'Y','ICU')"ICU_STATUS"
+     FROM   MEDIWARE.BED BD
+     LEFT JOIN  NURSTATION N ON  BD.NS_CODE = N.NS_CODE
+     LEFT JOIN ROOMTYPE R ON BD.RT_CODE=R.RT_CODE
+     LEFT JOIN ROOMCATEGORY C ON R.RC_CODE=C.RC_CODE
+     WHERE N.NSC_STATUS='Y' AND BD.BDC_STATUS='Y' AND R.RTC_STATUS='Y' AND N.NS_CODE=:NS_CODE
+     GROUP BY N.NS_CODE,N.NSC_DESC,N.NSC_STATUS,BD.BDC_NO,BD.BDC_OCCUP,BD.BD_CODE,BD.BDC_VIPBED,R.RTC_DESC,C.RCC_DESC,R.ICU,BD.RT_CODE,BD.BDC_STATUS,BD.HKD_CLEANINGREQ,BD.RM_CODE,BD.BDC_MHCODE,R.RC_CODE,R.RTC_STATUS,R.ICU,R.RTC_MHCODE
+     ORDER BY BD.BDC_NO `
+        try {
+            const result = await conn_ora.execute(
+                sql,
+                {
+                    NS_CODE: data.NS_CODE
+                },
+                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
+            )
+            await result.resultSet?.getRows((err, rows) => {
+                callBack(err, rows)
+            })
+        }
+        catch (error) {
+            return callBack(error)
+        } finally {
+            if (conn_ora) {
+                await conn_ora.close();
+                await pool_ora.close();
+            }
+        }
+    },
+    getCurrentPatient: async (data, callBack) => {
+        let pool_ora = await oraConnection();
+        let conn_ora = await pool_ora.getConnection();
+        const sql = `SELECT 
+                           IP_NO,                      
+                           IPD_DATE,                   
+                           PT_NO,                        
+                           PTC_PTNAME,               
+                           PTC_TYPE,                     
+                           PTC_SEX,                     
+                           PTD_DOB,                     
+                           PTN_DAYAGE,                   
+                           PTN_MONTHAGE,                
+                           PTN_YEARAGE,                  
+                           SA_CODE,                      
+                           PTC_LOADD1,                   
+                           PTC_LOADD2,                   
+                           PTC_LOADD3,                   
+                           PTC_LOADD4,                  
+                           PTC_LOPIN,                   
+                           PTC_LOPHONE,                  
+                           RE_CODE,                     
+                           PTC_RELATION,                 
+                           RC_CODE,                      
+                           IPADMISS.BD_CODE,                     
+                           IPADMISS.DO_CODE,                      
+                           RS_CODE,                      
+                           IPD_PART,                    
+                           IPD_DISC,                    
+                           IPC_STATUS,                  
+                           PTC_PETNAME,                 
+                           DMC_CACR,                     
+                           DMC_SLNO,                    
+                           DMD_DATE,                    
+                           IPADMISS.US_CODE,                      
+                           CU_CODE,                     
+                           PT_CODE,                     
+                           IPC_DISSUMM,                  
+                           IPC_PASS,                     
+                           PTC_REFDOCTOR,                
+                           DIS_USCODE,                   
+                           IP_REMARKS,                  
+                           IP_CUREF,                     
+                           IPD_DISCSUMM,                 
+                           IP_STAY,                     
+                           IPD_APPROXIMATE,              
+                           SC_CODE,                     
+                           IPC_ICDCODE,                  
+                           IPC_DICREQSTATUS,            
+                           CN_CODE,                      
+                           INS_SLNO,                    
+                           IPC_INSCLAIM,                
+                           IPC_EMPCODE,                  
+                           IPC_REFHOSNAME,               
+                           IPC_HOSADD1,                 
+                           IPC_HOSADD2,                 
+                           PTC_LANGUAGE,                 
+                           PTC_CARETYPE,                
+                           PTC_CARETAKERPHONE,           
+                           IP_REFDATE,                  
+                           IP_CARDNO,                    
+                           IPC_RECAL,                   
+                           IPC_DISBILLPROCESS_USCODE,   
+                           PTC_MOBILE,                  
+                           IPC_DISBILLPROS_USRTERMINAL,  
+                           IPC_DISBILLPROS_OSUSER,       
+                           IPC_ORASID,                   
+                           IPC_ORASERIAL,                
+                           IPD_PROCESSEDDATE,           
+                           IPC_INSPPROVALCODE,           
+                           PK_CODE,                     
+                           PK_STDATE,                   
+                           PK_ADDEDON,                   
+                           PK_ADDEDBY,                   
+                           IPC_COPAYDED_SPLIT,           
+                           IPC_PTFLAG,                     
+                           IPC_MHCODE,                   
+                           IPC_ADMITDOCODE,              
+                           IPC_ECCODE,                   
+                           IPC_ECCODE_START,             
+                           IPC_ECCODE_END,              
+                           IPC_CURSTATUS,                
+                           IPC_IDNO,                    
+                           IPD_REFWEFDT,                
+                           IPC_OPERSTATUS,               
+                           IPD_ACTRELEASE,              
+                           DT_CODE,                      
+                           IPC_CURRCCODE,                
+                           IPC_DONOR,                    
+                           IPN_RMCODE,                   
+                           IPD_VERIFIEDUPTO,            
+                           HIC_SLNO,                     
+                           IPC_ADMPLAN,                  
+                           IPC_WEBSESSIONID,             
+                           IPC_DISSUMSTATUS,             
+                           IPN_CASHCOLLECTED,            
+                           IPN_TOTTCSAPPLIEDAMT,         
+                           IPC_PTTYPE,                   
+                           IPC_MOTHERNAME,               
+                           IPC_GUARDIAN,                 
+                           IPC_GUARD_RECODE,             
+                           IPC_PTQUALIFICATION,          
+                           IPC_SPOUSEQUALIFIATION,       
+                           IPN_MARRIAGEAGE,             
+                           OC_CODE,                      
+                           IPC_PRADD1,                   
+                           IPC_PRADD2,                   
+                           IPC_PRADD3,                   
+                           IPC_PRADD4,                   
+                           ST_CODE,                      
+                           IPC_ADMITTYPCODE,             
+                           IPC_DIAGNOSIS,                
+                           RL_CODE,                      
+                           IPC_IPBILLREMARK,             
+                           IPC_BLREMARKUSER,           
+                           IPC_FATHERNAME,              
+                           RG_CODE,                      
+                           IPC_MLC,                      
+                           IPC_INHOUSE,                  
+                           UT_CODE,                      
+                           MS_CODE,                      
+                           ID_CODE,                      
+                           IPC_IDNUMBER,                 
+                           IPC_RTCODE,                   
+                           PTN_SLNO,                    
+                           IPC_IDPROOFATTACHED,          
+                           IPC_CUSTAPPROVALNO,           
+                           IPD_CUSTAPPROVALDT,          
+                           IPD_CALCRENTFROM,             
+                           IN_NO,                        
+                           IPC_EXTRARENT,               
+                           IPC_DISCDAYRENT,              
+                           IPC_KINCONTACTNO,             
+                           IPC_TAXREQ,                  
+                           INSPRE_SLNO,                  
+                           IPC_BLOCKIPCREDITBL,          
+                           IPC_BLOCKIPCREDITPH,          
+                           IPC_REFDOCODE ,               
+                           IPC_REFHOCODE,                
+                           PKC_STATUS,                  
+                           VRQ_SLNO                     
+                    FROM 
+                           IPADMISS,BED,NURSTATION
+                    WHERE 
+                           BED.BD_CODE=IPADMISS.BD_CODE
+                       AND NURSTATION.NS_CODE=BED.NS_CODE
+                       AND IPADMISS.IPC_PTFLAG = 'N'
+                       AND IPADMISS.IPC_STATUS IS NULL
+                       AND NURSTATION.NS_CODE =:NS_CODE
+                       AND IPADMISS.BD_CODE =:BD_CODE
+                       ORDER BY IPADMISS.IP_NO`;
+        try {
+            const result = await conn_ora.execute(
+                sql,
+                {
+                    NS_CODE: data.NS_CODE,
+                    BD_CODE: data.BD_CODE
+                },
+                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
+            )
+            await result.resultSet?.getRows((err, rows) => {
+                callBack(err, rows)
+            })
+        }
+        catch (error) {
+            console.log(error)
+        } finally {
+            if (conn_ora) {
+                await conn_ora.close();
+                await pool_ora.close();
+            }
+        }
+    },
 
 }
