@@ -41,8 +41,6 @@ module.exports = {
     },
     insertTsshPatient: (body) => {
         return Promise.all(body.map((e) => {
-            console.log(e)
-
             return new Promise((resolve, reject) => {
                 pool.query(
                     `INSERT INTO tssh_ipadmiss 
@@ -52,7 +50,6 @@ module.exports = {
                         e
                     ],
                     (error, results, fields) => {
-                        console.log(results)
                         console.log(error)
                         if (error) {
                             return reject(error)
@@ -235,11 +232,11 @@ module.exports = {
         const toDate = data.to;
 
         const sql = `SELECT 
-                        TO_CHAR(IPD_DISC ,'YYYY-MM-DD hh24:mi') DISDATE,
+                        TO_CHAR(DMD_DATE ,'YYYY-MM-DD hh24:mi') DISDATE,
                         IP_NO
                     FROM IPADMISS 
-                    WHERE  IPD_DISC >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
-                    AND IPD_DISC <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                    WHERE  DMD_DATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                    AND DMD_DATE <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
                     AND IPADMISS.IPC_PTFLAG = 'N'`;
         try {
             const result = await conn_ora.execute(

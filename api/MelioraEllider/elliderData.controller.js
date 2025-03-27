@@ -145,7 +145,6 @@ module.exports = {
 
     getPatientDetails: (req, res) => {
         getPatientDetails((err, results) => {
-            console.log(results);
             if (err) {
                 return res.status(200).json({
                     success: 0,
