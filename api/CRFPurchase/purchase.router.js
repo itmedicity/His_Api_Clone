@@ -5,7 +5,7 @@ const { getPODetails, getPendingPODetails, getItemGrnDetails, getPODetailsBySupp
 router.post('/getpo', checkToken, getPODetails);
 router.post('/getpendingpo', checkToken, getPendingPODetails);
 router.post('/getGrnDetails', checkToken, getItemGrnDetails);
-router.get('/getpoSupplier/:id', checkToken, getPODetailsBySupplier);
+router.get('/getPoDetails/:id', checkToken, getPODetailsBySupplier);
 
 router.post('/items', checkToken, getItemDetails);
 
