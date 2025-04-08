@@ -109,7 +109,7 @@ module.exports = {
                         PORDMAST.POC_CANCEL IS NULL
                         AND PORDMAST.PO_NO IN  (${ponoArray})
                         AND PORDMAST.ST_CODE IN (${stcodeArray})
-                        AND PORDMAST.POD_DATE >= ADD_MONTHS(SYSDATE, -12)`;
+                        AND PORDMAST.POD_DATE >= ADD_MONTHS(SYSDATE, -50)`;
             const result = await conn_ora.execute(
                 query,
                 {},
