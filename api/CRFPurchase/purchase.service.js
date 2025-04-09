@@ -148,7 +148,7 @@ module.exports = {
                         AND PORDDETL.TX_CODE = TAX.TX_CODE
                         AND PORDMAST.SU_CODE=:spcode
                         AND PORDMAST.POC_CANCEL IS NULL AND POC_CLOSE IS NULL
-                        AND PORDMAST.PON_TOTAPPROVALSCOMP=4
+                        AND PORDMAST.PON_TOTAPPROVALSCOMP=3
                         AND PORDMAST.POD_DATE >= ADD_MONTHS(SYSDATE, -12)
                  ORDER BY PORDMAST.POD_DATE DESC `,
                 {
