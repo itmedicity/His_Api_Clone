@@ -288,7 +288,6 @@ module.exports = {
                                 AND IPREFUNDMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 AND Iprefundmast.Rid_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')`;
 
-        console.log(sql)
 
         try {
             const result = await conn_ora.execute(

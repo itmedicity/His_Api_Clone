@@ -51,7 +51,7 @@ module.exports = {
                            SUC_STATUS='Y' AND PORDMAST.ST_CODE IN ('C001','C002','C003','C004','0037')
                            AND PORDMAST.POC_CANCEL IS NULL AND PORDMAST.POC_CLOSE IS NULL
                            AND PORDMAST.POD_DATE >= ADD_MONTHS(SYSDATE, -12)
-                           AND PORDMAST.PON_TOTAPPROVALSCOMP=4
+                           AND PORDMAST.PON_TOTAPPROVALSCOMP=3
                      GROUP BY  SUPPLIER.SU_CODE,SUC_NAME,SUC_ALIAS,SUC_STATUS
                      ORDER BY SUC_NAME`;
         try {

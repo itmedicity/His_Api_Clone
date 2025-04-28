@@ -7,7 +7,8 @@ const {
     getphamracyTsshReturnPart2,
     getphamracyTsshSalePart3,
     getphamracyTsshReturnPart3,
-    pharmacyRoundOffAmntTssh
+    pharmacyRoundOffAmntTssh,
+    pharmacyGroupedAmntForTmch
 } = require('./pharmacyTssh.controller')
 
 
@@ -20,5 +21,6 @@ router.post('/phaReturnPart2', checkToken, getphamracyTsshReturnPart2);
 router.post('/phaSalePart3', checkToken, getphamracyTsshSalePart3);
 router.post('/phaReturnPart3', checkToken, getphamracyTsshReturnPart3);
 router.post('/roundOffTssh', checkToken, pharmacyRoundOffAmntTssh);
+router.post('/groupedTmchReport', checkToken, pharmacyGroupedAmntForTmch);
 
 module.exports = router;

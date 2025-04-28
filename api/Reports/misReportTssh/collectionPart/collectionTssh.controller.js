@@ -306,7 +306,7 @@ module.exports = {
                 const ipNumber = results?.map((e) => e.IP_NO);
                 let datas = {
                     ipno: ipNumber,
-                    group: body.group
+                    group: body.groupIdForPrevious
                 }
 
                 getIpNumberFromPreviousDayCollection(datas, (err, getResult) => {
