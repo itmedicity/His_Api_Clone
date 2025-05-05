@@ -121,8 +121,6 @@ module.exports = {
         });
     },
 
-
-
     getInpatientDetails: (req, res) => {
         const body = req.body;
         getInpatientDetails(body, (err, results) => {
