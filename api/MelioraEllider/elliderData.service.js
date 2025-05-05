@@ -279,7 +279,7 @@ SELECT  IPADMISS.IP_NO,
            and  ipadmiss.IPC_MHCODE = '00' 
            and  nurstation.NS_CODE = :NS_CODE
 and((IPADMISS.IPC_STATUS IS NULL AND rmall.rmc_relesetype IS NULL)   OR(ipd_disc IS NOT NULL AND rmall.rmc_relesetype = 'D'   
-           AND(IPADMISS.IPD_ACTRELEASE IS NULL   OR IPADMISS.IPD_ACTRELEASE >= to_date(:TO_DATE, 'dd/MM/yyyy')))) AND        NVL(IPD_DISC, SYSDATE) >= TO_DATE('24/04/2025 10:10:32 AM', 'dd/MM/yyyy hh:mi:ss am') 
+           AND(IPADMISS.IPD_ACTRELEASE IS NULL   OR IPADMISS.IPD_ACTRELEASE >= to_date(:TO_DATE, 'dd/MM/yyyy')))) AND        NVL(IPD_DISC, SYSDATE) >= TO_DATE(:TO_DATE, 'dd/MM/yyyy hh:mi:ss am') 
            AND  rmall.rmc_occupby In('P')             
            and roommaster.RM_CODE(+) = BED.RM_CODE             
            and patient.SA_CODE = Salutation.sa_code(+) 
@@ -713,6 +713,65 @@ and((IPADMISS.IPC_STATUS IS NULL AND rmall.rmc_relesetype IS NULL)   OR(ipd_disc
         }
         catch (error) {
             console.log(error)
+        } finally {
+            if (conn_ora) {
+                await conn_ora.close();
+                await pool_ora.close();
+            }
+        }
+    },
+    getDisChargedPatient: async (data, callBack) => {
+        let pool_ora = await oraConnection();
+        let conn_ora = await pool_ora.getConnection();
+        const sql = `
+        SELECT Row_Number( ) Over (Partition By 1 Order By  Ipadmiss.ipd_disc,Nurstation.nsc_alias) "Slno", 
+       Ipadmiss.ipd_date"Admission_Date", 
+       Ipadmiss.ipd_disc"Discharge_Date", 
+       Ipadmiss.IP_NO"Admn. Number", 
+       patient.PT_NO"Patient_No#", 
+       Decode(nvl(Salutation.sac_alias,'N'),'N',Initcap(Patient.ptc_ptname),Salutation.sac_alias||' '|| Initcap(Patient.ptc_ptname))"Patient_Name", 
+       decode(Nvl(patient.ptn_yearage,0),0,decode(Nvl(Patient.ptn_monthage,0),0,Nvl(patient.ptn_dayage,0) || ' Day',Patient.ptn_monthage || ' Mon'  ),Patient.Ptn_yearage ||' Yr.' )"Age_year", 
+       Decode(Patient.ptc_sex,'M','Male','F','Female')"Gender", 
+       Initcap(Patient.Ptc_loadd1)"Address 1", 
+       Initcap(Patient.Ptc_loadd2)"Address 2", 
+       Initcap(Patient.Ptc_loadd3)"Address 3", 
+       Initcap(Department.Dpc_desc)"Department", 
+       Initcap(Doctor.DOC_NAME)"Doctor", 
+       CUSTOMER.CUC_NAME"CUSTOMER", 
+       Nurstation.nsc_alias"Ward", 
+       Bed.bdc_no"Bed", 
+       patient.ptc_mobile"Mobile No", 
+       decode(ipadmiss.ipc_status,'E','Expired','Q','Discharge on Request','U','Unchanged','D','Diagnosis Only','A','Absconded','T','Autopsy','H','Transfer to Other Hospital','O','Others','R','Recovered')"Discharge_Status"
+     FROM   Doctor,Salutation,Speciality,Department,Patient,Ipadmiss,Bed,Nurstation,CUSTOMER,Disbillmast
+     Where Ipadmiss.Pt_no = Patient.Pt_no and 
+          Disbillmast.Ip_no = Ipadmiss.Ip_no and 
+          ipadmiss.ipc_ptflag in ('N','Y ') and
+          Ipadmiss.bd_code = Bed.bd_code and 
+          Disbillmast.do_code = doctor.do_code and  
+          Bed.Ns_code = Nurstation.Ns_code and  
+          CUSTOMER.CU_CODE(+) = IPADMISS.CU_CODE AND 
+          Patient.Sa_code =  Salutation.Sa_code(+) and 
+          Doctor.Sp_code = Speciality.Sp_code and 
+          Speciality.Dp_code=Department.DP_code and
+          Department.DP_code in(select DP_CODE from DEPARTMENT) and 
+          Patient.ptc_ptflag in ('N       ') and 
+          Nvl(Disbillmast.Dmc_cancel,'N') ='N' and  
+          Trunc(Ipadmiss.ipd_disc)  between to_date(:FROM_DATE,'dd/MM/yyyy hh24:mi:ss') and to_date(:TO_DATE,'dd/MM/yyyy hh24:mi:ss')`;
+        try {
+            const result = await conn_ora.execute(
+                sql,
+                {
+                    TO_DATE: data.TO_DATE,
+                    FROM_DATE: data.FROM_DATE
+                },
+                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
+            )
+            await result.resultSet?.getRows((err, rows) => {
+                callBack(err, rows)
+            })
+        }
+        catch (error) {
+            return callBack(error)
         } finally {
             if (conn_ora) {
                 await conn_ora.close();
