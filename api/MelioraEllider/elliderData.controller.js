@@ -6,8 +6,8 @@ const { getOutlet,
     getInpatientDetails,
     getPatientDetails,
     getNursingBed,
-    getCurrentPatient, 
-    getDisChargedPatient} = require('./elliderData.service')
+    getCurrentPatient,
+    getDisChargedPatient } = require('./elliderData.service')
 
 module.exports = {
     getOutlet: (req, res) => {
@@ -128,7 +128,7 @@ module.exports = {
                 return res.status(200).json({
                     success: 0,
                     message: err
-                })
+                });
             }
             if (Object.keys(results).length === 0) {
                 return res.status(200).json({

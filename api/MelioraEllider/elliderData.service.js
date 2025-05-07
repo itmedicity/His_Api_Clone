@@ -249,6 +249,7 @@ SELECT  IPADMISS.IP_NO,
              ROOMTYPE.RTC_STATUS,
              ROOMTYPE.ICU,
              ROOMTYPE.RTC_MHCODE,
+             IPADMISS.IPC_PTFLAG,
              (SELECT department.DPC_DESC
                      FROM department,   speciality
                      WHERE ipadmiss.do_code = doctor.do_code 
