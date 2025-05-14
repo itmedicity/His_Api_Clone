@@ -57,6 +57,9 @@ const supplier = require("./api/SupplierDetails/supplier.router")
 const procedure = require("./api/ProcedureList/procedure.router")
 //CRF Purchase
 const crfpo = require("./api/CRFPurchase/purchase.router")
+const bisElliderData = require("./api/Version_1/BIS/bis_ellider_datas/bis_ellider_datas.router")
+
+
 
 app.use(express.json());
 
@@ -129,6 +132,8 @@ app.use("/api/supplierList", supplier)
 app.use("/api/procedureList", procedure)
 app.use("/api/crfpurchase", crfpo)
 
+//BIS_ELLIDER_API
+app.use("/api/bisElliderData", bisElliderData)
 
 
 app.listen(process.env.APP_PORT, (val) => {
