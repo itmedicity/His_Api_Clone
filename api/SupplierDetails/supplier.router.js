@@ -5,4 +5,5 @@ const { getSupplierList, getActiveSupplierList } = require('./supplier.controlle
 router.post('/supplier', checkToken, getSupplierList);
 router.get('/getsupplier', checkToken, getActiveSupplierList);
 
+
 module.exports = router;
