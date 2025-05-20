@@ -58,6 +58,7 @@ const procedure = require("./api/ProcedureList/procedure.router")
 //CRF Purchase
 const crfpo = require("./api/CRFPurchase/purchase.router")
 const bisElliderData = require("./api/Version_1/BIS/bis_ellider_datas/bis_ellider_datas.router")
+const amsAntibioticData =require('./api/Ams/Ams.router')
 
 
 
@@ -134,6 +135,9 @@ app.use("/api/crfpurchase", crfpo)
 
 //BIS_ELLIDER_API
 app.use("/api/bisElliderData", bisElliderData)
+
+//Ams _Antibiotic Data Collection
+app.use("/api/amsAntibiotic", amsAntibioticData)
 
 
 app.listen(process.env.APP_PORT, (val) => {
