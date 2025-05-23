@@ -62,9 +62,6 @@ const bisElliderData = require("./api/Version_1/BIS/bis_ellider_datas/bis_ellide
 //AMS Antibiotic
 const amsAntibioticData =require('./api/Ams/Ams.router')
 
-const crfpo = require("./api/CRFPurchase/purchase.router");
-const bisElliderData = require("./api/Version_1/BIS/bis_ellider_datas/bis_ellider_datas.router");
-
 
 // CRON JOB FUNCTION
 const cronjob = require("./cron-jobs/cron.router");

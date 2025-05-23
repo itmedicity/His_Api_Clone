@@ -73,7 +73,7 @@ const getPharmacyName = async () => {
           );
         });
       });
-      console.log(rows);
+      // console.log(rows);
     });
   } catch (error) {
     return callBack(error);
@@ -89,9 +89,9 @@ const getPharmacyName = async () => {
 //   testFun();
 // });
 
-cron.schedule("* * * * *", () => {
-  getPharmacyName();
-});
+// cron.schedule("* * * * *", () => {
+//   getPharmacyName();
+// });
 
 const getFun = async (req, res) => {
   //   await testFun();
