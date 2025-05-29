@@ -1,6 +1,7 @@
 const cron = require("node-cron");
 const { oraConnection, oracledb } = require("../config/oradbconfig");
-const { pool, mysqlpool } = require("../config/dbconfig");
+const pool = require("../config/dbconfig");
+const mysqlpool = require("../config/dbconfigmeliora");
 const { format, subHours } = require("date-fns");
 
 // const testFun = async () => {
@@ -225,18 +226,21 @@ const getInpatientDetail = async (callBack) => {
     );
     await result.resultSet?.getRows((err, rows) => {
       //  CHECK DATA FROM THE ORACLE DATABASE
+
       if (rows.length === 0) {
         // console.log("No data found");
         return;
       }
 
+
+
       const VALUES = rows?.map(item => [
         item.IP_NO,
-        item.IPD_DATE,
+        item.IPD_DATE ? format(new Date(item?.IPD_DATE), 'yyyy-MM-dd HH:mm:ss') : null,
         item.PT_NO,
         item.PTC_PTNAME,
         item.PTC_SEX,
-        item.PTD_DOB,
+        item.PTD_DOB ? format(new Date(item?.PTD_DOB), 'yyyy-MM-dd HH:mm:ss') : null,
         item.PTN_DAYAGE,
         item.PTN_MONTHAGE,
         item.PTN_YEARAGE,
@@ -249,10 +253,10 @@ const getInpatientDetail = async (callBack) => {
         item.IPD_BD_CODE,
         item.DO_CODE,
         item.RS_CODE,
-        item.IPD_DISC,
+        item.IPD_DISC ? format(new Date(item?.IPD_DISC), 'yyyy-MM-dd HH:mm:ss') : null,
         item.IPC_STATUS,
         item.DMC_SLNO,
-        item.DMD_DATE,
+        item.DMD_DATE ? format(new Date(item?.DMD_DATE), 'yyyy-MM-dd HH:mm:ss') : null,
         item.PTC_MOBILE,
         item.IPC_MHCODE,
         item.DOC_NAME,
@@ -261,7 +265,6 @@ const getInpatientDetail = async (callBack) => {
       ]);
 
       // FILTER DATA
-
       // INSERT DATA INTO THE MYSQL TABLE
 
       mysqlpool.getConnection((err, connection) => {
@@ -423,9 +426,9 @@ select ip_no,do_code,ipc_currccode,cu_code,ipc_curstatus,ipd_disc,ipc_status,dmd
       const Values = rows?.map(item => [
         item.DO_CODE,
         item.IPC_CURSTATUS,
-        item.IPD_DISC,
+        item.IPD_DISC ? format(new Date(item?.IPD_DISC), 'yyyy-MM-dd HH:mm:ss') : null,
         item.IPC_STATUS,
-        item.DMD_DATE,
+        item.DMD_DATE ? format(new Date(item?.DMD_DATE), 'yyyy-MM-dd HH:mm:ss') : null,
         item.DMC_SLNO,
         item.IP_NO
       ]);
