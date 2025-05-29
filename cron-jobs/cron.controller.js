@@ -66,7 +66,7 @@ const getPharmacyName = async () => {
                     });
                   } else {
                     connection.release();
-                    console.log("success");
+                    // console.log("success");
                   }
                 });
               }
@@ -74,7 +74,7 @@ const getPharmacyName = async () => {
           );
         });
       });
-      console.log(rows);
+      // console.log(rows);
     });
   } catch (error) {
     return callBack(error);
@@ -846,25 +846,27 @@ const getLastTriggerDate = async (processId) => {
 
 
 // auto sync at an interval of 10 min
-cron.schedule("*/10 * * * *", () => {
+cron.schedule("* * * * *", () => {
   getInpatientDetail();
 });
 
+//test triggering
+cron.schedule("*/2 * * * *", () => {
+  UpdateFbBedDetailMeliora();
+});
+
 // auto sync at an interval of 25 min
-cron.schedule("*/25 * * * *", () => {
+cron.schedule("*/5 * * * *", () => {
   UpdateInpatientDetailRmall();
 });
 
 // auto sync at an interval of 20 min
-cron.schedule("*/20 * * * *", () => {
+cron.schedule("*/4 * * * *", () => {
   UpdateIpStatusDetails();
 });
 
 
-//test triggering
-cron.schedule("*/20 * * * *", () => {
-  UpdateFbBedDetailMeliora();
-});
+
 
 
 // cron.schedule("* */2 * * *", () => {
