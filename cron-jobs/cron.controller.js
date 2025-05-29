@@ -267,7 +267,7 @@ const getInpatientDetail = async (callBack) => {
       mysqlpool.getConnection((err, connection) => {
         if (err) {
           // mysql db not connected check connection
-          console.log("mysql db not connected check connection");
+          // console.log("mysql db not connected check connection");
           return;
         }
         connection.beginTransaction((err) => {
@@ -635,7 +635,7 @@ const UpdateInpatientDetailRmall = async (callBack) => {
                             });
                           } else {
                             connection.release();
-                            console.log("success updation in UpdateInpatientDetailRmall");
+                            // console.log("success updation in UpdateInpatientDetailRmall");
                           }
                         });
                       }
@@ -845,17 +845,17 @@ const getLastTriggerDate = async (processId) => {
 };
 
 
-// auto sync at an interval of 2 hours
+// auto sync at an interval of 10 min
 cron.schedule("*/10 * * * *", () => {
   getInpatientDetail();
 });
 
-// auto sync at an interval of 1 hours
+// auto sync at an interval of 25 min
 cron.schedule("*/25 * * * *", () => {
   UpdateInpatientDetailRmall();
 });
 
-// auto sync at an interval of 1 hours
+// auto sync at an interval of 20 min
 cron.schedule("*/20 * * * *", () => {
   UpdateIpStatusDetails();
 });
@@ -867,7 +867,7 @@ cron.schedule("*/20 * * * *", () => {
 });
 
 
-// cron.schedule("*4/ * * * *", () => {
+// cron.schedule("* */2 * * *", () => {
 //   UpdateBeddetailFromRmall();
 // });
 
