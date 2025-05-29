@@ -27,7 +27,7 @@ const getPharmacyName = async () => {
     await result.resultSet?.getRows((err, rows) => {
       //  CHECK DATA FROM THE ORACLE DATABASE
       if (rows.length === 0) {
-        console.log("No data found");
+        // console.log("No data found");
         return;
       }
 
