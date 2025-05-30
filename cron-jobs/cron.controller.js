@@ -88,8 +88,6 @@ const { format, subHours } = require("date-fns");
 
 //get Inpatient Detail 
 
-
-
 const getInpatientDetail = async (callBack) => {
   let pool_ora = await oraConnection();
   let conn_ora = await pool_ora.getConnection();
