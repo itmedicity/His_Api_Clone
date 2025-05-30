@@ -87,7 +87,6 @@ const getPharmacyName = async () => {
   }
 };
 
-
 //get Inpatient Detail 
 const getInpatientDetail = async (callBack) => {
   let pool_ora = await oraConnection();
