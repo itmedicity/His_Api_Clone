@@ -4,90 +4,90 @@ const pool = require("../config/dbconfig");
 const mysqlpool = require("../config/dbconfigmeliora");
 const { format, subHours } = require("date-fns");
 
-// const testFun = async () => {
-//   console.log("hello");
+
+
+// const getPharmacyName = async () => {
+//   let pool_ora = await oraConnection();
+//   let conn_ora = await pool_ora.getConnection();
+
+//   const oracleSql = `select p.ph_code,p.phc_name from pharmacy p where p.phc_status='Y'`;
+//   try {
+//     // GET DATA FROM THE MYSQL TABLE FOR THE LAST INSERT DATE
+//     // sql get query here
+
+//     // CONVERT TO THE ORACLE DATE FORMAT FROM MYSQL FORMAT
+
+//     // GET DATA FROM ORACLE
+//     const result = await conn_ora.execute(
+//       oracleSql,
+//       {},
+//       { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
+//     );
+//     await result.resultSet?.getRows((err, rows) => {
+//       //  CHECK DATA FROM THE ORACLE DATABASE
+//       if (rows.length === 0) {
+//         // console.log("No data found");
+//         return;
+//       }
+
+//       // FILTER DATA
+
+//       // INSERT DATA INTO THE MYSQL TABLE
+
+//       pool.getConnection((err, connection) => {
+//         if (err) {
+//           // mysql db not connected check connection
+//           console.log("mysql db not connected check connection");
+//           return;
+//         }
+
+//         connection.beginTransaction((err) => {
+//           if (err) {
+//             connection.release();
+//             console.log("error in begin transaction");
+//           }
+
+//           connection.query(
+//             `INSERT INTO pharmacy(ph_code,phc_name) VALUES ?`,
+//             [rows],
+//             (err, result) => {
+//               if (err) {
+//                 connection.rollback(() => {
+//                   connection.release();
+//                   console.log("error in rollback data");
+//                 });
+//               } else {
+//                 connection.commit((err) => {
+//                   if (err) {
+//                     connection.rollback(() => {
+//                       connection.release();
+//                       console.log("error in commit");
+//                     });
+//                   } else {
+//                     connection.release();
+//                     // console.log("success");
+//                   }
+//                 });
+//               }
+//             }
+//           );
+//         });
+//       });
+//       // console.log(rows);
+//     });
+//   } catch (error) {
+//     return callBack(error);
+//   } finally {
+//     if (conn_ora) {
+//       await conn_ora.close();
+//       await pool_ora.close();
+//     }
+//   }
 // };
 
-const getPharmacyName = async () => {
-  let pool_ora = await oraConnection();
-  let conn_ora = await pool_ora.getConnection();
-
-  const oracleSql = `select p.ph_code,p.phc_name from pharmacy p where p.phc_status='Y'`;
-  try {
-    // GET DATA FROM THE MYSQL TABLE FOR THE LAST INSERT DATE
-    // sql get query here
-
-    // CONVERT TO THE ORACLE DATE FORMAT FROM MYSQL FORMAT
-
-    // GET DATA FROM ORACLE
-    const result = await conn_ora.execute(
-      oracleSql,
-      {},
-      { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
-    );
-    await result.resultSet?.getRows((err, rows) => {
-      //  CHECK DATA FROM THE ORACLE DATABASE
-      if (rows.length === 0) {
-        // console.log("No data found");
-        return;
-      }
-
-      // FILTER DATA
-
-      // INSERT DATA INTO THE MYSQL TABLE
-
-      pool.getConnection((err, connection) => {
-        if (err) {
-          // mysql db not connected check connection
-          console.log("mysql db not connected check connection");
-          return;
-        }
-
-        connection.beginTransaction((err) => {
-          if (err) {
-            connection.release();
-            console.log("error in begin transaction");
-          }
-
-          connection.query(
-            `INSERT INTO pharmacy(ph_code,phc_name) VALUES ?`,
-            [rows],
-            (err, result) => {
-              if (err) {
-                connection.rollback(() => {
-                  connection.release();
-                  console.log("error in rollback data");
-                });
-              } else {
-                connection.commit((err) => {
-                  if (err) {
-                    connection.rollback(() => {
-                      connection.release();
-                      console.log("error in commit");
-                    });
-                  } else {
-                    connection.release();
-                    // console.log("success");
-                  }
-                });
-              }
-            }
-          );
-        });
-      });
-      // console.log(rows);
-    });
-  } catch (error) {
-    return callBack(error);
-  } finally {
-    if (conn_ora) {
-      await conn_ora.close();
-      await pool_ora.close();
-    }
-  }
-};
 
 //get Inpatient Detail 
+
 const getInpatientDetail = async (callBack) => {
   let pool_ora = await oraConnection();
   let conn_ora = await pool_ora.getConnection();
@@ -225,7 +225,6 @@ const getInpatientDetail = async (callBack) => {
     );
     await result.resultSet?.getRows((err, rows) => {
       //  CHECK DATA FROM THE ORACLE DATABASE
-
       if (rows.length === 0) {
         // console.log("No data found");
         return;
@@ -269,7 +268,7 @@ const getInpatientDetail = async (callBack) => {
       mysqlpool.getConnection((err, connection) => {
         if (err) {
           // mysql db not connected check connection
-          // console.log("mysql db not connected check connection");
+          console.log("mysql db not connected check connection");
           return;
         }
         connection.beginTransaction((err) => {
@@ -335,7 +334,7 @@ const getInpatientDetail = async (callBack) => {
                       ],
                       (err, result) => {
                         if (err) {
-                          console.log(err, "fb_ipadmiss_log");
+
                           connection.rollback(() => {
                             connection.release();
                             console.log("error in rollback data");
@@ -363,7 +362,6 @@ const getInpatientDetail = async (callBack) => {
           );
         });
       });
-      // console.log(rows);
     });
   } catch (error) {
     console.log(error, "Error occured!");
@@ -495,7 +493,6 @@ select ip_no,do_code,ipc_currccode,cu_code,ipc_curstatus,ipd_disc,ipc_status,dmd
                             });
                           } else {
                             connection.release();
-                            // console.log("success updation in UpdateIpStatusDetails");
                           }
                         });
                       }
@@ -637,7 +634,6 @@ const UpdateInpatientDetailRmall = async (callBack) => {
                             });
                           } else {
                             connection.release();
-                            // console.log("success updation in UpdateInpatientDetailRmall");
                           }
                         });
                       }
@@ -788,7 +784,6 @@ const UpdateFbBedDetailMeliora = async (callBack) => {
                             });
                           } else {
                             connection.release();
-                            // console.log("success updation of Bed Details");
                           }
                         });
                       }
@@ -825,7 +820,7 @@ const getLastTriggerDate = async (processId) => {
   return new Promise((resolve, reject) => {
     mysqlpool.getConnection((err, connection) => {
       if (err) {
-        console.error("MySQL DB not connected. Check connection.");
+        console.log("MySQL DB not connected. Check connection.");
         return reject(err);
       }
       const query = `
