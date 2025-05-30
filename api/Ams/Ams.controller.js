@@ -22,5 +22,26 @@ module.exports = {
             })
         })
     },
+    //       getAntibioticPatientDetails: (req, res) => {
+    //       const body = req.body;
+    //       getAntibioticPatientDetails(body, (err, results) => {
+    //           if (err) {
+    //               return res.status(200).json({
+    //                   success: 0,
+    //                   message: err
+    //               })
+    //           }
+    //           if (results.length === 0) {
+    //               return res.status(200).json({
+    //                   success: 1,
+    //                   message: "No Records"
+    //               })
+    //           }
+    //           return res.status(200).json({
+    //               success: 2,
+    //               data: results
+    //           })
+    //       })
+    //   },
 
 }
