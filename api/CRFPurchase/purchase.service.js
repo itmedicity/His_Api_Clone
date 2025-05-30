@@ -50,8 +50,8 @@ module.exports = {
     // AND PORDMAST.POC_CLOSE IS NULL
 
     getPendingPODetails: async (data, callBack) => {
-        const ponoArray = data.map(d => `'${d.pono}'`).join(",");
-        const stcodeArray = data.map(d => `'${d.stcode}'`).join(",");
+        const ponoArray = data?.map(d => `'${d.pono}'`).join(",");
+        const stcodeArray = data?.map(d => `'${d.stcode}'`).join(",");
 
         let pool_ora = await oraConnection();
         let conn_ora = await pool_ora.getConnection();
@@ -91,8 +91,8 @@ module.exports = {
     // AND POC_CLOSE IS NULL
 
     getItemGrnDetails: async (data, callBack) => {
-        const ponoArray = data.map(d => `'${d.pono}'`).join(",");
-        const stcodeArray = data.map(d => `'${d.stcode}'`).join(",");
+        const ponoArray = data?.map(d => `'${d.pono}'`).join(",");
+        const stcodeArray = data?.map(d => `'${d.stcode}'`).join(",");
 
         let pool_ora = await oraConnection();
         let conn_ora = await pool_ora.getConnection();
@@ -172,8 +172,8 @@ module.exports = {
 
 
     getItemDetails: async (data, callBack) => {
-        const ponoArray = data.map(d => `'${d.pono}'`).join(",");
-        const stcodeArray = data.map(d => `'${d.stcode}'`).join(",");
+        const ponoArray = data?.map(d => `'${d.pono}'`).join(",");
+        const stcodeArray = data?.map(d => `'${d.stcode}'`).join(",");
 
         let pool_ora = await oraConnection();
         let conn_ora = await pool_ora.getConnection();
