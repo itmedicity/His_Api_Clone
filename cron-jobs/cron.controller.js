@@ -89,9 +89,9 @@ const getPharmacyName = async () => {
 //   testFun();
 // });
 
-cron.schedule("* * * * *", () => {
-  getPharmacyName();
-});
+// cron.schedule("* * * * *", () => {
+//   getPharmacyName();
+// });
 
 const getFun = async (req, res) => {
   //   await testFun();
