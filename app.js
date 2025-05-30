@@ -56,8 +56,12 @@ const qiPatientList = require("./api/QIPatientList/getPatientList.router");
 const supplier = require("./api/SupplierDetails/supplier.router");
 const procedure = require("./api/ProcedureList/procedure.router");
 //CRF Purchase
-const crfpo = require("./api/CRFPurchase/purchase.router");
-const bisElliderData = require("./api/Version_1/BIS/bis_ellider_datas/bis_ellider_datas.router");
+const crfpo = require("./api/CRFPurchase/purchase.router")
+const bisElliderData = require("./api/Version_1/BIS/bis_ellider_datas/bis_ellider_datas.router")
+
+//AMS Antibiotic
+const amsAntibioticData =require('./api/Ams/Ams.router')
+
 
 // CRON JOB FUNCTION
 const cronjob = require("./cron-jobs/cron.router");
@@ -136,8 +140,12 @@ app.use("/api/crfpurchase", crfpo);
 //BIS_ELLIDER_API
 app.use("/api/bisElliderData", bisElliderData);
 
+//Ams _Antibiotic Data Collection
+app.use("/api/amsAntibiotic", amsAntibioticData)
+
 // CRON JOB FUNCTION
 app.use("/api/cronjob", cronjob);
+
 
 app.listen(process.env.APP_PORT, (val) => {
   console.log(`Server Up and Running ${process.env.APP_PORT}`);

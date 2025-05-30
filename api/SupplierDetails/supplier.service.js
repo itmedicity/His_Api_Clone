@@ -2,7 +2,8 @@
 const pool = require('../../config/dbconfig');
 const { oraConnection, oracledb } = require('../../config/oradbconfig');
 module.exports = {
-    getSupplierList: async (data, callBack) => {
+    getSupplierList: async (data, callBack) => {  
+        
         let pool_ora = await oraConnection();
         let conn_ora = await pool_ora.getConnection();
         const sql = `SELECT

@@ -1,6 +1,7 @@
 const { oraConnection, oracledb } = require('../../config/oradbconfig');
 module.exports = {
 
+    //using
     getOutlet: async (callBack) => {
         let pool_ora = await oraConnection();
         let conn_ora = await pool_ora.getConnection();
@@ -37,6 +38,7 @@ module.exports = {
         }
 
     },
+    //using
     getNursingStation: async (callBack) => {
         let pool_ora = await oraConnection();
         let conn_ora = await pool_ora.getConnection();
@@ -166,124 +168,126 @@ module.exports = {
             }
         }
     },
-
+    //using
     getInpatientDetails: async (data, callBack) => {
         let pool_ora = await oraConnection();
         let conn_ora = await pool_ora.getConnection();
         const sql = `
-SELECT  IPADMISS.IP_NO, 
-             IPADMISS.IPD_DATE, 
-             IPADMISS.PT_NO,
-             IPADMISS.PTC_PTNAME,
-             IPADMISS.SA_CODE,         
-             IPADMISS.PTC_TYPE,                            
-             IPADMISS.BD_CODE,
-             IPADMISS.DO_CODE,
-             IPADMISS.PTC_SEX,
-             IPADMISS.PTD_DOB,
-             IPADMISS.PTN_DAYAGE,
-             IPADMISS.PTN_MONTHAGE,
-             IPADMISS.PTN_YEARAGE,
-             IPADMISS.PTC_LOADD1,
-             IPADMISS.PTC_LOADD2,
-             IPADMISS.PTC_LOADD3,
-             IPADMISS.PTC_LOADD4,
-             IPADMISS.PTC_LOPIN,
-             IPADMISS.BD_CODE,
-             IPADMISS.PTC_LOPHONE,
-             IPADMISS.PTC_MOBILE,
-             IPADMISS.RC_CODE,
-             IPADMISS.RS_CODE,
-             IPADMISS.IPD_DISC,
-             IPADMISS.IPC_STATUS,
-             IPADMISS.DMC_SLNO,
-             IPADMISS.DMD_DATE,
-             IPADMISS.CU_CODE,
-             IPADMISS.DIS_USCODE,
-             IPADMISS.SC_CODE,
-             (select scc_desc from schememast where sc_code=ipadmiss.SC_CODE) SCHEME_NAME,    
-             IPADMISS.IPC_DICREQSTATUS,
-             IPADMISS.IPC_MHCODE,
-             IPADMISS.IPC_ADMITDOCODE,
-             IPADMISS.IPC_CURSTATUS,
-             IPADMISS.IPD_ACTRELEASE,
-             IPADMISS.IPC_CURRCCODE,
-             IPADMISS.IPC_DISSUMSTATUS,
-             IPADMISS.RG_CODE,
-             (SELECT REGION.RGC_DESC FROM REGION WHERE RG_CODE=IPADMISS.RG_CODE) REGION_NAME,
-             DOCTOR.DO_CODE,
-             DOCTOR.DOC_NAME,
-             DOCTOR.DT_CODE,
-             DOCTOR.SP_CODE,
-             DOCTOR.DOC_QUAL,
-             DOCTOR.DOC_REGNO,
-             DOCTOR.DOC_STATUS,
-             BED.BDC_NO,
-             BED.NS_CODE,
-             BED.RT_CODE,
-             BED.BDC_OCCUP,
-             BED.BDN_OCCNO,
-             BED.BDC_STATUS,
-             BED.HKD_CLEANINGREQ,
-             BED.RM_CODE,
-             BED.BDC_MHCODE,
-             BED.BDC_VIPBED,
-             ADMNREASON.RS_CODE,
-             ADMNREASON.RSC_DESC,
-             ADMNREASON.RSC_ALIAS,
-             ADMNREASON.RSC_STATUS,
-             CUSTOMER.CUC_NAME,
-             ROOMMASTER.RM_CODE,
-             ROOMMASTER.RMC_DESC,
-             ROOMMASTER.RMC_ALIAS,
-             ROOMMASTER.RMC_STATUS,
-             ROOMMASTER.RMC_MHCODE,
-             ROOMCATEGORY.RC_CODE,
-             ROOMCATEGORY.RCC_DESC,
-             ROOMCATEGORY.RCC_ALIAS,
-             ROOMCATEGORY.RCC_STATUS,
-             ROOMCATEGORY.RCC_MHCODE,
-             ROOMTYPE.RT_CODE,
-             ROOMTYPE.RTC_DESC,
-             ROOMTYPE.RTC_ALIAS,
-             ROOMTYPE.RTC_STATUS,
-             ROOMTYPE.ICU,
-             ROOMTYPE.RTC_MHCODE,
-             (SELECT department.DPC_DESC
-                     FROM department,   speciality
-                     WHERE ipadmiss.do_code = doctor.do_code 
-                     AND doctor.SP_CODE         =speciality.SP_CODE(+) 
-                     AND speciality.DP_CODE=department.DP_CODE(+) ) DPC_DESC,                   
-             (select IRC_MARK from IPPATIENTRELEASEREQ where  IPPATIENTRELEASEREQ.IP_NO=ipadmiss.IP_NO and 
-                      NVL(IPPATIENTRELEASEREQ.IRC_CANCEL,'N')='N') CHECK_OUT
-          FROM IPADMISS,
-    patient,
-    doctor,
-    admnreason,
-    rmall, 
-    roommaster,
-    bed,
-    nurstation,
-    Salutation,
-    customer,
-    roomcategory ,
-    roomtype 
-           where  patient.pt_no = ipadmiss.pt_no 
-           and  ipadmiss.ip_no = rmall.ip_no
-            and ipadmiss.ipc_currccode=roomcategory.rc_code 
-           and  ipadmiss.do_code = doctor.do_code 
-           and  ipadmiss.rs_code = admnreason.rs_code 
-           and  rmall.bd_code = bed.bd_code 
-           and  bed.ns_code = nurstation.ns_Code 
-           and  ipadmiss.cu_code = customer.cu_code(+) 
-           and  ipadmiss.IPC_MHCODE = '00' 
-           and  nurstation.NS_CODE = :NS_CODE
-and((IPADMISS.IPC_STATUS IS NULL AND rmall.rmc_relesetype IS NULL)   OR(ipd_disc IS NOT NULL AND rmall.rmc_relesetype = 'D'   
-           AND(IPADMISS.IPD_ACTRELEASE IS NULL   OR IPADMISS.IPD_ACTRELEASE >= to_date(:TO_DATE, 'dd/MM/yyyy')))) AND        NVL(IPD_DISC, SYSDATE) >= TO_DATE(:TO_DATE, 'dd/MM/yyyy hh:mi:ss am') 
-           AND  rmall.rmc_occupby In('P')             
-           and roommaster.RM_CODE(+) = BED.RM_CODE             
-           and patient.SA_CODE = Salutation.sa_code(+) 
-           and ipadmiss.rc_code=roomtype.rc_code ORDER BY bdc_no
+                SELECT  IPADMISS.IP_NO, 
+                            IPADMISS.IPD_DATE, 
+                            IPADMISS.PT_NO,
+                            IPADMISS.PTC_PTNAME,
+                            IPADMISS.SA_CODE,         
+                            IPADMISS.PTC_TYPE,                            
+                            IPADMISS.BD_CODE,
+                            IPADMISS.DO_CODE,
+                            IPADMISS.PTC_SEX,
+                            IPADMISS.PTD_DOB,
+                            IPADMISS.PTN_DAYAGE,
+                            IPADMISS.PTN_MONTHAGE,
+                            IPADMISS.PTN_YEARAGE,
+                            IPADMISS.PTC_LOADD1,
+                            IPADMISS.PTC_LOADD2,
+                            IPADMISS.PTC_LOADD3,
+                            IPADMISS.PTC_LOADD4,
+                            IPADMISS.PTC_LOPIN,
+                            IPADMISS.BD_CODE,
+                            IPADMISS.PTC_LOPHONE,
+                            IPADMISS.PTC_MOBILE,
+                            IPADMISS.RC_CODE,
+                            IPADMISS.RS_CODE,
+                            IPADMISS.IPD_DISC,
+                            IPADMISS.IPC_STATUS,
+                            IPADMISS.DMC_SLNO,
+                            IPADMISS.DMD_DATE,
+                            IPADMISS.CU_CODE,
+                            IPADMISS.DIS_USCODE,
+                            IPADMISS.SC_CODE,
+                            (select scc_desc from schememast where sc_code=ipadmiss.SC_CODE) SCHEME_NAME,    
+                            IPADMISS.IPC_DICREQSTATUS,
+                            IPADMISS.IPC_MHCODE,
+                            IPADMISS.IPC_ADMITDOCODE,
+                            IPADMISS.IPC_CURSTATUS,
+                            IPADMISS.IPD_ACTRELEASE,
+                            IPADMISS.IPC_CURRCCODE,
+                            IPADMISS.IPC_DISSUMSTATUS,
+                            IPADMISS.RG_CODE,
+                            (SELECT REGION.RGC_DESC FROM REGION WHERE RG_CODE=IPADMISS.RG_CODE) REGION_NAME,
+                            DOCTOR.DO_CODE,
+                            DOCTOR.DOC_NAME,
+                            DOCTOR.DT_CODE,
+                            DOCTOR.SP_CODE,
+                            DOCTOR.DOC_QUAL,
+                            DOCTOR.DOC_REGNO,
+                            DOCTOR.DOC_STATUS,
+                            BED.BDC_NO,
+                            BED.NS_CODE,
+                            BED.RT_CODE,
+                            BED.BDC_OCCUP,
+                            BED.BDN_OCCNO,
+                            BED.BDC_STATUS,
+                            BED.HKD_CLEANINGREQ,
+                            BED.RM_CODE,
+                            BED.BDC_MHCODE,
+                            BED.BDC_VIPBED,
+                            ADMNREASON.RS_CODE,
+                            ADMNREASON.RSC_DESC,
+                            ADMNREASON.RSC_ALIAS,
+                            ADMNREASON.RSC_STATUS,
+                            CUSTOMER.CUC_NAME,
+                            ROOMMASTER.RM_CODE,
+                            ROOMMASTER.RMC_DESC,
+                            ROOMMASTER.RMC_ALIAS,
+                            ROOMMASTER.RMC_STATUS,
+                            ROOMMASTER.RMC_MHCODE,
+                            ROOMCATEGORY.RC_CODE,
+                            ROOMCATEGORY.RCC_DESC,
+                            ROOMCATEGORY.RCC_ALIAS,
+                            ROOMCATEGORY.RCC_STATUS,
+                            ROOMCATEGORY.RCC_MHCODE,
+                            ROOMTYPE.RT_CODE,
+                            ROOMTYPE.RTC_DESC,
+                            ROOMTYPE.RTC_ALIAS,
+                            ROOMTYPE.RTC_STATUS,
+                            ROOMTYPE.ICU,
+                            ROOMTYPE.RTC_MHCODE,
+                            IPADMISS.IPC_PTFLAG,
+                            (SELECT department.DPC_DESC
+                                    FROM department,   speciality
+                                    WHERE ipadmiss.do_code = doctor.do_code 
+                                    AND doctor.SP_CODE         =speciality.SP_CODE(+) 
+                                    AND speciality.DP_CODE=department.DP_CODE(+) ) DPC_DESC,                   
+                            (select IRC_MARK from IPPATIENTRELEASEREQ where  IPPATIENTRELEASEREQ.IP_NO=ipadmiss.IP_NO and 
+                                    NVL(IPPATIENTRELEASEREQ.IRC_CANCEL,'N')='N') CHECK_OUT
+                        FROM IPADMISS,
+                    patient,
+                    doctor,
+                    admnreason,
+                    rmall, 
+                    roommaster,
+                    bed,
+                    nurstation,
+                    Salutation,
+                    customer,
+                    roomcategory ,
+                    roomtype 
+                        where  patient.pt_no = ipadmiss.pt_no 
+                        and  ipadmiss.ip_no = rmall.ip_no
+                        and ipadmiss.ipc_currccode=roomcategory.rc_code 
+                        and  ipadmiss.do_code = doctor.do_code 
+                        and  ipadmiss.rs_code = admnreason.rs_code 
+                        and  rmall.bd_code = bed.bd_code 
+                        and  bed.ns_code = nurstation.ns_Code 
+                        and  ipadmiss.cu_code = customer.cu_code(+) 
+                        and  ipadmiss.IPC_MHCODE = '00' 
+                        and  nurstation.NS_CODE = :NS_CODE
+                        and((IPADMISS.IPC_STATUS IS NULL AND rmall.rmc_relesetype IS NULL)   OR(ipd_disc IS NOT NULL AND rmall.rmc_relesetype = 'D'   
+                        AND(IPADMISS.IPD_ACTRELEASE IS NULL   OR IPADMISS.IPD_ACTRELEASE >= to_date(:TO_DATE, 'dd/MM/yyyy')))) AND        
+                        NVL(IPD_DISC, SYSDATE) >= TO_DATE(:TO_DATE, 'dd/MM/yyyy hh:mi:ss') 
+                        AND  rmall.rmc_occupby In('P')             
+                        and roommaster.RM_CODE(+) = BED.RM_CODE             
+                        and patient.SA_CODE = Salutation.sa_code(+) 
+                        and ipadmiss.rc_code=roomtype.rc_code ORDER BY bdc_no
            `;
         try {
             const result = await conn_ora.execute(
@@ -308,7 +312,7 @@ and((IPADMISS.IPC_STATUS IS NULL AND rmall.rmc_relesetype IS NULL)   OR(ipd_disc
         }
     },
 
-
+    //not using
     getPatientDetails: async (callBack) => {
         let pool_ora = await oraConnection();
         let conn_ora = await pool_ora.getConnection();
@@ -495,6 +499,7 @@ and((IPADMISS.IPC_STATUS IS NULL AND rmall.rmc_relesetype IS NULL)   OR(ipd_disc
             }
         }
     },
+    //using
     getNursingBed: async (data, callBack) => {
         let pool_ora = await oraConnection();
         let conn_ora = await pool_ora.getConnection();
@@ -547,6 +552,7 @@ and((IPADMISS.IPC_STATUS IS NULL AND rmall.rmc_relesetype IS NULL)   OR(ipd_disc
             }
         }
     },
+    //using
     getCurrentPatient: async (data, callBack) => {
         let pool_ora = await oraConnection();
         let conn_ora = await pool_ora.getConnection();
@@ -720,6 +726,7 @@ and((IPADMISS.IPC_STATUS IS NULL AND rmall.rmc_relesetype IS NULL)   OR(ipd_disc
             }
         }
     },
+    //using
     getDisChargedPatient: async (data, callBack) => {
         let pool_ora = await oraConnection();
         let conn_ora = await pool_ora.getConnection();
@@ -779,5 +786,35 @@ and((IPADMISS.IPC_STATUS IS NULL AND rmall.rmc_relesetype IS NULL)   OR(ipd_disc
             }
         }
     },
+    getInpatientFollowUp: async (data, callBack) => {
+        let pool_ora = await oraConnection();
+        let conn_ora = await pool_ora.getConnection();
+        const sql = `SELECT DSC_DESCRIPTION FROM CLINICAL.DISCHARGESUMMARYHTML WHERE DSC_HEAD = 'DSC_FOLLOWUP' AND IP_NO = :IP_NO`;
+        try {
+            const result = await conn_ora.execute(
+                sql,
+                {
+                    IP_NO: data.IP_NO,
+                },
+                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
+            )
+            await result.resultSet?.getRows((err, rows) => {
+                callBack(err, rows)
+            })
+        }
+        catch (error) {
+            return callBack(error)
+        } finally {
+            if (conn_ora) {
+                await conn_ora.close();
+                await pool_ora.close();
+            }
+        }
+    },
 
 }
+
+
+//FOLLOW UP QUERY : SELECT DSC_DESCRIPTION FROM CLINICAL.DISCHARGESUMMARYHTML WHERE DSC_HEAD = 'DSC_FOLLOWUP' AND IP_NO = ?
+// VSD_DATE >= TO_DATE(:FROM_DATE, 'dd-Mon-yyyy HH24:MI:SS')
+// AND VSD_DATE <= TO_DATE(:TO_DATE, 'dd-Mon-yyyy HH24:MI:SS')
