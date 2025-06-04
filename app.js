@@ -58,9 +58,12 @@ const procedure = require("./api/ProcedureList/procedure.router");
 //CRF Purchase
 const crfpo = require("./api/CRFPurchase/purchase.router")
 const bisElliderData = require("./api/Version_1/BIS/bis_ellider_datas/bis_ellider_datas.router")
+const bisQuotationData = require("./api/Version_1/BIS/bis_quotation/bis_quotation.router")
+
+
 
 //AMS Antibiotic
-const amsAntibioticData =require('./api/Ams/Ams.router')
+const amsAntibioticData = require('./api/Ams/Ams.router')
 
 
 // CRON JOB FUNCTION
@@ -139,6 +142,7 @@ app.use("/api/crfpurchase", crfpo);
 
 //BIS_ELLIDER_API
 app.use("/api/bisElliderData", bisElliderData);
+app.use("/api/bisQuotationData", bisQuotationData);
 
 //Ams _Antibiotic Data Collection
 app.use("/api/amsAntibiotic", amsAntibioticData)
