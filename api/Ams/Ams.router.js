@@ -1,12 +1,14 @@
 
 const router = require("express").Router();
 const { checkToken } = require('../../auth/jwtValidation');
-const { getAntibiotic } = require('./Ams.controller');
+const { getAntibiotic,getAntibioticItemCode,
+    getMicrobiologyTest
+ } = require('./Ams.controller');
 
 router.post("/getAntibiotic", checkToken, getAntibiotic);
+router.get("/getAntibioticItemCode", checkToken, getAntibioticItemCode);
+router.get(`/getMicrobiologyTest/:id`, checkToken, getMicrobiologyTest);
 
-
-// router.post("/getAntibioticPatientDetails", checkToken, getAntibioticPatientDetails);
 
 
 
