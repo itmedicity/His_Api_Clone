@@ -845,24 +845,24 @@ const getLastTriggerDate = async (processId) => {
 };
 
 
-// auto sync at an interval of 2 hours
-cron.schedule("*/10 * * * *", () => {
+// auto sync at an interval of 2 hours 
+cron.schedule("*/30 * * * *", () => {
   getInpatientDetail();
 });
 
 // auto sync at an interval of 1 hours
-cron.schedule("*/25 * * * *", () => {
+cron.schedule("*/20 * * * *", () => {
   UpdateInpatientDetailRmall();
 });
 
 // auto sync at an interval of 1 hours
-cron.schedule("*/20 * * * *", () => {
+cron.schedule("*/10 * * * *", () => {
   UpdateIpStatusDetails();
 });
 
 
 //test triggering
-cron.schedule("*/20 * * * *", () => {
+cron.schedule("*/15 * * * *", () => {
   UpdateFbBedDetailMeliora();
 });
 
