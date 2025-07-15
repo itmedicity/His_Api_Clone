@@ -823,13 +823,15 @@ const getAmsPatientDetails = async (callBack) => {
 
   try {
     const detail = await getAmsLastUpdatedDate(1);
-    const lastInsertDate = detail?.ams_last_updated_date
-      ? new Date(detail?.ams_last_updated_date)
-      : subHours(new Date(), 1);
-
-    const fromDate = format(new Date(lastInsertDate), 'dd/MM/yyyy HH:mm:ss');
+    if (!detail?.ams_last_updated_date) {  
+      return; // Exit early — don’t fetch or insert anything
+    }
+    
+    const lastInsertDate = new Date(detail.ams_last_updated_date);
+    const fromDate = format(lastInsertDate, 'dd/MM/yyyy HH:mm:ss');
     const toDate = format(new Date(), 'dd/MM/yyyy HH:mm:ss');
     const mysqlsupportToDate = format(new Date(), 'yyyy-MM-dd HH:mm:ss');
+  
 
     const itemCodes = await new Promise((resolve, reject) => {
       mysqlpool.query(
