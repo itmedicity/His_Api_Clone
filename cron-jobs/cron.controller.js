@@ -196,7 +196,6 @@ const getInpatientDetail = async (callBack) => {
                                 AND NVL(IPD_DATE, SYSDATE) <= TO_DATE(:TO_DATE, 'dd/MM/yyyy hh24:mi:ss')
                                 AND rmall.rmc_occupby IN ('P')             
                               ORDER BY BED.BDC_NO`;
-
   try {
     // sql get query from meliora here
     const detail = await getLastTriggerDate(1)
@@ -225,14 +224,13 @@ const getInpatientDetail = async (callBack) => {
     );
     await result.resultSet?.getRows((err, rows) => {
       //  CHECK DATA FROM THE ORACLE DATABASE
-
       if (rows.length === 0) {
         // console.log("No data found");
         return;
       }
 
 
-
+      // FILTER DATA
       const VALUES = rows?.map(item => [
         item.IP_NO,
         item.IPD_DATE ? format(new Date(item?.IPD_DATE), 'yyyy-MM-dd HH:mm:ss') : null,
@@ -263,13 +261,13 @@ const getInpatientDetail = async (callBack) => {
         item.DPC_DESC
       ]);
 
-      // FILTER DATA
+
       // INSERT DATA INTO THE MYSQL TABLE
 
       mysqlpool.getConnection((err, connection) => {
         if (err) {
           // mysql db not connected check connection
-          // console.log("mysql db not connected check connection");
+          console.log("mysql db not connected check connection");
           return;
         }
         connection.beginTransaction((err) => {
@@ -335,7 +333,7 @@ const getInpatientDetail = async (callBack) => {
                       ],
                       (err, result) => {
                         if (err) {
-                          console.log(err, "fb_ipadmiss_log");
+
                           connection.rollback(() => {
                             connection.release();
                             console.log("error in rollback data");
@@ -363,7 +361,6 @@ const getInpatientDetail = async (callBack) => {
           );
         });
       });
-      // console.log(rows);
     });
   } catch (error) {
     console.log(error, "Error occured!");
@@ -431,18 +428,25 @@ select ip_no,do_code,ipc_currccode,cu_code,ipc_curstatus,ipd_disc,ipc_status,dmd
         item.DMC_SLNO,
         item.IP_NO
       ]);
-      // INSERT DATA INTO THE MYSQL TABLE
+
+
+      // INSERT DATA INTO THE MYSQL TABLEs
       mysqlpool.getConnection((err, connection) => {
         if (err) {
           // mysql db not connected check connection
           console.log("mysql db not connected check connection");
           return;
-        }
+        };
+
         connection.beginTransaction((err) => {
           if (err) {
             connection.release();
             console.log("error in begin transaction");
           }
+
+          // let missingIpNos = [];
+          // console.log(missingIpNos, "missingIpNos");
+
           const updateQueries = Values?.map((row) => {
             return new Promise((resolve, reject) => {
               connection.query(
@@ -459,11 +463,17 @@ select ip_no,do_code,ipc_currccode,cu_code,ipc_curstatus,ipd_disc,ipc_status,dmd
                 row,
                 (err, result) => {
                   if (err) return reject(err);
+                  // store the ipno that doesnot exist in mysqltable
+                  // if (result.affectedRows === 0) {
+                  //   const ipNo = row[6];
+                  //   missingIpNos = [...missingIpNos, ipNo];
+                  // }
                   resolve(result);
                 }
               );
             });
           });
+
           Promise.all(updateQueries).
             then((result) => {
               connection.commit((err) => {
@@ -495,7 +505,6 @@ select ip_no,do_code,ipc_currccode,cu_code,ipc_curstatus,ipd_disc,ipc_status,dmd
                             });
                           } else {
                             connection.release();
-                            // console.log("success updation in UpdateIpStatusDetails");
                           }
                         });
                       }
@@ -511,6 +520,7 @@ select ip_no,do_code,ipc_currccode,cu_code,ipc_curstatus,ipd_disc,ipc_status,dmd
                 console.log("Rolled back due to error");
               });
             });
+
         })
       });
     });
@@ -606,6 +616,7 @@ const UpdateInpatientDetailRmall = async (callBack) => {
               );
             });
           });
+
           Promise.all(updateQueries).
             then((result) => {
               connection.commit((err) => {
@@ -637,7 +648,6 @@ const UpdateInpatientDetailRmall = async (callBack) => {
                             });
                           } else {
                             connection.release();
-                            // console.log("success updation in UpdateInpatientDetailRmall");
                           }
                         });
                       }
@@ -653,6 +663,7 @@ const UpdateInpatientDetailRmall = async (callBack) => {
                 console.log("Rolled back due to error");
               });
             });
+
         })
       });
     });
@@ -817,6 +828,7 @@ const UpdateFbBedDetailMeliora = async (callBack) => {
   }
 };
 
+
 const getAmsPatientDetails = async (callBack) => {
   let pool_ora = await oraConnection();
   let conn_ora = await pool_ora.getConnection();
@@ -826,7 +838,7 @@ const getAmsPatientDetails = async (callBack) => {
     if (!detail?.ams_last_updated_date) {  
       return; // Exit early — don’t fetch or insert anything
     }
-    
+
     const lastInsertDate = new Date(detail.ams_last_updated_date);
     const fromDate = format(lastInsertDate, 'dd/MM/yyyy HH:mm:ss');
     const toDate = format(new Date(), 'dd/MM/yyyy HH:mm:ss');
@@ -1076,6 +1088,144 @@ const getAmsPatientDetails = async (callBack) => {
     });
   } catch (error) {
     return callBack(error);
+  }
+}
+
+
+// trigger to get the childer data for the correspoding date
+const InsertChilderDetailMeliora = async (callBack) => {
+  let pool_ora = await oraConnection();
+  let conn_ora = await pool_ora.getConnection();
+
+  const oracleSql = `
+     SELECT B.BR_SLNO,
+            B.BRD_DATE,
+            B.PT_NO,
+            B.PTC_PTNAME,
+            B.PTC_LOADD1,
+            B.PTC_LOADD2,
+            B.BRC_HUSBAND,
+            B.BRN_AGE,
+            B.BRN_TOTAL,
+            B.BRN_LIVE,
+            B.BD_CODE,
+            B.IP_NO,
+            B.BRC_MHCODE,
+            L.BRC_SEX AS CHILD_GENDER,
+            L.BRD_DATE AS BIRTH_DATE,
+            L.IP_NO AS MOTHER_IPNO,
+            L.PT_NO AS CHILD_PT_NO,
+            L.CHILD_IPNO AS CHILD_IPNO,
+            L.BRN_WEIGHT AS CHILD_WEIGHT
+       FROM BIRTHREGMAST B
+            LEFT JOIN BRITHREGDETL L ON B.BR_SLNO=L.BR_SLNO
+       WHERE B.BRD_DATE>= to_date(:GET_DATE,'DD-MON-YYYY')`;
+  try {
+
+    // date convertion to oracle support
+    const formattedDate = format(new Date(), 'dd-MMM-yyyy').toUpperCase();
+
+    const result = await conn_ora.execute(
+      oracleSql,
+      {
+        GET_DATE: formattedDate
+      },
+      { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
+    );
+
+    await result.resultSet?.getRows((err, rows) => {
+      //  CHECK DATA FROM THE ORACLE DATABASE
+      if (rows.length === 0) {
+        console.log("No Birth Registerd Today");
+        return;
+      }
+      // result of the oracle query
+      const VALUES = rows?.map(item => [
+        item.BR_SLNO,
+        item.BRD_DATE ? format(new Date(item?.BRD_DATE), 'yyyy-MM-dd HH:mm:ss') : null,
+        item.PT_NO,
+        item.PTC_PTNAME,
+        item.PTC_LOADD1,
+        item.PTC_LOADD2,
+        item.BRC_HUSBAND,
+        item.BRN_AGE,
+        item.BRN_TOTAL,
+        item.BRN_LIVE,
+        item.BD_CODE,
+        item.IP_NO,
+        item.BRC_MHCODE,
+        item.CHILD_GENDER,
+        item.BIRTH_DATE ? format(new Date(item?.BIRTH_DATE), 'yyyy-MM-dd HH:mm:ss') : null,
+        item.MOTHER_IPNO,
+        item.CHILD_PT_NO,
+        item.CHILD_IPNO,
+        item.CHILD_WEIGHT,
+      ]);
+      // INSERT DATA INTO THE MYSQL TABLE
+      mysqlpool.getConnection((err, connection) => {
+        if (err) {
+          // mysql db not connected check connection
+          console.log("mysql db not connected check connection");
+          return;
+        }
+        connection.beginTransaction((err) => {
+          if (err) {
+            connection.release();
+            console.log("error in begin transaction");
+          }
+          connection.query(
+            `INSERT INTO fb_birth_reg_mast(
+                  fb_br_slno,
+                  fb_brd_date,
+                  fb_pt_no,
+                  fb_ptc_name,
+                  fb_ptc_loadd1,
+                  fb_ptc_loadd2,
+                  fb_brc_husband,
+                  fb_brn_age,
+                  fb_brn_total,
+                  fb_brn_live,
+                  fb_bd_code,
+                  fb_ip_no,
+                  fb_brc_mhcode,
+                  fb_child_gender,
+                  fb_birth_date,
+                  fb_mother_ip_no,
+                  fb_child_pt_no,
+                  fb_child_ip_no,
+                  fb_child_weight
+                ) VALUES ?
+                  `,
+            [
+              VALUES
+            ],
+            (err, result) => {
+              if (err) {
+                console.log(err, "err");
+                connection.rollback(() => {
+                  connection.release();
+                  console.log("error in rollback data");
+                });
+              } else {
+                connection.commit((err) => {
+                  if (err) {
+                    connection.rollback(() => {
+                      connection.release();
+                      console.log("error in commit");
+                    });
+                  } else {
+                    connection.release();
+                  }
+                });
+              }
+            }
+          );
+        })
+      });
+    });
+  } catch (error) {
+    console.log(error, "Error occured!");
+    return callBack(error)
   } finally {
     if (conn_ora) {
       await conn_ora.close();
@@ -1121,13 +1271,14 @@ const updateAmsPatientDetails = () => {
 
 
 
+
 /****************************/
 
 const getLastTriggerDate = async (processId) => {
   return new Promise((resolve, reject) => {
     mysqlpool.getConnection((err, connection) => {
       if (err) {
-        console.error("MySQL DB not connected. Check connection.");
+        console.log("MySQL DB not connected. Check connection.");
         return reject(err);
       }
       const query = `
@@ -1182,17 +1333,17 @@ cron.schedule("* * * * *", () => {
   getInpatientDetail();
 });
 
-//test triggering
+//  test triggering
 cron.schedule("*/2 * * * *", () => {
   UpdateFbBedDetailMeliora();
 });
 
-// auto sync at an interval of 25 min
+//  auto sync at an interval of 25 min
 cron.schedule("*/5 * * * *", () => {
   UpdateInpatientDetailRmall();
 });
 
-// auto sync at an interval of 20 min
+//  auto sync at an interval of 20 min
 cron.schedule("*/4 * * * *", () => {
   UpdateIpStatusDetails();
 });
@@ -1206,6 +1357,10 @@ cron.schedule("0 0 */3 * * *", () => {
   updateAmsPatientDetails(); 
 });
 
+// Running InsertChilderDetailMeliora at midnight... 12.00 AM
+cron.schedule("0 0 * * *", () => {
+  InsertChilderDetailMeliora();
+});
 
 
 

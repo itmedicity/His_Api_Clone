@@ -172,7 +172,6 @@ module.exports = {
         getNursingBed(data, (err, results) => {
             if (err) {
                 console.log(err, "err");
-
                 return res.status(200).json({
                     success: 0,
                     message: err
