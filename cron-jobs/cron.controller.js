@@ -1091,7 +1091,6 @@ const getAmsPatientDetails = async (callBack) => {
   }
 }
 
-
 // trigger to get the childer data for the correspoding date
 const InsertChilderDetailMeliora = async (callBack) => {
   let pool_ora = await oraConnection();
@@ -1348,16 +1347,18 @@ cron.schedule("*/4 * * * *", () => {
   UpdateIpStatusDetails();
 });
 
-cron.schedule("0 0 * * * *", () => {
-  getAmsPatientDetails(); 
+
+ //runs at every 49 minutes
+cron.schedule('0 */49 * * * *', () => {
+  getAmsPatientDetails();
 });
 
 
-cron.schedule("0 0 */3 * * *", () => {
-  updateAmsPatientDetails(); 
+//runs at every 3 hours
+cron.schedule('0 0 */3 * * *', () => {
+  updateAmsPatientDetails();
 });
 
-// Running InsertChilderDetailMeliora at midnight... 12.00 AM
 cron.schedule("0 0 * * *", () => {
   InsertChilderDetailMeliora();
 });
