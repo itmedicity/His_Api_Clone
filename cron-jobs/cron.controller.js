@@ -5,9 +5,88 @@ const mysqlpool = require("../config/dbconfigmeliora");
 const { format, subHours } = require("date-fns");
 
 
+// const getPharmacyName = async () => {
+//   let pool_ora = await oraConnection();
+//   let conn_ora = await pool_ora.getConnection();
+
+//   const oracleSql = `select p.ph_code,p.phc_name from pharmacy p where p.phc_status='Y'`;
+//   try {
+//     // GET DATA FROM THE MYSQL TABLE FOR THE LAST INSERT DATE
+//     // sql get query here
+
+//     // CONVERT TO THE ORACLE DATE FORMAT FROM MYSQL FORMAT
+
+//     // GET DATA FROM ORACLE
+//     const result = await conn_ora.execute(
+//       oracleSql,
+//       {},
+//       { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
+//     );
+//     await result.resultSet?.getRows((err, rows) => {
+//       //  CHECK DATA FROM THE ORACLE DATABASE
+//       if (rows.length === 0) {
+//         // console.log("No data found");
+//         return;
+//       }
+
+//       // FILTER DATA
+
+//       // INSERT DATA INTO THE MYSQL TABLE
+
+//       pool.getConnection((err, connection) => {
+//         if (err) {
+//           // mysql db not connected check connection
+//           console.log("mysql db not connected check connection");
+//           return;
+//         }
+
+//         connection.beginTransaction((err) => {
+//           if (err) {
+//             connection.release();
+//             console.log("error in begin transaction");
+//           }
+
+//           connection.query(
+//             `INSERT INTO pharmacy(ph_code,phc_name) VALUES ?`,
+//             [rows],
+//             (err, result) => {
+//               if (err) {
+//                 connection.rollback(() => {
+//                   connection.release();
+//                   console.log("error in rollback data");
+//                 });
+//               } else {
+//                 connection.commit((err) => {
+//                   if (err) {
+//                     connection.rollback(() => {
+//                       connection.release();
+//                       console.log("error in commit");
+//                     });
+//                   } else {
+//                     connection.release();
+//                     // console.log("success");
+//                   }
+//                 });
+//               }
+//             }
+//           );
+//         });
+//       });
+//       // console.log(rows);
+//     });
+//   } catch (error) {
+//     return callBack(error);
+//   } finally {
+//     if (conn_ora) {
+//       await conn_ora.close();
+//       await pool_ora.close();
+//     }
+//   }
+// };
 
 
 //get Inpatient Detail 
+
 
 const getInpatientDetail = async (callBack) => {
   let pool_ora = await oraConnection();
@@ -749,6 +828,269 @@ const UpdateFbBedDetailMeliora = async (callBack) => {
   }
 };
 
+
+const getAmsPatientDetails = async (callBack) => {
+  let pool_ora = await oraConnection();
+  let conn_ora = await pool_ora.getConnection();
+
+  try {
+    const detail = await getAmsLastUpdatedDate(1);
+    if (!detail?.ams_last_updated_date) {  
+      return; // Exit early — don’t fetch or insert anything
+    }
+
+    const lastInsertDate = new Date(detail.ams_last_updated_date);
+    const fromDate = format(lastInsertDate, 'dd/MM/yyyy HH:mm:ss');
+    const toDate = format(new Date(), 'dd/MM/yyyy HH:mm:ss');
+    const mysqlsupportToDate = format(new Date(), 'yyyy-MM-dd HH:mm:ss');
+  
+
+    const itemCodes = await new Promise((resolve, reject) => {
+      mysqlpool.query(
+        `SELECT item_code FROM ams_antibiotic_master WHERE status = 1`,
+        [],
+        (err, results) => {
+          if (err) return reject(err);
+          resolve(results.map(row => row.item_code));
+        }
+      );
+    });
+
+    if (itemCodes.length === 0) return;
+
+    const itemCodeBinds = itemCodes.map((_, i) => `:item_code_${i}`).join(',');
+    const itemCodeParams = {};
+    itemCodes.forEach((code, i) => {
+      itemCodeParams[`item_code_${i}`] = code;
+    });
+
+    const oracleSql = `
+      SELECT P.BMD_DATE,
+             P.BM_NO,
+             B.BD_CODE,
+             P.PT_NO,
+             PT.PTC_PTNAME,
+             DECODE(PT.PTC_SEX, 'M', 'Male', 'F', 'Female') AS GENEDER,
+             PT.PTN_YEARAGE,
+             P.IP_NO,
+             N.NSC_DESC,   
+             D.DOC_NAME,
+             DP.DPC_DESC,
+             M.ITC_DESC,
+             G.CMC_DESC,
+             PL.IT_CODE
+      FROM PBILLMAST P
+        LEFT JOIN PBILLDETL PL ON P.BMC_SLNO = PL.BMC_SLNO
+        LEFT JOIN PATIENT PT ON P.PT_NO = PT.PT_NO
+        LEFT JOIN IPADMISS I ON P.IP_NO = I.IP_NO
+        LEFT JOIN BED B ON I.BD_CODE = B.BD_CODE
+        LEFT JOIN NURSTATION N ON B.NS_CODE = N.NS_CODE
+        LEFT JOIN DOCTOR D ON P.DO_CODE = D.DO_CODE
+        LEFT JOIN SPECIALITY S ON D.SP_CODE = S.SP_CODE
+        LEFT JOIN DEPARTMENT DP ON S.DP_CODE = DP.DP_CODE
+        LEFT JOIN MEDDESC M ON PL.IT_CODE = M.IT_CODE
+        LEFT JOIN MEDGENCOMB G ON M.CM_CODE = G.CM_CODE
+      WHERE PL.IT_CODE IN (${itemCodeBinds})
+        AND P.BMD_DATE >= TO_DATE(:FROM_DATE, 'dd/MM/yyyy hh24:mi:ss')
+        AND P.BMD_DATE <= TO_DATE(:TO_DATE, 'dd/MM/yyyy hh24:mi:ss')
+      GROUP BY P.BMD_DATE, P.BM_NO, P.PT_NO, PT.PTC_PTNAME, PT.PTC_SEX, PT.PTN_YEARAGE,
+               P.IP_NO, N.NSC_DESC,D.DOC_NAME, DP.DPC_DESC, G.CMC_DESC, M.ITC_DESC,PL.IT_CODE, B.BD_CODE`;
+
+    const bindParams = {
+      FROM_DATE: fromDate,
+      TO_DATE: toDate,
+      ...itemCodeParams
+    };
+
+    const result = await conn_ora.execute(oracleSql, bindParams, {
+      resultSet: true,
+      outFormat: oracledb.OUT_FORMAT_OBJECT,
+    });
+
+    await result.resultSet?.getRows((err, rows) => {
+      if (rows.length === 0) return;
+
+      const formatDateTime = (dateStr) => {
+        const date = new Date(dateStr);
+        return date.toISOString().slice(0, 19).replace('T', ' ');
+      };
+
+      const filteredRows = rows.filter(
+        (item) => item.PT_NO != null && item.IP_NO != null
+      );
+
+      if (filteredRows.length === 0) return;
+
+      // Group by IP_NO
+      const groupedMap = new Map();
+
+      filteredRows.forEach(item => {
+        const key = item.IP_NO;
+        const formattedDate = formatDateTime(item.BMD_DATE);
+
+        if (!groupedMap.has(key)) {
+          groupedMap.set(key, {
+            patient: {
+              PT_NO: item.PT_NO,
+              IP_NO: item.IP_NO,
+              PTC_PTNAME: item.PTC_PTNAME,
+              PTN_YEARAGE: item.PTN_YEARAGE,
+              GENEDER: item.GENEDER,
+              NSC_DESC: item.NSC_DESC,
+              BD_CODE: item.BD_CODE,
+              DPC_DESC: item.DPC_DESC,
+              DOC_NAME: item.DOC_NAME,
+              BMD_DATE: formattedDate
+            },
+            antibiotics: []
+          });
+        }
+
+        const group = groupedMap.get(key);
+
+        // Update earliest BMD_DATE
+        if (new Date(formattedDate) < new Date(group.patient.BMD_DATE)) {
+          group.patient.BMD_DATE = formattedDate;
+        }
+
+        group.antibiotics.push({
+          item_code: item.IT_CODE,
+          bill_no: item.BM_NO,
+          bill_date: formattedDate,
+          item_status: 1
+        });
+      });
+
+      const VALUES = [];
+      for (const [_, data] of groupedMap.entries()) {
+        const p = data.patient;
+        VALUES.push([
+          p.PT_NO,
+          p.IP_NO,
+          p.PTC_PTNAME,
+          p.PTN_YEARAGE,
+          p.GENEDER,
+          p.NSC_DESC,
+          p.BD_CODE,
+          p.DPC_DESC,
+          p.BMD_DATE,
+          p.DOC_NAME
+        ]);
+      }
+
+      mysqlpool.getConnection((err, connection) => {
+        if (err) return;
+
+        connection.beginTransaction(err => {
+          if (err) return connection.release();
+
+          connection.query(
+            `INSERT INTO ams_antibiotic_patient_details (
+              mrd_no,
+              patient_ip_no,
+              patient_name,
+              patient_age,
+              patient_gender,
+              patient_location,
+              bed_code,
+              consultant_department,            
+              bill_date,
+              doc_name
+            ) VALUES ?`,
+            [VALUES],
+            (err, result) => {
+              if (err) {
+                connection.query(
+                  `DELETE FROM ams_antibiotic_patient_details 
+                   WHERE DATE(create_date) = CURDATE() 
+                     AND TIME(create_date) >= TIME(DATE_SUB(NOW(), INTERVAL 2 MINUTE))`,
+                  [],
+                  () => connection.rollback(() => connection.release())
+                );
+              } else {
+                const insertedIds = Array.from({ length: result.affectedRows }, (_, i) => result.insertId + i);
+                const antibioticsFinal = [];
+
+                let index = 0;
+                for (const [_, data] of groupedMap.entries()) {
+                  const pid = insertedIds[index++];
+                  data.antibiotics.forEach(row => {
+                    antibioticsFinal.push([
+                      pid,
+                      data.patient.IP_NO,
+                      row.item_code,
+                      row.bill_no,
+                      row.bill_date,
+                      row.item_status
+                    ]);
+                  });
+                }
+
+                connection.query(
+                  `INSERT INTO ams_patient_antibiotics (
+                    ams_patient_detail_slno,
+                    patient_ip_no,
+                    item_code,
+                    bill_no,
+                    bill_date,
+                    item_status
+                  ) VALUES ?`,
+                  [antibioticsFinal],
+                  (err2, result2) => {
+                    if (err2) {
+                      connection.query(
+                        `DELETE FROM ams_antibiotic_patient_details 
+                         WHERE DATE(create_date) = CURDATE() 
+                           AND TIME(create_date) >= TIME(DATE_SUB(NOW(), INTERVAL 2 MINUTE))`,
+                        [],
+                        () => connection.rollback(() => connection.release())
+                      );
+                    } else {
+                      connection.query(
+                        `UPDATE ams_patient_details_last_updated_date 
+                         SET ams_last_updated_date = ? 
+                         WHERE ams_lastupdate_slno = 1`,
+                        [mysqlsupportToDate],
+                        (err, result) => {
+                          if (err) {
+                            connection.query(
+                              `DELETE FROM ams_antibiotic_patient_details 
+                               WHERE DATE(create_date) = CURDATE() 
+                                 AND TIME(create_date) >= TIME(DATE_SUB(NOW(), INTERVAL 2 MINUTE))`,
+                              [],
+                              () => connection.rollback(() => connection.release())
+                            );
+                          } else {
+                            connection.commit(err => {
+                              if (err) {
+                                connection.query(
+                                  `DELETE FROM ams_antibiotic_patient_details 
+                                   WHERE DATE(create_date) = CURDATE() 
+                                     AND TIME(create_date) >= TIME(DATE_SUB(NOW(), INTERVAL 2 MINUTE))`,
+                                  [],
+                                  () => connection.rollback(() => connection.release())
+                                );
+                              } else {
+                                connection.release();
+                              }
+                            });
+                          }
+                        }
+                      );
+                    }
+                  }
+                );
+              }
+            }
+          );
+        });
+      });
+    });
+  } catch (error) {
+    return callBack(error);
+  }
+}
+
 // trigger to get the childer data for the correspoding date
 const InsertChilderDetailMeliora = async (callBack) => {
   let pool_ora = await oraConnection();
@@ -892,8 +1234,45 @@ const InsertChilderDetailMeliora = async (callBack) => {
 };
 
 
+const updateAmsPatientDetails = () => {
+  mysqlpool.getConnection((err, connection) => {
+    if (err) return;
+    const updateQuery = `
+      UPDATE ams_antibiotic_patient_details a
+      LEFT JOIN fb_ipadmiss f ON a.patient_ip_no = f.fb_ip_no
+      LEFT JOIN fb_bed b ON f.fb_bd_code = b.fb_bd_code
+      LEFT JOIN fb_nurse_station_master n ON b.fb_ns_code = n.fb_ns_code
+      SET 
+        a.bed_code = f.fb_bd_code,
+        a.patient_location = n.fb_ns_name
+      WHERE 
+        a.report_updated = 0
+        AND f.fb_ip_no IS NOT NULL
+        AND f.fb_bd_code IS NOT NULL
+        AND n.fb_ns_name IS NOT NULL
+        AND (
+          a.bed_code IS NULL OR
+          a.patient_location IS NULL OR
+          a.bed_code <> f.fb_bd_code OR
+          a.patient_location <> n.fb_ns_name
+        );
+    `;
+    connection.query(updateQuery, () => {
+      connection.release(); 
+    });
+  });
+};
 
-// get last trigger date for the paritcular 
+
+
+
+
+
+
+
+
+/****************************/
+
 const getLastTriggerDate = async (processId) => {
   return new Promise((resolve, reject) => {
     mysqlpool.getConnection((err, connection) => {
@@ -919,6 +1298,34 @@ const getLastTriggerDate = async (processId) => {
   });
 };
 
+const getAmsLastUpdatedDate = async (processId) => {
+  return new Promise((resolve, reject) => {
+    mysqlpool.getConnection((err, connection) => {
+      if (err) {
+        console.error("MySQL DB not connected. Check connection.");
+        return reject(err);
+      }
+      const query = `
+        SELECT ams_last_updated_date 
+        FROM ams_patient_details_last_updated_date ;
+      `;
+      connection.query(query, [processId], (err, results) => {
+        connection.release();
+        if (err) {
+          return reject(err);
+        }
+        resolve(results.length > 0 ? results[0] : null);
+      });
+    });
+  });
+};
+
+
+
+
+
+
+/****************************/
 
 // auto sync at an interval of 10 min
 cron.schedule("* * * * *", () => {
@@ -941,11 +1348,18 @@ cron.schedule("*/4 * * * *", () => {
 });
 
 
-// Running InsertChilderDetailMeliora at midnight... 12.00 AM
-cron.schedule("0 0 * * *", () => {
-  InsertChilderDetailMeliora();
+ //runs at every 49 minutes
+cron.schedule('0 */49 * * * *', () => {
+  getAmsPatientDetails();
 });
 
 
+//runs at every 3 hours
+cron.schedule('0 0 */3 * * *', () => {
+  updateAmsPatientDetails();
+});
 
+cron.schedule("0 0 * * *", () => {
+  InsertChilderDetailMeliora();
+});
 
