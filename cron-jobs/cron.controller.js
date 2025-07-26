@@ -1234,31 +1234,75 @@ const InsertChilderDetailMeliora = async (callBack) => {
 };
 
 
+
 const updateAmsPatientDetails = () => {
   mysqlpool.getConnection((err, connection) => {
-    if (err) return;
-    const updateQuery = `
-      UPDATE ams_antibiotic_patient_details a
-      LEFT JOIN fb_ipadmiss f ON a.patient_ip_no = f.fb_ip_no
-      LEFT JOIN fb_bed b ON f.fb_bd_code = b.fb_bd_code
-      LEFT JOIN fb_nurse_station_master n ON b.fb_ns_code = n.fb_ns_code
-      SET 
-        a.bed_code = f.fb_bd_code,
-        a.patient_location = n.fb_ns_name
+    if (err) {
+      return;
+    }
+    const selectQuery = `
+         SELECT 
+          a.patient_ip_no,
+          a.ams_patient_detail_slno,
+          f.fb_bd_code,
+          n.fb_ns_name
+      FROM 
+          ams_antibiotic_patient_details a,
+          fb_ipadmiss f,
+          fb_bed b,
+          fb_nurse_station_master n
       WHERE 
-        a.report_updated = 0
-        AND f.fb_ip_no IS NOT NULL
-        AND f.fb_bd_code IS NOT NULL
-        AND n.fb_ns_name IS NOT NULL
-        AND (
-          a.bed_code IS NULL OR
-          a.patient_location IS NULL OR
-          a.bed_code <> f.fb_bd_code OR
-          a.patient_location <> n.fb_ns_name
-        );
-    `;
-    connection.query(updateQuery, () => {
-      connection.release(); 
+          a.patient_ip_no = f.fb_ip_no
+          AND f.fb_bd_code = b.fb_bd_code
+          AND b.fb_ns_code = n.fb_ns_code
+          AND a.report_updated = 0
+          AND (
+              a.bed_code IS NULL OR
+              a.patient_location IS NULL OR
+              a.bed_code <> f.fb_bd_code OR
+              a.patient_location <> n.fb_ns_name
+          )
+        GROUP BY 
+         a.ams_patient_detail_slno,
+         a.patient_ip_no`;
+
+    connection.query(selectQuery, (Err, results) => {
+      if (Err) {
+        connection.release();
+        return;
+      }        
+      if (results.length === 0) {
+        connection.release();
+        return;
+      }
+      const updateQuery = `
+        UPDATE ams_antibiotic_patient_details 
+        SET bed_code = ?, patient_location = ?
+        WHERE ams_patient_detail_slno = ? AND patient_ip_no = ?
+      `;
+
+      const updatePromises = results.map(row => {
+        const { fb_bd_code, fb_ns_name, ams_patient_detail_slno, patient_ip_no } = row;
+        return new Promise((resolve, reject) => {
+          connection.query(updateQuery, [fb_bd_code, fb_ns_name, ams_patient_detail_slno, patient_ip_no], (updateErr) => {
+            if (updateErr) {
+              reject(updateErr);
+            } else {
+              resolve();
+            }
+          });
+        });
+      });
+
+      // all settle works even if any of the query fails and doest throw error
+      Promise.allSettled(updatePromises)
+        .then(() => {
+          connection.release();   
+          
+        })
+        .catch(() => {
+          connection.release();
+        });
     });
   });
 };
@@ -1348,20 +1392,19 @@ cron.schedule("*/4 * * * *", () => {
 });
 
 
- //runs at every 49 minutes
-cron.schedule('0 */49 * * * *', () => {
+cron.schedule('*/49 * * * *', () => {
   getAmsPatientDetails();
 });
 
 
 //runs at every 3 hours
-cron.schedule('0 0 */3 * * *', () => {
+cron.schedule("0 */3 * * *", () => {
   updateAmsPatientDetails();
 });
 
-cron.schedule("0 0 * * *", () => {
-  InsertChilderDetailMeliora();
-});
+// cron.schedule("0 0 * * *", () => {
+//   InsertChilderDetailMeliora();
+// });
 
 
 
