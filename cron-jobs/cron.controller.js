@@ -1368,7 +1368,6 @@ const getAmsLastUpdatedDate = async (processId) => {
 
 
 
-
 /****************************/
 
 // auto sync at an interval of 10 min
