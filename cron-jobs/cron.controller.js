@@ -1406,7 +1406,3 @@ cron.schedule("0 */3 * * *", () => {
 //   InsertChilderDetailMeliora();
 // });
 
-
-
-
-
