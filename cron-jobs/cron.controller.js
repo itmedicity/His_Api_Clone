@@ -182,9 +182,7 @@ const getInpatientDetail = async (callBack) => {
         item.DPC_DESC
       ]);
 
-
       // INSERT DATA INTO THE MYSQL TABLE
-
       mysqlpool.getConnection((err, connection) => {
         if (err) {
           // mysql db not connected check connection
@@ -604,14 +602,13 @@ const UpdateInpatientDetailRmall = async (callBack) => {
 const UpdateFbBedDetailMeliora = async (callBack) => {
   let pool_ora = await oraConnection();
   let conn_ora = await pool_ora.getConnection();
-
   const oracleSql = `
       SELECT 
           BD.BDC_OCCUP,
           BD.BD_CODE,
           SUM(BD.BDN_OCCNO) AS OCCU
       FROM 
-          MEDIWARE.BED BD
+          BED BD
       WHERE  
           BD.BDC_STATUS = 'Y' 
           AND (BD.BDD_EDDATE >= TO_DATE(:FROM_DATE, 'dd/MM/yyyy HH24:mi:ss') 
@@ -621,9 +618,7 @@ const UpdateFbBedDetailMeliora = async (callBack) => {
           BD.BD_CODE`;
 
   try {
-
     const detail = await getLastTriggerDate(4);
-
     const lastUpdatetDate = detail?.fb_last_update_time
       ? new Date(detail?.fb_last_update_time)
       : subHours(new Date(), 1);
@@ -941,8 +936,8 @@ cron.schedule("*/4 * * * *", () => {
 });
 
 
-// Running InsertChilderDetailMeliora at midnight... 12.00 AM
-cron.schedule("0 0 * * *", () => {
+// Running InsertChilderDetailMeliora at midnight... 11.00 pm
+cron.schedule("0 23 * * *", () => {
   InsertChilderDetailMeliora();
 });
 
