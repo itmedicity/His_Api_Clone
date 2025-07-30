@@ -829,21 +829,282 @@ const UpdateFbBedDetailMeliora = async (callBack) => {
 };
 
 
+// const getAmsPatientDetails = async (callBack) => {
+//   let pool_ora = await oraConnection();
+//   let conn_ora = await pool_ora.getConnection();
+
+//   try {
+//     const detail = await getAmsLastUpdatedDate(1);
+//     if (!detail?.ams_last_updated_date) {  
+//       return; // Exit early — don’t fetch or insert anything
+//     }
+
+//     const lastInsertDate = new Date(detail.ams_last_updated_date);
+//     const fromDate = format(lastInsertDate, 'dd/MM/yyyy HH:mm:ss');
+//     const toDate = format(new Date(), 'dd/MM/yyyy HH:mm:ss');
+//     const mysqlsupportToDate = format(new Date(), 'yyyy-MM-dd HH:mm:ss');
+  
+
+//     const itemCodes = await new Promise((resolve, reject) => {
+//       mysqlpool.query(
+//         `SELECT item_code FROM ams_antibiotic_master WHERE status = 1`,
+//         [],
+//         (err, results) => {
+//           if (err) return reject(err);
+//           resolve(results.map(row => row.item_code));
+//         }
+//       );
+//     });
+
+//     if (itemCodes.length === 0) return;
+
+//     const itemCodeBinds = itemCodes.map((_, i) => `:item_code_${i}`).join(',');
+//     const itemCodeParams = {};
+//     itemCodes.forEach((code, i) => {
+//       itemCodeParams[`item_code_${i}`] = code;
+//     });
+
+//     const oracleSql = `
+//       SELECT P.BMD_DATE,
+//              P.BM_NO,
+//              B.BD_CODE,
+//              P.PT_NO,
+//              PT.PTC_PTNAME,
+//              DECODE(PT.PTC_SEX, 'M', 'Male', 'F', 'Female') AS GENEDER,
+//              PT.PTN_YEARAGE,
+//              P.IP_NO,
+//              N.NSC_DESC,   
+//              D.DOC_NAME,
+//              DP.DPC_DESC,
+//              M.ITC_DESC,
+//              G.CMC_DESC,
+//              PL.IT_CODE
+//       FROM PBILLMAST P
+//         LEFT JOIN PBILLDETL PL ON P.BMC_SLNO = PL.BMC_SLNO
+//         LEFT JOIN PATIENT PT ON P.PT_NO = PT.PT_NO
+//         LEFT JOIN IPADMISS I ON P.IP_NO = I.IP_NO
+//         LEFT JOIN BED B ON I.BD_CODE = B.BD_CODE
+//         LEFT JOIN NURSTATION N ON B.NS_CODE = N.NS_CODE
+//         LEFT JOIN DOCTOR D ON P.DO_CODE = D.DO_CODE
+//         LEFT JOIN SPECIALITY S ON D.SP_CODE = S.SP_CODE
+//         LEFT JOIN DEPARTMENT DP ON S.DP_CODE = DP.DP_CODE
+//         LEFT JOIN MEDDESC M ON PL.IT_CODE = M.IT_CODE
+//         LEFT JOIN MEDGENCOMB G ON M.CM_CODE = G.CM_CODE
+//       WHERE PL.IT_CODE IN (${itemCodeBinds})
+//         AND P.BMD_DATE >= TO_DATE(:FROM_DATE, 'dd/MM/yyyy hh24:mi:ss')
+//         AND P.BMD_DATE <= TO_DATE(:TO_DATE, 'dd/MM/yyyy hh24:mi:ss')
+//       GROUP BY P.BMD_DATE, P.BM_NO, P.PT_NO, PT.PTC_PTNAME, PT.PTC_SEX, PT.PTN_YEARAGE,
+//                P.IP_NO, N.NSC_DESC,D.DOC_NAME, DP.DPC_DESC, G.CMC_DESC, M.ITC_DESC,PL.IT_CODE, B.BD_CODE`;
+
+//     const bindParams = {
+//       FROM_DATE: fromDate,
+//       TO_DATE: toDate,
+//       ...itemCodeParams
+//     };
+
+//     const result = await conn_ora.execute(oracleSql, bindParams, {
+//       resultSet: true,
+//       outFormat: oracledb.OUT_FORMAT_OBJECT,
+//     });
+
+//     await result.resultSet?.getRows((err, rows) => {
+//       if (rows.length === 0) return;
+
+//       const formatDateTime = (dateStr) => {
+//         const date = new Date(dateStr);
+//         return date.toISOString().slice(0, 19).replace('T', ' ');
+//       };
+
+//       const filteredRows = rows.filter(
+//         (item) => item.PT_NO != null && item.IP_NO != null
+//       );
+
+//       if (filteredRows.length === 0) return;
+
+//       // Group by IP_NO
+//       const groupedMap = new Map();
+
+//       filteredRows.forEach(item => {
+//         const key = item.IP_NO;
+//         const formattedDate = formatDateTime(item.BMD_DATE);
+
+//         if (!groupedMap.has(key)) {
+//           groupedMap.set(key, {
+//             patient: {
+//               PT_NO: item.PT_NO,
+//               IP_NO: item.IP_NO,
+//               PTC_PTNAME: item.PTC_PTNAME,
+//               PTN_YEARAGE: item.PTN_YEARAGE,
+//               GENEDER: item.GENEDER,
+//               NSC_DESC: item.NSC_DESC,
+//               BD_CODE: item.BD_CODE,
+//               DPC_DESC: item.DPC_DESC,
+//               DOC_NAME: item.DOC_NAME,
+//               BMD_DATE: formattedDate
+//             },
+//             antibiotics: []
+//           });
+//         }
+
+//         const group = groupedMap.get(key);
+
+//         // Update earliest BMD_DATE
+//         if (new Date(formattedDate) < new Date(group.patient.BMD_DATE)) {
+//           group.patient.BMD_DATE = formattedDate;
+//         }
+
+//         group.antibiotics.push({
+//           item_code: item.IT_CODE,
+//           bill_no: item.BM_NO,
+//           bill_date: formattedDate,
+//           item_status: 1
+//         });
+//       });
+
+//       const VALUES = [];
+//       for (const [_, data] of groupedMap.entries()) {
+//         const p = data.patient;
+//         VALUES.push([
+//           p.PT_NO,
+//           p.IP_NO,
+//           p.PTC_PTNAME,
+//           p.PTN_YEARAGE,
+//           p.GENEDER,
+//           p.NSC_DESC,
+//           p.BD_CODE,
+//           p.DPC_DESC,
+//           p.BMD_DATE,
+//           p.DOC_NAME
+//         ]);
+//       }
+
+//       mysqlpool.getConnection((err, connection) => {
+//         if (err) return;
+
+//         connection.beginTransaction(err => {
+//           if (err) return connection.release();
+
+//           connection.query(
+//             `INSERT INTO ams_antibiotic_patient_details (
+//               mrd_no,
+//               patient_ip_no,
+//               patient_name,
+//               patient_age,
+//               patient_gender,
+//               patient_location,
+//               bed_code,
+//               consultant_department,            
+//               bill_date,
+//               doc_name
+//             ) VALUES ?`,
+//             [VALUES],
+//             (err, result) => {
+//               if (err) {
+//                 connection.query(
+//                   `DELETE FROM ams_antibiotic_patient_details 
+//                    WHERE DATE(create_date) = CURDATE() 
+//                      AND TIME(create_date) >= TIME(DATE_SUB(NOW(), INTERVAL 2 MINUTE))`,
+//                   [],
+//                   () => connection.rollback(() => connection.release())
+//                 );
+//               } else {
+//                 const insertedIds = Array.from({ length: result.affectedRows }, (_, i) => result.insertId + i);
+//                 const antibioticsFinal = [];
+
+//                 let index = 0;
+//                 for (const [_, data] of groupedMap.entries()) {
+//                   const pid = insertedIds[index++];
+//                   data.antibiotics.forEach(row => {
+//                     antibioticsFinal.push([
+//                       pid,
+//                       data.patient.IP_NO,
+//                       row.item_code,
+//                       row.bill_no,
+//                       row.bill_date,
+//                       row.item_status
+//                     ]);
+//                   });
+//                 }
+
+//                 connection.query(
+//                   `INSERT INTO ams_patient_antibiotics (
+//                     ams_patient_detail_slno,
+//                     patient_ip_no,
+//                     item_code,
+//                     bill_no,
+//                     bill_date,
+//                     item_status
+//                   ) VALUES ?`,
+//                   [antibioticsFinal],
+//                   (err2, result2) => {
+//                     if (err2) {
+//                       connection.query(
+//                         `DELETE FROM ams_antibiotic_patient_details 
+//                          WHERE DATE(create_date) = CURDATE() 
+//                            AND TIME(create_date) >= TIME(DATE_SUB(NOW(), INTERVAL 2 MINUTE))`,
+//                         [],
+//                         () => connection.rollback(() => connection.release())
+//                       );
+//                     } else {
+//                       connection.query(
+//                         `UPDATE ams_patient_details_last_updated_date 
+//                          SET ams_last_updated_date = ? 
+//                          WHERE ams_lastupdate_slno = 1`,
+//                         [mysqlsupportToDate],
+//                         (err, result) => {
+//                           if (err) {
+//                             connection.query(
+//                               `DELETE FROM ams_antibiotic_patient_details 
+//                                WHERE DATE(create_date) = CURDATE() 
+//                                  AND TIME(create_date) >= TIME(DATE_SUB(NOW(), INTERVAL 2 MINUTE))`,
+//                               [],
+//                               () => connection.rollback(() => connection.release())
+//                             );
+//                           } else {
+//                             connection.commit(err => {
+//                               if (err) {
+//                                 connection.query(
+//                                   `DELETE FROM ams_antibiotic_patient_details 
+//                                    WHERE DATE(create_date) = CURDATE() 
+//                                      AND TIME(create_date) >= TIME(DATE_SUB(NOW(), INTERVAL 2 MINUTE))`,
+//                                   [],
+//                                   () => connection.rollback(() => connection.release())
+//                                 );
+//                               } else {
+//                                 connection.release();
+//                               }
+//                             });
+//                           }
+//                         }
+//                       );
+//                     }
+//                   }
+//                 );
+//               }
+//             }
+//           );
+//         });
+//       });
+//     });
+//   } catch (error) {
+//     return callBack(error);
+//   }
+// }
+
+// trigger to get the childer data for the correspoding date
+
 const getAmsPatientDetails = async (callBack) => {
   let pool_ora = await oraConnection();
   let conn_ora = await pool_ora.getConnection();
 
   try {
     const detail = await getAmsLastUpdatedDate(1);
-    if (!detail?.ams_last_updated_date) {  
-      return; // Exit early — don’t fetch or insert anything
-    }
+    if (!detail?.ams_last_updated_date) return;
 
     const lastInsertDate = new Date(detail.ams_last_updated_date);
     const fromDate = format(lastInsertDate, 'dd/MM/yyyy HH:mm:ss');
     const toDate = format(new Date(), 'dd/MM/yyyy HH:mm:ss');
     const mysqlsupportToDate = format(new Date(), 'yyyy-MM-dd HH:mm:ss');
-  
 
     const itemCodes = await new Promise((resolve, reject) => {
       mysqlpool.query(
@@ -907,7 +1168,7 @@ const getAmsPatientDetails = async (callBack) => {
       outFormat: oracledb.OUT_FORMAT_OBJECT,
     });
 
-    await result.resultSet?.getRows((err, rows) => {
+    await result.resultSet?.getRows(async (err, rows) => {
       if (rows.length === 0) return;
 
       const formatDateTime = (dateStr) => {
@@ -915,13 +1176,9 @@ const getAmsPatientDetails = async (callBack) => {
         return date.toISOString().slice(0, 19).replace('T', ' ');
       };
 
-      const filteredRows = rows.filter(
-        (item) => item.PT_NO != null && item.IP_NO != null
-      );
-
+      const filteredRows = rows.filter((item) => item.PT_NO != null && item.IP_NO != null);
       if (filteredRows.length === 0) return;
 
-      // Group by IP_NO
       const groupedMap = new Map();
 
       filteredRows.forEach(item => {
@@ -947,8 +1204,6 @@ const getAmsPatientDetails = async (callBack) => {
         }
 
         const group = groupedMap.get(key);
-
-        // Update earliest BMD_DATE
         if (new Date(formattedDate) < new Date(group.patient.BMD_DATE)) {
           group.patient.BMD_DATE = formattedDate;
         }
@@ -961,137 +1216,150 @@ const getAmsPatientDetails = async (callBack) => {
         });
       });
 
-      const VALUES = [];
-      for (const [_, data] of groupedMap.entries()) {
-        const p = data.patient;
-        VALUES.push([
-          p.PT_NO,
-          p.IP_NO,
-          p.PTC_PTNAME,
-          p.PTN_YEARAGE,
-          p.GENEDER,
-          p.NSC_DESC,
-          p.BD_CODE,
-          p.DPC_DESC,
-          p.BMD_DATE,
-          p.DOC_NAME
-        ]);
-      }
+      const ipNos = Array.from(groupedMap.keys());
+      const placeholders = ipNos.map(() => '?').join(',');
 
       mysqlpool.getConnection((err, connection) => {
         if (err) return;
 
-        connection.beginTransaction(err => {
-          if (err) return connection.release();
+        connection.query(
+          `SELECT ams_patient_detail_slno, patient_ip_no 
+           FROM ams_antibiotic_patient_details 
+           WHERE patient_ip_no IN (${placeholders}) AND report_updated = 0`,
+          ipNos,
+          (err, existingRows) => {
+            if (err) return connection.release();
 
-          connection.query(
-            `INSERT INTO ams_antibiotic_patient_details (
-              mrd_no,
-              patient_ip_no,
-              patient_name,
-              patient_age,
-              patient_gender,
-              patient_location,
-              bed_code,
-              consultant_department,            
-              bill_date,
-              doc_name
-            ) VALUES ?`,
-            [VALUES],
-            (err, result) => {
-              if (err) {
-                connection.query(
-                  `DELETE FROM ams_antibiotic_patient_details 
-                   WHERE DATE(create_date) = CURDATE() 
-                     AND TIME(create_date) >= TIME(DATE_SUB(NOW(), INTERVAL 2 MINUTE))`,
-                  [],
-                  () => connection.rollback(() => connection.release())
-                );
+            const existingMap = new Map();
+            existingRows.forEach(row => {
+              existingMap.set(row.patient_ip_no, row.ams_patient_detail_slno);
+            });
+
+            const newPatients = [];
+            const antibioticsFinal = [];
+
+            for (const [ip_no, data] of groupedMap.entries()) {
+              const p = data.patient;
+              if (existingMap.has(ip_no)) {
+                const existingId = existingMap.get(ip_no);
+                data.antibiotics.forEach(row => {
+                  antibioticsFinal.push([
+                    existingId,
+                    ip_no,
+                    row.item_code,
+                    row.bill_no,
+                    row.bill_date,
+                    row.item_status
+                  ]);
+                });
               } else {
-                const insertedIds = Array.from({ length: result.affectedRows }, (_, i) => result.insertId + i);
-                const antibioticsFinal = [];
+                newPatients.push([
+                  p.PT_NO,
+                  p.IP_NO,
+                  p.PTC_PTNAME,
+                  p.PTN_YEARAGE,
+                  p.GENEDER,
+                  p.NSC_DESC,
+                  p.BD_CODE,
+                  p.DPC_DESC,
+                  p.BMD_DATE,
+                  p.DOC_NAME
+                ]);
+              }
+            }
 
-                let index = 0;
-                for (const [_, data] of groupedMap.entries()) {
-                  const pid = insertedIds[index++];
-                  data.antibiotics.forEach(row => {
-                    antibioticsFinal.push([
-                      pid,
-                      data.patient.IP_NO,
-                      row.item_code,
-                      row.bill_no,
-                      row.bill_date,
-                      row.item_status
-                    ]);
-                  });
-                }
+            connection.beginTransaction(err => {
+              if (err) return connection.release();
 
-                connection.query(
-                  `INSERT INTO ams_patient_antibiotics (
-                    ams_patient_detail_slno,
-                    patient_ip_no,
-                    item_code,
-                    bill_no,
-                    bill_date,
-                    item_status
-                  ) VALUES ?`,
-                  [antibioticsFinal],
-                  (err2, result2) => {
-                    if (err2) {
-                      connection.query(
-                        `DELETE FROM ams_antibiotic_patient_details 
-                         WHERE DATE(create_date) = CURDATE() 
-                           AND TIME(create_date) >= TIME(DATE_SUB(NOW(), INTERVAL 2 MINUTE))`,
-                        [],
-                        () => connection.rollback(() => connection.release())
-                      );
-                    } else {
+              const insertNewPatients = newPatients.length > 0
+                ? new Promise((resolve, reject) => {
+                    connection.query(
+                      `INSERT INTO ams_antibiotic_patient_details (
+                        mrd_no,
+                        patient_ip_no,
+                        patient_name,
+                        patient_age,
+                        patient_gender,
+                        patient_location,
+                        bed_code,
+                        consultant_department,
+                        bill_date,
+                        doc_name
+                      ) VALUES ?`,
+                      [newPatients],
+                      (err, result) => {
+                        if (err) return reject(err);
+
+                        const insertedIds = Array.from({ length: result.affectedRows }, (_, i) => result.insertId + i);
+                        let index = 0;
+
+                        for (const [ip_no, data] of groupedMap.entries()) {
+                          if (!existingMap.has(ip_no)) {
+                            const newId = insertedIds[index++];
+                            existingMap.set(ip_no, newId);
+                            data.antibiotics.forEach(row => {
+                              antibioticsFinal.push([
+                                newId,
+                                ip_no,
+                                row.item_code,
+                                row.bill_no,
+                                row.bill_date,
+                                row.item_status
+                              ]);
+                            });
+                          }
+                        }
+
+                        resolve();
+                      }
+                    );
+                  })
+                : Promise.resolve();
+
+              insertNewPatients
+                .then(() => {
+                  connection.query(
+                    `INSERT INTO ams_patient_antibiotics (
+                      ams_patient_detail_slno,
+                      patient_ip_no,
+                      item_code,
+                      bill_no,
+                      bill_date,
+                      item_status
+                    ) VALUES ?`,
+                    [antibioticsFinal],
+                    (err2) => {
+                      if (err2) return connection.rollback(() => connection.release());
+
                       connection.query(
                         `UPDATE ams_patient_details_last_updated_date 
                          SET ams_last_updated_date = ? 
                          WHERE ams_lastupdate_slno = 1`,
                         [mysqlsupportToDate],
-                        (err, result) => {
-                          if (err) {
-                            connection.query(
-                              `DELETE FROM ams_antibiotic_patient_details 
-                               WHERE DATE(create_date) = CURDATE() 
-                                 AND TIME(create_date) >= TIME(DATE_SUB(NOW(), INTERVAL 2 MINUTE))`,
-                              [],
-                              () => connection.rollback(() => connection.release())
-                            );
-                          } else {
-                            connection.commit(err => {
-                              if (err) {
-                                connection.query(
-                                  `DELETE FROM ams_antibiotic_patient_details 
-                                   WHERE DATE(create_date) = CURDATE() 
-                                     AND TIME(create_date) >= TIME(DATE_SUB(NOW(), INTERVAL 2 MINUTE))`,
-                                  [],
-                                  () => connection.rollback(() => connection.release())
-                                );
-                              } else {
-                                connection.release();
-                              }
-                            });
-                          }
+                        (err3) => {
+                          if (err3) return connection.rollback(() => connection.release());
+                          connection.commit(err4 => {
+                            if (err4) return connection.rollback(() => connection.release());
+                            connection.release();
+                          });
                         }
                       );
                     }
-                  }
-                );
-              }
-            }
-          );
-        });
+                  );
+                })
+                .catch(err => connection.rollback(() => connection.release()));
+            });
+          }
+        );
       });
     });
   } catch (error) {
     return callBack(error);
   }
-}
+};
 
-// trigger to get the childer data for the correspoding date
+
+
 const InsertChilderDetailMeliora = async (callBack) => {
   let pool_ora = await oraConnection();
   let conn_ora = await pool_ora.getConnection();
@@ -1397,7 +1665,7 @@ cron.schedule('*/49 * * * *', () => {
 
 
 //runs at every 3 hours
-cron.schedule("0 */3 * * *", () => {
+cron.schedule('0 */3 * * *', () => {
   updateAmsPatientDetails();
 });
 
