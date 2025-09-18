@@ -1094,13 +1094,18 @@ const UpdateFbBedDetailMeliora = async (callBack) => {
 // trigger to get the childer data for the correspoding date
 
 const getAmsPatientDetails = async (callBack) => {
+
   let pool_ora = await oraConnection();
   let conn_ora = await pool_ora.getConnection();
 
   try {
     const detail = await getAmsLastUpdatedDate(1);
-    if (!detail?.ams_last_updated_date) return;
 
+    console.log("detail",detail);
+    
+
+    if (!detail?.ams_last_updated_date) return;
+         
     const lastInsertDate = new Date(detail.ams_last_updated_date);
     const fromDate = format(lastInsertDate, 'dd/MM/yyyy HH:mm:ss');
     const toDate = format(new Date(), 'dd/MM/yyyy HH:mm:ss');
@@ -1110,7 +1115,7 @@ const getAmsPatientDetails = async (callBack) => {
       mysqlpool.query(
         `SELECT item_code FROM ams_antibiotic_master WHERE status = 1`,
         [],
-        (err, results) => {
+        (err, results) => {          
           if (err) return reject(err);
           resolve(results.map(row => row.item_code));
         }
@@ -1167,7 +1172,7 @@ const getAmsPatientDetails = async (callBack) => {
       resultSet: true,
       outFormat: oracledb.OUT_FORMAT_OBJECT,
     });
-
+    
     await result.resultSet?.getRows(async (err, rows) => {
       if (rows.length === 0) return;
 
@@ -1353,8 +1358,17 @@ const getAmsPatientDetails = async (callBack) => {
         );
       });
     });
-  } catch (error) {
-    return callBack(error);
+
+  } catch (err) {
+    if (callBack) callBack(err);
+  } finally {
+    if (conn_ora) {
+      try {
+        await conn_ora.release(); 
+      } catch (closeErr) {
+        console.error("Error closing Oracle connection:", closeErr);
+      }
+    }
   }
 };
 
@@ -1622,6 +1636,7 @@ const getAmsLastUpdatedDate = async (processId) => {
         FROM ams_patient_details_last_updated_date ;
       `;
       connection.query(query, [processId], (err, results) => {
+       
         connection.release();
         if (err) {
           return reject(err);
@@ -1669,7 +1684,7 @@ cron.schedule('0 */3 * * *', () => {
   updateAmsPatientDetails();
 });
 
-// cron.schedule("0 0 * * *", () => {
-//   InsertChilderDetailMeliora();
-// });
+cron.schedule("0 0 * * *", () => {
+  InsertChilderDetailMeliora();
+});
 

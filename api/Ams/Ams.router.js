@@ -6,7 +6,7 @@ const { getAntibiotic,getAntibioticItemCode,
  } = require('./Ams.controller');
 
 router.post("/getAntibiotic", checkToken, getAntibiotic);
-router.get("/getAntibioticItemCode", checkToken, getAntibioticItemCode);
+router.get("/getAntibioticItemCode",checkToken , getAntibioticItemCode);
 router.get(`/getMicrobiologyTest/:id`, checkToken, getMicrobiologyTest);
 
 
