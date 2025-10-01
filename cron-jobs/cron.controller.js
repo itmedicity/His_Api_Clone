@@ -677,6 +677,7 @@ const UpdateInpatientDetailRmall = async (callBack) => {
 }
 
 
+
 // trigger to fetch data from bed to update fb_bed 
 const UpdateFbBedDetailMeliora = async (callBack) => {
   let pool_ora = await oraConnection();
@@ -1094,12 +1095,17 @@ const getAmsPatientDetails = async (callBack) => {
 
   try {
     const detail = await getAmsLastUpdatedDate(1);
-    if (!detail?.ams_last_updated_date) return;
+
+    if (!detail?.ams_last_updated_date) {
+      return; // Exit early — don’t fetch or insert anything
+    }
+
 
     const lastInsertDate = new Date(detail.ams_last_updated_date);
     const fromDate = format(lastInsertDate, 'dd/MM/yyyy HH:mm:ss');
     const toDate = format(new Date(), 'dd/MM/yyyy HH:mm:ss');
     const mysqlsupportToDate = format(new Date(), 'yyyy-MM-dd HH:mm:ss');
+
 
     const itemCodes = await new Promise((resolve, reject) => {
       mysqlpool.query(
@@ -1533,7 +1539,7 @@ const updateAmsPatientDetails = () => {
       if (Err) {
         connection.release();
         return;
-      }        
+      }
       if (results.length === 0) {
         connection.release();
         return;
@@ -1560,8 +1566,8 @@ const updateAmsPatientDetails = () => {
       // all settle works even if any of the query fails and doest throw error
       Promise.allSettled(updatePromises)
         .then(() => {
-          connection.release();   
-          
+          connection.release();
+
         })
         .catch(() => {
           connection.release();
@@ -1624,8 +1630,6 @@ const getAmsLastUpdatedDate = async (processId) => {
 
 
 
-
-
 /****************************/
 
 // auto sync at an interval of 10 min
@@ -1649,10 +1653,9 @@ cron.schedule("*/4 * * * *", () => {
 });
 
 
-
-cron.schedule('*/49 * * * *', () => {
-  getAmsPatientDetails();
-});
+// cron.schedule('*/49 * * * *', () => {
+//   getAmsPatientDetails();
+// });
 
 
 //runs at every 3 hours
