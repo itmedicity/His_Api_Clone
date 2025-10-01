@@ -789,7 +789,10 @@ module.exports = {
     getInpatientFollowUp: async (data, callBack) => {
         let pool_ora = await oraConnection();
         let conn_ora = await pool_ora.getConnection();
-        const sql = `SELECT DSC_DESCRIPTION FROM CLINICAL.DISCHARGESUMMARYHTML WHERE DSC_HEAD = 'DSC_FOLLOWUP' AND IP_NO = :IP_NO`;
+        const sql = `SELECT DSC_DESCRIPTION 
+                     FROM CLINICAL.DISCHARGESUMMARYHTML DS
+                     LEFT JOIN CLINICAL.DISCHARGESUMMARY D ON DS.DS_SLNO=D.DS_SLNO
+                     WHERE D.DSC_APPROVAL='Y' AND DS.DSC_HEAD = 'DSC_FOLLOWUP' AND  DS.IP_NO = :IP_NO;`;
         try {
             const result = await conn_ora.execute(
                 sql,

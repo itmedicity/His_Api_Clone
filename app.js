@@ -60,8 +60,12 @@ const crfpo = require("./api/CRFPurchase/purchase.router")
 const bisElliderData = require("./api/Version_1/BIS/bis_ellider_datas/bis_ellider_datas.router")
 
 //AMS Antibiotic
-const amsAntibioticData =require('./api/Ams/Ams.router')
+const amsAntibioticData = require('./api/Ams/Ams.router')
 
+
+//MEDLAB patient Lab result 
+
+const medlab = require('./api/Medlab/medlab.router')
 
 // CRON JOB FUNCTION
 const cronjob = require("./cron-jobs/cron.router");
@@ -142,6 +146,10 @@ app.use("/api/bisElliderData", bisElliderData);
 
 //Ams _Antibiotic Data Collection
 app.use("/api/amsAntibiotic", amsAntibioticData)
+
+
+//MedLab Patient Lab Result and Pharmacy
+app.use("/api/medlab", medlab)
 
 // CRON JOB FUNCTION
 app.use("/api/cronjob", cronjob);
