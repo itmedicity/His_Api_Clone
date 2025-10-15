@@ -20,6 +20,15 @@ const income = require("./api/Reports/misReport/incomePart/procedureIncome/proin
 const incomeDetlPart = require("./api/Reports/misReport/MisDetlRpt/incomePart/income.router");
 const collectionDetlPart = require("./api/Reports/misReport/MisDetlRpt/collectionPart/misCollectonPart.router");
 
+//QMT TYPE
+const collectionQmt = require("./api/Reports/misReportType/collectionPart/collection.router");
+const patientTypeDiscountQmt = require("./api/Reports/misReportType/PatientType/patientType.router");
+const pharmacyQmt = require("./api/Reports/misReportType/incomePart/pharmacyincome/pharmacy.router");
+const incomeQmt = require("./api/Reports/misReportType/incomePart/procedureIncome/proincome.router");
+// QMT TYPE income part details
+const incomeDetlPartQmt = require("./api/Reports/misReportType/MisDetlRpt/incomePart/income.router");
+const collectionDetlPartQmt = require("./api/Reports/misReportType/MisDetlRpt/collectionPart/misCollectonPart.router");
+
 //TSSH
 const collectionTssh = require("./api/Reports/misReportTssh/collectionPart/collectionTssh.router");
 const patientTypeDiscountTssh = require("./api/Reports/misReportTssh/PatientType/patientTypeTssh.router");
@@ -56,12 +65,11 @@ const qiPatientList = require("./api/QIPatientList/getPatientList.router");
 const supplier = require("./api/SupplierDetails/supplier.router");
 const procedure = require("./api/ProcedureList/procedure.router");
 //CRF Purchase
-const crfpo = require("./api/CRFPurchase/purchase.router")
-const bisElliderData = require("./api/Version_1/BIS/bis_ellider_datas/bis_ellider_datas.router")
+const crfpo = require("./api/CRFPurchase/purchase.router");
+const bisElliderData = require("./api/Version_1/BIS/bis_ellider_datas/bis_ellider_datas.router");
 
 //AMS Antibiotic
-const amsAntibioticData =require('./api/Ams/Ams.router')
-
+const amsAntibioticData = require("./api/Ams/Ams.router");
 
 // CRON JOB FUNCTION
 const cronjob = require("./cron-jobs/cron.router");
@@ -70,10 +78,7 @@ app.use(express.json());
 
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-Width, Content-Type, Accept, Authorization"
-  );
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-Width, Content-Type, Accept, Authorization");
 
   if (req.method === "OPTIONS") {
     res.header("Access-Control-Allow-Methods", "PUT, POST, PATCH, DELETE, GET");
@@ -93,6 +98,14 @@ app.use("/api/pharmacy", pharmacy);
 app.use("/api/income", income);
 app.use("/api/incomeDetl", incomeDetlPart);
 app.use("/api/collectionDetlPart", collectionDetlPart);
+
+//QMT TYPE
+app.use("/api/collectionQmt", collectionQmt);
+app.use("/api/patientTypeQmt", patientTypeDiscountQmt);
+app.use("/api/pharmacyQmt", pharmacyQmt);
+app.use("/api/incomeQmt", incomeQmt);
+app.use("/api/incomeDetlQmt", incomeDetlPartQmt);
+app.use("/api/collectionDetlPartQmt", collectionDetlPartQmt);
 
 //TSSH
 app.use("/api/collectionTssh", collectionTssh);
@@ -141,11 +154,10 @@ app.use("/api/crfpurchase", crfpo);
 app.use("/api/bisElliderData", bisElliderData);
 
 //Ams _Antibiotic Data Collection
-app.use("/api/amsAntibiotic", amsAntibioticData)
+app.use("/api/amsAntibiotic", amsAntibioticData);
 
 // CRON JOB FUNCTION
 app.use("/api/cronjob", cronjob);
-
 
 app.listen(process.env.APP_PORT, (val) => {
   console.log(`Server Up and Running ${process.env.APP_PORT}`);

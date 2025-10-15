@@ -1,18 +1,22 @@
 // @ts-ignore
-const pool = require('../../../../config/dbconfig');
-const { oracledb, connectionClose, oraConnection } = require('../../../../config/oradbconfig');
+const pool = require("../../../../config/dbconfig");
+const {
+  oracledb,
+  connectionClose,
+  oraConnection,
+} = require("../../../../config/oradbconfig");
 
 module.exports = {
-    //Advance Collection (C)
-    advanceCollectionTssh: async (data, callBack) => {
+  //Advance Collection (C)
+  advanceCollectionTssh: async (data, callBack) => {
+    let pool_ora = await oraConnection();
+    let conn_ora = await pool_ora.getConnection();
 
-        let pool_ora = await oraConnection();
-        let conn_ora = await pool_ora.getConnection();
-
-        const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(',')) || null;
-        const fromDate = data.from;
-        const toDate = data.to;
-        const sql = ` SELECT SUM (NVL (ARN_AMOUNT, 0)) Amt, 0 tax
+    const ipNumberList =
+      (data?.ptno?.length > 0 && data.ptno.join(",")) || null;
+    const fromDate = data.from;
+    const toDate = data.to;
+    const sql = ` SELECT SUM (NVL (ARN_AMOUNT, 0)) Amt, 0 tax
                             FROM OPADVANCE
                         WHERE NVL (ARC_CANCEL, 'N') = 'N'
                                 AND ARD_DATE >=  TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
@@ -36,32 +40,33 @@ module.exports = {
                                 AND IPADVANCE.IAC_MHCODE IN (SELECT MH_CODE FROM multihospital)
                                 AND IPADVANCE.IP_NO IN (${ipNumberList})`;
 
-        try {
-            const result = await conn_ora.execute(sql,
-                {},
-                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-            )
-            await result.resultSet?.getRows((err, rows) => {
-                callBack(err, rows)
-            })
+    try {
+      const result = await conn_ora.execute(
+        sql,
+        {},
+        { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
+      );
+      await result.resultSet?.getRows((err, rows) => {
+        callBack(err, rows);
+      });
+    } catch (error) {
+      console.log(error);
+    } finally {
+      if (conn_ora) {
+        await conn_ora.close();
+        await pool_ora.close();
+      }
+    }
+  },
+  advanceRefundTssh: async (data, callBack) => {
+    let pool_ora = await oraConnection();
+    let conn_ora = await pool_ora.getConnection();
 
-        } catch (error) {
-            console.log(error)
-        } finally {
-            if (conn_ora) {
-                await conn_ora.close();
-                await pool_ora.close();
-            }
-        }
-    },
-    advanceRefundTssh: async (data, callBack) => {
-        let pool_ora = await oraConnection();
-        let conn_ora = await pool_ora.getConnection();
-
-        const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(',')) || null;;
-        const fromDate = data.from;
-        const toDate = data.to;
-        const advanceRefndSql = `SELECT SUM (NVL (REFUNDOPADVANCE.RFN_AMT, 0)) Amt, 0 tax
+    const ipNumberList =
+      (data?.ptno?.length > 0 && data.ptno.join(",")) || null;
+    const fromDate = data.from;
+    const toDate = data.to;
+    const advanceRefndSql = `SELECT SUM (NVL (REFUNDOPADVANCE.RFN_AMT, 0)) Amt, 0 tax
                 FROM REFUNDOPADVANCE
             WHERE REFUNDOPADVANCE.Rfc_Cancel = 'N'
                     AND REFUNDOPADVANCE.Rfd_Date >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
@@ -101,34 +106,35 @@ module.exports = {
                     AND ADVANCERETURN.AR_SLNO IN (SELECT AR_SLNO FROM OPADVANCE WHERE  IP_NO IN (${ipNumberList}))
             HAVING SUM (NVL (ADVANCERETURN.RAN_AMT, 0)) > 0`;
 
-        try {
-            const result = await conn_ora.execute(
-                advanceRefndSql,
-                {},
-                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-            )
-            await result.resultSet?.getRows((err, rows) => {
-                callBack(err, rows)
-            })
-        } catch (error) {
-            console.log(error)
-        } finally {
-            if (conn_ora) {
-                await conn_ora.close();
-                await pool_ora.close();
-            }
-        }
-    },
-    //Advance Settled
-    advanceSettledTssh: async (data, callBack) => {
-        let pool_ora = await oraConnection();
-        let conn_ora = await pool_ora.getConnection();
+    try {
+      const result = await conn_ora.execute(
+        advanceRefndSql,
+        {},
+        { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
+      );
+      await result.resultSet?.getRows((err, rows) => {
+        callBack(err, rows);
+      });
+    } catch (error) {
+      console.log(error);
+    } finally {
+      if (conn_ora) {
+        await conn_ora.close();
+        await pool_ora.close();
+      }
+    }
+  },
+  //Advance Settled
+  advanceSettledTssh: async (data, callBack) => {
+    let pool_ora = await oraConnection();
+    let conn_ora = await pool_ora.getConnection();
 
-        const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(',')) || null;;
-        const fromDate = data.from;
-        const toDate = data.to;
+    const ipNumberList =
+      (data?.ptno?.length > 0 && data.ptno.join(",")) || null;
+    const fromDate = data.from;
+    const toDate = data.to;
 
-        const advanceSettledSql = `SELECT SUM (NVL (bmn_advamount, 0)) Amt, 0 tax
+    const advanceSettledSql = `SELECT SUM (NVL (bmn_advamount, 0)) Amt, 0 tax
                                         FROM Pbillmast
                                     WHERE NVL (BMC_CANCEL, 'N') = 'N'
                                             AND BMD_DATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
@@ -176,34 +182,35 @@ module.exports = {
                                             AND BILLMAST.IP_NO IN (${ipNumberList})
                                             AND BILLMAST.BMC_CACR = 'I'`;
 
-        try {
-            const result = await conn_ora.execute(
-                advanceSettledSql,
-                {},
-                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-            )
-            await result.resultSet?.getRows((err, rows) => {
-                callBack(err, rows)
-            })
-        } catch (error) {
-            console.log(error)
-        } finally {
-            if (conn_ora) {
-                await conn_ora.close();
-                await pool_ora.close();
-            }
-        }
-    },
-    //Collection Against Sales (A) Total Value
-    collectionAgainstSalePart1Tssh: async (data, callBack) => {
-        let pool_ora = await oraConnection();
-        let conn_ora = await pool_ora.getConnection();
+    try {
+      const result = await conn_ora.execute(
+        advanceSettledSql,
+        {},
+        { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
+      );
+      await result.resultSet?.getRows((err, rows) => {
+        callBack(err, rows);
+      });
+    } catch (error) {
+      console.log(error);
+    } finally {
+      if (conn_ora) {
+        await conn_ora.close();
+        await pool_ora.close();
+      }
+    }
+  },
+  //Collection Against Sales (A) Total Value
+  collectionAgainstSalePart1Tssh: async (data, callBack) => {
+    let pool_ora = await oraConnection();
+    let conn_ora = await pool_ora.getConnection();
 
-        const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(',')) || null;
-        const fromDate = data.from;
-        const toDate = data.to;
+    const ipNumberList =
+      (data?.ptno?.length > 0 && data.ptno.join(",")) || null;
+    const fromDate = data.from;
+    const toDate = data.to;
 
-        const sql = ` SELECT 
+    const sql = ` SELECT 
                             SUM ( NVL (ipreceipt.irn_amount, 0) + NVL (ipreceipt.irn_card, 0) + NVL (ipreceipt.irn_cheque, 0) + NVL (ipreceipt.irn_neft, 0)) - SUM (NVL (irn_balance, 0) + NVL (IRN_REFCHEQ, 0) + NVL (IPRECEIPT.IRN_REFCARD, 0)) Amt
                         FROM IPRECEIPT, Disbillmast
                         WHERE Disbillmast.Dmc_Slno = IPRECEIPT.Dmc_Slno
@@ -216,35 +223,35 @@ module.exports = {
                             AND IRD_DATE <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
                             AND DISBILLMAST.IP_NO IN  (${ipNumberList})`;
 
-        try {
-            const result = await conn_ora.execute(
-                sql,
-                {},
-                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-            )
-            await result.resultSet?.getRows((err, rows) => {
-                callBack(err, rows)
-            })
+    try {
+      const result = await conn_ora.execute(
+        sql,
+        {},
+        { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
+      );
+      await result.resultSet?.getRows((err, rows) => {
+        callBack(err, rows);
+      });
+    } catch (error) {
+      console.log(error);
+    } finally {
+      if (conn_ora) {
+        await conn_ora.close();
+        await pool_ora.close();
+      }
+    }
+  },
+  //Collection Against Sales (A) negative value
+  collectionAgainstSalePart2Tssh: async (data, callBack) => {
+    let pool_ora = await oraConnection();
+    let conn_ora = await pool_ora.getConnection();
 
-        } catch (error) {
-            console.log(error)
-        } finally {
-            if (conn_ora) {
-                await conn_ora.close();
-                await pool_ora.close();
-            }
-        }
-    },
-    //Collection Against Sales (A) negative value
-    collectionAgainstSalePart2Tssh: async (data, callBack) => {
-        let pool_ora = await oraConnection();
-        let conn_ora = await pool_ora.getConnection();
+    const ipNumberList =
+      (data?.ptno?.length > 0 && data.ptno.join(",")) || null;
+    const fromDate = data.from;
+    const toDate = data.to;
 
-        const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(',')) || null;
-        const fromDate = data.from;
-        const toDate = data.to;
-
-        const sql = `SELECT 
+    const sql = `SELECT 
                         SUM (NVL (IPRECEIPTrefund.irf_cash, 0) + NVL (IPRECEIPTrefund.irf_card, 0) + NVL (IPRECEIPTrefund.irf_cheque, 0))  * -1 AS Amt,
                         0 tax
                     FROM IPRECEIPTrefund
@@ -254,34 +261,33 @@ module.exports = {
                         AND IRF_DATE <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
                         AND ipreceiptrefund.IRC_MHCODE IN (SELECT MH_CODE FROM multihospital)
                         AND IPRECEIPTREFUND.IP_NO IN (${ipNumberList})`;
-        try {
-            const result = await conn_ora.execute(
-                sql,
-                {},
-                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-            )
-            await result.resultSet?.getRows((err, rows) => {
-                callBack(err, rows)
-            })
+    try {
+      const result = await conn_ora.execute(
+        sql,
+        {},
+        { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
+      );
+      await result.resultSet?.getRows((err, rows) => {
+        callBack(err, rows);
+      });
+    } catch (error) {
+      console.log(error);
+    } finally {
+      if (conn_ora) {
+        await conn_ora.close();
+        await pool_ora.close();
+      }
+    }
+  },
+  // Complimentary
+  complimentoryTssh: async (data, callBack) => {
+    let pool_ora = await oraConnection();
+    let conn_ora = await pool_ora.getConnection();
 
-        } catch (error) {
-            console.log(error)
-        } finally {
-            if (conn_ora) {
-                await conn_ora.close();
-                await pool_ora.close();
-            }
-        }
-    },
-    // Complimentary
-    complimentoryTssh: async (data, callBack) => {
-        let pool_ora = await oraConnection();
-        let conn_ora = await pool_ora.getConnection();
+    const fromDate = data.from;
+    const toDate = data.to;
 
-        const fromDate = data.from;
-        const toDate = data.to;
-
-        const sql = `SELECT SUM (NVL (Opbillmast.OPN_NETAMT, 0)
+    const sql = `SELECT SUM (NVL (Opbillmast.OPN_NETAMT, 0)
                                 + NVL (OPBILLMAST.OPN_SALETAXCH, 0)
                                 + NVL (OPBILLMAST.OPN_SALETAXCR, 0)) AS Amt,
                             SUM (NVL (opbillmast.OPN_TOTTAX, 0)) Tax
@@ -302,36 +308,36 @@ module.exports = {
                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             AND DMD_DATE <=TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')`;
 
-        try {
-            const result = await conn_ora.execute(
-                sql,
-                {},
-                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-            )
+    try {
+      const result = await conn_ora.execute(
+        sql,
+        {},
+        { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
+      );
 
-            await result.resultSet?.getRows((err, rows) => {
-                callBack(err, rows)
-            })
+      await result.resultSet?.getRows((err, rows) => {
+        callBack(err, rows);
+      });
+    } catch (error) {
+      console.log(error);
+    } finally {
+      if (conn_ora) {
+        await conn_ora.close();
+        await pool_ora.close();
+      }
+    }
+  },
+  // CreditInsurance Bill Collection(D)
+  creditInsuranceBillCollectionTssh: async (data, callBack) => {
+    let pool_ora = await oraConnection();
+    let conn_ora = await pool_ora.getConnection();
 
-        } catch (error) {
-            console.log(error)
-        } finally {
-            if (conn_ora) {
-                await conn_ora.close();
-                await pool_ora.close();
-            }
-        }
-    },
-    // CreditInsurance Bill Collection(D)
-    creditInsuranceBillCollectionTssh: async (data, callBack) => {
-        let pool_ora = await oraConnection();
-        let conn_ora = await pool_ora.getConnection();
+    const ipNumberList =
+      (data?.ptno?.length > 0 && data.ptno.join(",")) || null;
+    const fromDate = data.from;
+    const toDate = data.to;
 
-        const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(',')) || null;;
-        const fromDate = data.from;
-        const toDate = data.to;
-
-        const sql = `SELECT 
+    const sql = `SELECT 
                             SUM (NVL (RECPCOLLECTIONMAST.RCN_CASH, 0) + NVL (RECPCOLLECTIONMAST.RCN_CHK, 0) + NVL (RECPCOLLECTIONMAST.RCN_DD, 0) + NVL (RECPCOLLECTIONMAST.RCN_Card, 0) + NVL (RECPCOLLECTIONMAST.RCN_NEFT, 0)) Amt,
                             0 tax
                         FROM RECPCOLLECTIONMAST
@@ -365,34 +371,35 @@ module.exports = {
                                 WHERE RECPCOLLECTIONDETL.RCD_DATE >= TO_DATE ('${fromDate}',' dd/MM/yyyy hh24:mi:ss')
                                 AND RECPCOLLECTIONDETL.RCD_DATE <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss') 
                                 AND RECPCOLLECTIONDETL.IP_NO  IN  (${ipNumberList}))`;
-        try {
-            const result = await conn_ora.execute(
-                sql,
-                {},
-                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-            )
-            await result.resultSet?.getRows((err, rows) => {
-                callBack(err, rows)
-            })
-        } catch (error) {
-            console.log(error)
-        } finally {
-            if (conn_ora) {
-                await conn_ora.close();
-                await pool_ora.close();
-            }
-        }
-    },
-    //	Credit/Insurance Bill
-    creditInsuranceBillTssh: async (data, callBack) => {
-        let pool_ora = await oraConnection();
-        let conn_ora = await pool_ora.getConnection();
+    try {
+      const result = await conn_ora.execute(
+        sql,
+        {},
+        { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
+      );
+      await result.resultSet?.getRows((err, rows) => {
+        callBack(err, rows);
+      });
+    } catch (error) {
+      console.log(error);
+    } finally {
+      if (conn_ora) {
+        await conn_ora.close();
+        await pool_ora.close();
+      }
+    }
+  },
+  //	Credit/Insurance Bill
+  creditInsuranceBillTssh: async (data, callBack) => {
+    let pool_ora = await oraConnection();
+    let conn_ora = await pool_ora.getConnection();
 
-        const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(',')) || null;;
-        const fromDate = data.from;
-        const toDate = data.to;
+    const ipNumberList =
+      (data?.ptno?.length > 0 && data.ptno.join(",")) || null;
+    const fromDate = data.from;
+    const toDate = data.to;
 
-        const sql = `SELECT 
+    const sql = `SELECT 
                                 SUM (NVL (Disbillmast.DMN_FINALCREDIT, 0)) + SUM (NVL (dmn_copayded_credit, 0))  Amt,
                                 SUM ( DECODE ( NVL (Disbillmast.Dmc_Cancel, 'N'), 'N',   NVL (DMN_SALESTAXCH, 0) + NVL (DMN_SALESTAXCR, 0) + NVL (DMN_CESSCH, 0)  + NVL (DMN_CESSCR, 0), 0)) TAX
                         FROM Disbillmast
@@ -402,34 +409,35 @@ module.exports = {
                                 AND DMD_DATE <=  TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
                                 AND IP_NO IN (${ipNumberList})`;
 
-        try {
-            const result = await conn_ora.execute(
-                sql,
-                {},
-                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-            )
-            await result.resultSet?.getRows((err, rows) => {
-                callBack(err, rows)
-            })
-        } catch (error) {
-            console.log(error)
-        } finally {
-            if (conn_ora) {
-                await conn_ora.close();
-                await pool_ora.close();
-            }
-        }
-    },
-    //Ip Consolidate Discount
-    ipConsolidatedDiscountTssh: async (data, callBack) => {
-        let pool_ora = await oraConnection();
-        let conn_ora = await pool_ora.getConnection();
+    try {
+      const result = await conn_ora.execute(
+        sql,
+        {},
+        { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
+      );
+      await result.resultSet?.getRows((err, rows) => {
+        callBack(err, rows);
+      });
+    } catch (error) {
+      console.log(error);
+    } finally {
+      if (conn_ora) {
+        await conn_ora.close();
+        await pool_ora.close();
+      }
+    }
+  },
+  //Ip Consolidate Discount
+  ipConsolidatedDiscountTssh: async (data, callBack) => {
+    let pool_ora = await oraConnection();
+    let conn_ora = await pool_ora.getConnection();
 
-        const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(',')) || null;;
-        const fromDate = data.from;
-        const toDate = data.to;
+    const ipNumberList =
+      (data?.ptno?.length > 0 && data.ptno.join(",")) || null;
+    const fromDate = data.from;
+    const toDate = data.to;
 
-        const sql = `SELECT SUM (NVL (irn_discount, 0)) Discount
+    const sql = `SELECT SUM (NVL (irn_discount, 0)) Discount
                             FROM Ipreceipt, Disbillmast
                         WHERE  Ipreceipt.Dmc_Slno = Disbillmast.Dmc_Slno
                                 AND NVL (irc_cancel, 'N') = 'N'
@@ -444,34 +452,35 @@ module.exports = {
                                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 AND NVL (irn_discount, 0) > 0`;
 
-        try {
-            const result = await conn_ora.execute(
-                sql,
-                {},
-                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-            )
-            await result.resultSet?.getRows((err, rows) => {
-                callBack(err, rows)
-            })
-        } catch (error) {
-            console.log(error)
-        } finally {
-            if (conn_ora) {
-                await conn_ora.close();
-                await pool_ora.close();
-            }
-        }
-    },
-    // IP Previous Day's  Discount
-    ipPreviousDayDiscountTssh: async (data, callBack) => {
-        let pool_ora = await oraConnection();
-        let conn_ora = await pool_ora.getConnection();
+    try {
+      const result = await conn_ora.execute(
+        sql,
+        {},
+        { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
+      );
+      await result.resultSet?.getRows((err, rows) => {
+        callBack(err, rows);
+      });
+    } catch (error) {
+      console.log(error);
+    } finally {
+      if (conn_ora) {
+        await conn_ora.close();
+        await pool_ora.close();
+      }
+    }
+  },
+  // IP Previous Day's  Discount
+  ipPreviousDayDiscountTssh: async (data, callBack) => {
+    let pool_ora = await oraConnection();
+    let conn_ora = await pool_ora.getConnection();
 
-        const ipNumberList = (data?.ipNoColl?.length > 0 && data.ipNoColl.join(',')) || null;
-        const fromDate = data.from;
-        const toDate = data.to;
+    const ipNumberList =
+      (data?.ipNoColl?.length > 0 && data.ipNoColl.join(",")) || null;
+    const fromDate = data.from;
+    const toDate = data.to;
 
-        const sql = `SELECT SUM (NVL (Irn_Discount, 0)) Discount,DISBILLMAST.IP_NO
+    const sql = `SELECT SUM (NVL (Irn_Discount, 0)) Discount,DISBILLMAST.IP_NO
                         FROM ipreceipt, Disbillmast
                         WHERE Ipreceipt.Dmc_slno = Disbillmast.Dmc_slno
                             AND Disbillmast.Dmd_date < TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
@@ -480,38 +489,37 @@ module.exports = {
                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             AND IRD_DATE <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
                             AND NVL (Irc_cancel, 'N') = 'N'
-                            AND Disbillmast.IP_NO IN (${ipNumberList})
                             group by DISBILLMAST.IP_NO`;
 
-        try {
-            const result = await conn_ora.execute(
-                sql,
-                {},
-                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-            )
-            await result.resultSet?.getRows((err, rows) => {
-                callBack(err, rows)
-            })
+    try {
+      const result = await conn_ora.execute(
+        sql,
+        {},
+        { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
+      );
+      await result.resultSet?.getRows((err, rows) => {
+        callBack(err, rows);
+      });
+    } catch (error) {
+      console.log(error);
+    } finally {
+      if (conn_ora) {
+        await conn_ora.close();
+        await pool_ora.close();
+      }
+    }
+  },
+  // IP Previous Day's Collectoion(E)
+  ipPreviousDayCollectionTssh: async (data, callBack) => {
+    let pool_ora = await oraConnection();
+    let conn_ora = await pool_ora.getConnection();
 
-        } catch (error) {
-            console.log(error)
-        } finally {
-            if (conn_ora) {
-                await conn_ora.close();
-                await pool_ora.close();
-            }
-        }
-    },
-    // IP Previous Day's Collectoion(E)
-    ipPreviousDayCollectionTssh: async (data, callBack) => {
-        let pool_ora = await oraConnection();
-        let conn_ora = await pool_ora.getConnection();
+    const ipNumberList =
+      (data?.ipNoColl?.length > 0 && data.ipNoColl.join(",")) || null;
+    const fromDate = data.from;
+    const toDate = data.to;
 
-        const ipNumberList = (data?.ipNoColl?.length > 0 && data.ipNoColl.join(',')) || null;
-        const fromDate = data.from;
-        const toDate = data.to;
-
-        const sql = `SELECT SUM (
+    const sql = `SELECT SUM (
                         (  NVL (Ipreceipt.irn_amount, 0)
                         + NVL (Ipreceipt.irn_cheque, 0)
                         + NVL (Ipreceipt.irn_card, 0)
@@ -529,36 +537,36 @@ module.exports = {
                             AND IRD_DATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
                             AND ird_date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
                             AND Irc_cancel IS NULL group by  DISBILLMAST.IP_NO`;
-        try {
-            const result = await conn_ora.execute(
-                sql,
-                {},
-                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-            )
+    try {
+      const result = await conn_ora.execute(
+        sql,
+        {},
+        { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
+      );
 
-            await result.resultSet?.getRows((err, rows) => {
-                callBack(err, rows)
-            })
+      await result.resultSet?.getRows((err, rows) => {
+        callBack(err, rows);
+      });
+    } catch (err) {
+      console.log(err);
+    } finally {
+      if (conn_ora) {
+        await conn_ora.close();
+        await pool_ora.close();
+      }
+    }
+  },
+  // UnSettled Amount
+  unsettledAmount: async (data, callBack) => {
+    let pool_ora = await oraConnection();
+    let conn_ora = await pool_ora.getConnection();
 
-        } catch (err) {
-            console.log(err)
-        } finally {
-            if (conn_ora) {
-                await conn_ora.close();
-                await pool_ora.close();
-            }
-        }
-    },
-    // UnSettled Amount
-    unsettledAmount: async (data, callBack) => {
-        let pool_ora = await oraConnection();
-        let conn_ora = await pool_ora.getConnection();
+    const ipNumberList =
+      (data?.ptno?.length > 0 && data.ptno.join(",")) || null;
+    const fromDate = data.from;
+    const toDate = data.to;
 
-        const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(',')) || null;;
-        const fromDate = data.from;
-        const toDate = data.to;
-
-        const sql = `SELECT 
+    const sql = `SELECT 
                         SUM (NVL (Payable, 0)) Amt, 
                         SUM (tax) tax
                     FROM (SELECT SUM (NVL (DMN_FINALPTPAYABLE, 0)) Payable,
@@ -605,111 +613,103 @@ module.exports = {
                                         + NVL (Ipreceipt.IRN_REFCHEQ, 0)
                                         + NVL (Ipreceipt.irn_refcard, 0))
                                     + NVL (ipreceipt.irn_discount, 0)) <> 0) A`;
-        try {
-            const result = await conn_ora.execute(
-                sql,
-                {},
-                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-            )
-            await result.resultSet?.getRows((err, rows) => {
-                callBack(err, rows)
-            })
+    try {
+      const result = await conn_ora.execute(
+        sql,
+        {},
+        { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
+      );
+      await result.resultSet?.getRows((err, rows) => {
+        callBack(err, rows);
+      });
+    } catch (error) {
+      console.log(error);
+    } finally {
+      if (conn_ora) {
+        await conn_ora.close();
+        await pool_ora.close();
+      }
+    }
+  },
+  // MIS GROUP & CATEGORY
+  misGroupMast: async (callBack) => {
+    let pool_ora = await oraConnection();
+    let conn_ora = await pool_ora.getConnection();
+    try {
+      const result = await conn_ora.execute(
+        `SELECT * FROM MISINCEXPMAST`,
+        {},
+        { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
+      );
 
-        } catch (error) {
-            console.log(error)
-        } finally {
-            if (conn_ora) {
-                await conn_ora.close();
-                await pool_ora.close();
-            }
-        }
-    },
-    // MIS GROUP & CATEGORY 
-    misGroupMast: async (callBack) => {
-        let pool_ora = await oraConnection();
-        let conn_ora = await pool_ora.getConnection();
-        try {
-            const result = await conn_ora.execute(
-                `SELECT * FROM MISINCEXPMAST`,
-                {},
-                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-            )
+      await result.resultSet?.getRows((err, rows) => {
+        callBack(err, rows);
+      });
+    } catch (err) {
+      console.log(err);
+    } finally {
+      if (conn_ora) {
+        await conn_ora.close();
+        await pool_ora.close();
+      }
+    }
+  },
+  misGroup: async (callBack) => {
+    let pool_ora = await oraConnection();
+    let conn_ora = await pool_ora.getConnection();
+    try {
+      const result = await conn_ora.execute(
+        `SELECT * FROM Misincexpgroup`,
+        {},
+        { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
+      );
 
-            await result.resultSet?.getRows((err, rows) => {
-                callBack(err, rows)
-            })
+      await result.resultSet?.getRows((err, rows) => {
+        callBack(err, rows);
+      });
+    } catch (err) {
+      console.log(err);
+    } finally {
+      if (conn_ora) {
+        await conn_ora.close();
+        await pool_ora.close();
+      }
+    }
+  },
+  creditInsuranceBillRefund: async (data, callBack) => {
+    let pool_ora = await oraConnection();
+    let conn_ora = await pool_ora.getConnection();
 
-        } catch (err) {
-            console.log(err)
-        } finally {
-            if (conn_ora) {
-                await conn_ora.close();
-                await pool_ora.close();
-            }
-        }
-    },
-    misGroup: async (callBack) => {
-        let pool_ora = await oraConnection();
-        let conn_ora = await pool_ora.getConnection();
-        try {
-            const result = await conn_ora.execute(
-                `SELECT * FROM Misincexpgroup`,
-                {},
-                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-            )
+    const fromDate = data.from;
+    const toDate = data.to;
 
-            await result.resultSet?.getRows((err, rows) => {
-                callBack(err, rows)
-            })
-
-        } catch (err) {
-            console.log(err)
-        } finally {
-            if (conn_ora) {
-                await conn_ora.close();
-                await pool_ora.close();
-            }
-        }
-    },
-    creditInsuranceBillRefund: async (data, callBack) => {
-        let pool_ora = await oraConnection();
-        let conn_ora = await pool_ora.getConnection();
-
-        const fromDate = data.from;
-        const toDate = data.to;
-
-        try {
-            const result = await conn_ora.execute(
-                `SELECT 0 AMT,0 TAX FROM DUAL`,
-                {},
-                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-            )
-            await result.resultSet?.getRows((err, rows) => {
-                callBack(err, rows)
-            })
-        } catch (error) {
-            console.log(error)
-        } finally {
-            if (conn_ora) {
-                await conn_ora.close();
-                await pool_ora.close();
-            }
-        }
-    },
-    getIpNumberFromPreviousDayCollection: (data, callBack) => {
-
-        const sql = `SELECT ip_no,dis_status,tmch_status
+    try {
+      const result = await conn_ora.execute(
+        `SELECT 0 AMT,0 TAX FROM DUAL`,
+        {},
+        { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
+      );
+      await result.resultSet?.getRows((err, rows) => {
+        callBack(err, rows);
+      });
+    } catch (error) {
+      console.log(error);
+    } finally {
+      if (conn_ora) {
+        await conn_ora.close();
+        await pool_ora.close();
+      }
+    }
+  },
+  getIpNumberFromPreviousDayCollection: (data, callBack) => {
+    const sql = `SELECT ip_no,dis_status,tmch_status
         FROM tssh_ipadmiss 
         WHERE ip_no IN (${data.ipno}) AND tmch_status = ${data.group}`;
-        pool.query(
-            sql,
-            [],
-            (error, results, feilds) => {
-                if (error) {
-                    return error
-                }
-                return callBack(null, results)
-            }
-        )
-    }
-}
+    pool.query(sql, [], (error, results, feilds) => {
+      if (error) {
+        return error;
+      }
+      return callBack(null, results);
+    });
+  },
+};

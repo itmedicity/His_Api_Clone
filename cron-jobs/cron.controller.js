@@ -1,9 +1,8 @@
 const cron = require("node-cron");
-const { oraConnection, oracledb } = require("../config/oradbconfig");
+const {oraConnection, oracledb} = require("../config/oradbconfig");
 const pool = require("../config/dbconfig");
 const mysqlpool = require("../config/dbconfigmeliora");
-const { format, subHours } = require("date-fns");
-
+const {format, subHours} = require("date-fns");
 
 // const getPharmacyName = async () => {
 //   let pool_ora = await oraConnection();
@@ -84,9 +83,7 @@ const { format, subHours } = require("date-fns");
 //   }
 // };
 
-
-//get Inpatient Detail 
-
+//get Inpatient Detail
 
 const getInpatientDetail = async (callBack) => {
   let pool_ora = await oraConnection();
@@ -198,29 +195,27 @@ const getInpatientDetail = async (callBack) => {
                               ORDER BY BED.BDC_NO`;
   try {
     // sql get query from meliora here
-    const detail = await getLastTriggerDate(1)
+    const detail = await getLastTriggerDate(1);
 
     // lastupdate time
-    const lastInsertDate = detail?.fb_last_trigger_date
-      ? new Date(detail?.fb_last_trigger_date)
-      : subHours(new Date(), 1);
+    const lastInsertDate = detail?.fb_last_trigger_date ? new Date(detail?.fb_last_trigger_date) : subHours(new Date(), 1);
 
     // const manualFromDate = new Date(2025, 4, 20, 9, 10, 0);// test date
 
     // date convertion to oracle support
-    const fromDate = format(new Date(lastInsertDate), 'dd/MM/yyyy HH:mm:ss')
-    const toDate = format(new Date(), 'dd/MM/yyyy HH:mm:ss');
+    const fromDate = format(new Date(lastInsertDate), "dd/MM/yyyy HH:mm:ss");
+    const toDate = format(new Date(), "dd/MM/yyyy HH:mm:ss");
 
-    const mysqlsupportToDate = format(new Date(), 'yyyy-MM-dd HH:mm:ss');
+    const mysqlsupportToDate = format(new Date(), "yyyy-MM-dd HH:mm:ss");
 
     // GET DATA FROM ORACLE
     const result = await conn_ora.execute(
       oracleSql,
       {
         FROM_DATE: fromDate,
-        TO_DATE: toDate
+        TO_DATE: toDate,
       },
-      { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
+      {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT}
     );
     await result.resultSet?.getRows((err, rows) => {
       //  CHECK DATA FROM THE ORACLE DATABASE
@@ -229,15 +224,14 @@ const getInpatientDetail = async (callBack) => {
         return;
       }
 
-
       // FILTER DATA
-      const VALUES = rows?.map(item => [
+      const VALUES = rows?.map((item) => [
         item.IP_NO,
-        item.IPD_DATE ? format(new Date(item?.IPD_DATE), 'yyyy-MM-dd HH:mm:ss') : null,
+        item.IPD_DATE ? format(new Date(item?.IPD_DATE), "yyyy-MM-dd HH:mm:ss") : null,
         item.PT_NO,
         item.PTC_PTNAME,
         item.PTC_SEX,
-        item.PTD_DOB ? format(new Date(item?.PTD_DOB), 'yyyy-MM-dd HH:mm:ss') : null,
+        item.PTD_DOB ? format(new Date(item?.PTD_DOB), "yyyy-MM-dd HH:mm:ss") : null,
         item.PTN_DAYAGE,
         item.PTN_MONTHAGE,
         item.PTN_YEARAGE,
@@ -250,15 +244,15 @@ const getInpatientDetail = async (callBack) => {
         item.IPD_BD_CODE,
         item.DO_CODE,
         item.RS_CODE,
-        item.IPD_DISC ? format(new Date(item?.IPD_DISC), 'yyyy-MM-dd HH:mm:ss') : null,
+        item.IPD_DISC ? format(new Date(item?.IPD_DISC), "yyyy-MM-dd HH:mm:ss") : null,
         item.IPC_STATUS,
         item.DMC_SLNO,
-        item.DMD_DATE ? format(new Date(item?.DMD_DATE), 'yyyy-MM-dd HH:mm:ss') : null,
+        item.DMD_DATE ? format(new Date(item?.DMD_DATE), "yyyy-MM-dd HH:mm:ss") : null,
         item.PTC_MOBILE,
         item.IPC_MHCODE,
         item.DOC_NAME,
         item.IPC_CURSTATUS,
-        item.DPC_DESC
+        item.DPC_DESC,
       ]);
 
       // INSERT DATA INTO THE MYSQL TABLE
@@ -304,9 +298,7 @@ const getInpatientDetail = async (callBack) => {
                         fb_dep_desc
                     ) VALUES ?
                     `,
-            [
-              VALUES
-            ],
+            [VALUES],
             (err, result) => {
               if (err) {
                 console.log(err, "err");
@@ -322,35 +314,27 @@ const getInpatientDetail = async (callBack) => {
                       console.log("error in commit");
                     });
                   } else {
-
                     //inserting detail in log table fb_process_id === 1 for inpatientinsert
-                    connection.query(
-                      `INSERT INTO fb_ipadmiss_logdtl (fb_last_trigger_date,fb_process_id) VALUES (?,?)`,
-                      [
-                        mysqlsupportToDate, 1
-                      ],
-                      (err, result) => {
-                        if (err) {
-
-                          connection.rollback(() => {
-                            connection.release();
-                            console.log("error in rollback data");
-                          });
-                        } else {
-                          connection.commit((err) => {
-                            if (err) {
-                              connection.rollback(() => {
-                                connection.release();
-                                console.log("error in commit");
-                              });
-                            } else {
+                    connection.query(`INSERT INTO fb_ipadmiss_logdtl (fb_last_trigger_date,fb_process_id) VALUES (?,?)`, [mysqlsupportToDate, 1], (err, result) => {
+                      if (err) {
+                        connection.rollback(() => {
+                          connection.release();
+                          console.log("error in rollback data");
+                        });
+                      } else {
+                        connection.commit((err) => {
+                          if (err) {
+                            connection.rollback(() => {
                               connection.release();
-                              // console.log("success insertion");
-                            }
-                          });
-                        }
+                              console.log("error in commit");
+                            });
+                          } else {
+                            connection.release();
+                            // console.log("success insertion");
+                          }
+                        });
                       }
-                    );
+                    });
                     //  ends here
                   }
                 });
@@ -371,7 +355,6 @@ const getInpatientDetail = async (callBack) => {
   }
 };
 
-
 // update trigger for ipadmiss to set curstatus ,actrelease and Discharge date details
 const UpdateIpStatusDetails = async (callBack) => {
   let pool_ora = await oraConnection();
@@ -384,29 +367,26 @@ select ip_no,do_code,ipc_currccode,cu_code,ipc_curstatus,ipd_disc,ipc_status,dmd
                and (ipd_disc >= to_date(:FROM_DATE,'dd/MM/yyyy HH24:mi:ss')
                and ipd_disc <= to_date(:TO_DATE,'dd/MM/yyyy HH24:mi:ss'))`;
   try {
+    const detail = await getLastTriggerDate(2);
 
-    const detail = await getLastTriggerDate(2)
-
-    const lastUpdatetDate = detail?.fb_last_update_time
-      ? new Date(detail?.fb_last_update_time)
-      : subHours(new Date(), 1);
+    const lastUpdatetDate = detail?.fb_last_update_time ? new Date(detail?.fb_last_update_time) : subHours(new Date(), 1);
 
     // const manualFromDate = new Date(2025, 4, 20, 9, 10, 0);// test date
 
     // date convertion to oracle support
-    const fromDate = format(new Date(lastUpdatetDate), 'dd/MM/yyyy HH:mm:ss')
-    const toDate = format(new Date(), 'dd/MM/yyyy HH:mm:ss');
+    const fromDate = format(new Date(lastUpdatetDate), "dd/MM/yyyy HH:mm:ss");
+    const toDate = format(new Date(), "dd/MM/yyyy HH:mm:ss");
 
     // mysqlsupport format
-    const mysqlsupportToDate = format(new Date(), 'yyyy-MM-dd HH:mm:ss');
+    const mysqlsupportToDate = format(new Date(), "yyyy-MM-dd HH:mm:ss");
 
     const result = await conn_ora.execute(
       oracleSql,
       {
         FROM_DATE: fromDate,
-        TO_DATE: toDate
+        TO_DATE: toDate,
       },
-      { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
+      {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT}
     );
 
     await result.resultSet?.getRows((err, rows) => {
@@ -417,16 +397,15 @@ select ip_no,do_code,ipc_currccode,cu_code,ipc_curstatus,ipd_disc,ipc_status,dmd
       }
 
       // result of the oracle query
-      const Values = rows?.map(item => [
+      const Values = rows?.map((item) => [
         item.DO_CODE,
         item.IPC_CURSTATUS,
-        item.IPD_DISC ? format(new Date(item?.IPD_DISC), 'yyyy-MM-dd HH:mm:ss') : null,
+        item.IPD_DISC ? format(new Date(item?.IPD_DISC), "yyyy-MM-dd HH:mm:ss") : null,
         item.IPC_STATUS,
-        item.DMD_DATE ? format(new Date(item?.DMD_DATE), 'yyyy-MM-dd HH:mm:ss') : null,
+        item.DMD_DATE ? format(new Date(item?.DMD_DATE), "yyyy-MM-dd HH:mm:ss") : null,
         item.DMC_SLNO,
-        item.IP_NO
+        item.IP_NO,
       ]);
-
 
       // INSERT DATA INTO THE MYSQL TABLEs
       mysqlpool.getConnection((err, connection) => {
@@ -434,7 +413,7 @@ select ip_no,do_code,ipc_currccode,cu_code,ipc_curstatus,ipd_disc,ipc_status,dmd
           // mysql db not connected check connection
           console.log("mysql db not connected check connection");
           return;
-        };
+        }
 
         connection.beginTransaction((err) => {
           if (err) {
@@ -472,8 +451,8 @@ select ip_no,do_code,ipc_currccode,cu_code,ipc_curstatus,ipd_disc,ipc_status,dmd
             });
           });
 
-          Promise.all(updateQueries).
-            then((result) => {
+          Promise.all(updateQueries)
+            .then((result) => {
               connection.commit((err) => {
                 if (err) {
                   connection.rollback(() => {
@@ -482,57 +461,50 @@ select ip_no,do_code,ipc_currccode,cu_code,ipc_curstatus,ipd_disc,ipc_status,dmd
                   });
                 } else {
                   // Updating detail in log table (fb_process_id === 2 for Status Update in ipadmiss)
-                  connection.query(
-                    `INSERT INTO fb_ipadmiss_logdtl (fb_last_trigger_date,fb_process_id) VALUES (?,?)`,
-                    [
-                      mysqlsupportToDate, 2
-                    ],
-                    (err, result) => {
-                      if (err) {
-                        console.log(err, "error");
-                        connection.rollback(() => {
-                          connection.release();
-                          console.log("error in rollback data");
-                        });
-                      } else {
-                        connection.commit((err) => {
-                          if (err) {
-                            connection.rollback(() => {
-                              connection.release();
-                              console.log("error in commit");
-                            });
-                          } else {
+                  connection.query(`INSERT INTO fb_ipadmiss_logdtl (fb_last_trigger_date,fb_process_id) VALUES (?,?)`, [mysqlsupportToDate, 2], (err, result) => {
+                    if (err) {
+                      console.log(err, "error");
+                      connection.rollback(() => {
+                        connection.release();
+                        console.log("error in rollback data");
+                      });
+                    } else {
+                      connection.commit((err) => {
+                        if (err) {
+                          connection.rollback(() => {
                             connection.release();
-                          }
-                        });
-                      }
+                            console.log("error in commit");
+                          });
+                        } else {
+                          connection.release();
+                        }
+                      });
                     }
-                  );
+                  });
                   //  ends here
                 }
               });
-            }).catch((err) => {
+            })
+            .catch((err) => {
               console.log(err, "Update query error");
               connection.rollback(() => {
                 connection.release();
                 console.log("Rolled back due to error");
               });
             });
-
-        })
+        });
       });
     });
   } catch (error) {
     console.log(error, "Error occured!");
-    return callBack(error)
+    return callBack(error);
   } finally {
     if (conn_ora) {
       await conn_ora.close();
       await pool_ora.close();
     }
   }
-}
-
+};
 
 // tirgger for getting data form RMALL bed_code
 const UpdateInpatientDetailRmall = async (callBack) => {
@@ -548,29 +520,26 @@ const UpdateInpatientDetailRmall = async (callBack) => {
                      and  (rmall.rmd_occupdate >= to_date(:FROM_DATE,'dd/MM/yyyy HH24:mi:ss')
                      and rmall.rmd_occupdate <= to_date(:TO_DATE,'dd/MM/yyyy HH24:mi:ss'))`;
   try {
-
     const detail = await getLastTriggerDate(3);
 
-    const lastUpdatetDate = detail?.fb_last_update_time
-      ? new Date(detail?.fb_last_update_time)
-      : subHours(new Date(), 1);
+    const lastUpdatetDate = detail?.fb_last_update_time ? new Date(detail?.fb_last_update_time) : subHours(new Date(), 1);
 
     // const manualFromDate = new Date(2025, 4, 20, 9, 10, 0);// test date
 
     // date convertion to oracle support
-    const fromDate = format(new Date(lastUpdatetDate), 'dd/MM/yyyy HH:mm:ss')
-    const toDate = format(new Date(), 'dd/MM/yyyy HH:mm:ss');
+    const fromDate = format(new Date(lastUpdatetDate), "dd/MM/yyyy HH:mm:ss");
+    const toDate = format(new Date(), "dd/MM/yyyy HH:mm:ss");
 
     // mysqlsupport format
-    const mysqlsupportToDate = format(new Date(), 'yyyy-MM-dd HH:mm:ss');
+    const mysqlsupportToDate = format(new Date(), "yyyy-MM-dd HH:mm:ss");
 
     const result = await conn_ora.execute(
       oracleSql,
       {
         FROM_DATE: fromDate,
-        TO_DATE: toDate
+        TO_DATE: toDate,
       },
-      { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
+      {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT}
     );
 
     await result.resultSet?.getRows((err, rows) => {
@@ -581,10 +550,7 @@ const UpdateInpatientDetailRmall = async (callBack) => {
       }
 
       // result of the oracle query
-      const Values = rows?.map(item => [
-        item.BD_CODE,
-        item.IP_NO
-      ]);
+      const Values = rows?.map((item) => [item.BD_CODE, item.IP_NO]);
 
       // INSERT DATA INTO THE MYSQL TABLE
       mysqlpool.getConnection((err, connection) => {
@@ -615,8 +581,8 @@ const UpdateInpatientDetailRmall = async (callBack) => {
             });
           });
 
-          Promise.all(updateQueries).
-            then((result) => {
+          Promise.all(updateQueries)
+            .then((result) => {
               connection.commit((err) => {
                 if (err) {
                   connection.rollback(() => {
@@ -625,59 +591,52 @@ const UpdateInpatientDetailRmall = async (callBack) => {
                   });
                 } else {
                   // Updating detail in log table fb_process_id === 3 for Ip detail update from rmaill
-                  connection.query(
-                    `INSERT INTO fb_ipadmiss_logdtl (fb_last_trigger_date,fb_process_id) VALUES (?,?)`,
-                    [
-                      mysqlsupportToDate, 3
-                    ],
-                    (err, result) => {
-                      if (err) {
-                        console.log(err, "error");
-                        connection.rollback(() => {
-                          connection.release();
-                          console.log("error in rollback data");
-                        });
-                      } else {
-                        connection.commit((err) => {
-                          if (err) {
-                            connection.rollback(() => {
-                              connection.release();
-                              console.log("error in commit");
-                            });
-                          } else {
+                  connection.query(`INSERT INTO fb_ipadmiss_logdtl (fb_last_trigger_date,fb_process_id) VALUES (?,?)`, [mysqlsupportToDate, 3], (err, result) => {
+                    if (err) {
+                      console.log(err, "error");
+                      connection.rollback(() => {
+                        connection.release();
+                        console.log("error in rollback data");
+                      });
+                    } else {
+                      connection.commit((err) => {
+                        if (err) {
+                          connection.rollback(() => {
                             connection.release();
-                          }
-                        });
-                      }
+                            console.log("error in commit");
+                          });
+                        } else {
+                          connection.release();
+                        }
+                      });
                     }
-                  );
+                  });
                   //  ends here
                 }
               });
-            }).catch((err) => {
+            })
+            .catch((err) => {
               console.log(err, "Update query error");
               connection.rollback(() => {
                 connection.release();
                 console.log("Rolled back due to error");
               });
             });
-
-        })
+        });
       });
     });
   } catch (error) {
     console.log(error, "Error occured!");
-    return callBack(error)
+    return callBack(error);
   } finally {
     if (conn_ora) {
       await conn_ora.close();
       await pool_ora.close();
     }
   }
-}
+};
 
-
-// trigger to fetch data from bed to update fb_bed 
+// trigger to fetch data from bed to update fb_bed
 const UpdateFbBedDetailMeliora = async (callBack) => {
   let pool_ora = await oraConnection();
   let conn_ora = await pool_ora.getConnection();
@@ -698,26 +657,24 @@ const UpdateFbBedDetailMeliora = async (callBack) => {
 
   try {
     const detail = await getLastTriggerDate(4);
-    const lastUpdatetDate = detail?.fb_last_update_time
-      ? new Date(detail?.fb_last_update_time)
-      : subHours(new Date(), 1);
+    const lastUpdatetDate = detail?.fb_last_update_time ? new Date(detail?.fb_last_update_time) : subHours(new Date(), 1);
 
     // const manualFromDate = new Date(2025, 4, 20, 10, 10, 0); // test date
 
     // date convertion to oracle support
-    const fromDate = format(new Date(lastUpdatetDate), 'dd/MM/yyyy HH:mm:ss')
-    const toDate = format(new Date(), 'dd/MM/yyyy HH:mm:ss');
+    const fromDate = format(new Date(lastUpdatetDate), "dd/MM/yyyy HH:mm:ss");
+    const toDate = format(new Date(), "dd/MM/yyyy HH:mm:ss");
 
     // mysqlsupport format
-    const mysqlsupportToDate = format(new Date(), 'yyyy-MM-dd HH:mm:ss');
+    const mysqlsupportToDate = format(new Date(), "yyyy-MM-dd HH:mm:ss");
 
     const result = await conn_ora.execute(
       oracleSql,
       {
         FROM_DATE: fromDate,
-        TO_DATE: toDate
+        TO_DATE: toDate,
       },
-      { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
+      {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT}
     );
 
     await result.resultSet?.getRows((err, rows) => {
@@ -728,11 +685,7 @@ const UpdateFbBedDetailMeliora = async (callBack) => {
       }
 
       // result of the oracle query
-      const Values = rows?.map(item => [
-        item.BDC_OCCUP,
-        item.OCCU,
-        item.BD_CODE
-      ]);
+      const Values = rows?.map((item) => [item.BDC_OCCUP, item.OCCU, item.BD_CODE]);
 
       // INSERT DATA INTO THE MYSQL TABLE
       mysqlpool.getConnection((err, connection) => {
@@ -763,8 +716,8 @@ const UpdateFbBedDetailMeliora = async (callBack) => {
               );
             });
           });
-          Promise.all(updateQueries).
-            then((result) => {
+          Promise.all(updateQueries)
+            .then((result) => {
               connection.commit((err) => {
                 if (err) {
                   connection.rollback(() => {
@@ -773,48 +726,43 @@ const UpdateFbBedDetailMeliora = async (callBack) => {
                   });
                 } else {
                   // Updating detail in log table fb_process_id === 3 for Ip detail update from rmaill
-                  connection.query(
-                    `INSERT INTO fb_ipadmiss_logdtl (fb_last_trigger_date,fb_process_id) VALUES (?,?)`,
-                    [
-                      mysqlsupportToDate, 4
-                    ],
-                    (err, result) => {
-                      if (err) {
-                        console.log(err, "error");
-                        connection.rollback(() => {
-                          connection.release();
-                          console.log("error in rollback data");
-                        });
-                      } else {
-                        connection.commit((err) => {
-                          if (err) {
-                            connection.rollback(() => {
-                              connection.release();
-                              console.log("error in commit");
-                            });
-                          } else {
+                  connection.query(`INSERT INTO fb_ipadmiss_logdtl (fb_last_trigger_date,fb_process_id) VALUES (?,?)`, [mysqlsupportToDate, 4], (err, result) => {
+                    if (err) {
+                      console.log(err, "error");
+                      connection.rollback(() => {
+                        connection.release();
+                        console.log("error in rollback data");
+                      });
+                    } else {
+                      connection.commit((err) => {
+                        if (err) {
+                          connection.rollback(() => {
                             connection.release();
-                          }
-                        });
-                      }
+                            console.log("error in commit");
+                          });
+                        } else {
+                          connection.release();
+                        }
+                      });
                     }
-                  );
+                  });
                   //  ends here
                 }
               });
-            }).catch((err) => {
+            })
+            .catch((err) => {
               console.log(err, "Update query error");
               connection.rollback(() => {
                 connection.release();
                 console.log("Rolled back due to error");
               });
             });
-        })
+        });
       });
     });
   } catch (error) {
     console.log(error, "Error occured!");
-    return callBack(error)
+    return callBack(error);
   } finally {
     if (conn_ora) {
       await conn_ora.close();
@@ -823,14 +771,13 @@ const UpdateFbBedDetailMeliora = async (callBack) => {
   }
 };
 
-
 // const getAmsPatientDetails = async (callBack) => {
 //   let pool_ora = await oraConnection();
 //   let conn_ora = await pool_ora.getConnection();
 
 //   try {
 //     const detail = await getAmsLastUpdatedDate(1);
-//     if (!detail?.ams_last_updated_date) {  
+//     if (!detail?.ams_last_updated_date) {
 //       return; // Exit early — don’t fetch or insert anything
 //     }
 
@@ -838,7 +785,6 @@ const UpdateFbBedDetailMeliora = async (callBack) => {
 //     const fromDate = format(lastInsertDate, 'dd/MM/yyyy HH:mm:ss');
 //     const toDate = format(new Date(), 'dd/MM/yyyy HH:mm:ss');
 //     const mysqlsupportToDate = format(new Date(), 'yyyy-MM-dd HH:mm:ss');
-  
 
 //     const itemCodes = await new Promise((resolve, reject) => {
 //       mysqlpool.query(
@@ -868,7 +814,7 @@ const UpdateFbBedDetailMeliora = async (callBack) => {
 //              DECODE(PT.PTC_SEX, 'M', 'Male', 'F', 'Female') AS GENEDER,
 //              PT.PTN_YEARAGE,
 //              P.IP_NO,
-//              N.NSC_DESC,   
+//              N.NSC_DESC,
 //              D.DOC_NAME,
 //              DP.DPC_DESC,
 //              M.ITC_DESC,
@@ -988,7 +934,7 @@ const UpdateFbBedDetailMeliora = async (callBack) => {
 //               patient_gender,
 //               patient_location,
 //               bed_code,
-//               consultant_department,            
+//               consultant_department,
 //               bill_date,
 //               doc_name
 //             ) VALUES ?`,
@@ -996,8 +942,8 @@ const UpdateFbBedDetailMeliora = async (callBack) => {
 //             (err, result) => {
 //               if (err) {
 //                 connection.query(
-//                   `DELETE FROM ams_antibiotic_patient_details 
-//                    WHERE DATE(create_date) = CURDATE() 
+//                   `DELETE FROM ams_antibiotic_patient_details
+//                    WHERE DATE(create_date) = CURDATE()
 //                      AND TIME(create_date) >= TIME(DATE_SUB(NOW(), INTERVAL 2 MINUTE))`,
 //                   [],
 //                   () => connection.rollback(() => connection.release())
@@ -1034,23 +980,23 @@ const UpdateFbBedDetailMeliora = async (callBack) => {
 //                   (err2, result2) => {
 //                     if (err2) {
 //                       connection.query(
-//                         `DELETE FROM ams_antibiotic_patient_details 
-//                          WHERE DATE(create_date) = CURDATE() 
+//                         `DELETE FROM ams_antibiotic_patient_details
+//                          WHERE DATE(create_date) = CURDATE()
 //                            AND TIME(create_date) >= TIME(DATE_SUB(NOW(), INTERVAL 2 MINUTE))`,
 //                         [],
 //                         () => connection.rollback(() => connection.release())
 //                       );
 //                     } else {
 //                       connection.query(
-//                         `UPDATE ams_patient_details_last_updated_date 
-//                          SET ams_last_updated_date = ? 
+//                         `UPDATE ams_patient_details_last_updated_date
+//                          SET ams_last_updated_date = ?
 //                          WHERE ams_lastupdate_slno = 1`,
 //                         [mysqlsupportToDate],
 //                         (err, result) => {
 //                           if (err) {
 //                             connection.query(
-//                               `DELETE FROM ams_antibiotic_patient_details 
-//                                WHERE DATE(create_date) = CURDATE() 
+//                               `DELETE FROM ams_antibiotic_patient_details
+//                                WHERE DATE(create_date) = CURDATE()
 //                                  AND TIME(create_date) >= TIME(DATE_SUB(NOW(), INTERVAL 2 MINUTE))`,
 //                               [],
 //                               () => connection.rollback(() => connection.release())
@@ -1059,8 +1005,8 @@ const UpdateFbBedDetailMeliora = async (callBack) => {
 //                             connection.commit(err => {
 //                               if (err) {
 //                                 connection.query(
-//                                   `DELETE FROM ams_antibiotic_patient_details 
-//                                    WHERE DATE(create_date) = CURDATE() 
+//                                   `DELETE FROM ams_antibiotic_patient_details
+//                                    WHERE DATE(create_date) = CURDATE()
 //                                      AND TIME(create_date) >= TIME(DATE_SUB(NOW(), INTERVAL 2 MINUTE))`,
 //                                   [],
 //                                   () => connection.rollback(() => connection.release())
@@ -1097,24 +1043,20 @@ const getAmsPatientDetails = async (callBack) => {
     if (!detail?.ams_last_updated_date) return;
 
     const lastInsertDate = new Date(detail.ams_last_updated_date);
-    const fromDate = format(lastInsertDate, 'dd/MM/yyyy HH:mm:ss');
-    const toDate = format(new Date(), 'dd/MM/yyyy HH:mm:ss');
-    const mysqlsupportToDate = format(new Date(), 'yyyy-MM-dd HH:mm:ss');
+    const fromDate = format(lastInsertDate, "dd/MM/yyyy HH:mm:ss");
+    const toDate = format(new Date(), "dd/MM/yyyy HH:mm:ss");
+    const mysqlsupportToDate = format(new Date(), "yyyy-MM-dd HH:mm:ss");
 
     const itemCodes = await new Promise((resolve, reject) => {
-      mysqlpool.query(
-        `SELECT item_code FROM ams_antibiotic_master WHERE status = 1`,
-        [],
-        (err, results) => {
-          if (err) return reject(err);
-          resolve(results.map(row => row.item_code));
-        }
-      );
+      mysqlpool.query(`SELECT item_code FROM ams_antibiotic_master WHERE status = 1`, [], (err, results) => {
+        if (err) return reject(err);
+        resolve(results.map((row) => row.item_code));
+      });
     });
 
     if (itemCodes.length === 0) return;
 
-    const itemCodeBinds = itemCodes.map((_, i) => `:item_code_${i}`).join(',');
+    const itemCodeBinds = itemCodes.map((_, i) => `:item_code_${i}`).join(",");
     const itemCodeParams = {};
     itemCodes.forEach((code, i) => {
       itemCodeParams[`item_code_${i}`] = code;
@@ -1155,7 +1097,7 @@ const getAmsPatientDetails = async (callBack) => {
     const bindParams = {
       FROM_DATE: fromDate,
       TO_DATE: toDate,
-      ...itemCodeParams
+      ...itemCodeParams,
     };
 
     const result = await conn_ora.execute(oracleSql, bindParams, {
@@ -1168,7 +1110,7 @@ const getAmsPatientDetails = async (callBack) => {
 
       const formatDateTime = (dateStr) => {
         const date = new Date(dateStr);
-        return date.toISOString().slice(0, 19).replace('T', ' ');
+        return date.toISOString().slice(0, 19).replace("T", " ");
       };
 
       const filteredRows = rows.filter((item) => item.PT_NO != null && item.IP_NO != null);
@@ -1176,7 +1118,7 @@ const getAmsPatientDetails = async (callBack) => {
 
       const groupedMap = new Map();
 
-      filteredRows.forEach(item => {
+      filteredRows.forEach((item) => {
         const key = item.IP_NO;
         const formattedDate = formatDateTime(item.BMD_DATE);
 
@@ -1192,9 +1134,9 @@ const getAmsPatientDetails = async (callBack) => {
               BD_CODE: item.BD_CODE,
               DPC_DESC: item.DPC_DESC,
               DOC_NAME: item.DOC_NAME,
-              BMD_DATE: formattedDate
+              BMD_DATE: formattedDate,
             },
-            antibiotics: []
+            antibiotics: [],
           });
         }
 
@@ -1207,12 +1149,12 @@ const getAmsPatientDetails = async (callBack) => {
           item_code: item.IT_CODE,
           bill_no: item.BM_NO,
           bill_date: formattedDate,
-          item_status: 1
+          item_status: 1,
         });
       });
 
       const ipNos = Array.from(groupedMap.keys());
-      const placeholders = ipNos.map(() => '?').join(',');
+      const placeholders = ipNos.map(() => "?").join(",");
 
       mysqlpool.getConnection((err, connection) => {
         if (err) return;
@@ -1226,7 +1168,7 @@ const getAmsPatientDetails = async (callBack) => {
             if (err) return connection.release();
 
             const existingMap = new Map();
-            existingRows.forEach(row => {
+            existingRows.forEach((row) => {
               existingMap.set(row.patient_ip_no, row.ams_patient_detail_slno);
             });
 
@@ -1237,39 +1179,22 @@ const getAmsPatientDetails = async (callBack) => {
               const p = data.patient;
               if (existingMap.has(ip_no)) {
                 const existingId = existingMap.get(ip_no);
-                data.antibiotics.forEach(row => {
-                  antibioticsFinal.push([
-                    existingId,
-                    ip_no,
-                    row.item_code,
-                    row.bill_no,
-                    row.bill_date,
-                    row.item_status
-                  ]);
+                data.antibiotics.forEach((row) => {
+                  antibioticsFinal.push([existingId, ip_no, row.item_code, row.bill_no, row.bill_date, row.item_status]);
                 });
               } else {
-                newPatients.push([
-                  p.PT_NO,
-                  p.IP_NO,
-                  p.PTC_PTNAME,
-                  p.PTN_YEARAGE,
-                  p.GENEDER,
-                  p.NSC_DESC,
-                  p.BD_CODE,
-                  p.DPC_DESC,
-                  p.BMD_DATE,
-                  p.DOC_NAME
-                ]);
+                newPatients.push([p.PT_NO, p.IP_NO, p.PTC_PTNAME, p.PTN_YEARAGE, p.GENEDER, p.NSC_DESC, p.BD_CODE, p.DPC_DESC, p.BMD_DATE, p.DOC_NAME]);
               }
             }
 
-            connection.beginTransaction(err => {
+            connection.beginTransaction((err) => {
               if (err) return connection.release();
 
-              const insertNewPatients = newPatients.length > 0
-                ? new Promise((resolve, reject) => {
-                    connection.query(
-                      `INSERT INTO ams_antibiotic_patient_details (
+              const insertNewPatients =
+                newPatients.length > 0
+                  ? new Promise((resolve, reject) => {
+                      connection.query(
+                        `INSERT INTO ams_antibiotic_patient_details (
                         mrd_no,
                         patient_ip_no,
                         patient_name,
@@ -1281,35 +1206,28 @@ const getAmsPatientDetails = async (callBack) => {
                         bill_date,
                         doc_name
                       ) VALUES ?`,
-                      [newPatients],
-                      (err, result) => {
-                        if (err) return reject(err);
+                        [newPatients],
+                        (err, result) => {
+                          if (err) return reject(err);
 
-                        const insertedIds = Array.from({ length: result.affectedRows }, (_, i) => result.insertId + i);
-                        let index = 0;
+                          const insertedIds = Array.from({length: result.affectedRows}, (_, i) => result.insertId + i);
+                          let index = 0;
 
-                        for (const [ip_no, data] of groupedMap.entries()) {
-                          if (!existingMap.has(ip_no)) {
-                            const newId = insertedIds[index++];
-                            existingMap.set(ip_no, newId);
-                            data.antibiotics.forEach(row => {
-                              antibioticsFinal.push([
-                                newId,
-                                ip_no,
-                                row.item_code,
-                                row.bill_no,
-                                row.bill_date,
-                                row.item_status
-                              ]);
-                            });
+                          for (const [ip_no, data] of groupedMap.entries()) {
+                            if (!existingMap.has(ip_no)) {
+                              const newId = insertedIds[index++];
+                              existingMap.set(ip_no, newId);
+                              data.antibiotics.forEach((row) => {
+                                antibioticsFinal.push([newId, ip_no, row.item_code, row.bill_no, row.bill_date, row.item_status]);
+                              });
+                            }
                           }
-                        }
 
-                        resolve();
-                      }
-                    );
-                  })
-                : Promise.resolve();
+                          resolve();
+                        }
+                      );
+                    })
+                  : Promise.resolve();
 
               insertNewPatients
                 .then(() => {
@@ -1333,7 +1251,7 @@ const getAmsPatientDetails = async (callBack) => {
                         [mysqlsupportToDate],
                         (err3) => {
                           if (err3) return connection.rollback(() => connection.release());
-                          connection.commit(err4 => {
+                          connection.commit((err4) => {
                             if (err4) return connection.rollback(() => connection.release());
                             connection.release();
                           });
@@ -1342,7 +1260,7 @@ const getAmsPatientDetails = async (callBack) => {
                     }
                   );
                 })
-                .catch(err => connection.rollback(() => connection.release()));
+                .catch((err) => connection.rollback(() => connection.release()));
             });
           }
         );
@@ -1352,8 +1270,6 @@ const getAmsPatientDetails = async (callBack) => {
     return callBack(error);
   }
 };
-
-
 
 const InsertChilderDetailMeliora = async (callBack) => {
   let pool_ora = await oraConnection();
@@ -1383,16 +1299,15 @@ const InsertChilderDetailMeliora = async (callBack) => {
             LEFT JOIN BRITHREGDETL L ON B.BR_SLNO=L.BR_SLNO
        WHERE B.BRD_DATE>= to_date(:GET_DATE,'DD-MON-YYYY')`;
   try {
-
     // date convertion to oracle support
-    const formattedDate = format(new Date(), 'dd-MMM-yyyy').toUpperCase();
+    const formattedDate = format(new Date(), "dd-MMM-yyyy").toUpperCase();
 
     const result = await conn_ora.execute(
       oracleSql,
       {
-        GET_DATE: formattedDate
+        GET_DATE: formattedDate,
       },
-      { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
+      {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT}
     );
 
     await result.resultSet?.getRows((err, rows) => {
@@ -1402,9 +1317,9 @@ const InsertChilderDetailMeliora = async (callBack) => {
         return;
       }
       // result of the oracle query
-      const VALUES = rows?.map(item => [
+      const VALUES = rows?.map((item) => [
         item.BR_SLNO,
-        item.BRD_DATE ? format(new Date(item?.BRD_DATE), 'yyyy-MM-dd HH:mm:ss') : null,
+        item.BRD_DATE ? format(new Date(item?.BRD_DATE), "yyyy-MM-dd HH:mm:ss") : null,
         item.PT_NO,
         item.PTC_PTNAME,
         item.PTC_LOADD1,
@@ -1417,7 +1332,7 @@ const InsertChilderDetailMeliora = async (callBack) => {
         item.IP_NO,
         item.BRC_MHCODE,
         item.CHILD_GENDER,
-        item.BIRTH_DATE ? format(new Date(item?.BIRTH_DATE), 'yyyy-MM-dd HH:mm:ss') : null,
+        item.BIRTH_DATE ? format(new Date(item?.BIRTH_DATE), "yyyy-MM-dd HH:mm:ss") : null,
         item.MOTHER_IPNO,
         item.CHILD_PT_NO,
         item.CHILD_IPNO,
@@ -1458,9 +1373,7 @@ const InsertChilderDetailMeliora = async (callBack) => {
                   fb_child_weight
                 ) VALUES ?
                   `,
-            [
-              VALUES
-            ],
+            [VALUES],
             (err, result) => {
               if (err) {
                 console.log(err, "err");
@@ -1482,12 +1395,12 @@ const InsertChilderDetailMeliora = async (callBack) => {
               }
             }
           );
-        })
+        });
       });
     });
   } catch (error) {
     console.log(error, "Error occured!");
-    return callBack(error)
+    return callBack(error);
   } finally {
     if (conn_ora) {
       await conn_ora.close();
@@ -1495,8 +1408,6 @@ const InsertChilderDetailMeliora = async (callBack) => {
     }
   }
 };
-
-
 
 const updateAmsPatientDetails = () => {
   mysqlpool.getConnection((err, connection) => {
@@ -1533,7 +1444,7 @@ const updateAmsPatientDetails = () => {
       if (Err) {
         connection.release();
         return;
-      }        
+      }
       if (results.length === 0) {
         connection.release();
         return;
@@ -1544,8 +1455,8 @@ const updateAmsPatientDetails = () => {
         WHERE ams_patient_detail_slno = ? AND patient_ip_no = ?
       `;
 
-      const updatePromises = results.map(row => {
-        const { fb_bd_code, fb_ns_name, ams_patient_detail_slno, patient_ip_no } = row;
+      const updatePromises = results.map((row) => {
+        const {fb_bd_code, fb_ns_name, ams_patient_detail_slno, patient_ip_no} = row;
         return new Promise((resolve, reject) => {
           connection.query(updateQuery, [fb_bd_code, fb_ns_name, ams_patient_detail_slno, patient_ip_no], (updateErr) => {
             if (updateErr) {
@@ -1560,8 +1471,7 @@ const updateAmsPatientDetails = () => {
       // all settle works even if any of the query fails and doest throw error
       Promise.allSettled(updatePromises)
         .then(() => {
-          connection.release();   
-          
+          connection.release();
         })
         .catch(() => {
           connection.release();
@@ -1569,9 +1479,6 @@ const updateAmsPatientDetails = () => {
     });
   });
 };
-
-
-
 
 /****************************/
 
@@ -1622,46 +1529,38 @@ const getAmsLastUpdatedDate = async (processId) => {
   });
 };
 
-
-
-
-
 /****************************/
 
-// auto sync at an interval of 10 min
-cron.schedule("* * * * *", () => {
-  getInpatientDetail();
-});
+// // auto sync at an interval of 10 min
+// cron.schedule("* * * * *", () => {
+//   getInpatientDetail();
+// });
 
-//  test triggering
-cron.schedule("*/2 * * * *", () => {
-  UpdateFbBedDetailMeliora();
-});
+// //  test triggering
+// cron.schedule("*/2 * * * *", () => {
+//   UpdateFbBedDetailMeliora();
+// });
 
-//  auto sync at an interval of 25 min
-cron.schedule("*/5 * * * *", () => {
-  UpdateInpatientDetailRmall();
-});
+// //  auto sync at an interval of 25 min
+// cron.schedule("*/5 * * * *", () => {
+//   UpdateInpatientDetailRmall();
+// });
 
-//  auto sync at an interval of 20 min
-cron.schedule("*/4 * * * *", () => {
-  UpdateIpStatusDetails();
-});
+// //  auto sync at an interval of 20 min
+// cron.schedule("*/4 * * * *", () => {
+//   UpdateIpStatusDetails();
+// });
 
+// cron.schedule('*/49 * * * *', () => {
+//   getAmsPatientDetails();
+// });
 
+// //runs at every 3 hours
+// cron.schedule('0 */3 * * *', () => {
+//   updateAmsPatientDetails();
+// });
 
-cron.schedule('*/49 * * * *', () => {
-  getAmsPatientDetails();
-});
-
-
-//runs at every 3 hours
-cron.schedule('0 */3 * * *', () => {
-  updateAmsPatientDetails();
-});
-
-// Running InsertChilderDetailMeliora at midnight... 11.00 pm
-cron.schedule("0 23 * * *", () => {
-  InsertChilderDetailMeliora();
-});
-
+// // Running InsertChilderDetailMeliora at midnight... 11.00 pm
+// cron.schedule("0 23 * * *", () => {
+//   InsertChilderDetailMeliora();
+// });
