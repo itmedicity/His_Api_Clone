@@ -2,8 +2,7 @@ const pool = require('../../config/dbconfig');
 module.exports = {
     getOPCountYear: (data, callBack) => {
         const fromDate = data.from;
-        const toDate = data.to;
-        // console.log(data);
+        const toDate = data.to;    
         pool.query(
             `select year, count, yearday from op_count_year WHERE
              yearday between ('${fromDate}')and ('${toDate}') order by yearday`,
@@ -19,8 +18,7 @@ module.exports = {
 
     getIPCountYear: (data, callBack) => {
         const fromDate = data.from;
-        const toDate = data.to;
-        // console.log(data);
+        const toDate = data.to;  
         pool.query(
             `select year, count, yearday from ip_count_year WHERE
              yearday between ('${fromDate}')and ('${toDate}') order by yearday`,

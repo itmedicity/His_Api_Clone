@@ -25,6 +25,7 @@
     "jsonwebtoken": "^9.0.0",
     "moment": "^2.29.4",
     "mysql": "^2.18.1",
+    "node-cron": "^3.0.2",
     "oracledb": "^5.5.0"
   },
   "devDependencies": {
