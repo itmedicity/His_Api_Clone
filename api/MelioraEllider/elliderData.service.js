@@ -792,7 +792,7 @@ module.exports = {
         const sql = `SELECT DSC_DESCRIPTION 
                      FROM CLINICAL.DISCHARGESUMMARYHTML DS
                      LEFT JOIN CLINICAL.DISCHARGESUMMARY D ON DS.DS_SLNO=D.DS_SLNO
-                     WHERE D.DSC_APPROVAL='Y' AND DS.DSC_HEAD = 'DSC_FOLLOWUP' AND  DS.IP_NO = :IP_NO;`;
+                     WHERE D.DSC_APPROVAL='Y' AND DS.DSC_HEAD = 'DSC_FOLLOWUP' AND  DS.IP_NO = :IP_NO`;
         try {
             const result = await conn_ora.execute(
                 sql,
