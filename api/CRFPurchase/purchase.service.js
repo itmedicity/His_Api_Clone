@@ -50,9 +50,10 @@ module.exports = {
     // AND PORDMAST.POC_CLOSE IS NULL
 
     getPendingPODetails: async (data, callBack) => {
+
+
         const ponoArray = data.map(d => `'${d.pono}'`).join(",");
         const stcodeArray = data.map(d => `'${d.stcode}'`).join(",");
-
         let pool_ora = await oraConnection();
         let conn_ora = await pool_ora.getConnection();
         try {
@@ -68,7 +69,8 @@ module.exports = {
                 WHERE
                        POC_CANCEL IS NULL
                        AND PO_NO IN (${ponoArray})
-                       AND ST_CODE IN (${stcodeArray}) `;
+                       AND ST_CODE IN (${stcodeArray})
+                       AND PORDMAST.POD_DATE >= ADD_MONTHS(SYSDATE, -30) `;
 
             const result = await conn_ora.execute(
                 query,
@@ -148,7 +150,7 @@ module.exports = {
                         AND PORDDETL.TX_CODE = TAX.TX_CODE
                         AND PORDMAST.SU_CODE=:spcode
                         AND PORDMAST.POC_CANCEL IS NULL AND POC_CLOSE IS NULL
-                        AND PORDMAST.PON_TOTAPPROVALSCOMP=3
+                        AND PORDMAST.PON_TOTAPPROVALSCOMP=2
                         AND PORDMAST.POD_DATE >= ADD_MONTHS(SYSDATE, -12)
                  ORDER BY PORDMAST.POD_DATE DESC `,
                 {
@@ -172,8 +174,8 @@ module.exports = {
 
 
     getItemDetails: async (data, callBack) => {
-        const ponoArray = data.map(d => `'${d.pono}'`).join(",");
-        const stcodeArray = data.map(d => `'${d.stcode}'`).join(",");
+        const ponoArray = data?.map(d => `'${d.pono}'`).join(",");
+        const stcodeArray = data?.map(d => `'${d.stcode}'`).join(",");
 
         let pool_ora = await oraConnection();
         let conn_ora = await pool_ora.getConnection();
