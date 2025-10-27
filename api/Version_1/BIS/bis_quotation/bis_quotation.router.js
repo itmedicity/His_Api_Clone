@@ -1,12 +1,13 @@
 const router = require('express').Router();
+const { checkToken } = require('../../../../auth/jwtValidation');
 const { getQtnMastDetails, getQtnDetailDetails, getActiveItems, storeItems, medstore, medDescription, getTotalQtn } = require('./bis_quotation.controller')
 
-router.post('/qtnMastDetails', getQtnMastDetails);
-router.post('/qtnDetailDetails', getQtnDetailDetails);
-router.get('/getActiveItems', getActiveItems);
-router.get('/storeItems', storeItems);
-router.get('/medstore', medstore);
-router.get('/medDescription', medDescription);
-router.get('/getTotalQtn', getTotalQtn);
+router.post('/qtnMastDetails', checkToken, getQtnMastDetails);
+router.post('/qtnDetailDetails', checkToken, getQtnDetailDetails);
+router.get('/getActiveItems', checkToken, getActiveItems);
+router.get('/storeItems', checkToken, storeItems);
+router.get('/medstore', checkToken, medstore);
+router.get('/medDescription', checkToken, medDescription);
+router.get('/getTotalQtn', checkToken, getTotalQtn);
 
 module.exports = router;

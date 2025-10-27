@@ -136,7 +136,9 @@ module.exports = {
 
     getTotalQtn: (req, res) => {
         const body = req.body;
+        // console.log("getTotalQtn", body);
         getTotalQtn(body, (err, results) => {
+            // console.log("results:", results);
             if (err) {
                 return res.status(200).json({
                     success: 0,

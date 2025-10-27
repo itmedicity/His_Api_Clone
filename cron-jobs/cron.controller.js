@@ -839,7 +839,7 @@ const UpdateFbBedDetailMeliora = async (callBack) => {
 //     const fromDate = format(lastInsertDate, 'dd/MM/yyyy HH:mm:ss');
 //     const toDate = format(new Date(), 'dd/MM/yyyy HH:mm:ss');
 //     const mysqlsupportToDate = format(new Date(), 'yyyy-MM-dd HH:mm:ss');
-  
+
 
 //     const itemCodes = await new Promise((resolve, reject) => {
 //       mysqlpool.query(
@@ -1269,8 +1269,8 @@ const getAmsPatientDetails = async (callBack) => {
 
               const insertNewPatients = newPatients.length > 0
                 ? new Promise((resolve, reject) => {
-                    connection.query(
-                      `INSERT INTO ams_antibiotic_patient_details (
+                  connection.query(
+                    `INSERT INTO ams_antibiotic_patient_details (
                         mrd_no,
                         patient_ip_no,
                         patient_name,
@@ -1282,34 +1282,34 @@ const getAmsPatientDetails = async (callBack) => {
                         bill_date,
                         doc_name
                       ) VALUES ?`,
-                      [newPatients],
-                      (err, result) => {
-                        if (err) return reject(err);
+                    [newPatients],
+                    (err, result) => {
+                      if (err) return reject(err);
 
-                        const insertedIds = Array.from({ length: result.affectedRows }, (_, i) => result.insertId + i);
-                        let index = 0;
+                      const insertedIds = Array.from({ length: result.affectedRows }, (_, i) => result.insertId + i);
+                      let index = 0;
 
-                        for (const [ip_no, data] of groupedMap.entries()) {
-                          if (!existingMap.has(ip_no)) {
-                            const newId = insertedIds[index++];
-                            existingMap.set(ip_no, newId);
-                            data.antibiotics.forEach(row => {
-                              antibioticsFinal.push([
-                                newId,
-                                ip_no,
-                                row.item_code,
-                                row.bill_no,
-                                row.bill_date,
-                                row.item_status
-                              ]);
-                            });
-                          }
+                      for (const [ip_no, data] of groupedMap.entries()) {
+                        if (!existingMap.has(ip_no)) {
+                          const newId = insertedIds[index++];
+                          existingMap.set(ip_no, newId);
+                          data.antibiotics.forEach(row => {
+                            antibioticsFinal.push([
+                              newId,
+                              ip_no,
+                              row.item_code,
+                              row.bill_no,
+                              row.bill_date,
+                              row.item_status
+                            ]);
+                          });
                         }
-
-                        resolve();
                       }
-                    );
-                  })
+
+                      resolve();
+                    }
+                  );
+                })
                 : Promise.resolve();
 
               insertNewPatients
@@ -1933,7 +1933,7 @@ const InsertTmcMedDesc = async (callBack) => {
         WHERE trgr_slno = 1`, [currentDate]);
     }
 
-    // ✅ Step 9: Commit transaction
+    //  Step 9: Commit transaction
     await mysqlConn.commit();
 
     if (callBack) callBack(null, `Inserted: ${Values.length}, Updated: ${filteredUpdates.length}`);
@@ -1947,15 +1947,7 @@ const InsertTmcMedDesc = async (callBack) => {
   }
 };
 
-// Run via cron
-// cron.schedule("* * * * *", () => {
-//   InsertKmcMedDesc();
-// });
 
-
-cron.schedule("0 0 * * *", () => {
-  InsertTmcMedDesc();
-});
 
 ///////////////////////////////////KMC*******************************
 
@@ -2172,7 +2164,7 @@ const InsertKmcMedDesc = async (callBack) => {
     const updateRows = await updateResult.resultSet.getRows();
     await updateResult.resultSet.close();
 
-    const updateItCodes = await getTMCItCodesInChunks(mysqlConn, fromDate, toDate, 1000);
+    const updateItCodes = await getKMCItCodesInChunks(mysqlConn, fromDate, toDate, 1000);
     const updateSet = new Set(updateItCodes.flat());
 
     const filteredUpdates = updateRows.filter(row => updateSet.has(row.IT_CODE));
@@ -2209,7 +2201,7 @@ const InsertKmcMedDesc = async (callBack) => {
         WHERE trgr_slno = 1`, [currentDate]);
     }
 
-    // ✅ Step 9: Commit transaction
+    //  Step 9: Commit transaction
     await mysqlConn.commit();
 
     if (callBack) callBack(null, `Inserted: ${Values.length}, Updated: ${filteredUpdates.length}`);
@@ -2225,14 +2217,16 @@ const InsertKmcMedDesc = async (callBack) => {
 
 
 
-cron.schedule("0 0 * * *", () => {
-  InsertKmcMedDesc();
-});
+// cron.schedule("0 0 * * *", () => {
+//   InsertKmcMedDesc();
+// });
 
 
 
-
-
+// // for 5 mints
+// cron.schedule('*/5 * * * *', () => {
+//   InsertKmcMedDesc();
+// });
 
 
 
@@ -2419,7 +2413,7 @@ const updateAmsPatientDetails = () => {
       if (Err) {
         connection.release();
         return;
-      }        
+      }
       if (results.length === 0) {
         connection.release();
         return;
@@ -2446,8 +2440,8 @@ const updateAmsPatientDetails = () => {
       // all settle works even if any of the query fails and doest throw error
       Promise.allSettled(updatePromises)
         .then(() => {
-          connection.release();   
-          
+          connection.release();
+
         })
         .catch(() => {
           connection.release();
@@ -2551,3 +2545,16 @@ cron.schedule("0 23 * * *", () => {
   InsertChilderDetailMeliora();
 });
 
+
+// Run via cron- Jomol for BIS
+// cron.schedule("*/2 * * * *", () => {
+//   InsertKmcMedDesc();
+// });
+
+cron.schedule("0 0 * * *", () => {
+  InsertKmcMedDesc();
+});
+
+cron.schedule("0 22 * * *", () => {
+  InsertTmcMedDesc();
+});
