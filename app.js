@@ -66,6 +66,10 @@ const bisQuotationData = require("./api/Version_1/BIS/bis_quotation/bis_quotatio
 const amsAntibioticData = require('./api/Ams/Ams.router')
 
 
+//MEDLAB patient Lab result 
+
+const medlab = require('./api/Medlab/medlab.router')
+
 // CRON JOB FUNCTION
 const cronjob = require("./cron-jobs/cron.router");
 
@@ -146,6 +150,10 @@ app.use("/api/bisQuotationData", bisQuotationData);
 
 //Ams _Antibiotic Data Collection
 app.use("/api/amsAntibiotic", amsAntibioticData)
+
+
+//MedLab Patient Lab Result and Pharmacy
+app.use("/api/medlab", medlab)
 
 // CRON JOB FUNCTION
 app.use("/api/cronjob", cronjob);
