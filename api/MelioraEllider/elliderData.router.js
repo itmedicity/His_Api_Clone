@@ -11,7 +11,8 @@ const { getOutlet,
     getNursingBed,
     getCurrentPatient,
     getDisChargedPatient,
-    getInpatientFollowUp
+    getInpatientFollowUp,
+    getBedMasterDetail
 } = require('./elliderData.controller')
 
 // router.get('/outlet', checkToken, getOutlet);
@@ -31,6 +32,8 @@ router.post('/inpatientdetil', getCurrentPatient)
 
 router.post('/getdischargepatient', getDisChargedPatient)
 router.post('/getipfollowup', getInpatientFollowUp)
+
+router.post('/bed/import', getBedMasterDetail)
 
 
 module.exports = router;
