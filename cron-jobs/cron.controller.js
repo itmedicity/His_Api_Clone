@@ -151,8 +151,8 @@ const getInpatientDetail = async (callBack) => {
     // const manualFromDate = new Date(2025, 4, 20, 9, 10, 0);// test date
 
     // date convertion to oracle support
-      const fromDate = format(new Date(lastInsertDate), 'dd/MM/yyyy HH:mm:ss'); 
-      const toDate = format(new Date(), 'dd/MM/yyyy HH:mm:ss');
+    const fromDate = format(new Date(lastInsertDate), 'dd/MM/yyyy HH:mm:ss');
+    const toDate = format(new Date(), 'dd/MM/yyyy HH:mm:ss');
 
     const mysqlsupportToDate = format(new Date(), 'yyyy-MM-dd HH:mm:ss');
 
@@ -182,49 +182,49 @@ const getInpatientDetail = async (callBack) => {
       }
 
 
-    // FILTER DATA
-    const VALUES = rows?.map(item => [
-      item.IP_NO,
-      item.IPD_DATE ? format(new Date(item?.IPD_DATE), 'yyyy-MM-dd HH:mm:ss') : null,
-      item.PT_NO,
-      item.PTC_PTNAME,
-      item.PTC_SEX,
-      item.PTD_DOB ? format(new Date(item?.PTD_DOB), 'yyyy-MM-dd HH:mm:ss') : null,
-      item.PTN_DAYAGE,
-      item.PTN_MONTHAGE,
-      item.PTN_YEARAGE,
-      item.PTC_LOADD1,
-      item.PTC_LOADD2,
-      item.PTC_LOADD3,
-      item.PTC_LOADD4,
-      item.PTC_LOPIN,
-      item.RC_CODE,
-      item.IPD_BD_CODE,
-      item.DO_CODE,
-      item.RS_CODE,
-      item.IPC_CURSTATUS,
-      item.PTC_MOBILE,
-      item.IPC_MHCODE,
-      item.DOC_NAME,
-      item.DPC_DESC
-    ]);
+      // FILTER DATA
+      const VALUES = rows?.map(item => [
+        item.IP_NO,
+        item.IPD_DATE ? format(new Date(item?.IPD_DATE), 'yyyy-MM-dd HH:mm:ss') : null,
+        item.PT_NO,
+        item.PTC_PTNAME,
+        item.PTC_SEX,
+        item.PTD_DOB ? format(new Date(item?.PTD_DOB), 'yyyy-MM-dd HH:mm:ss') : null,
+        item.PTN_DAYAGE,
+        item.PTN_MONTHAGE,
+        item.PTN_YEARAGE,
+        item.PTC_LOADD1,
+        item.PTC_LOADD2,
+        item.PTC_LOADD3,
+        item.PTC_LOADD4,
+        item.PTC_LOPIN,
+        item.RC_CODE,
+        item.IPD_BD_CODE,
+        item.DO_CODE,
+        item.RS_CODE,
+        item.IPC_CURSTATUS,
+        item.PTC_MOBILE,
+        item.IPC_MHCODE,
+        item.DOC_NAME,
+        item.DPC_DESC
+      ]);
 
 
-    // INSERT DATA INTO THE MYSQL TABLE
-    mysqlpool.getConnection((err, connection) => {
-      if (err) {
-        // mysql db not connected check connection
-        console.log("mysql db not connected check connection");
-        return;
-      }
-      connection.beginTransaction((err) => {
+      // INSERT DATA INTO THE MYSQL TABLE
+      mysqlpool.getConnection((err, connection) => {
         if (err) {
-          connection.release();
-          console.log("error in begin transaction");
+          // mysql db not connected check connection
+          console.log("mysql db not connected check connection");
+          return;
         }
+        connection.beginTransaction((err) => {
+          if (err) {
+            connection.release();
+            console.log("error in begin transaction");
+          }
 
-        connection.query(
-          `INSERT INTO fb_ipadmiss (
+          connection.query(
+            `INSERT INTO fb_ipadmiss (
                         fb_ip_no,
                         fb_ipd_date,
                         fb_pt_no,
@@ -250,61 +250,61 @@ const getInpatientDetail = async (callBack) => {
                         fb_dep_desc
                     ) VALUES ?
                     `,
-          [
-            VALUES
-          ],
-          (err, result) => {
-            if (err) {
-              console.log(err, "err");
-              connection.rollback(() => {
-                connection.release();
-                console.log("error in rollback data");
-              });
-            } else {
-              connection.commit((err) => {
-                if (err) {
-                  connection.rollback(() => {
-                    connection.release();
-                    console.log("error in commit");
-                  });
-                } else {
+            [
+              VALUES
+            ],
+            (err, result) => {
+              if (err) {
+                console.log(err, "err");
+                connection.rollback(() => {
+                  connection.release();
+                  console.log("error in rollback data");
+                });
+              } else {
+                connection.commit((err) => {
+                  if (err) {
+                    connection.rollback(() => {
+                      connection.release();
+                      console.log("error in commit");
+                    });
+                  } else {
 
-                  //inserting detail in log table fb_process_id === 1 for inpatientinsert
-                  connection.query(
-                    `INSERT INTO fb_ipadmiss_logdtl (fb_last_trigger_date,fb_process_id) VALUES (?,?)`,
-                    [
-                      mysqlsupportToDate, 1
-                    ],
-                    (err, result) => {
-                      if (err) {
+                    //inserting detail in log table fb_process_id === 1 for inpatientinsert
+                    connection.query(
+                      `INSERT INTO fb_ipadmiss_logdtl (fb_last_trigger_date,fb_process_id) VALUES (?,?)`,
+                      [
+                        mysqlsupportToDate, 1
+                      ],
+                      (err, result) => {
+                        if (err) {
 
-                        connection.rollback(() => {
-                          connection.release();
-                          console.log("error in rollback data");
-                        });
-                      } else {
-                        connection.commit((err) => {
-                          if (err) {
-                            connection.rollback(() => {
-                              connection.release();
-                              console.log("error in commit");
-                            });
-                          } else {
+                          connection.rollback(() => {
                             connection.release();
-                            // console.log("success insertion");
-                          }
-                        });
+                            console.log("error in rollback data");
+                          });
+                        } else {
+                          connection.commit((err) => {
+                            if (err) {
+                              connection.rollback(() => {
+                                connection.release();
+                                console.log("error in commit");
+                              });
+                            } else {
+                              connection.release();
+                              // console.log("success insertion");
+                            }
+                          });
+                        }
                       }
-                    }
-                  );
-                  //  ends here
-                }
-              });
+                    );
+                    //  ends here
+                  }
+                });
+              }
             }
-          }
-        );
+          );
+        });
       });
-    });
     });
   } catch (error) {
     console.log(error, "Error occured!");
@@ -357,7 +357,7 @@ select ip_no,do_code,ipc_currccode,cu_code,ipc_curstatus,ipd_disc,ipc_status,dmd
 
     await result.resultSet?.getRows((err, rows) => {
       //  CHECK DATA FROM THE ORACLE DATABASE
-      
+
       if (rows.length === 0) {
         // console.log("No update date found UpdateIpStatusDetails");
         return;
@@ -618,7 +618,7 @@ const UpdateInpatientDetailRmall = async (callBack) => {
 
         })
       });
-      
+
     });
   } catch (error) {
     console.log(error, "Error occured!");
@@ -2241,49 +2241,49 @@ const InsertChilderDetailMeliora = async (callBack) => {
     //     return;
     //   }
 
-      const rows = await result.resultSet.getRows();
+    const rows = await result.resultSet.getRows();
     //  STOP execution if no data
     if (!rows || rows.length === 0) {
       console.log("No Birth Registerd Today.");
       return; // This now stops the entire async function
     }
 
-      // result of the oracle query
-      const VALUES = rows?.map(item => [
-        item.BR_SLNO,
-        item.BRD_DATE ? format(new Date(item?.BRD_DATE), 'yyyy-MM-dd HH:mm:ss') : null,
-        item.PT_NO,
-        item.PTC_PTNAME,
-        item.PTC_LOADD1,
-        item.PTC_LOADD2,
-        item.BRC_HUSBAND,
-        item.BRN_AGE,
-        item.BRN_TOTAL,
-        item.BRN_LIVE,
-        item.BD_CODE,
-        item.IP_NO,
-        item.BRC_MHCODE,
-        item.CHILD_GENDER,
-        item.BIRTH_DATE ? format(new Date(item?.BIRTH_DATE), 'yyyy-MM-dd HH:mm:ss') : null,
-        item.MOTHER_IPNO,
-        item.CHILD_PT_NO,
-        item.CHILD_IPNO,
-        item.CHILD_WEIGHT,
-      ]);
-      // INSERT DATA INTO THE MYSQL TABLE
-      mysqlpool.getConnection((err, connection) => {
+    // result of the oracle query
+    const VALUES = rows?.map(item => [
+      item.BR_SLNO,
+      item.BRD_DATE ? format(new Date(item?.BRD_DATE), 'yyyy-MM-dd HH:mm:ss') : null,
+      item.PT_NO,
+      item.PTC_PTNAME,
+      item.PTC_LOADD1,
+      item.PTC_LOADD2,
+      item.BRC_HUSBAND,
+      item.BRN_AGE,
+      item.BRN_TOTAL,
+      item.BRN_LIVE,
+      item.BD_CODE,
+      item.IP_NO,
+      item.BRC_MHCODE,
+      item.CHILD_GENDER,
+      item.BIRTH_DATE ? format(new Date(item?.BIRTH_DATE), 'yyyy-MM-dd HH:mm:ss') : null,
+      item.MOTHER_IPNO,
+      item.CHILD_PT_NO,
+      item.CHILD_IPNO,
+      item.CHILD_WEIGHT,
+    ]);
+    // INSERT DATA INTO THE MYSQL TABLE
+    mysqlpool.getConnection((err, connection) => {
+      if (err) {
+        // mysql db not connected check connection
+        console.log("mysql db not connected check connection");
+        return;
+      }
+      connection.beginTransaction((err) => {
         if (err) {
-          // mysql db not connected check connection
-          console.log("mysql db not connected check connection");
-          return;
+          connection.release();
+          console.log("error in begin transaction");
         }
-        connection.beginTransaction((err) => {
-          if (err) {
-            connection.release();
-            console.log("error in begin transaction");
-          }
-          connection.query(
-            `INSERT INTO fb_birth_reg_mast(
+        connection.query(
+          `INSERT INTO fb_birth_reg_mast(
                   fb_br_slno,
                   fb_brd_date,
                   fb_pt_no,
@@ -2305,32 +2305,32 @@ const InsertChilderDetailMeliora = async (callBack) => {
                   fb_child_weight
                 ) VALUES ?
                   `,
-            [
-              VALUES
-            ],
-            (err, result) => {
-              if (err) {
-                console.log(err, "err");
-                connection.rollback(() => {
-                  connection.release();
-                  console.log("error in rollback data");
-                });
-              } else {
-                connection.commit((err) => {
-                  if (err) {
-                    connection.rollback(() => {
-                      connection.release();
-                      console.log("error in commit");
-                    });
-                  } else {
+          [
+            VALUES
+          ],
+          (err, result) => {
+            if (err) {
+              console.log(err, "err");
+              connection.rollback(() => {
+                connection.release();
+                console.log("error in rollback data");
+              });
+            } else {
+              connection.commit((err) => {
+                if (err) {
+                  connection.rollback(() => {
                     connection.release();
-                  }
-                });
-              }
+                    console.log("error in commit");
+                  });
+                } else {
+                  connection.release();
+                }
+              });
             }
-          );
-        })
-      });
+          }
+        );
+      })
+    });
     // });
   } catch (error) {
     console.log(error, "Error occured!");
@@ -2511,124 +2511,127 @@ cron.schedule("0 23 * * *", () => {
 
 
 
-// old query 
+// old query
 
 
- // const oracleSql = `
-  // SELECT  
-  //       IPADMISS.IP_NO, 
-  //       IPADMISS.IPD_DATE, 
-  //       IPADMISS.PT_NO,
-  //       IPADMISS.PTC_PTNAME,
-  //       IPADMISS.SA_CODE,         
-  //       IPADMISS.PTC_TYPE,                            
-  //       IPADMISS.BD_CODE AS IPD_BD_CODE,
-  //       IPADMISS.DO_CODE,
-  //       IPADMISS.PTC_SEX,
-  //       IPADMISS.PTD_DOB,
-  //       IPADMISS.PTN_DAYAGE,
-  //       IPADMISS.PTN_MONTHAGE,
-  //       IPADMISS.PTN_YEARAGE,
-  //       IPADMISS.PTC_LOADD1,
-  //       IPADMISS.PTC_LOADD2,
-  //       IPADMISS.PTC_LOADD3,
-  //       IPADMISS.PTC_LOADD4,
-  //       IPADMISS.PTC_LOPIN,
-  //       IPADMISS.PTC_LOPHONE,
-  //       IPADMISS.PTC_MOBILE,
-  //       IPADMISS.RC_CODE,
-  //       IPADMISS.RS_CODE,
-  //       IPADMISS.IPD_DISC,
-  //       IPADMISS.IPC_STATUS,
-  //       IPADMISS.DMC_SLNO,
-  //       IPADMISS.DMD_DATE,
-  //       IPADMISS.CU_CODE,
-  //       IPADMISS.DIS_USCODE,
-  //       IPADMISS.SC_CODE,    
-  //       IPADMISS.IPC_DICREQSTATUS,
-  //       IPADMISS.IPC_MHCODE,
-  //       IPADMISS.IPC_ADMITDOCODE,
-  //       IPADMISS.IPC_CURSTATUS,
-  //       IPADMISS.IPD_ACTRELEASE,
-  //       IPADMISS.IPC_CURRCCODE,
-  //       IPADMISS.IPC_DISSUMSTATUS,
-  //       IPADMISS.RG_CODE,
-  //       DOCTOR.DO_CODE,
-  //       DOCTOR.DOC_NAME,
-  //       DOCTOR.DT_CODE,
-  //       DOCTOR.SP_CODE,
-  //       DOCTOR.DOC_QUAL,
-  //       DOCTOR.DOC_REGNO,
-  //       DOCTOR.DOC_STATUS,
-  //       BED.BDC_NO,
-  //       BED.NS_CODE,
-  //       BED.RT_CODE,
-  //       BED.BDC_OCCUP,
-  //       BED.BDN_OCCNO,
-  //       BED.BDC_STATUS,
-  //       BED.HKD_CLEANINGREQ,
-  //       BED.RM_CODE,
-  //       BED.BDC_MHCODE,
-  //       BED.BDC_VIPBED,
-  //       ADMNREASON.RS_CODE,
-  //       ADMNREASON.RSC_DESC,
-  //       ADMNREASON.RSC_ALIAS,
-  //       ADMNREASON.RSC_STATUS,
-  //       CUSTOMER.CUC_NAME,
-  //       ROOMMASTER.RM_CODE,
-  //       ROOMMASTER.RMC_DESC,
-  //       ROOMMASTER.RMC_ALIAS,
-  //       ROOMMASTER.RMC_STATUS,
-  //       ROOMMASTER.RMC_MHCODE,
-  //       ROOMCATEGORY.RC_CODE,
-  //       ROOMCATEGORY.RCC_DESC,
-  //       ROOMCATEGORY.RCC_ALIAS,
-  //       ROOMCATEGORY.RCC_STATUS,
-  //       ROOMCATEGORY.RCC_MHCODE,
-  //       IPADMISS.IPC_PTFLAG,
-  //       LATEST_RTC_DESC.RTC_DESC,
-  //       LATEST_RTC_DESC.RTC_ALIAS,
-  //       LATEST_RTC_DESC.RTC_STATUS,
-  //       LATEST_RTC_DESC.ICU,
-  //       LATEST_RTC_DESC.RTC_MHCODE,
-  //       (SELECT department.DPC_DESC
-  //           FROM department
-  //           LEFT JOIN speciality ON department.DP_CODE = speciality.DP_CODE
-  //           LEFT JOIN doctor ON speciality.SP_CODE = doctor.SP_CODE
-  //           WHERE doctor.DO_CODE = ipadmiss.DO_CODE) AS DPC_DESC                   
-  //             FROM IPADMISS
-  //             LEFT JOIN patient ON ipadmiss.pt_no = patient.pt_no 
-  //             LEFT JOIN rmall ON rmall.ip_no = ipadmiss.ip_no 
-  //             LEFT JOIN roomcategory ON roomcategory.rc_code = ipadmiss.ipc_currccode
-  //             LEFT JOIN doctor ON doctor.do_code = ipadmiss.do_code 
-  //             LEFT JOIN admnreason ON admnreason.rs_code = ipadmiss.rs_code 
-  //             LEFT JOIN bed ON bed.bd_code = rmall.bd_code
-  //             LEFT JOIN nurstation ON nurstation.ns_Code = bed.ns_code 
-  //             LEFT JOIN salutation ON Salutation.sa_code = patient.SA_CODE 
-  //             LEFT JOIN roommaster ON roommaster.RM_CODE = BED.RM_CODE 
-  //             LEFT JOIN ( 
-  //                         SELECT rc_code, MAX(rtc_desc) AS rtc_desc, MAX( rtc_alias) AS rtc_alias, MAX(rtc_status) AS rtc_status,MAX(icu) AS icu,MAX(rtc_mhcode) AS rtc_mhcode
-  //                         FROM roomtype
-  //                         GROUP BY rc_code ) latest_rtc_desc ON ipadmiss.rc_code = latest_rtc_desc.rc_code                                               
-  //                       LEFT JOIN customer ON ipadmiss.cu_code = customer.cu_code
-  //                       WHERE ipadmiss.IPC_MHCODE = '00' 
-  //                               AND ((IPADMISS.IPC_STATUS IS NULL AND rmall.rmc_relesetype IS NULL) OR (ipd_disc IS NOT NULL 
-  //                               AND (IPADMISS.IPD_ACTRELEASE IS NULL  OR IPADMISS.IPD_ACTRELEASE >= to_date('20/05/2025', 'dd/MM/yyyy'))))
-  //                               AND NVL(IPD_DATE, SYSDATE) >= TO_DATE(:FROM_DATE, 'dd/MM/yyyy hh24:mi:ss')
-  //                               AND NVL(IPD_DATE, SYSDATE) <= TO_DATE(:TO_DATE, 'dd/MM/yyyy hh24:mi:ss')
-  //                               AND rmall.rmc_occupby IN ('P')             
-  //                             ORDER BY BED.BDC_NO`;
+// const oracleSql = `
+// SELECT
+//       IPADMISS.IP_NO,
+//       IPADMISS.IPD_DATE,
+//       IPADMISS.PT_NO,
+//       IPADMISS.PTC_PTNAME,
+//       IPADMISS.SA_CODE,
+//       IPADMISS.PTC_TYPE,
+//       IPADMISS.BD_CODE AS IPD_BD_CODE,
+//       IPADMISS.DO_CODE,
+//       IPADMISS.PTC_SEX,
+//       IPADMISS.PTD_DOB,
+//       IPADMISS.PTN_DAYAGE,
+//       IPADMISS.PTN_MONTHAGE,
+//       IPADMISS.PTN_YEARAGE,
+//       IPADMISS.PTC_LOADD1,
+//       IPADMISS.PTC_LOADD2,
+//       IPADMISS.PTC_LOADD3,
+//       IPADMISS.PTC_LOADD4,
+//       IPADMISS.PTC_LOPIN,
+//       IPADMISS.PTC_LOPHONE,
+//       IPADMISS.PTC_MOBILE,
+//       IPADMISS.RC_CODE,
+//       IPADMISS.RS_CODE,
+//       IPADMISS.IPD_DISC,
+//       IPADMISS.IPC_STATUS,
+//       IPADMISS.DMC_SLNO,
+//       IPADMISS.DMD_DATE,
+//       IPADMISS.CU_CODE,
+//       IPADMISS.DIS_USCODE,
+//       IPADMISS.SC_CODE,
+//       IPADMISS.IPC_DICREQSTATUS,
+//       IPADMISS.IPC_MHCODE,
+//       IPADMISS.IPC_ADMITDOCODE,
+//       IPADMISS.IPC_CURSTATUS,
+//       IPADMISS.IPD_ACTRELEASE,
+//       IPADMISS.IPC_CURRCCODE,
+//       IPADMISS.IPC_DISSUMSTATUS,
+//       IPADMISS.RG_CODE,
+//       DOCTOR.DO_CODE,
+//       DOCTOR.DOC_NAME,
+//       DOCTOR.DT_CODE,
+//       DOCTOR.SP_CODE,
+//       DOCTOR.DOC_QUAL,
+//       DOCTOR.DOC_REGNO,
+//       DOCTOR.DOC_STATUS,
+//       BED.BDC_NO,
+//       BED.NS_CODE,
+//       BED.RT_CODE,
+//       BED.BDC_OCCUP,
+//       BED.BDN_OCCNO,
+//       BED.BDC_STATUS,
+//       BED.HKD_CLEANINGREQ,
+//       BED.RM_CODE,
+//       BED.BDC_MHCODE,
+//       BED.BDC_VIPBED,
+//       ADMNREASON.RS_CODE,
+//       ADMNREASON.RSC_DESC,
+//       ADMNREASON.RSC_ALIAS,
+//       ADMNREASON.RSC_STATUS,
+//       CUSTOMER.CUC_NAME,
+//       ROOMMASTER.RM_CODE,
+//       ROOMMASTER.RMC_DESC,
+//       ROOMMASTER.RMC_ALIAS,
+//       ROOMMASTER.RMC_STATUS,
+//       ROOMMASTER.RMC_MHCODE,
+//       ROOMCATEGORY.RC_CODE,
+//       ROOMCATEGORY.RCC_DESC,
+//       ROOMCATEGORY.RCC_ALIAS,
+//       ROOMCATEGORY.RCC_STATUS,
+//       ROOMCATEGORY.RCC_MHCODE,
+//       IPADMISS.IPC_PTFLAG,
+//       LATEST_RTC_DESC.RTC_DESC,
+//       LATEST_RTC_DESC.RTC_ALIAS,
+//       LATEST_RTC_DESC.RTC_STATUS,
+//       LATEST_RTC_DESC.ICU,
+//       LATEST_RTC_DESC.RTC_MHCODE,
+//       (SELECT department.DPC_DESC
+//           FROM department
+//           LEFT JOIN speciality ON department.DP_CODE = speciality.DP_CODE
+//           LEFT JOIN doctor ON speciality.SP_CODE = doctor.SP_CODE
+//           WHERE doctor.DO_CODE = ipadmiss.DO_CODE) AS DPC_DESC
+//             FROM IPADMISS
+//             LEFT JOIN patient ON ipadmiss.pt_no = patient.pt_no
+//             LEFT JOIN rmall ON rmall.ip_no = ipadmiss.ip_no
+//             LEFT JOIN roomcategory ON roomcategory.rc_code = ipadmiss.ipc_currccode
+//             LEFT JOIN doctor ON doctor.do_code = ipadmiss.do_code
+//             LEFT JOIN admnreason ON admnreason.rs_code = ipadmiss.rs_code
+//             LEFT JOIN bed ON bed.bd_code = rmall.bd_code
+//             LEFT JOIN nurstation ON nurstation.ns_Code = bed.ns_code
+//             LEFT JOIN salutation ON Salutation.sa_code = patient.SA_CODE
+//             LEFT JOIN roommaster ON roommaster.RM_CODE = BED.RM_CODE
+//             LEFT JOIN (
+//                         SELECT rc_code, MAX(rtc_desc) AS rtc_desc, MAX( rtc_alias) AS rtc_alias, MAX(rtc_status) AS rtc_status,MAX(icu) AS icu,MAX(rtc_mhcode) AS rtc_mhcode
+//                         FROM roomtype
+//                         GROUP BY rc_code ) latest_rtc_desc ON ipadmiss.rc_code = latest_rtc_desc.rc_code
+//                       LEFT JOIN customer ON ipadmiss.cu_code = customer.cu_code
+//                       WHERE ipadmiss.IPC_MHCODE = '00'
+//                               AND ((IPADMISS.IPC_STATUS IS NULL AND rmall.rmc_relesetype IS NULL) OR (ipd_disc IS NOT NULL
+//                               AND (IPADMISS.IPD_ACTRELEASE IS NULL  OR IPADMISS.IPD_ACTRELEASE >= to_date('20/05/2025', 'dd/MM/yyyy'))))
+//                               AND NVL(IPD_DATE, SYSDATE) >= TO_DATE(:FROM_DATE, 'dd/MM/yyyy hh24:mi:ss')
+//                               AND NVL(IPD_DATE, SYSDATE) <= TO_DATE(:TO_DATE, 'dd/MM/yyyy hh24:mi:ss')
+//                               AND rmall.rmc_occupby IN ('P')
+//                             ORDER BY BED.BDC_NO`;
 
 // Run via cron- Jomol for BIS
 // cron.schedule("*/2 * * * *", () => {
 //   InsertKmcMedDesc();
 // });
 
-cron.schedule("0 0 * * *", () => {
-  InsertKmcMedDesc();
-});
 
-cron.schedule("0 22 * * *", () => {
-  InsertTmcMedDesc();
-});
+
+// ********************* BIS ************************
+// cron.schedule("0 0 * * *", () => {
+//   InsertKmcMedDesc();
+// });
+
+// cron.schedule("0 22 * * *", () => {
+//   InsertTmcMedDesc();
+// });
 
