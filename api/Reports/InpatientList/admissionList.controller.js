@@ -165,7 +165,7 @@ module.exports = {
     },
     getPatientData: (req, res) => {
         const id = req.params.id;
-        console.log("id");
+        // console.log("id");
         getPatientData(id, (err, results) => {
             if (err) {
                 return res.status(200).json({
