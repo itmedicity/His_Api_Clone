@@ -282,7 +282,7 @@ module.exports = {
     getBedMasterDetail: async (req, res) => {
         const data = req.body;
         try {
-            // Fetch base data from Ellider
+            // Fetch base data from Elliders
             const elliderResult = await new Promise((resolve, reject) => {
                 getBedMasterDetail(data, (err, result) => {
                     if (err) return reject(err);
