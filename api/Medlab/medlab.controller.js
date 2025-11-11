@@ -31,10 +31,12 @@ module.exports = {
             }
             if (Object.keys(results).length === 0) {
                 return res.status(200).json({
-                    success: 1,
-                    message: 'No Data Found'
+                    success: 2,
+                    message: 'No Data Found',
+                    data: []
                 })
             }
+
             return res.status(200).json({
                 success: 2,
                 data: results

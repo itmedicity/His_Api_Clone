@@ -435,7 +435,6 @@ module.exports = {
             //     FilteredBedDetail
             // });
 
-
             // If Nothing exist then send a response show no data found
             if (
                 (!filteredRoomType || filteredRoomType?.length === 0) &&
@@ -532,58 +531,3 @@ module.exports = {
     }
 
 }
-
-
-
-
-
-//   await processNursingStation(nurseStationTypeCodes, (err, melioraNsResult) => {
-//                     if (err) {
-//                         return res.status(200).json({
-//                             success: 0,
-//                             message: err
-//                         })
-//                     }
-//                     //  New records (present in Ellider but missing in Meliora)
-//                     const newNurseStationTypes = nursingStationData?.filter(
-//                         elliderItem =>
-//                             !melioraNsResult?.some(m => m?.fb_ns_code === elliderItem?.fb_ns_code)
-//                     );
-
-//                     console.log(newNurseStationTypes, "newNurseStationTypes");
-
-//                     // extracting rc code from the filtered data
-//                     const newNsTypeCodes = newNurseStationTypes?.map(item => item?.fb_ns_code);
-
-//                     // if new Code Present Get the master Detail From Ellider
-//                     if (newNsTypeCodes && newNsTypeCodes?.length > 0) {
-//                         getNsDetailEllider(newNsTypeCodes, (err, nsresultEllider) => {
-//                             if (err) {
-//                                 return res.status(200).json({
-//                                     success: 0,
-//                                     message: err
-//                                 })
-//                             }
-
-//                             if (nsresultEllider && nsresultEllider?.length > 0) {
-//                                 const MelioraNsDetail = nsresultEllider?.map(value => [
-//                                     value?.NS_CODE,
-//                                     value?.NSC_DESC
-//                                 ]);
-
-//                                 //then insert the room detail to the Meliora
-//                                 insertnurseStationMeliora(MelioraNsDetail, (err, nsresult) => {
-//                                     if (err) {
-//                                         console.log(err, "err");
-//                                         return res.status(200).json({
-//                                             success: 0,
-//                                             message: err
-//                                         })
-//                                     }
-//                                     console.log(" successfully inserted insertnurseStationMeliora");
-//                                 })
-//                             }
-
-//                         })
-//                     }
-//                 });

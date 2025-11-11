@@ -818,51 +818,6 @@ module.exports = {
     getBedMasterDetail: async (data, callBack) => {
         let pool_ora = await oraConnection();
         let conn_ora = await pool_ora.getConnection();
-        //         const sql = `
-        //         SELECT
-        //         B.BD_CODE,
-        //         B.BDC_NO,
-        //         B.NS_CODE,
-        //         B.RT_CODE,
-        //         RT.RT_CODE,
-        //         RT.RTC_DESC,
-        //         RT.RTC_ALIAS,
-        //         RT.RC_CODE,
-        //         RT.RTC_STATUS,
-        //         RT.ICU,
-        //         RT.RTC_MHCODE,
-        //         B.BDC_OCCUP,
-        //         B.BDN_OCCNO,
-        //         B.BDC_STATUS,
-        //         B.HKD_CLEANINGREQ,
-        //         B.RM_CODE,
-        //         B.BDC_MHCODE,
-        //         B.BDC_VIPBED,
-        //         RM.RM_CODE,
-        //         RM.RMC_DESC,
-        //         RM.RMC_ALIAS,
-        //         RM.RMC_STATUS,
-        //         RM.RMC_MHCODE,
-        //         RM.NS_CODE,     
-        //         RC.RC_CODE,
-        //         RC.RCC_DESC,
-        //         RC.RCC_ALIAS,
-        //         RC.RCC_STATUS,
-        //         RC.RCC_MHCODE,
-        //         N.NS_CODE,
-        //         N.NSC_DESC,
-        //         N.BUILD_CODE,
-        //         N.FLOOR_CODE,
-        //         N.NSC_MHCODE
-        //     FROM BED B
-        //               LEFT JOIN roomtype RT ON B.rt_code=RT.rt_code
-        //               LEFT JOIN roomcategory RC ON RT.rc_code = RC.rc_code
-        //               LEFT JOIN roommaster RM ON B.rm_code =RM.rm_code 
-        //               LEFT JOIN nurstation N ON B.ns_code =N.ns_Code 
-        //     WHERE B.BDC_STATUS='Y'
-        //                AND TRUNC(N.NSD_EDDATE) >='30-OCT-2025'
-        // `;
-
         const sql = `
         SELECT
             B.BD_CODE,
@@ -1240,7 +1195,6 @@ module.exports = {
     },
 
     insertRoomTypeMeliora: (data, callBack) => {
-        console.log(data, "data");
         try {
             mysqlpool.query(
                 `INSERT INTO fb_room_type (
