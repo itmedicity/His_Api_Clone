@@ -6,89 +6,6 @@ const { format, subHours, subMonths } = require("date-fns");
 const bispool = require("../config/dbconfbis");
 
 
-// const getPharmacyName = async () => {
-//   let pool_ora = await oraConnection();
-//   let conn_ora = await pool_ora.getConnection();
-
-//   const oracleSql = `select p.ph_code,p.phc_name from pharmacy p where p.phc_status='Y'`;
-//   try {
-//     // GET DATA FROM THE MYSQL TABLE FOR THE LAST INSERT DATE
-//     // sql get query here
-
-//     // CONVERT TO THE ORACLE DATE FORMAT FROM MYSQL FORMAT
-
-//     // GET DATA FROM ORACLE
-//     const result = await conn_ora.execute(
-//       oracleSql,
-//       {},
-//       { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
-//     );
-//     await result.resultSet?.getRows((err, rows) => {
-//       //  CHECK DATA FROM THE ORACLE DATABASE
-//       if (rows.length === 0) {
-//         // console.log("No data found");
-//         return;
-//       }
-
-//       // FILTER DATA
-
-//       // INSERT DATA INTO THE MYSQL TABLE
-
-//       pool.getConnection((err, connection) => {
-//         if (err) {
-//           // mysql db not connected check connection
-//           console.log("mysql db not connected check connection");
-//           return;
-//         }
-
-//         connection.beginTransaction((err) => {
-//           if (err) {
-//             connection.release();
-//             console.log("error in begin transaction");
-//           }
-
-//           connection.query(
-//             `INSERT INTO pharmacy(ph_code,phc_name) VALUES ?`,
-//             [rows],
-//             (err, result) => {
-//               if (err) {
-//                 connection.rollback(() => {
-//                   connection.release();
-//                   console.log("error in rollback data");
-//                 });
-//               } else {
-//                 connection.commit((err) => {
-//                   if (err) {
-//                     connection.rollback(() => {
-//                       connection.release();
-//                       console.log("error in commit");
-//                     });
-//                   } else {
-//                     connection.release();
-//                     // console.log("success");
-//                   }
-//                 });
-//               }
-//             }
-//           );
-//         });
-//       });
-//       // console.log(rows);
-//     });
-//   } catch (error) {
-//     return callBack(error);
-//   } finally {
-//     if (conn_ora) {
-//       await conn_ora.close();
-//       await pool_ora.close();
-//     }
-//   }
-// };
-
-
-//get Inpatient Detail 
-
-
 const getInpatientDetail = async (callBack) => {
   let pool_ora = await oraConnection();
   let conn_ora = await pool_ora.getConnection();
@@ -165,14 +82,6 @@ const getInpatientDetail = async (callBack) => {
       },
       { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
-
-    // Get rows using async/await instead of callback
-    // const rows = await result.resultSet.getRows();
-    // //  STOP execution if no data
-    // if (!rows || rows.length === 0) {
-    //   console.log("No data found — stopping execution.");
-    //   return; // This now stops the entire async function
-    // }
 
     await result.resultSet?.getRows((err, rows) => {
       //  CHECK DATA FROM THE ORACLE DATABASE
@@ -362,13 +271,6 @@ select ip_no,do_code,ipc_currccode,cu_code,ipc_curstatus,ipd_disc,ipc_status,dmd
         // console.log("No update date found UpdateIpStatusDetails");
         return;
       }
-
-      // const rows = await result.resultSet.getRows();   
-      // //  STOP execution if no data
-      // if (!rows || rows.length === 0) {
-      //   console.log("No update date found UpdateIpStatusDetails.");
-      //   return; // This now stops the entire async function
-      // }
 
       // result of the oracle query
       const Values = rows?.map(item => [
@@ -1042,7 +944,6 @@ const UpdateFbBedDetailMeliora = async (callBack) => {
 // }
 
 // trigger to get the childer data for the correspoding date
-
 const getAmsPatientDetails = async (callBack) => {
   let pool_ora = await oraConnection();
   let conn_ora = await pool_ora.getConnection();
@@ -1314,10 +1215,6 @@ const getAmsPatientDetails = async (callBack) => {
 };
 
 //bis module- jomol
-
-
-
-
 
 // Utility function
 // const getItCodesInChunks = (mysqlConn, fromDate, toDate, chunkSize = 1000) => {
@@ -1906,10 +1803,7 @@ const InsertTmcMedDesc = async (callBack) => {
   }
 };
 
-
-
 ///////////////////////////////////KMC*******************************
-
 
 //TMCH 
 const getBisKmcLastTriggerDate = async () => {
@@ -1962,9 +1856,7 @@ const getKMCItCodesInChunks = (mysqlConn, fromDate, toDate, chunkSize = 1000) =>
 };
 
 
-
 // jomol code
-
 const InsertKmcMedDesc = async (callBack) => {
   let pool_ora, conn_ora, mysqlConn;
 
@@ -2174,23 +2066,15 @@ const InsertKmcMedDesc = async (callBack) => {
   }
 };
 
-
-
 // cron.schedule("0 0 * * *", () => {
 //   InsertKmcMedDesc();
 // });
-
 
 
 // // for 5 mints
 // cron.schedule('*/5 * * * *', () => {
 //   InsertKmcMedDesc();
 // });
-
-
-
-
-
 
 
 // getting child detail from ellider
@@ -2233,13 +2117,6 @@ const InsertChilderDetailMeliora = async (callBack) => {
       },
       { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
-
-    // await result.resultSet?.getRows((err, rows) => {
-    //   //  CHECK DATA FROM THE ORACLE DATABASE
-    //   if (rows.length === 0) {
-    //     console.log("No Birth Registerd Today");
-    //     return;
-    //   }
 
     const rows = await result.resultSet.getRows();
     //  STOP execution if no data
@@ -2418,10 +2295,7 @@ const updateAmsPatientDetails = () => {
 };
 
 
-
-
 /****************************/
-
 const getLastTriggerDate = async (processId) => {
   return new Promise((resolve, reject) => {
     mysqlpool.getConnection((err, connection) => {
@@ -2474,157 +2348,43 @@ const getAmsLastUpdatedDate = async (processId) => {
 /****************************/
 
 // auto sync at an interval of 10 min
-cron.schedule("*/2 * * * *", () => {
-  getInpatientDetail();
-});
+// cron.schedule("*/2 * * * *", () => {
+//   getInpatientDetail();
+// });
 
 //  test triggering
-cron.schedule("*/3 * * * *", () => {
-  UpdateFbBedDetailMeliora();
-});
+// cron.schedule("*/3 * * * *", () => {
+//   UpdateFbBedDetailMeliora();
+// });
 
 //  auto sync at an interval of 25 min
-cron.schedule("*/5 * * * *", () => {
-  UpdateInpatientDetailRmall();
-});
+// cron.schedule("*/5 * * * *", () => {
+//   UpdateInpatientDetailRmall();
+// });
 
 //  auto sync at an interval of 20 min
-cron.schedule("*/7 * * * *", () => {
-  UpdateIpStatusDetails();
-});
-
+// cron.schedule("*/7 * * * *", () => {
+//   UpdateIpStatusDetails();
+// });
 
 // cron.schedule('*/49 * * * *', () => {
 //   getAmsPatientDetails();
 // });
 
-
 //runs at every 3 hours
-cron.schedule('0 */3 * * *', () => {
-  updateAmsPatientDetails();
-});
+// cron.schedule('0 */3 * * *', () => {
+//   updateAmsPatientDetails();
+// });
 
 // Running InsertChilderDetailMeliora at midnight... 11.00 pm
-cron.schedule("0 23 * * *", () => {
-  InsertChilderDetailMeliora();
-});
-
-
-
-// old query
-
-
-// const oracleSql = `
-// SELECT
-//       IPADMISS.IP_NO,
-//       IPADMISS.IPD_DATE,
-//       IPADMISS.PT_NO,
-//       IPADMISS.PTC_PTNAME,
-//       IPADMISS.SA_CODE,
-//       IPADMISS.PTC_TYPE,
-//       IPADMISS.BD_CODE AS IPD_BD_CODE,
-//       IPADMISS.DO_CODE,
-//       IPADMISS.PTC_SEX,
-//       IPADMISS.PTD_DOB,
-//       IPADMISS.PTN_DAYAGE,
-//       IPADMISS.PTN_MONTHAGE,
-//       IPADMISS.PTN_YEARAGE,
-//       IPADMISS.PTC_LOADD1,
-//       IPADMISS.PTC_LOADD2,
-//       IPADMISS.PTC_LOADD3,
-//       IPADMISS.PTC_LOADD4,
-//       IPADMISS.PTC_LOPIN,
-//       IPADMISS.PTC_LOPHONE,
-//       IPADMISS.PTC_MOBILE,
-//       IPADMISS.RC_CODE,
-//       IPADMISS.RS_CODE,
-//       IPADMISS.IPD_DISC,
-//       IPADMISS.IPC_STATUS,
-//       IPADMISS.DMC_SLNO,
-//       IPADMISS.DMD_DATE,
-//       IPADMISS.CU_CODE,
-//       IPADMISS.DIS_USCODE,
-//       IPADMISS.SC_CODE,
-//       IPADMISS.IPC_DICREQSTATUS,
-//       IPADMISS.IPC_MHCODE,
-//       IPADMISS.IPC_ADMITDOCODE,
-//       IPADMISS.IPC_CURSTATUS,
-//       IPADMISS.IPD_ACTRELEASE,
-//       IPADMISS.IPC_CURRCCODE,
-//       IPADMISS.IPC_DISSUMSTATUS,
-//       IPADMISS.RG_CODE,
-//       DOCTOR.DO_CODE,
-//       DOCTOR.DOC_NAME,
-//       DOCTOR.DT_CODE,
-//       DOCTOR.SP_CODE,
-//       DOCTOR.DOC_QUAL,
-//       DOCTOR.DOC_REGNO,
-//       DOCTOR.DOC_STATUS,
-//       BED.BDC_NO,
-//       BED.NS_CODE,
-//       BED.RT_CODE,
-//       BED.BDC_OCCUP,
-//       BED.BDN_OCCNO,
-//       BED.BDC_STATUS,
-//       BED.HKD_CLEANINGREQ,
-//       BED.RM_CODE,
-//       BED.BDC_MHCODE,
-//       BED.BDC_VIPBED,
-//       ADMNREASON.RS_CODE,
-//       ADMNREASON.RSC_DESC,
-//       ADMNREASON.RSC_ALIAS,
-//       ADMNREASON.RSC_STATUS,
-//       CUSTOMER.CUC_NAME,
-//       ROOMMASTER.RM_CODE,
-//       ROOMMASTER.RMC_DESC,
-//       ROOMMASTER.RMC_ALIAS,
-//       ROOMMASTER.RMC_STATUS,
-//       ROOMMASTER.RMC_MHCODE,
-//       ROOMCATEGORY.RC_CODE,
-//       ROOMCATEGORY.RCC_DESC,
-//       ROOMCATEGORY.RCC_ALIAS,
-//       ROOMCATEGORY.RCC_STATUS,
-//       ROOMCATEGORY.RCC_MHCODE,
-//       IPADMISS.IPC_PTFLAG,
-//       LATEST_RTC_DESC.RTC_DESC,
-//       LATEST_RTC_DESC.RTC_ALIAS,
-//       LATEST_RTC_DESC.RTC_STATUS,
-//       LATEST_RTC_DESC.ICU,
-//       LATEST_RTC_DESC.RTC_MHCODE,
-//       (SELECT department.DPC_DESC
-//           FROM department
-//           LEFT JOIN speciality ON department.DP_CODE = speciality.DP_CODE
-//           LEFT JOIN doctor ON speciality.SP_CODE = doctor.SP_CODE
-//           WHERE doctor.DO_CODE = ipadmiss.DO_CODE) AS DPC_DESC
-//             FROM IPADMISS
-//             LEFT JOIN patient ON ipadmiss.pt_no = patient.pt_no
-//             LEFT JOIN rmall ON rmall.ip_no = ipadmiss.ip_no
-//             LEFT JOIN roomcategory ON roomcategory.rc_code = ipadmiss.ipc_currccode
-//             LEFT JOIN doctor ON doctor.do_code = ipadmiss.do_code
-//             LEFT JOIN admnreason ON admnreason.rs_code = ipadmiss.rs_code
-//             LEFT JOIN bed ON bed.bd_code = rmall.bd_code
-//             LEFT JOIN nurstation ON nurstation.ns_Code = bed.ns_code
-//             LEFT JOIN salutation ON Salutation.sa_code = patient.SA_CODE
-//             LEFT JOIN roommaster ON roommaster.RM_CODE = BED.RM_CODE
-//             LEFT JOIN (
-//                         SELECT rc_code, MAX(rtc_desc) AS rtc_desc, MAX( rtc_alias) AS rtc_alias, MAX(rtc_status) AS rtc_status,MAX(icu) AS icu,MAX(rtc_mhcode) AS rtc_mhcode
-//                         FROM roomtype
-//                         GROUP BY rc_code ) latest_rtc_desc ON ipadmiss.rc_code = latest_rtc_desc.rc_code
-//                       LEFT JOIN customer ON ipadmiss.cu_code = customer.cu_code
-//                       WHERE ipadmiss.IPC_MHCODE = '00'
-//                               AND ((IPADMISS.IPC_STATUS IS NULL AND rmall.rmc_relesetype IS NULL) OR (ipd_disc IS NOT NULL
-//                               AND (IPADMISS.IPD_ACTRELEASE IS NULL  OR IPADMISS.IPD_ACTRELEASE >= to_date('20/05/2025', 'dd/MM/yyyy'))))
-//                               AND NVL(IPD_DATE, SYSDATE) >= TO_DATE(:FROM_DATE, 'dd/MM/yyyy hh24:mi:ss')
-//                               AND NVL(IPD_DATE, SYSDATE) <= TO_DATE(:TO_DATE, 'dd/MM/yyyy hh24:mi:ss')
-//                               AND rmall.rmc_occupby IN ('P')
-//                             ORDER BY BED.BDC_NO`;
+// cron.schedule("0 23 * * *", () => {
+//   InsertChilderDetailMeliora();
+// });
 
 // Run via cron- Jomol for BIS
 // cron.schedule("*/2 * * * *", () => {
 //   InsertKmcMedDesc();
 // });
-
-
 
 // ********************* BIS ************************
 // cron.schedule("0 0 * * *", () => {
