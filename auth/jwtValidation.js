@@ -20,7 +20,7 @@ module.exports = {
                     // });
                     next();
                 }
-            });
+            }); 
         } else if ((token.startsWith("Token"))) {
             token = token.slice(6);
             jwt.verify(token, process.env.SECRET_KEY_MEL, (err, decoded) => {
