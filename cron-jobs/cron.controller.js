@@ -2348,38 +2348,38 @@ const getAmsLastUpdatedDate = async (processId) => {
 /****************************/
 
 // auto sync at an interval of 10 min
-// cron.schedule("*/2 * * * *", () => {
-//   getInpatientDetail();
-// });
+cron.schedule("*/2 * * * *", () => {
+  getInpatientDetail();
+});
 
 //  test triggering
-// cron.schedule("*/3 * * * *", () => {
-//   UpdateFbBedDetailMeliora();
-// });
+cron.schedule("*/3 * * * *", () => {
+  UpdateFbBedDetailMeliora();
+});
 
 //  auto sync at an interval of 25 min
-// cron.schedule("*/5 * * * *", () => {
-//   UpdateInpatientDetailRmall();
-// });
+cron.schedule("*/5 * * * *", () => {
+  UpdateInpatientDetailRmall();
+});
 
 //  auto sync at an interval of 20 min
-// cron.schedule("*/7 * * * *", () => {
-//   UpdateIpStatusDetails();
-// });
+cron.schedule("*/7 * * * *", () => {
+  UpdateIpStatusDetails();
+});
 
-// cron.schedule('*/49 * * * *', () => {
-//   getAmsPatientDetails();
-// });
+cron.schedule('*/49 * * * *', () => {
+  getAmsPatientDetails();
+});
 
 //runs at every 3 hours
-// cron.schedule('0 */3 * * *', () => {
-//   updateAmsPatientDetails();
-// });
+cron.schedule('0 */3 * * *', () => {
+  updateAmsPatientDetails();
+});
 
 // Running InsertChilderDetailMeliora at midnight... 11.00 pm
-// cron.schedule("0 23 * * *", () => {
-//   InsertChilderDetailMeliora();
-// });
+cron.schedule("0 23 * * *", () => {
+  InsertChilderDetailMeliora();
+});
 
 // Run via cron- Jomol for BIS
 // cron.schedule("*/2 * * * *", () => {
