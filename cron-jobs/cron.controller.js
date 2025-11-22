@@ -6,12 +6,77 @@ const { format, subHours, subMonths } = require("date-fns");
 const bispool = require("../config/dbconfbis");
 
 
-const getInpatientDetail = async (callBack) => {
-  let pool_ora = await oraConnection();
-  let conn_ora = await pool_ora.getConnection();
+// Getting Company Slno
+const mysqlExecute = (sql, values = []) => {
+  return new Promise((resolve, reject) => {
+    mysqlpool.query(sql, values, (err, result) => {
+      if (err) return reject(err);
+      resolve(result);
+    });
+  });
+};
 
-  //new query
-  const oracleSql = `
+
+// my sql transaction for patient insert Query
+const mysqlExecuteTransaction = (queries = []) => {
+  return new Promise((resolve, reject) => {
+    mysqlpool.getConnection((err, connection) => {
+      if (err) return reject(err);
+
+      connection.beginTransaction(async (transactionerror) => {
+        if (transactionerror) {
+          connection.release();
+          return reject(transactionerror);
+        }
+
+        try {
+          const results = [];
+
+          for (const { sql, values } of queries) {
+            const data = await new Promise((ok, fail) => {
+              connection.query(sql, values, (err, res) => {
+                if (err) return fail(err);
+                ok(res);
+              });
+            });
+            results.push(data);
+          }
+
+          connection.commit((commitErr) => {
+            if (commitErr) {
+              return connection.rollback(() => {
+                connection.release();
+                reject(commitErr);
+              });
+            }
+            connection.release();
+            resolve(results);
+          });
+        } catch (error) {
+          connection.rollback(() => {
+            connection.release();
+            reject(error);
+          });
+        }
+      });
+    });
+  });
+};
+
+//Get Inpaitent Detail
+const getInpatientDetail = async (callBack = () => { }) => {
+  let pool_ora;
+  let conn_ora;
+  let resultSet;
+
+  try {
+    //  get company_slno
+    const crmResult = await mysqlExecute("SELECT company_slno FROM crm_common");
+    const companySlno = crmResult?.[0]?.company_slno;
+    const mh_Code = Number(companySlno) === 1 ? "00" : "KC";
+
+    //  ORACLE SQL
+    const oracleSql = `
       SELECT  
         IPADMISS.IP_NO, 
         IPADMISS.IPD_DATE, 
@@ -36,193 +101,122 @@ const getInpatientDetail = async (callBack) => {
         IPADMISS.RS_CODE,   
         IPADMISS.IPC_CURSTATUS,   
         IPADMISS.IPC_MHCODE,
-         DOCTOR.DOC_NAME ,
-         (SELECT department.DPC_DESC
-            FROM department
-            LEFT JOIN speciality ON department.DP_CODE = speciality.DP_CODE
-            LEFT JOIN doctor ON speciality.SP_CODE = doctor.SP_CODE
-            WHERE doctor.DO_CODE = ipadmiss.DO_CODE) AS DPC_DESC      
-              FROM IPADMISS
-               LEFT JOIN rmall ON rmall.ip_no = ipadmiss.ip_no
-               LEFT JOIN doctor ON doctor.do_code = ipadmiss.do_code 
-               LEFT JOIN speciality ON doctor.SP_CODE=speciality.SP_CODE 
-               LEFT JOIN department ON speciality.DP_CODE=department.DP_CODE
-                        WHERE ipadmiss.IPC_MHCODE = '00' 
-                                AND NVL(IPD_DATE, SYSDATE) >= TO_DATE(:FROM_DATE, 'dd/MM/yyyy HH24:mi:ss')
-                                AND NVL(IPD_DATE, SYSDATE) <= TO_DATE(:TO_DATE, 'dd/MM/yyyy HH24:mi:ss')
-                                AND rmall.rmc_occupby IN ('P') 
-                                and ipc_ptflag='N'            
-                              ORDER BY  IPADMISS.IPD_DATE
-      `;
+        DOCTOR.DOC_NAME,
+        (SELECT department.DPC_DESC
+           FROM department
+           LEFT JOIN speciality ON department.DP_CODE = speciality.DP_CODE
+           LEFT JOIN doctor ON speciality.SP_CODE = doctor.SP_CODE
+           WHERE doctor.DO_CODE = ipadmiss.DO_CODE) AS DPC_DESC
+      FROM IPADMISS
+      LEFT JOIN rmall ON rmall.ip_no = ipadmiss.ip_no
+      LEFT JOIN doctor ON doctor.do_code = ipadmiss.do_code 
+      LEFT JOIN speciality ON doctor.SP_CODE = speciality.SP_CODE 
+      LEFT JOIN department ON speciality.DP_CODE = department.DP_CODE
+      WHERE ipadmiss.IPC_MHCODE = :MH_CODE
+        AND NVL(IPD_DATE, SYSDATE) >= TO_DATE(:FROM_DATE, 'dd/MM/yyyy HH24:mi:ss')
+        AND NVL(IPD_DATE, SYSDATE) <= TO_DATE(:TO_DATE, 'dd/MM/yyyy HH24:mi:ss')
+        AND rmall.rmc_occupby IN ('P')
+        AND ipc_ptflag = 'N'
+      ORDER BY IPADMISS.IPD_DATE
+    `;
 
-  // chance to throw this error : Error => ORA-01849: hour must be between 1 and 12
-  try {
-    // sql get query from meliora here
-    const detail = await getLastTriggerDate(1)
-
-    // lastupdate time
+    //  get date
+    const detail = await getLastTriggerDate(1);
     const lastInsertDate = detail?.fb_last_trigger_date
-      ? new Date(detail?.fb_last_trigger_date)
-      : subHours(new Date(), 1);
+      ? new Date(detail.fb_last_trigger_date)
+      : new Date(Date.now() - 60 * 60 * 1000);
 
-    // const manualFromDate = new Date(2025, 4, 20, 9, 10, 0);// test date
+    if (isNaN(lastInsertDate)) {
+      throw new Error("Invalid last trigger date");
+    }
 
-    // date convertion to oracle support
-    const fromDate = format(new Date(lastInsertDate), 'dd/MM/yyyy HH:mm:ss');
-    const toDate = format(new Date(), 'dd/MM/yyyy HH:mm:ss');
+    const fromDate = format(lastInsertDate, "dd/MM/yyyy HH:mm:ss");
+    const toDate = format(new Date(), "dd/MM/yyyy HH:mm:ss");
+    const mysqlsupportToDate = format(new Date(), "yyyy-MM-dd HH:mm:ss");
 
-    const mysqlsupportToDate = format(new Date(), 'yyyy-MM-dd HH:mm:ss');
+    // Oracle execute
+    pool_ora = await oraConnection();
+    conn_ora = await pool_ora.getConnection();
 
-    // GET DATA FROM ORACLE
     const result = await conn_ora.execute(
       oracleSql,
-      {
-        FROM_DATE: fromDate,
-        TO_DATE: toDate
-      },
+      { MH_CODE: mh_Code, FROM_DATE: fromDate, TO_DATE: toDate },
       { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
 
-    await result.resultSet?.getRows((err, rows) => {
-      //  CHECK DATA FROM THE ORACLE DATABASE
-      if (rows.length === 0) {
-        // console.log("No data found");
-        return;
-      }
+    resultSet = result.resultSet;
 
+    // Fetch ALL rows at once 
+    const rows = await resultSet.getRows(0);
 
-      // FILTER DATA
-      const VALUES = rows?.map(item => [
-        item.IP_NO,
-        item.IPD_DATE ? format(new Date(item?.IPD_DATE), 'yyyy-MM-dd HH:mm:ss') : null,
-        item.PT_NO,
-        item.PTC_PTNAME,
-        item.PTC_SEX,
-        item.PTD_DOB ? format(new Date(item?.PTD_DOB), 'yyyy-MM-dd HH:mm:ss') : null,
-        item.PTN_DAYAGE,
-        item.PTN_MONTHAGE,
-        item.PTN_YEARAGE,
-        item.PTC_LOADD1,
-        item.PTC_LOADD2,
-        item.PTC_LOADD3,
-        item.PTC_LOADD4,
-        item.PTC_LOPIN,
-        item.RC_CODE,
-        item.IPD_BD_CODE,
-        item.DO_CODE,
-        item.RS_CODE,
-        item.IPC_CURSTATUS,
-        item.PTC_MOBILE,
-        item.IPC_MHCODE,
-        item.DOC_NAME,
-        item.DPC_DESC
-      ]);
+    await resultSet.close();
+    resultSet = undefined;
 
-
-      // INSERT DATA INTO THE MYSQL TABLE
-      mysqlpool.getConnection((err, connection) => {
-        if (err) {
-          // mysql db not connected check connection
-          console.log("mysql db not connected check connection");
-          return;
-        }
-        connection.beginTransaction((err) => {
-          if (err) {
-            connection.release();
-            console.log("error in begin transaction");
-          }
-
-          connection.query(
-            `INSERT INTO fb_ipadmiss (
-                        fb_ip_no,
-                        fb_ipd_date,
-                        fb_pt_no,
-                        fb_ptc_name,
-                        fb_ptc_sex,
-                        fb_ptd_dob,   
-                        fb_ptn_dayage,
-                        fb_ptn_monthage,
-                        fb_ptn_yearage,
-                        fb_ptc_loadd1,
-                        fb_ptc_loadd2, 
-                        fb_ptc_loadd3,
-                        fb_ptc_loadd4,
-                        fb_ptc_lopin,
-                        fb_rc_code,
-                        fb_bd_code,
-                        fb_do_code, 
-                        fb_rs_code, 
-                        fb_ipc_curstatus, 
-                        fb_ptc_mobile, 
-                        fb_ipc_mhcode,
-                        fb_doc_name,
-                        fb_dep_desc
-                    ) VALUES ?
-                    `,
-            [
-              VALUES
-            ],
-            (err, result) => {
-              if (err) {
-                console.log(err, "err");
-                connection.rollback(() => {
-                  connection.release();
-                  console.log("error in rollback data");
-                });
-              } else {
-                connection.commit((err) => {
-                  if (err) {
-                    connection.rollback(() => {
-                      connection.release();
-                      console.log("error in commit");
-                    });
-                  } else {
-
-                    //inserting detail in log table fb_process_id === 1 for inpatientinsert
-                    connection.query(
-                      `INSERT INTO fb_ipadmiss_logdtl (fb_last_trigger_date,fb_process_id) VALUES (?,?)`,
-                      [
-                        mysqlsupportToDate, 1
-                      ],
-                      (err, result) => {
-                        if (err) {
-
-                          connection.rollback(() => {
-                            connection.release();
-                            console.log("error in rollback data");
-                          });
-                        } else {
-                          connection.commit((err) => {
-                            if (err) {
-                              connection.rollback(() => {
-                                connection.release();
-                                console.log("error in commit");
-                              });
-                            } else {
-                              connection.release();
-                              // console.log("success insertion");
-                            }
-                          });
-                        }
-                      }
-                    );
-                    //  ends here
-                  }
-                });
-              }
-            }
-          );
-        });
-      });
-    });
-  } catch (error) {
-    console.log(error, "Error occured!");
-    return callBack(error);
-  } finally {
-    if (conn_ora) {
-      await conn_ora.close();
-      await pool_ora.close();
+    if (!rows || rows.length === 0) {
+      return callBack(null, { message: "No rows from Oracle" });
     }
+
+    //  Convert Oracle rows MySQL rows using map()
+    const allValues = rows.map((item) => ([
+      item.IP_NO,
+      item.IPD_DATE ? format(new Date(item.IPD_DATE), "yyyy-MM-dd HH:mm:ss") : null,
+      item.PT_NO,
+      item.PTC_PTNAME,
+      item.PTC_SEX,
+      item.PTD_DOB ? format(new Date(item.PTD_DOB), "yyyy-MM-dd HH:mm:ss") : null,
+      item.PTN_DAYAGE,
+      item.PTN_MONTHAGE,
+      item.PTN_YEARAGE,
+      item.PTC_LOADD1,
+      item.PTC_LOADD2,
+      item.PTC_LOADD3,
+      item.PTC_LOADD4,
+      item.PTC_LOPIN,
+      item.RC_CODE,
+      item.IPD_BD_CODE,
+      item.DO_CODE,
+      item.RS_CODE,
+      item.IPC_CURSTATUS,
+      item.PTC_MOBILE,
+      item.IPC_MHCODE,
+      item.DOC_NAME,
+      item.DPC_DESC
+    ]));
+
+    //  Bulk insert once (no loops used here also)
+    const queries = [
+      {
+        sql: `INSERT INTO fb_ipadmiss (
+                fb_ip_no, fb_ipd_date, fb_pt_no, fb_ptc_name, fb_ptc_sex,
+                fb_ptd_dob, fb_ptn_dayage, fb_ptn_monthage, fb_ptn_yearage,
+                fb_ptc_loadd1, fb_ptc_loadd2, fb_ptc_loadd3, fb_ptc_loadd4,
+                fb_ptc_lopin, fb_rc_code, fb_bd_code, fb_do_code, fb_rs_code,
+                fb_ipc_curstatus, fb_ptc_mobile, fb_ipc_mhcode, fb_doc_name, fb_dep_desc
+             ) VALUES ?`,
+        values: [allValues]
+      },
+      {
+        sql: `INSERT INTO fb_ipadmiss_logdtl (fb_last_trigger_date, fb_process_id) VALUES (?, ?)`,
+        values: [mysqlsupportToDate, 1]
+      }
+    ];
+
+    await mysqlExecuteTransaction(queries);
+
+    return callBack(null, { inserted: allValues.length });
+
+  } catch (err) {
+    console.error("getInpatientDetail error:", err);
+
+    try { if (resultSet) await resultSet.close(); } catch { }
+    try { if (conn_ora) await conn_ora.close(); } catch { }
+    try { if (pool_ora) await pool_ora.close(); } catch { }
+
+    return callBack(err);
+  } finally {
+    try { if (resultSet) await resultSet.close(); } catch { }
+    try { if (conn_ora) await conn_ora.close(); } catch { }
+    try { if (pool_ora) await pool_ora.close(); } catch { }
   }
 };
 
@@ -2347,7 +2341,7 @@ const getAmsLastUpdatedDate = async (processId) => {
 
 /****************************/
 
-// auto sync at an interval of 10 min
+// auto sync at an interval of 10 min/2
 cron.schedule("*/2 * * * *", () => {
   getInpatientDetail();
 });
@@ -2381,6 +2375,9 @@ cron.schedule("0 23 * * *", () => {
   InsertChilderDetailMeliora();
 });
 
+
+
+
 // Run via cron- Jomol for BIS
 // cron.schedule("*/2 * * * *", () => {
 //   InsertKmcMedDesc();
@@ -2395,3 +2392,236 @@ cron.schedule("0 23 * * *", () => {
 //   InsertTmcMedDesc();
 // });
 
+
+// const getInpatientDetail = async (callBack) => {
+//   let pool_ora = await oraConnection();
+//   let conn_ora = await pool_ora.getConnection();
+
+//   let crmResult;
+//   try {
+//     // example call
+//     crmResult = await mysqlExecute(`select company_slno from crm_common`, []);
+//   } catch (error) {
+//     console.log(error, "Error occured!");
+//     return callBack(error);
+//   }
+
+//   const companySlno = crmResult[0]?.company_slno;
+//   const mh_Code = Number(companySlno) === 1 ? '00' : 'KC';
+
+//   //new query
+//   const oracleSql = `
+//       SELECT  
+//         IPADMISS.IP_NO, 
+//         IPADMISS.IPD_DATE, 
+//         IPADMISS.PT_NO,
+//         IPADMISS.PTC_PTNAME,     
+//         IPADMISS.PTC_TYPE,                            
+//         IPADMISS.BD_CODE AS IPD_BD_CODE ,
+//         IPADMISS.DO_CODE,
+//         IPADMISS.PTC_SEX,
+//         IPADMISS.PTD_DOB,
+//         IPADMISS.PTN_DAYAGE,
+//         IPADMISS.PTN_MONTHAGE,
+//         IPADMISS.PTN_YEARAGE,
+//         IPADMISS.PTC_LOADD1,
+//         IPADMISS.PTC_LOADD2,
+//         IPADMISS.PTC_LOADD3,
+//         IPADMISS.PTC_LOADD4,
+//         IPADMISS.PTC_LOPIN,
+//         IPADMISS.PTC_LOPHONE,
+//         IPADMISS.PTC_MOBILE,
+//         IPADMISS.RC_CODE,
+//         IPADMISS.RS_CODE,   
+//         IPADMISS.IPC_CURSTATUS,   
+//         IPADMISS.IPC_MHCODE,
+//          DOCTOR.DOC_NAME ,
+//          (SELECT department.DPC_DESC
+//             FROM department
+//             LEFT JOIN speciality ON department.DP_CODE = speciality.DP_CODE
+//             LEFT JOIN doctor ON speciality.SP_CODE = doctor.SP_CODE
+//             WHERE doctor.DO_CODE = ipadmiss.DO_CODE) AS DPC_DESC      
+//               FROM IPADMISS
+//                LEFT JOIN rmall ON rmall.ip_no = ipadmiss.ip_no
+//                LEFT JOIN doctor ON doctor.do_code = ipadmiss.do_code 
+//                LEFT JOIN speciality ON doctor.SP_CODE=speciality.SP_CODE 
+//                LEFT JOIN department ON speciality.DP_CODE=department.DP_CODE
+//                         WHERE ipadmiss.IPC_MHCODE = :MH_CODE
+//                                 AND NVL(IPD_DATE, SYSDATE) >= TO_DATE(:FROM_DATE, 'dd/MM/yyyy HH24:mi:ss')
+//                                 AND NVL(IPD_DATE, SYSDATE) <= TO_DATE(:TO_DATE, 'dd/MM/yyyy HH24:mi:ss')
+//                                 AND rmall.rmc_occupby IN ('P') 
+//                                 and ipc_ptflag='N'            
+//                               ORDER BY  IPADMISS.IPD_DATE
+//       `;
+
+//   // chance to throw this error : Error => ORA-01849: hour must be between 1 and 12
+//   try {
+//     // sql get query from meliora here
+//     const detail = await getLastTriggerDate(1)
+
+//     // lastupdate time
+//     const lastInsertDate = detail?.fb_last_trigger_date
+//       ? new Date(detail?.fb_last_trigger_date)
+//       : subHours(new Date(), 1);
+
+//     // const manualFromDate = new Date(2025, 4, 20, 9, 10, 0);// test date
+
+//     // date convertion to oracle support
+//     const fromDate = format(new Date(lastInsertDate), 'dd/MM/yyyy HH:mm:ss');
+//     const toDate = format(new Date(), 'dd/MM/yyyy HH:mm:ss');
+
+//     const mysqlsupportToDate = format(new Date(), 'yyyy-MM-dd HH:mm:ss');
+
+//     // GET DATA FROM ORACLE
+//     const result = await conn_ora.execute(
+//       oracleSql,
+//       {
+//         MH_CODE: mh_Code,
+//         FROM_DATE: fromDate,
+//         TO_DATE: toDate
+//       },
+//       { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
+//     );
+
+//     result.resultSet?.getRows((err, rows) => {
+//       //  CHECK DATA FROM THE ORACLE DATABASE
+//       if (rows.length === 0) {
+//         // console.log("No data found");
+//         return;
+//       }
+
+//       // FILTER DATA
+//       const VALUES = rows?.map(item => [
+//         item.IP_NO,
+//         item.IPD_DATE ? format(new Date(item?.IPD_DATE), 'yyyy-MM-dd HH:mm:ss') : null,
+//         item.PT_NO,
+//         item.PTC_PTNAME,
+//         item.PTC_SEX,
+//         item.PTD_DOB ? format(new Date(item?.PTD_DOB), 'yyyy-MM-dd HH:mm:ss') : null,
+//         item.PTN_DAYAGE,
+//         item.PTN_MONTHAGE,
+//         item.PTN_YEARAGE,
+//         item.PTC_LOADD1,
+//         item.PTC_LOADD2,
+//         item.PTC_LOADD3,
+//         item.PTC_LOADD4,
+//         item.PTC_LOPIN,
+//         item.RC_CODE,
+//         item.IPD_BD_CODE,
+//         item.DO_CODE,
+//         item.RS_CODE,
+//         item.IPC_CURSTATUS,
+//         item.PTC_MOBILE,
+//         item.IPC_MHCODE,
+//         item.DOC_NAME,
+//         item.DPC_DESC
+//       ]);
+
+
+//       // INSERT DATA INTO THE MYSQL TABLE
+//       mysqlpool.getConnection((err, connection) => {
+//         if (err) {
+//           // mysql db not connected check connection
+//           console.log("mysql db not connected check connection");
+//           return;
+//         }
+//         connection.beginTransaction((err) => {
+//           if (err) {
+//             connection.release();
+//             console.log("error in begin transaction");
+//           }
+
+//           connection.query(
+//             `INSERT INTO fb_ipadmiss (
+//                         fb_ip_no,
+//                         fb_ipd_date,
+//                         fb_pt_no,
+//                         fb_ptc_name,
+//                         fb_ptc_sex,
+//                         fb_ptd_dob,   
+//                         fb_ptn_dayage,
+//                         fb_ptn_monthage,
+//                         fb_ptn_yearage,
+//                         fb_ptc_loadd1,
+//                         fb_ptc_loadd2, 
+//                         fb_ptc_loadd3,
+//                         fb_ptc_loadd4,
+//                         fb_ptc_lopin,
+//                         fb_rc_code,
+//                         fb_bd_code,
+//                         fb_do_code, 
+//                         fb_rs_code, 
+//                         fb_ipc_curstatus, 
+//                         fb_ptc_mobile, 
+//                         fb_ipc_mhcode,
+//                         fb_doc_name,
+//                         fb_dep_desc
+//                     ) VALUES ?
+//                     `,
+//             [
+//               VALUES
+//             ],
+//             (err, result) => {
+//               if (err) {
+//                 console.log(err, "err");
+//                 connection.rollback(() => {
+//                   connection.release();
+//                   console.log("error in rollback data");
+//                 });
+//               } else {
+//                 connection.commit((err) => {
+//                   if (err) {
+//                     connection.rollback(() => {
+//                       connection.release();
+//                       console.log("error in commit");
+//                     });
+//                   } else {
+
+//                     //inserting detail in log table fb_process_id === 1 for inpatientinsert
+//                     connection.query(
+//                       `INSERT INTO fb_ipadmiss_logdtl (fb_last_trigger_date,fb_process_id) VALUES (?,?)`,
+//                       [
+//                         mysqlsupportToDate, 1
+//                       ],
+//                       (err, result) => {
+//                         if (err) {
+
+//                           connection.rollback(() => {
+//                             connection.release();
+//                             console.log("error in rollback data");
+//                           });
+//                         } else {
+//                           connection.commit((err) => {
+//                             if (err) {
+//                               connection.rollback(() => {
+//                                 connection.release();
+//                                 console.log("error in commit");
+//                               });
+//                             } else {
+//                               connection.release();
+//                               // console.log("success insertion");
+//                             }
+//                           });
+//                         }
+//                       }
+//                     );
+//                     //  ends here
+//                   }
+//                 });
+//               }
+//             }
+//           );
+//         });
+//       });
+
+//     });
+//   } catch (error) {
+//     console.log(error, "Error occured!");
+//     return callBack(error);
+//   } finally {
+//     if (conn_ora) {
+//       await conn_ora.close();
+//       await pool_ora.close();
+//     }
+//   }
+// };
