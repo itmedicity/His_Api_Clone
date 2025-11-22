@@ -146,7 +146,7 @@ const getInpatientDetail = async (callBack = () => { }) => {
 
     resultSet = result.resultSet;
 
-    // Fetch ALL rows at once (max 20–300 rows)
+    // Fetch ALL rows at once 
     const rows = await resultSet.getRows(0);
 
     await resultSet.close();
@@ -2342,7 +2342,7 @@ const getAmsLastUpdatedDate = async (processId) => {
 /****************************/
 
 // auto sync at an interval of 10 min/2
-cron.schedule("* * * * *", () => {
+cron.schedule("*/2 * * * *", () => {
   getInpatientDetail();
 });
 
