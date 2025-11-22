@@ -101,25 +101,48 @@ const getInpatientDetail = async (callBack = () => { }) => {
         IPADMISS.RS_CODE,   
         IPADMISS.IPC_CURSTATUS,   
         IPADMISS.IPC_MHCODE,
-        DOCTOR.DOC_NAME,
-        (SELECT department.DPC_DESC
-           FROM department
-           LEFT JOIN speciality ON department.DP_CODE = speciality.DP_CODE
-           LEFT JOIN doctor ON speciality.SP_CODE = doctor.SP_CODE
-           WHERE doctor.DO_CODE = ipadmiss.DO_CODE) AS DPC_DESC
-      FROM IPADMISS
-      LEFT JOIN rmall ON rmall.ip_no = ipadmiss.ip_no
-      LEFT JOIN doctor ON doctor.do_code = ipadmiss.do_code 
-      LEFT JOIN speciality ON doctor.SP_CODE = speciality.SP_CODE 
-      LEFT JOIN department ON speciality.DP_CODE = department.DP_CODE
-      WHERE ipadmiss.IPC_MHCODE = :MH_CODE
-        AND NVL(IPD_DATE, SYSDATE) >= TO_DATE(:FROM_DATE, 'dd/MM/yyyy HH24:mi:ss')
-        AND NVL(IPD_DATE, SYSDATE) <= TO_DATE(:TO_DATE, 'dd/MM/yyyy HH24:mi:ss')
-        AND rmall.rmc_occupby IN ('P')
-        AND ipc_ptflag = 'N'
-      ORDER BY IPADMISS.IPD_DATE
+         DOCTOR.DOC_NAME ,
+         (SELECT department.DPC_DESC
+            FROM department
+            LEFT JOIN speciality ON department.DP_CODE = speciality.DP_CODE
+            LEFT JOIN doctor ON speciality.SP_CODE = doctor.SP_CODE
+            WHERE doctor.DO_CODE = ipadmiss.DO_CODE) AS DPC_DESC      
+              FROM IPADMISS
+               LEFT JOIN rmall ON rmall.ip_no = ipadmiss.ip_no
+               LEFT JOIN doctor ON doctor.do_code = ipadmiss.do_code 
+               LEFT JOIN speciality ON doctor.SP_CODE=speciality.SP_CODE 
+               LEFT JOIN department ON speciality.DP_CODE=department.DP_CODE
+                        WHERE ipadmiss.IPC_MHCODE = :MH_CODE 
+				                        AND NVL(IPD_DATE, SYSDATE) >= TO_DATE(:FROM_DATE, 'dd/MM/yyyy HH24:mi:ss')
+                                AND NVL(IPD_DATE, SYSDATE) <= TO_DATE(:TO_DATE, 'dd/MM/yyyy HH24:mi:ss')
+                                AND rmall.rmc_occupby IN ('P') 
+                                and ipc_ptflag='N'    
+                        Group by  IPADMISS.IP_NO, 
+                                                IPADMISS.IPD_DATE, 
+                                                IPADMISS.PT_NO,
+                                                IPADMISS.PTC_PTNAME,     
+                                                IPADMISS.PTC_TYPE,                            
+                                                IPADMISS.BD_CODE,
+                                                IPADMISS.DO_CODE,
+                                                IPADMISS.PTC_SEX,
+                                                IPADMISS.PTD_DOB,
+                                                IPADMISS.PTN_DAYAGE,
+                                                IPADMISS.PTN_MONTHAGE,
+                                                IPADMISS.PTN_YEARAGE,
+                                                IPADMISS.PTC_LOADD1,
+                                                IPADMISS.PTC_LOADD2,
+                                                IPADMISS.PTC_LOADD3,
+                                                IPADMISS.PTC_LOADD4,
+                                                IPADMISS.PTC_LOPIN,
+                                                IPADMISS.PTC_LOPHONE,
+                                                IPADMISS.PTC_MOBILE,
+                                                IPADMISS.RC_CODE,
+                                                IPADMISS.RS_CODE,   
+                                                IPADMISS.IPC_CURSTATUS,   
+                                                IPADMISS.IPC_MHCODE,
+                                                DOCTOR.DOC_NAME        
+                              ORDER BY  IPADMISS.IPD_DATE
     `;
-
     //  get date
     const detail = await getLastTriggerDate(1);
     const lastInsertDate = detail?.fb_last_trigger_date
@@ -2411,12 +2434,12 @@ cron.schedule("0 23 * * *", () => {
 
 //   //new query
 //   const oracleSql = `
-//       SELECT  
-//         IPADMISS.IP_NO, 
-//         IPADMISS.IPD_DATE, 
+//       SELECT
+//         IPADMISS.IP_NO,
+//         IPADMISS.IPD_DATE,
 //         IPADMISS.PT_NO,
-//         IPADMISS.PTC_PTNAME,     
-//         IPADMISS.PTC_TYPE,                            
+//         IPADMISS.PTC_PTNAME,
+//         IPADMISS.PTC_TYPE,
 //         IPADMISS.BD_CODE AS IPD_BD_CODE ,
 //         IPADMISS.DO_CODE,
 //         IPADMISS.PTC_SEX,
@@ -2432,25 +2455,25 @@ cron.schedule("0 23 * * *", () => {
 //         IPADMISS.PTC_LOPHONE,
 //         IPADMISS.PTC_MOBILE,
 //         IPADMISS.RC_CODE,
-//         IPADMISS.RS_CODE,   
-//         IPADMISS.IPC_CURSTATUS,   
+//         IPADMISS.RS_CODE,
+//         IPADMISS.IPC_CURSTATUS,
 //         IPADMISS.IPC_MHCODE,
 //          DOCTOR.DOC_NAME ,
 //          (SELECT department.DPC_DESC
 //             FROM department
 //             LEFT JOIN speciality ON department.DP_CODE = speciality.DP_CODE
 //             LEFT JOIN doctor ON speciality.SP_CODE = doctor.SP_CODE
-//             WHERE doctor.DO_CODE = ipadmiss.DO_CODE) AS DPC_DESC      
+//             WHERE doctor.DO_CODE = ipadmiss.DO_CODE) AS DPC_DESC
 //               FROM IPADMISS
 //                LEFT JOIN rmall ON rmall.ip_no = ipadmiss.ip_no
-//                LEFT JOIN doctor ON doctor.do_code = ipadmiss.do_code 
-//                LEFT JOIN speciality ON doctor.SP_CODE=speciality.SP_CODE 
+//                LEFT JOIN doctor ON doctor.do_code = ipadmiss.do_code
+//                LEFT JOIN speciality ON doctor.SP_CODE=speciality.SP_CODE
 //                LEFT JOIN department ON speciality.DP_CODE=department.DP_CODE
 //                         WHERE ipadmiss.IPC_MHCODE = :MH_CODE
 //                                 AND NVL(IPD_DATE, SYSDATE) >= TO_DATE(:FROM_DATE, 'dd/MM/yyyy HH24:mi:ss')
 //                                 AND NVL(IPD_DATE, SYSDATE) <= TO_DATE(:TO_DATE, 'dd/MM/yyyy HH24:mi:ss')
-//                                 AND rmall.rmc_occupby IN ('P') 
-//                                 and ipc_ptflag='N'            
+//                                 AND rmall.rmc_occupby IN ('P')
+//                                 and ipc_ptflag='N'
 //                               ORDER BY  IPADMISS.IPD_DATE
 //       `;
 
@@ -2538,21 +2561,21 @@ cron.schedule("0 23 * * *", () => {
 //                         fb_pt_no,
 //                         fb_ptc_name,
 //                         fb_ptc_sex,
-//                         fb_ptd_dob,   
+//                         fb_ptd_dob,
 //                         fb_ptn_dayage,
 //                         fb_ptn_monthage,
 //                         fb_ptn_yearage,
 //                         fb_ptc_loadd1,
-//                         fb_ptc_loadd2, 
+//                         fb_ptc_loadd2,
 //                         fb_ptc_loadd3,
 //                         fb_ptc_loadd4,
 //                         fb_ptc_lopin,
 //                         fb_rc_code,
 //                         fb_bd_code,
-//                         fb_do_code, 
-//                         fb_rs_code, 
-//                         fb_ipc_curstatus, 
-//                         fb_ptc_mobile, 
+//                         fb_do_code,
+//                         fb_rs_code,
+//                         fb_ipc_curstatus,
+//                         fb_ptc_mobile,
 //                         fb_ipc_mhcode,
 //                         fb_doc_name,
 //                         fb_dep_desc
