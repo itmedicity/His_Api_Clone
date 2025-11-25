@@ -5,7 +5,7 @@ const mysqlpool = require("../config/dbconfigmeliora");
 const { format, subHours, subMonths } = require("date-fns");
 const bispool = require("../config/dbconfbis");
 
-
+{/* %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% FEED BACK CRON-JOBS STARTS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% */}
 // Getting Company Slno
 const mysqlExecute = (sql, values = []) => {
   return new Promise((resolve, reject) => {
@@ -15,7 +15,6 @@ const mysqlExecute = (sql, values = []) => {
     });
   });
 };
-
 
 // my sql transaction for patient insert Query
 const mysqlExecuteTransaction = (queries = []) => {
@@ -243,459 +242,499 @@ const getInpatientDetail = async (callBack = () => { }) => {
   }
 };
 
-
 // update trigger for ipadmiss to set curstatus ,actrelease and Discharge date details
-const UpdateIpStatusDetails = async (callBack) => {
-  let pool_ora = await oraConnection();
-  let conn_ora = await pool_ora.getConnection();
+// UPDATE IPADMISS STATUS DETAILS
+const UpdateIpStatusDetails = async (callBack = () => { }) => {
+  let pool_ora = null;
+  let conn_ora = null;
+  let resultSet = null;
 
-  const oracleSql = `
-select ip_no,do_code,ipc_currccode,cu_code,ipc_curstatus,ipd_disc,ipc_status,dmd_date,dmc_slno
-           from ipadmiss
-           where ipc_ptflag='N' 
-               and (ipd_disc >= to_date(:FROM_DATE,'dd/MM/yyyy HH24:mi:ss')
-               and ipd_disc <= to_date(:TO_DATE,'dd/MM/yyyy HH24:mi:ss'))`;
   try {
 
-    const detail = await getLastTriggerDate(2)
+    // 1. Get Last Trigger Date (Process ID = 2)
+    const detail = await getLastTriggerDate(2);
 
-    const lastUpdatetDate = detail?.fb_last_trigger_date
-      ? new Date(detail?.fb_last_trigger_date)
-      : subHours(new Date(), 1);
+    const lastUpdateDate = detail?.fb_last_trigger_date
+      ? new Date(detail.fb_last_trigger_date)
+      : new Date(Date.now() - 60 * 60 * 1000); // fallback:last 1 hour
 
-    // const manualFromDate = new Date(2025, 4, 20, 9, 10, 0);// test date
-
-    // date convertion to oracle support
-    const fromDate = format(new Date(lastUpdatetDate), 'dd/MM/yyyy HH:mm:ss')
-    const toDate = format(new Date(), 'dd/MM/yyyy HH:mm:ss');
-
-    // mysqlsupport format
-    const mysqlsupportToDate = format(new Date(), 'yyyy-MM-dd HH:mm:ss');
-
-    const result = await conn_ora.execute(
-      oracleSql,
-      {
-        FROM_DATE: fromDate,
-        TO_DATE: toDate
-      },
-      { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
-    );
-
-    await result.resultSet?.getRows((err, rows) => {
-      //  CHECK DATA FROM THE ORACLE DATABASE
-
-      if (rows.length === 0) {
-        // console.log("No update date found UpdateIpStatusDetails");
-        return;
-      }
-
-      // result of the oracle query
-      const Values = rows?.map(item => [
-        item.DO_CODE,
-        item.IPC_CURSTATUS,
-        item.IPD_DISC ? format(new Date(item?.IPD_DISC), 'yyyy-MM-dd HH:mm:ss') : null,
-        item.IPC_STATUS,
-        item.DMD_DATE ? format(new Date(item?.DMD_DATE), 'yyyy-MM-dd HH:mm:ss') : null,
-        item.DMC_SLNO,
-        item.IP_NO
-      ]);
-
-
-      // INSERT DATA INTO THE MYSQL TABLEs
-      mysqlpool.getConnection((err, connection) => {
-        if (err) {
-          // mysql db not connected check connection
-          console.log("mysql db not connected check connection");
-          return;
-        };
-
-        connection.beginTransaction((err) => {
-          if (err) {
-            connection.release();
-            console.log("error in begin transaction");
-          }
-
-          // let missingIpNos = [];
-          // console.log(missingIpNos, "missingIpNos");
-
-          const updateQueries = Values?.map((row) => {
-            return new Promise((resolve, reject) => {
-              connection.query(
-                `
-              UPDATE fb_ipadmiss
-                SET
-                  fb_do_code = ?,
-                  fb_ipc_curstatus = ?,
-                  fb_ipd_disc = ?,
-                  fb_ipc_status = ?,
-                  fb_dmd_date = ?,
-                  fb_dmc_slno = ?
-                WHERE fb_ip_no = ?`,
-                row,
-                (err, result) => {
-                  if (err) return reject(err);
-                  // store the ipno that doesnot exist in mysqltable
-                  // if (result.affectedRows === 0) {
-                  //   const ipNo = row[6];
-                  //   missingIpNos = [...missingIpNos, ipNo];
-                  // }
-                  resolve(result);
-                }
-              );
-            });
-          });
-
-          Promise.all(updateQueries).
-            then((result) => {
-              connection.commit((err) => {
-                if (err) {
-                  connection.rollback(() => {
-                    connection.release();
-                    console.log("error in commit");
-                  });
-                } else {
-                  // Updating detail in log table (fb_process_id === 2 for Status Update in ipadmiss)
-                  connection.query(
-                    `INSERT INTO fb_ipadmiss_logdtl (fb_last_trigger_date,fb_process_id) VALUES (?,?)`,
-                    [
-                      mysqlsupportToDate, 2
-                    ],
-                    (err, result) => {
-                      if (err) {
-                        console.log(err, "error");
-                        connection.rollback(() => {
-                          connection.release();
-                          console.log("error in rollback data");
-                        });
-                      } else {
-                        connection.commit((err) => {
-                          if (err) {
-                            connection.rollback(() => {
-                              connection.release();
-                              console.log("error in commit");
-                            });
-                          } else {
-                            connection.release();
-                          }
-                        });
-                      }
-                    }
-                  );
-                  //  ends here
-                }
-              });
-            }).catch((err) => {
-              console.log(err, "Update query error");
-              connection.rollback(() => {
-                connection.release();
-                console.log("Rolled back due to error");
-              });
-            });
-
-        })
-      });
-    });
-  } catch (error) {
-    console.log(error, "Error occured!");
-    return callBack(error)
-  } finally {
-    if (conn_ora) {
-      await conn_ora.close();
-      await pool_ora.close();
+    if (isNaN(lastUpdateDate.getTime())) {
+      throw new Error("Invalid last trigger date");
     }
-  }
-}
 
+    // Oracle format
+    const fromDate = format(lastUpdateDate, "dd/MM/yyyy HH:mm:ss");
+    const toDate = format(new Date(), "dd/MM/yyyy HH:mm:ss");
+    // MySQL format
+    const mysqlsupportToDate = format(new Date(), "yyyy-MM-dd HH:mm:ss");
 
-// tirgger for getting data form RMALL bed_code
-const UpdateInpatientDetailRmall = async (callBack) => {
-  let pool_ora = await oraConnection();
-  let conn_ora = await pool_ora.getConnection();
-
-  const oracleSql = `
-  SELECT  rmall.bd_code,rmall.ip_no
-            FROM   rmall
-            left join ipadmiss on rmall.ip_no=ipadmiss.ip_no
-            Where  (ipadmiss.ipc_ptflag = 'N')
-                     and rmall.rmd_relesedate is null
-                     and  (rmall.rmd_occupdate >= to_date(:FROM_DATE,'dd/MM/yyyy HH24:mi:ss')
-                     and rmall.rmd_occupdate <= to_date(:TO_DATE,'dd/MM/yyyy HH24:mi:ss'))`;
-  try {
-
-    const detail = await getLastTriggerDate(3);
-
-    const lastUpdatetDate = detail?.fb_last_trigger_date
-      ? new Date(detail?.fb_last_trigger_date)
-      : subHours(new Date(), 1);
-
-    // const manualFromDate = new Date(2025, 4, 20, 9, 10, 0);// test date
-
-    // date convertion to oracle support
-    const fromDate = format(new Date(lastUpdatetDate), 'dd/MM/yyyy HH:mm:ss')
-    const toDate = format(new Date(), 'dd/MM/yyyy HH:mm:ss');
-
-    // mysqlsupport format
-    const mysqlsupportToDate = format(new Date(), 'yyyy-MM-dd HH:mm:ss');
-
-    const result = await conn_ora.execute(
-      oracleSql,
-      {
-        FROM_DATE: fromDate,
-        TO_DATE: toDate
-      },
-      { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
-    );
-
-    await result.resultSet?.getRows((err, rows) => {
-      //  CHECK DATA FROM THE ORACLE DATABASE
-      if (rows.length === 0) {
-        // console.log("No update date found for bed");
-        return;
-      }
-
-      // result of the oracle query
-      const Values = rows?.map(item => [
-        item.BD_CODE,
-        item.IP_NO
-      ]);
-
-      // INSERT DATA INTO THE MYSQL TABLE
-      mysqlpool.getConnection((err, connection) => {
-        if (err) {
-          // mysql db not connected check connection
-          console.log("mysql db not connected check connection");
-          return;
-        }
-        connection.beginTransaction((err) => {
-          if (err) {
-            connection.release();
-            console.log("error in begin transaction");
-          }
-          const updateQueries = Values?.map((row) => {
-            return new Promise((resolve, reject) => {
-              connection.query(
-                `
-              UPDATE fb_ipadmiss
-                SET
-                  fb_bd_code = ?
-                WHERE fb_ip_no = ?`,
-                row,
-                (err, result) => {
-                  if (err) return reject(err);
-                  resolve(result);
-                }
-              );
-            });
-          });
-
-          Promise.all(updateQueries).
-            then((result) => {
-              connection.commit((err) => {
-                if (err) {
-                  connection.rollback(() => {
-                    connection.release();
-                    console.log("error in commit");
-                  });
-                } else {
-                  // Updating detail in log table fb_process_id === 3 for Ip detail update from rmaill
-                  connection.query(
-                    `INSERT INTO fb_ipadmiss_logdtl (fb_last_trigger_date,fb_process_id) VALUES (?,?)`,
-                    [
-                      mysqlsupportToDate, 3
-                    ],
-                    (err, result) => {
-                      if (err) {
-                        console.log(err, "error");
-                        connection.rollback(() => {
-                          connection.release();
-                          console.log("error in rollback data");
-                        });
-                      } else {
-                        connection.commit((err) => {
-                          if (err) {
-                            connection.rollback(() => {
-                              connection.release();
-                              console.log("error in commit");
-                            });
-                          } else {
-                            connection.release();
-                          }
-                        });
-                      }
-                    }
-                  );
-                  //  ends here
-                }
-              });
-            }).catch((err) => {
-              console.log(err, "Update query error");
-              connection.rollback(() => {
-                connection.release();
-                console.log("Rolled back due to error");
-              });
-            });
-
-        })
-      });
-
-    });
-  } catch (error) {
-    console.log(error, "Error occured!");
-    return callBack(error)
-  } finally {
-    if (conn_ora) {
-      await conn_ora.close();
-      await pool_ora.close();
-    }
-  }
-}
-
-
-// trigger to fetch data from bed to update fb_bed 
-const UpdateFbBedDetailMeliora = async (callBack) => {
-  let pool_ora = await oraConnection();
-  let conn_ora = await pool_ora.getConnection();
-  const oracleSql = `
+    // 2. Oracle SQL Query
+    const oracleSql = `
       SELECT 
-          BD.BDC_OCCUP,
-          BD.BD_CODE,
-          SUM(BD.BDN_OCCNO) AS OCCU
-      FROM 
-          BED BD
-      WHERE  
-          BD.BDC_STATUS = 'Y' 
-          AND (BD.BDD_EDDATE >= TO_DATE(:FROM_DATE, 'dd/MM/yyyy HH24:mi:ss') 
-                AND BD.BDD_EDDATE <= TO_DATE(:TO_DATE, 'dd/MM/yyyy HH24:mi:ss'))
-      GROUP BY 
-          BD.BDC_OCCUP, 
-          BD.BD_CODE`;
+        ip_no,
+        do_code,
+        ipc_curstatus,
+        ipd_disc,
+        ipc_status,
+        dmd_date,
+        dmc_slno
+      FROM ipadmiss
+      WHERE ipc_ptflag = 'N'
+        AND ipd_actrelease >= TO_DATE(:FROM_DATE, 'dd/MM/yyyy HH24:mi:ss')
+        AND ipd_actrelease <= TO_DATE(:TO_DATE, 'dd/MM/yyyy HH24:mi:ss')
+    `;
 
-  try {
-    const detail = await getLastTriggerDate(4);
-    const lastUpdatetDate = detail?.fb_last_trigger_date
-      ? new Date(detail?.fb_last_trigger_date)
-      : subHours(new Date(), 1);
-
-    // const manualFromDate = new Date(2025, 4, 20, 10, 10, 0); // test date
-
-    // date convertion to oracle support
-    const fromDate = format(new Date(lastUpdatetDate), 'dd/MM/yyyy HH:mm:ss')
-    const toDate = format(new Date(), 'dd/MM/yyyy HH:mm:ss');
-
-    // mysqlsupport format
-    const mysqlsupportToDate = format(new Date(), 'yyyy-MM-dd HH:mm:ss');
+    // 3. Execute Oracle Query
+    pool_ora = await oraConnection();
+    conn_ora = await pool_ora.getConnection();
 
     const result = await conn_ora.execute(
       oracleSql,
-      {
-        FROM_DATE: fromDate,
-        TO_DATE: toDate
-      },
+      { FROM_DATE: fromDate, TO_DATE: toDate },
       { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
     );
 
-    await result.resultSet?.getRows((err, rows) => {
-      //  CHECK DATA FROM THE ORACLE DATABASE
-      if (rows.length === 0) {
-        // console.log("No update date found for bed");
-        return;
-      }
+    resultSet = result.resultSet;
 
-      // result of the oracle query
-      const Values = rows?.map(item => [
-        item.BDC_OCCUP,
-        item.OCCU,
-        item.BD_CODE
-      ]);
+    const rows = await resultSet.getRows(0); // fetch all rows
+    await resultSet.close();
+    resultSet = null;
 
-      // INSERT DATA INTO THE MYSQL TABLE
-      mysqlpool.getConnection((err, connection) => {
-        if (err) {
-          // mysql db not connected check connection
-          console.log("mysql db not connected check connection");
-          return;
-        }
-        connection.beginTransaction((err) => {
-          if (err) {
-            connection.release();
-            console.log("error in begin transaction");
-          }
-          const updateQueries = Values?.map((row) => {
-            return new Promise((resolve, reject) => {
-              connection.query(
-                `
-              UPDATE fb_bed
-                SET
-                  fb_bdc_occup = ?,
-                  fb_bdn_cccno = ?
-                WHERE fb_bd_code = ?`,
-                row,
-                (err, result) => {
-                  if (err) return reject(err);
-                  resolve(result);
-                }
-              );
-            });
-          });
-          Promise.all(updateQueries).
-            then((result) => {
-              connection.commit((err) => {
-                if (err) {
-                  connection.rollback(() => {
-                    connection.release();
-                    console.log("error in commit");
-                  });
-                } else {
-                  // Updating detail in log table fb_process_id === 3 for Ip detail update from rmaill
-                  connection.query(
-                    `INSERT INTO fb_ipadmiss_logdtl (fb_last_trigger_date,fb_process_id) VALUES (?,?)`,
-                    [
-                      mysqlsupportToDate, 4
-                    ],
-                    (err, result) => {
-                      if (err) {
-                        console.log(err, "error");
-                        connection.rollback(() => {
-                          connection.release();
-                          console.log("error in rollback data");
-                        });
-                      } else {
-                        connection.commit((err) => {
-                          if (err) {
-                            connection.rollback(() => {
-                              connection.release();
-                              console.log("error in commit");
-                            });
-                          } else {
-                            connection.release();
-                          }
-                        });
-                      }
-                    }
-                  );
-                  //  ends here
-                }
-              });
-            }).catch((err) => {
-              console.log(err, "Update query error");
-              connection.rollback(() => {
-                connection.release();
-                console.log("Rolled back due to error");
-              });
-            });
-        })
-      });
+    if (!rows || rows.length === 0) {
+      return callBack(null, { message: "No update rows found" });
+    }
+
+    // 4. Convert rows to update values
+    const updateValues = rows.map((item) => [
+      item.DO_CODE,
+      item.IPC_CURSTATUS,
+      item.IPD_DISC ? format(new Date(item.IPD_DISC), "yyyy-MM-dd HH:mm:ss") : null,
+      item.IPC_STATUS,
+      item.DMD_DATE ? format(new Date(item.DMD_DATE), "yyyy-MM-dd HH:mm:ss") : null,
+      item.DMC_SLNO,
+      item.IP_NO
+    ]);
+
+    // 5. Prepare MySQL transaction queries
+    const updateQueries = updateValues.map((row) => ({
+      sql: `
+        UPDATE fb_ipadmiss
+        SET
+          fb_do_code = ?,
+          fb_ipc_curstatus = ?,
+          fb_ipd_disc = ?,
+          fb_ipc_status = ?,
+          fb_dmd_date = ?,
+          fb_dmc_slno = ?
+        WHERE fb_ip_no = ?
+      `,
+      values: row
+    }));
+
+    // insert log record
+    updateQueries.push({
+      sql: `INSERT INTO fb_ipadmiss_logdtl (fb_last_trigger_date, fb_process_id) VALUES (?, ?)`,
+      values: [mysqlsupportToDate, 2]
     });
-  } catch (error) {
-    console.log(error, "Error occured!");
-    return callBack(error)
+
+    // 6. Execute MySQL Transaction
+    await mysqlExecuteTransaction(updateQueries);
+
+    // 7. Callback success
+    return callBack(null, { updated: updateValues.length });
+
+  } catch (err) {
+    return callBack(err);
+
   } finally {
+    // Safe close
+    if (resultSet) {
+      try { await resultSet.close(); } catch { }
+    }
     if (conn_ora) {
-      await conn_ora.close();
-      await pool_ora.close();
+      try { await conn_ora.close(); } catch { }
+    }
+    if (pool_ora) {
+      try { await pool_ora.close(); } catch { }
     }
   }
 };
+
+// tirgger for getting data form RMALL bed_code
+
+// UPDATE BED DETAILS STATUS DETAILS
+const UpdateInpatientDetailRmall = async (callBack = () => { }) => {
+  let pool_ora = null;
+  let conn_ora = null;
+  let resultSet = null;
+
+  try {
+    // 1. Get Last Trigger Date (Process ID = 3)
+    const detail = await getLastTriggerDate(3);
+
+    const lastUpdateDate = detail?.fb_last_trigger_date
+      ? new Date(detail.fb_last_trigger_date)
+      : new Date(Date.now() - 60 * 60 * 1000); // fallback: last 1 hour
+
+    if (isNaN(lastUpdateDate.getTime())) {
+      throw new Error("Invalid last trigger date");
+    }
+
+    // Oracle date formats
+    const fromDate = format(lastUpdateDate, "dd/MM/yyyy HH:mm:ss");
+    const toDate = format(new Date(), "dd/MM/yyyy HH:mm:ss");
+
+    // MySQL format
+    const mysqlsupportToDate = format(new Date(), "yyyy-MM-dd HH:mm:ss");
+
+    // 2. Oracle SQL
+    const oracleSql = `
+      SELECT 
+        rmall.bd_code,
+        rmall.ip_no
+      FROM rmall
+      LEFT JOIN ipadmiss ON rmall.ip_no = ipadmiss.ip_no
+      WHERE ipadmiss.ipc_ptflag = 'N'
+        AND rmall.rmd_relesedate IS NULL
+        AND rmall.rmd_occupdate >= TO_DATE(:FROM_DATE, 'dd/MM/yyyy HH24:mi:ss')
+        AND rmall.rmd_occupdate <= TO_DATE(:TO_DATE, 'dd/MM/yyyy HH24:mi:ss')
+    `;
+
+    // 3. Execute Oracle Query
+    pool_ora = await oraConnection();
+    conn_ora = await pool_ora.getConnection();
+
+    const result = await conn_ora.execute(
+      oracleSql,
+      { FROM_DATE: fromDate, TO_DATE: toDate },
+      { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
+    );
+
+    resultSet = result.resultSet;
+
+    const rows = await resultSet.getRows(0); // fetch all rows
+    await resultSet.close();
+    resultSet = null;
+
+    if (!rows || rows.length === 0) {
+      return callBack(null, { message: "No updated rows found" });
+    }
+
+    // 4. Prepare update values
+    const updateValues = rows.map((item) => [
+      item.BD_CODE,
+      item.IP_NO
+    ]);
+
+    // 5. Build MySQL Transaction Queries
+    const updateQueries = updateValues.map((row) => ({
+      sql: `
+        UPDATE fb_ipadmiss
+        SET fb_bd_code = ?
+        WHERE fb_ip_no = ?
+      `,
+      values: row
+    }));
+
+    // Add log entry
+    updateQueries.push({
+      sql: `
+        INSERT INTO fb_ipadmiss_logdtl (fb_last_trigger_date, fb_process_id)
+        VALUES (?, ?)
+      `,
+      values: [mysqlsupportToDate, 3]
+    });
+
+    // 6. Run MySQL Transaction
+    await mysqlExecuteTransaction(updateQueries);
+
+    // 7. Success
+    return callBack(null, { updated: updateValues.length });
+
+  } catch (error) {
+    return callBack(error);
+
+  } finally {
+    // Proper resource cleanup
+    if (resultSet) {
+      try { await resultSet.close(); } catch { }
+    }
+    if (conn_ora) {
+      try { await conn_ora.close(); } catch { }
+    }
+    if (pool_ora) {
+      try { await pool_ora.close(); } catch { }
+    }
+  }
+};
+
+// trigger to fetch data from bed to update fb_bed 
+
+// UPDATE BED DETAILS  DETAILS ON BED TABLE
+const UpdateFbBedDetailMeliora = async (callBack = () => { }) => {
+  let pool_ora = null;
+  let conn_ora = null;
+  let resultSet = null;
+
+  try {
+    // 1. Get last trigger date (Process ID = 4)
+    const detail = await getLastTriggerDate(4);
+
+    const lastUpdateDate = detail?.fb_last_trigger_date
+      ? new Date(detail.fb_last_trigger_date)
+      : new Date(Date.now() - 60 * 60 * 1000); // fallback: last 1 hour
+
+    if (isNaN(lastUpdateDate.getTime())) {
+      throw new Error("Invalid last trigger date");
+    }
+
+    // Oracle formats
+    const fromDate = format(lastUpdateDate, "dd/MM/yyyy HH:mm:ss");
+    const toDate = format(new Date(), "dd/MM/yyyy HH:mm:ss");
+    // MySQL format
+    const mysqlsupportToDate = format(new Date(), "yyyy-MM-dd HH:mm:ss");
+
+    // 2. Oracle SQL
+    const oracleSql = `
+      SELECT 
+        BD.BDC_OCCUP,
+        BD.BD_CODE,
+        SUM(BD.BDN_OCCNO) AS OCCU
+      FROM BED BD
+      WHERE BD.BDC_STATUS = 'Y'
+        AND BD.BDD_EDDATE >= TO_DATE(:FROM_DATE, 'dd/MM/yyyy HH24:mi:ss')
+        AND BD.BDD_EDDATE <= TO_DATE(:TO_DATE, 'dd/MM/yyyy HH24:mi:ss')
+      GROUP BY BD.BDC_OCCUP, BD.BD_CODE
+    `;
+
+    // 3. Execute Oracle
+    pool_ora = await oraConnection();
+    conn_ora = await pool_ora.getConnection();
+
+    const result = await conn_ora.execute(
+      oracleSql,
+      { FROM_DATE: fromDate, TO_DATE: toDate },
+      { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
+    );
+
+    resultSet = result.resultSet;
+    const rows = await resultSet.getRows(0); // fetch all rows
+
+    await resultSet.close();
+    resultSet = null;
+
+    if (!rows || rows.length === 0) {
+      return callBack(null, { message: "No bed update rows found" });
+    }
+
+    // 4. Prepare update values
+    const updateValues = rows.map((item) => [
+      item.BDC_OCCUP,
+      item.OCCU,
+      item.BD_CODE
+    ]);
+
+    // 5. Build MySQL transaction queries
+    const updateQueries = updateValues.map((row) => ({
+      sql: `
+        UPDATE fb_bed
+        SET 
+          fb_bdc_occup = ?,
+          fb_bdn_cccno = ?
+        WHERE fb_bd_code = ?
+      `,
+      values: row
+    }));
+
+    // Add log entry (process_id = 4)
+    updateQueries.push({
+      sql: `
+        INSERT INTO fb_ipadmiss_logdtl (fb_last_trigger_date, fb_process_id)
+        VALUES (?, ?)
+      `,
+      values: [mysqlsupportToDate, 4]
+    });
+
+    // 6. Run MySQL transaction
+    await mysqlExecuteTransaction(updateQueries);
+
+    // 7. Success
+    return callBack(null, { updated: updateValues.length });
+
+  } catch (error) {
+    return callBack(error);
+
+  } finally {
+    // Safe close of resources
+    if (resultSet) {
+      try { await resultSet.close(); } catch { }
+    }
+    if (conn_ora) {
+      try { await conn_ora.close(); } catch { }
+    }
+    if (pool_ora) {
+      try { await pool_ora.close(); } catch { }
+    }
+  }
+};
+
+// GET CHILD DETAIL FROM ELLIDER
+const InsertChilderDetailMeliora = async (callBack = () => { }) => {
+  let pool_ora = null;
+  let conn_ora = null;
+  let resultSet = null;
+
+  try {
+    // 1. Format today's date for Oracle query (DD-MON-YYYY)
+    const formattedDate = format(new Date(), "dd-MMM-yyyy").toUpperCase();
+
+    // 2. Oracle SQL
+    const oracleSql = `
+      SELECT 
+        B.BR_SLNO,
+        B.BRD_DATE,
+        B.PT_NO,
+        B.PTC_PTNAME,
+        B.PTC_LOADD1,
+        B.PTC_LOADD2,
+        B.BRC_HUSBAND,
+        B.BRN_AGE,
+        B.BRN_TOTAL,
+        B.BRN_LIVE,
+        B.BD_CODE,
+        B.IP_NO,
+        B.BRC_MHCODE,
+        L.BRC_SEX AS CHILD_GENDER,
+        L.BRD_DATE AS BIRTH_DATE,
+        L.IP_NO AS MOTHER_IPNO,
+        L.PT_NO AS CHILD_PT_NO,
+        L.CHILD_IPNO AS CHILD_IPNO,
+        L.BRN_WEIGHT AS CHILD_WEIGHT
+      FROM BIRTHREGMAST B
+      LEFT JOIN BRITHREGDETL L ON B.BR_SLNO = L.BR_SLNO
+      WHERE B.BRD_DATE >= TO_DATE(:GET_DATE, 'DD-MON-YYYY')
+    `;
+
+    // 3. Execute Oracle
+    pool_ora = await oraConnection();
+    conn_ora = await pool_ora.getConnection();
+
+    const result = await conn_ora.execute(
+      oracleSql,
+      { GET_DATE: formattedDate },
+      { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
+    );
+
+    resultSet = result.resultSet;
+    const rows = await resultSet.getRows(0); // fetch all rows
+
+    await resultSet.close();
+    resultSet = null;
+
+    if (!rows || rows.length === 0) {
+      return callBack(null, { message: "No Birth Registered Today" });
+    }
+
+    // 4. Convert rows to MySQL array values
+    const insertValues = rows.map((item) => [
+      item.BR_SLNO,
+      item.BRD_DATE ? format(new Date(item.BRD_DATE), "yyyy-MM-dd HH:mm:ss") : null,
+      item.PT_NO,
+      item.PTC_PTNAME,
+      item.PTC_LOADD1,
+      item.PTC_LOADD2,
+      item.BRC_HUSBAND,
+      item.BRN_AGE,
+      item.BRN_TOTAL,
+      item.BRN_LIVE,
+      item.BD_CODE,
+      item.IP_NO,
+      item.BRC_MHCODE,
+      item.CHILD_GENDER,
+      item.BIRTH_DATE ? format(new Date(item.BIRTH_DATE), "yyyy-MM-dd HH:mm:ss") : null,
+      item.MOTHER_IPNO,
+      item.CHILD_PT_NO,
+      item.CHILD_IPNO,
+      item.CHILD_WEIGHT
+    ]);
+
+    // 5. Prepare MySQL transaction query
+    const insertQuery = {
+      sql: `
+        INSERT INTO fb_birth_reg_mast (
+          fb_br_slno,
+          fb_brd_date,
+          fb_pt_no,
+          fb_ptc_name,
+          fb_ptc_loadd1,
+          fb_ptc_loadd2,
+          fb_brc_husband,
+          fb_brn_age,
+          fb_brn_total,
+          fb_brn_live,
+          fb_bd_code,
+          fb_ip_no,
+          fb_brc_mhcode,
+          fb_child_gender,
+          fb_birth_date,
+          fb_mother_ip_no,
+          fb_child_pt_no,
+          fb_child_ip_no,
+          fb_child_weight
+        ) VALUES ?
+      `,
+      values: [insertValues]
+    };
+
+    // 6. Run MySQL Transaction
+    await mysqlExecuteTransaction([insertQuery]);
+
+    // 7. Success callback
+    return callBack(null, { inserted: insertValues.length });
+
+  } catch (err) {
+    return callBack(err);
+
+  } finally {
+    if (resultSet) {
+      try { await resultSet.close(); } catch { }
+    }
+    if (conn_ora) {
+      try { await conn_ora.close(); } catch { }
+    }
+    if (pool_ora) {
+      try { await pool_ora.close(); } catch { }
+    }
+  }
+};
+
+/****************************/
+const getLastTriggerDate = async (processId) => {
+  return new Promise((resolve, reject) => {
+    mysqlpool.getConnection((err, connection) => {
+      if (err) {
+        console.log("MySQL DB not connected. Check connection.");
+        return reject(err);
+      }
+      const query = `
+        SELECT fb_last_trigger_date 
+        FROM fb_ipadmiss_logdtl 
+        WHERE fb_process_id = ? 
+        ORDER BY fb_log_slno DESC 
+        LIMIT 1;
+      `;
+      connection.query(query, [processId], (err, results) => {
+        connection.release();
+        if (err) {
+          return reject(err);
+        }
+        resolve(results.length > 0 ? results[0] : null);
+      });
+    });
+  });
+};
+
+{/* %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% FEED BACK CRON-JOBS ENDS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% */}
 
 
 // const getAmsPatientDetails = async (callBack) => {
@@ -1231,8 +1270,10 @@ const getAmsPatientDetails = async (callBack) => {
   }
 };
 
-//bis module- jomol
 
+
+
+//bis module- jomol
 // Utility function
 // const getItCodesInChunks = (mysqlConn, fromDate, toDate, chunkSize = 1000) => {
 //   return new Promise((resolve, reject) => {
@@ -1526,6 +1567,7 @@ const getConnection = (pool) => {
 //     });
 //   });
 // };
+
 const queryPromise = (conn, sql, params) =>
   new Promise((resolve, reject) => {
     conn.query(sql, params, (err, results) => {
@@ -2095,147 +2137,150 @@ const InsertKmcMedDesc = async (callBack) => {
 
 
 // getting child detail from ellider
-const InsertChilderDetailMeliora = async (callBack) => {
-  let pool_ora = await oraConnection();
-  let conn_ora = await pool_ora.getConnection();
+// const InsertChilderDetailMeliora = async (callBack) => {
+//   let pool_ora = await oraConnection();
+//   let conn_ora = await pool_ora.getConnection();
 
-  const oracleSql = `
-     SELECT B.BR_SLNO,
-            B.BRD_DATE,
-            B.PT_NO,
-            B.PTC_PTNAME,
-            B.PTC_LOADD1,
-            B.PTC_LOADD2,
-            B.BRC_HUSBAND,
-            B.BRN_AGE,
-            B.BRN_TOTAL,
-            B.BRN_LIVE,
-            B.BD_CODE,
-            B.IP_NO,
-            B.BRC_MHCODE,
-            L.BRC_SEX AS CHILD_GENDER,
-            L.BRD_DATE AS BIRTH_DATE,
-            L.IP_NO AS MOTHER_IPNO,
-            L.PT_NO AS CHILD_PT_NO,
-            L.CHILD_IPNO AS CHILD_IPNO,
-            L.BRN_WEIGHT AS CHILD_WEIGHT
-       FROM BIRTHREGMAST B
-            LEFT JOIN BRITHREGDETL L ON B.BR_SLNO=L.BR_SLNO
-       WHERE B.BRD_DATE>= to_date(:GET_DATE,'DD-MON-YYYY')`;
-  try {
+//   const oracleSql = `
+//      SELECT B.BR_SLNO,
+//             B.BRD_DATE,
+//             B.PT_NO,
+//             B.PTC_PTNAME,
+//             B.PTC_LOADD1,
+//             B.PTC_LOADD2,
+//             B.BRC_HUSBAND,
+//             B.BRN_AGE,
+//             B.BRN_TOTAL,
+//             B.BRN_LIVE,
+//             B.BD_CODE,
+//             B.IP_NO,
+//             B.BRC_MHCODE,
+//             L.BRC_SEX AS CHILD_GENDER,
+//             L.BRD_DATE AS BIRTH_DATE,
+//             L.IP_NO AS MOTHER_IPNO,
+//             L.PT_NO AS CHILD_PT_NO,
+//             L.CHILD_IPNO AS CHILD_IPNO,
+//             L.BRN_WEIGHT AS CHILD_WEIGHT
+//        FROM BIRTHREGMAST B
+//             LEFT JOIN BRITHREGDETL L ON B.BR_SLNO=L.BR_SLNO
+//        WHERE B.BRD_DATE>= to_date(:GET_DATE,'DD-MON-YYYY')`;
+//   try {
 
-    // date convertion to oracle support
-    const formattedDate = format(new Date(), 'dd-MMM-yyyy').toUpperCase();
+//     // date convertion to oracle support
+//     const formattedDate = format(new Date(), 'dd-MMM-yyyy').toUpperCase();
 
-    const result = await conn_ora.execute(
-      oracleSql,
-      {
-        GET_DATE: formattedDate
-      },
-      { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
-    );
+//     const result = await conn_ora.execute(
+//       oracleSql,
+//       {
+//         GET_DATE: formattedDate
+//       },
+//       { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
+//     );
 
-    const rows = await result.resultSet.getRows();
-    //  STOP execution if no data
-    if (!rows || rows.length === 0) {
-      console.log("No Birth Registerd Today.");
-      return; // This now stops the entire async function
-    }
+//     const rows = await result.resultSet.getRows();
+//     //  STOP execution if no data
+//     if (!rows || rows.length === 0) {
+//       console.log("No Birth Registerd Today.");
+//       return; // This now stops the entire async function
+//     }
 
-    // result of the oracle query
-    const VALUES = rows?.map(item => [
-      item.BR_SLNO,
-      item.BRD_DATE ? format(new Date(item?.BRD_DATE), 'yyyy-MM-dd HH:mm:ss') : null,
-      item.PT_NO,
-      item.PTC_PTNAME,
-      item.PTC_LOADD1,
-      item.PTC_LOADD2,
-      item.BRC_HUSBAND,
-      item.BRN_AGE,
-      item.BRN_TOTAL,
-      item.BRN_LIVE,
-      item.BD_CODE,
-      item.IP_NO,
-      item.BRC_MHCODE,
-      item.CHILD_GENDER,
-      item.BIRTH_DATE ? format(new Date(item?.BIRTH_DATE), 'yyyy-MM-dd HH:mm:ss') : null,
-      item.MOTHER_IPNO,
-      item.CHILD_PT_NO,
-      item.CHILD_IPNO,
-      item.CHILD_WEIGHT,
-    ]);
-    // INSERT DATA INTO THE MYSQL TABLE
-    mysqlpool.getConnection((err, connection) => {
-      if (err) {
-        // mysql db not connected check connection
-        console.log("mysql db not connected check connection");
-        return;
-      }
-      connection.beginTransaction((err) => {
-        if (err) {
-          connection.release();
-          console.log("error in begin transaction");
-        }
-        connection.query(
-          `INSERT INTO fb_birth_reg_mast(
-                  fb_br_slno,
-                  fb_brd_date,
-                  fb_pt_no,
-                  fb_ptc_name,
-                  fb_ptc_loadd1,
-                  fb_ptc_loadd2,
-                  fb_brc_husband,
-                  fb_brn_age,
-                  fb_brn_total,
-                  fb_brn_live,
-                  fb_bd_code,
-                  fb_ip_no,
-                  fb_brc_mhcode,
-                  fb_child_gender,
-                  fb_birth_date,
-                  fb_mother_ip_no,
-                  fb_child_pt_no,
-                  fb_child_ip_no,
-                  fb_child_weight
-                ) VALUES ?
-                  `,
-          [
-            VALUES
-          ],
-          (err, result) => {
-            if (err) {
-              console.log(err, "err");
-              connection.rollback(() => {
-                connection.release();
-                console.log("error in rollback data");
-              });
-            } else {
-              connection.commit((err) => {
-                if (err) {
-                  connection.rollback(() => {
-                    connection.release();
-                    console.log("error in commit");
-                  });
-                } else {
-                  connection.release();
-                }
-              });
-            }
-          }
-        );
-      })
-    });
-    // });
-  } catch (error) {
-    console.log(error, "Error occured!");
-    return callBack(error)
-  } finally {
-    if (conn_ora) {
-      await conn_ora.close();
-      await pool_ora.close();
-    }
-  }
-};
+//     // result of the oracle query
+//     const VALUES = rows?.map(item => [
+//       item.BR_SLNO,
+//       item.BRD_DATE ? format(new Date(item?.BRD_DATE), 'yyyy-MM-dd HH:mm:ss') : null,
+//       item.PT_NO,
+//       item.PTC_PTNAME,
+//       item.PTC_LOADD1,
+//       item.PTC_LOADD2,
+//       item.BRC_HUSBAND,
+//       item.BRN_AGE,
+//       item.BRN_TOTAL,
+//       item.BRN_LIVE,
+//       item.BD_CODE,
+//       item.IP_NO,
+//       item.BRC_MHCODE,
+//       item.CHILD_GENDER,
+//       item.BIRTH_DATE ? format(new Date(item?.BIRTH_DATE), 'yyyy-MM-dd HH:mm:ss') : null,
+//       item.MOTHER_IPNO,
+//       item.CHILD_PT_NO,
+//       item.CHILD_IPNO,
+//       item.CHILD_WEIGHT,
+//     ]);
+//     // INSERT DATA INTO THE MYSQL TABLE
+//     mysqlpool.getConnection((err, connection) => {
+//       if (err) {
+//         // mysql db not connected check connection
+//         console.log("mysql db not connected check connection");
+//         return;
+//       }
+//       connection.beginTransaction((err) => {
+//         if (err) {
+//           connection.release();
+//           console.log("error in begin transaction");
+//         }
+//         connection.query(
+//           `INSERT INTO fb_birth_reg_mast(
+//                   fb_br_slno,
+//                   fb_brd_date,
+//                   fb_pt_no,
+//                   fb_ptc_name,
+//                   fb_ptc_loadd1,
+//                   fb_ptc_loadd2,
+//                   fb_brc_husband,
+//                   fb_brn_age,
+//                   fb_brn_total,
+//                   fb_brn_live,
+//                   fb_bd_code,
+//                   fb_ip_no,
+//                   fb_brc_mhcode,
+//                   fb_child_gender,
+//                   fb_birth_date,
+//                   fb_mother_ip_no,
+//                   fb_child_pt_no,
+//                   fb_child_ip_no,
+//                   fb_child_weight
+//                 ) VALUES ?
+//                   `,
+//           [
+//             VALUES
+//           ],
+//           (err, result) => {
+//             if (err) {
+//               console.log(err, "err");
+//               connection.rollback(() => {
+//                 connection.release();
+//                 console.log("error in rollback data");
+//               });
+//             } else {
+//               connection.commit((err) => {
+//                 if (err) {
+//                   connection.rollback(() => {
+//                     connection.release();
+//                     console.log("error in commit");
+//                   });
+//                 } else {
+//                   connection.release();
+//                 }
+//               });
+//             }
+//           }
+//         );
+//       })
+//     });
+//     // });
+//   } catch (error) {
+//     console.log(error, "Error occured!");
+//     return callBack(error)
+//   } finally {
+//     if (conn_ora) {
+//       await conn_ora.close();
+//       await pool_ora.close();
+//     }
+//   }
+// };
+
+
+
 
 
 
@@ -2312,31 +2357,7 @@ const updateAmsPatientDetails = () => {
 };
 
 
-/****************************/
-const getLastTriggerDate = async (processId) => {
-  return new Promise((resolve, reject) => {
-    mysqlpool.getConnection((err, connection) => {
-      if (err) {
-        console.log("MySQL DB not connected. Check connection.");
-        return reject(err);
-      }
-      const query = `
-        SELECT fb_last_trigger_date 
-        FROM fb_ipadmiss_logdtl 
-        WHERE fb_process_id = ? 
-        ORDER BY fb_log_slno DESC 
-        LIMIT 1;
-      `;
-      connection.query(query, [processId], (err, results) => {
-        connection.release();
-        if (err) {
-          return reject(err);
-        }
-        resolve(results.length > 0 ? results[0] : null);
-      });
-    });
-  });
-};
+
 
 const getAmsLastUpdatedDate = async (processId) => {
   return new Promise((resolve, reject) => {
