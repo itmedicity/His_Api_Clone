@@ -1,3 +1,4 @@
+const mysqlpool = require('../../config/dbconfigmeliora');
 const { oraConnection, oracledb } = require('../../config/oradbconfig');
 module.exports = {
 
@@ -789,7 +790,10 @@ module.exports = {
     getInpatientFollowUp: async (data, callBack) => {
         let pool_ora = await oraConnection();
         let conn_ora = await pool_ora.getConnection();
-        const sql = `SELECT DSC_DESCRIPTION FROM CLINICAL.DISCHARGESUMMARYHTML WHERE DSC_HEAD = 'DSC_FOLLOWUP' AND IP_NO = :IP_NO`;
+        const sql = `SELECT DSC_DESCRIPTION 
+                     FROM CLINICAL.DISCHARGESUMMARYHTML DS
+                     LEFT JOIN CLINICAL.DISCHARGESUMMARY D ON DS.DS_SLNO=D.DS_SLNO
+                     WHERE D.DSC_APPROVAL='Y' AND DS.DSC_HEAD = 'DSC_FOLLOWUP' AND  DS.IP_NO = :IP_NO`;
         try {
             const result = await conn_ora.execute(
                 sql,
@@ -811,10 +815,575 @@ module.exports = {
             }
         }
     },
+    getBedMasterDetail: async (data, callBack) => {
+        let pool_ora = await oraConnection();
+        let conn_ora = await pool_ora.getConnection();
+        const sql = `
+        SELECT
+            B.BD_CODE,
+            B.BDC_NO,
+            B.NS_CODE AS BED_NS_CODE,
+            B.RT_CODE AS BED_RT_CODE,
+            RT.RT_CODE AS ROOMTYPE_RT_CODE,
+            RT.RTC_DESC,
+            RT.RTC_ALIAS,
+            RT.RC_CODE AS ROOMTYPE_RC_CODE,
+            RT.RTC_STATUS,
+            RT.ICU,
+            RT.RTC_MHCODE,
+            B.BDC_OCCUP,
+            B.BDN_OCCNO,
+            B.BDC_STATUS,
+            B.HKD_CLEANINGREQ,
+            B.RM_CODE AS BED_RM_CODE,
+            B.BDC_MHCODE,
+            B.BDC_VIPBED,
+            RM.RM_CODE AS ROOMMASTER_RM_CODE,
+            RM.RMC_DESC,
+            RM.RMC_ALIAS,
+            RM.RMC_STATUS,
+            RM.RMC_MHCODE,
+            RM.NS_CODE AS ROOMMASTER_NS_CODE,
+            RC.RC_CODE AS ROOMCATEGORY_RC_CODE,
+            RC.RCC_DESC,
+            RC.RCC_ALIAS,
+            RC.RCC_STATUS,
+            RC.RCC_MHCODE,
+            N.NS_CODE AS NURSTATION_NS_CODE,
+            N.NSC_DESC,
+            N.BUILD_CODE,
+            N.FLOOR_CODE,
+            N.NSC_MHCODE
+        FROM BED B
+            LEFT JOIN roomtype RT ON B.RT_CODE = RT.RT_CODE
+            LEFT JOIN roomcategory RC ON RT.RC_CODE = RC.RC_CODE
+            LEFT JOIN roommaster RM ON B.RM_CODE = RM.RM_CODE
+            LEFT JOIN nurstation N ON B.NS_CODE = N.NS_CODE
+        WHERE
+            B.BDC_STATUS = 'Y'
+            AND TRUNC(N.NSD_EDDATE) >= TO_DATE(:TO_DATE, 'DD-MON-YYYY')
+`;
+
+
+        try {
+            const result = await conn_ora.execute(
+                sql,
+                {
+                    TO_DATE: data.lastUpdteDate,
+                },
+                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
+            )
+            await result.resultSet?.getRows((err, rows) => {
+                callBack(err, rows)
+            })
+        }
+        catch (error) {
+            return callBack(error)
+        } finally {
+            if (conn_ora) {
+                await conn_ora.close();
+                await pool_ora.close();
+            }
+        }
+
+    },
+
+    getRoomDetailEllider: async (data, callBack) => {
+        let pool_ora;
+        let conn_ora;
+        try {
+            pool_ora = await oraConnection();
+            conn_ora = await pool_ora.getConnection();
+
+            if (!data || data.length === 0) {
+                return callBack(null, []); // no codes to query
+            }
+            //  Join the codes directly into the query
+            const codes = data.map(code => `'${code}'`).join(',');
+            const sql = `
+            SELECT 
+                RT_CODE,
+                RTC_DESC,
+                RTC_ALIAS,
+                RC_CODE,
+                RTC_STATUS,
+                ICU,
+                RTC_MHCODE
+            FROM 
+                roomtype
+            WHERE 
+                RT_CODE IN (${codes})
+        `;
+
+            const result = await conn_ora.execute(sql, [], {
+                outFormat: oracledb.OUT_FORMAT_OBJECT
+            });
+
+            callBack(null, result.rows);
+        } catch (error) {
+            console.log("Oracle Error:", error);
+            callBack(error);
+        } finally {
+            if (conn_ora) await conn_ora.close();
+            if (pool_ora) await pool_ora.close();
+        }
+    },
+    getRoomCategoryDetailEllider: async (data, callBack) => {
+        let pool_ora;
+        let conn_ora;
+        try {
+            pool_ora = await oraConnection();
+            conn_ora = await pool_ora.getConnection();
+
+            if (!data || data.length === 0) {
+                return callBack(null, []); // no codes to query
+            }
+            //  Join the codes directly into the query
+            const codes = data.map(code => `'${code}'`).join(',');
+            const sql = `
+            SELECT 
+                RC_CODE,
+                RCC_DESC,
+                RCC_ALIAS,
+                RCC_STATUS,
+                RCC_MHCODE
+            FROM 
+                roomcategory
+            WHERE 
+                RC_CODE IN (${codes})
+        `;
+
+            const result = await conn_ora.execute(sql, [], {
+                outFormat: oracledb.OUT_FORMAT_OBJECT
+            });
+
+            callBack(null, result.rows);
+        } catch (error) {
+            console.log("Oracle Error:", error);
+            callBack(error);
+        } finally {
+            if (conn_ora) await conn_ora.close();
+            if (pool_ora) await pool_ora.close();
+        }
+    },
+    getRoomMasterDetailEllider: async (data, callBack) => {
+        let pool_ora;
+        let conn_ora;
+        try {
+            pool_ora = await oraConnection();
+            conn_ora = await pool_ora.getConnection();
+
+            if (!data || data.length === 0) {
+                return callBack(null, []); // no codes to query
+            }
+            //  Join the codes directly into the query
+            const codes = data.map(code => `'${code}'`).join(',');
+            const sql = `
+            SELECT 
+                RM_CODE,
+                RMC_DESC,
+                RMC_ALIAS,
+                RMC_STATUS,
+                RMC_MHCODE,
+                NS_CODE
+            FROM 
+                roommaster
+            WHERE 
+                RM_CODE IN (${codes})
+        `;
+
+            const result = await conn_ora.execute(sql, [], {
+                outFormat: oracledb.OUT_FORMAT_OBJECT
+            });
+
+            callBack(null, result.rows);
+        } catch (error) {
+            console.log("Oracle Error:", error);
+            callBack(error);
+        } finally {
+            if (conn_ora) await conn_ora.close();
+            if (pool_ora) await pool_ora.close();
+        }
+    },
+    getNsDetailEllider: async (data, callBack) => {
+        let pool_ora;
+        let conn_ora;
+        try {
+            pool_ora = await oraConnection();
+            conn_ora = await pool_ora.getConnection();
+
+            if (!data || data.length === 0) {
+                return callBack(null, []); // no codes to query
+            }
+            //  Join the codes directly into the query
+            const codes = data.map(code => `'${code}'`).join(',');
+            const sql = `
+            SELECT 
+                NS_CODE,
+                NSC_DESC,
+                NSC_ALIAS,
+                NSC_STATUS
+            FROM 
+                nurstation
+            WHERE 
+                NS_CODE IN (${codes})
+        `;
+
+            const result = await conn_ora.execute(sql, [], {
+                outFormat: oracledb.OUT_FORMAT_OBJECT
+            });
+
+            callBack(null, result.rows);
+        } catch (error) {
+            console.log("Oracle Error:", error);
+            callBack(error);
+        } finally {
+            if (conn_ora) await conn_ora.close();
+            if (pool_ora) await pool_ora.close();
+        }
+    },
+    getBedDetailEllider: (data, callBack) => {
+        mysqlpool.query(
+            ` SELECT 
+                fb_bd_code,
+                fb_bdc_no
+             from 
+                fb_bed`,
+            [
+
+            ]
+            , (error, results, fields) => {
+                if (error) {
+                    return callBack(error)
+                }
+                return callBack(null, results)
+            })
+    },
+    insertFbBedMeliora: (data, callBack) => {
+        try {
+            mysqlpool.query(
+                `INSERT INTO fb_bed (
+                fb_bd_code,
+                fb_bdc_no,
+                fb_ns_code,
+                fb_rt_code,
+                fb_bdc_occup,
+                fb_bdn_cccno,
+                fb_bdc_status,
+                fb_hkd_cleaningreq,
+                fb_rm_code,
+                fb_bdc_mhcode,
+                fb_bdc_vipbed
+            ) VALUES ?
+            `,
+                [
+                    data
+                ],
+                (error, results, fields) => {
+                    if (error) {
+                        return callBack(error);
+                    }
+                    return callBack(null, { insertId: results.insertId });
+                }
+            );
+        } catch (err) {
+            return callBack(err);
+        }
+    },
+    processRoomType: (data, callBack) => {
+        mysqlpool.query(
+            `SELECT 
+                fb_rt_code,
+                fb_rtc_desc,
+                fb_rtc_alias,
+                fb_rc_code
+            FROM 
+                fb_room_type
+            WHERE 
+                fb_rt_code IN (?)`,
+            [
+                data
+            ],
+            (error, results) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+
+    },
+    processRoomCategory: (data, callBack) => {
+        mysqlpool.query(
+            `SELECT 
+                fb_rc_code,
+                fb_rcc_desc
+            FROM 
+                fb_room_category
+            WHERE 
+                fb_rc_code IN (?)`,
+            [
+                data
+            ],
+            (error, results) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+    processRoomMaster: (data, callBack) => {
+        mysqlpool.query(
+            `SELECT 
+                fb_rm_code,
+                fb_rmc_desc
+            FROM 
+                fb_room_master
+            WHERE 
+                fb_rm_code IN (?)`,
+            [
+                data
+            ],
+            (error, results) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+    processNursingStation: (data, callBack) => {
+        mysqlpool.query(
+            `SELECT 
+                fb_ns_code,
+                fb_ns_name
+            FROM 
+                fb_nurse_station_master
+            WHERE 
+                fb_ns_code IN (?)`,
+            [
+                data
+            ],
+            (error, results) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+    processBedDetail: (data, callBack) => {
+        mysqlpool.query(
+            `SELECT 
+                fb_bd_code,
+                fb_bdc_no
+            FROM 
+                fb_bed
+            WHERE 
+                fb_bd_code IN (?)`,
+            [
+                data
+            ],
+            (error, results) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+
+    insertRoomTypeMeliora: (data, callBack) => {
+        try {
+            mysqlpool.query(
+                `INSERT INTO fb_room_type (
+                fb_rt_code,
+                fb_rtc_desc,
+                fb_rtc_alias,
+                fb_rc_code,
+                fb_rtc_status,
+                fb_icu,
+                fb_rtc_mhcode
+            ) VALUES ?
+            `,
+                [
+                    data
+                ],
+                (error, results, fields) => {
+                    if (error) {
+                        return callBack(error);
+                    }
+                    return callBack(null, { insertId: results.insertId });
+                }
+            );
+        } catch (err) {
+            return callBack(err);
+        }
+    },
+
+    insertRoomCategoryTypeMeliora: (data, callBack) => {
+        try {
+            mysqlpool.query(
+                `INSERT INTO fb_room_category (
+                fb_rc_code,
+                fb_rcc_desc,
+                fb_rcc_alias,
+                fb_rcc_status,
+                fb_rcc_mhocde
+            ) VALUES ?
+            `,
+                [
+                    data
+                ],
+                (error, results, fields) => {
+                    if (error) {
+                        return callBack(error);
+                    }
+                    return callBack(null, { insertId: results.insertId });
+                }
+            );
+        } catch (err) {
+            return callBack(err);
+        }
+    },
+    insertRoomMasterTypeMeliora: (data, callBack) => {
+        try {
+            mysqlpool.query(
+                `INSERT INTO fb_room_master (
+                 fb_rm_code,
+                fb_rmc_desc,
+                fb_rmc_alias,
+                fb_rac_status,
+                fb_rmc_mhcode,
+                fb_ns_code
+            ) VALUES ?
+            `,
+                [
+                    data
+                ],
+                (error, results, fields) => {
+                    if (error) {
+                        return callBack(error);
+                    }
+                    return callBack(null, { insertId: results.insertId });
+                }
+            );
+        } catch (err) {
+            return callBack(err);
+        }
+    },
+    insertnurseStationMeliora: (data, callBack) => {
+        try {
+            mysqlpool.query(
+                `INSERT INTO fb_nurse_station_master (
+                 fb_ns_code,
+                fb_ns_name
+            ) VALUES ?
+            `,
+                [
+                    data
+                ],
+                (error, results, fields) => {
+                    if (error) {
+                        return callBack(error);
+                    }
+                    return callBack(null, { insertId: results.insertId });
+                }
+            );
+        } catch (err) {
+            return callBack(err);
+        }
+    },
+
+    getAllRoomTypeDetail: (callBack) => {
+        mysqlpool.query(
+            `SELECT 
+            fb_rt_code,
+            fb_rtc_desc,
+            fb_rtc_alias,
+            fb_rc_code,
+            fb_rtc_status,
+            fb_icu,
+            fb_rtc_mhcode
+        FROM
+            fb_room_type`,
+            [],
+            (error, results) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+
+    getAllRoomCategoryDetail: (callBack) => {
+        mysqlpool.query(
+            `SELECT 
+            fb_rc_code,
+            fb_rcc_desc,
+            fb_rcc_alias,
+            fb_rcc_status,
+            fb_rcc_mhocde
+        FROM
+            fb_room_category`,
+            [],
+            (error, results) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+
+    },
+
+    getAllRoomMasterDetail: (callBack) => {
+        mysqlpool.query(
+            `SELECT 
+                fb_rm_code,
+                fb_rmc_desc,
+                fb_rmc_alias,
+                fb_rac_status,
+                fb_rmc_mhcode,
+                fb_ns_code
+            FROM
+                fb_room_master`,
+            [],
+            (error, results) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+
+    getAllBedDetail: (callBack) => {
+        mysqlpool.query(
+            `SELECT 
+                fb_bd_code
+            FROM
+                fb_bed`,
+            [],
+            (error, results) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+
+
+
+
+
+
+
+
+
+
 
 }
-
-
-//FOLLOW UP QUERY : SELECT DSC_DESCRIPTION FROM CLINICAL.DISCHARGESUMMARYHTML WHERE DSC_HEAD = 'DSC_FOLLOWUP' AND IP_NO = ?
-// VSD_DATE >= TO_DATE(:FROM_DATE, 'dd-Mon-yyyy HH24:MI:SS')
-// AND VSD_DATE <= TO_DATE(:TO_DATE, 'dd-Mon-yyyy HH24:MI:SS')

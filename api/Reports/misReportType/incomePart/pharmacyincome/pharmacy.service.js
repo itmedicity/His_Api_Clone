@@ -40,7 +40,7 @@ module.exports = {
                 FROM Mretdetl
                 JOIN Pbilldetl ON Pbilldetl.Bmc_Slno = Mretdetl.Bmc_Slno  
                 JOIN mretmast ON Pbilldetl.IT_CODE = Mretdetl.It_code
-                LEFTJOIN PATIENT ON PATIENT.PT_NO = MRETMAST.PT_NO
+                LEFT JOIN PATIENT ON PATIENT.PT_NO = MRETMAST.PT_NO
                 WHERE  Pbilldetl.ITC_DOCNO = Mretdetl.Itc_docno
                     AND mretmast.mrc_slno = Mretdetl.mrc_slno
                     AND Pbilldetl.ITC_DOCTYPE = Mretdetl.Itc_Doctype
