@@ -1,3 +1,4 @@
+const { format } = require('date-fns');
 const { getOutlet,
     getNursingStation,
     getRoomType,
@@ -28,7 +29,13 @@ const { getOutlet,
     getAllRoomTypeDetail,
     getAllRoomCategoryDetail,
     getAllRoomMasterDetail,
-    getAllBedDetail } = require('./elliderData.service')
+    getAllBedDetail,
+    getPatientByIpNumber,
+    getPatientDetail,
+    getPatientDetailFromNursingStation,
+    getPatientDetailMeliora,
+    InsertNsPatientDetailMeliora,
+    UpdatePatientDetail } = require('./elliderData.service')
 
 module.exports = {
     getOutlet: (req, res) => {
@@ -278,6 +285,161 @@ module.exports = {
             });
         });
     },
+    getPatientByIpNumber: (req, res) => {
+        const body = req.body;
+        getPatientByIpNumber(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: 'No Patient Against this Ip Number!',
+                    data: [],
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results,
+
+            });
+        });
+    },
+    getPatientDetail: (req, res) => {
+        const body = req.body;
+        getPatientDetail(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err
+                })
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 1,
+                    message: 'No Patient Against this Ip Number!',
+                    data: [],
+                })
+            }
+            return res.status(200).json({
+                success: 2,
+                data: results,
+
+            });
+        });
+    },
+    UpdatePatientDetail: async (req, res) => {
+        const body = req.body;
+
+        try {
+            // 1. Get Nursing Station Details
+            const PatientDetails = await new Promise((resolve, reject) => {
+                getPatientDetailFromNursingStation(body, (err, result) => {
+                    if (err) return reject(err);
+                    resolve(result);
+                });
+            });
+
+            if (!Array.isArray(PatientDetails) || PatientDetails.length === 0) {
+                return res.status(200).json({ success: 0, message: "No Patient Details" });
+            }
+
+            // 2. Get existing Meliora details
+            const PatientDetailMeliora = await new Promise((resolve, reject) => {
+                getPatientDetailMeliora(body, (err, result) => {
+                    if (err) return reject(err);
+                    resolve(result || []);
+                });
+            });
+
+            // Ensure array
+            const existingList = Array.isArray(PatientDetailMeliora)
+                ? PatientDetailMeliora
+                : [];
+
+            const insertValues = [];
+            const updateValues = [];
+
+            const existingIPs = Array.isArray(existingList)
+                ? existingList.map(r => String(r.fb_ip_no))
+                : [];
+
+            PatientDetails.forEach(item => {
+                const ip = String(item.IP_NO); // ensure string
+                const row = [
+                    ip,
+                    item.IPD_DATE ? format(new Date(item.IPD_DATE), "yyyy-MM-dd HH:mm:ss") : null,
+                    item.PT_NO,
+                    item.PTC_PTNAME?.trim(),
+                    item.PTC_SEX,
+                    item.PTD_DOB ? format(new Date(item.PTD_DOB), "yyyy-MM-dd HH:mm:ss") : null,
+                    item.PTN_DAYAGE,
+                    item.PTN_MONTHAGE,
+                    item.PTN_YEARAGE,
+                    item.PTC_LOADD1,
+                    item.PTC_LOADD2,
+                    item.PTC_LOADD3,
+                    item.PTC_LOADD4,
+                    item.PTC_LOPIN,
+                    item.RC_CODE,
+                    item.BD_CODE,
+                    item.DO_CODE,
+                    item.RS_CODE,
+                    item.IPC_CURSTATUS,
+                    item.PTC_MOBILE,
+                    item.IPC_MHCODE,
+                    item.DOC_NAME,
+                    item.DPC_DESC,
+                    item.IPD_DISC ? format(new Date(item.IPD_DISC), "yyyy-MM-dd HH:mm:ss") : null,
+                    item.IPC_STATUS,
+                    item.DMC_SLNO,
+                    item.DMD_DATE ? format(new Date(item.DMD_DATE), "yyyy-MM-dd HH:mm:ss") : null
+                ];
+
+                if (existingIPs.includes(ip)) {
+                    updateValues.push(row);
+                } else {
+                    insertValues.push(row);
+                }
+            });
+
+            // 4. INSERT (run only once)
+            if (insertValues.length > 0) {
+                await new Promise(resolve => {
+                    InsertNsPatientDetailMeliora(insertValues, err => {
+                        if (err) console.log("Insert error:", err);
+                        resolve();
+                    });
+                });
+            }
+
+            // 5. UPDATE (run once per row)
+            for (const row of updateValues) {
+                await new Promise(resolve => {
+                    UpdatePatientDetail(row, err => {
+                        if (err) console.log("Update error:", err);
+                        resolve();
+                    });
+                });
+            }
+
+            // 6. Success Response
+            return res.status(200).json({
+                success: 2,
+                message: "Nursing Station Update Successfully",
+                inserted: insertValues.length,
+                updated: updateValues.length
+            });
+
+        } catch (error) {
+            console.error(error);
+            return res.status(500).json({ success: 0, message: "Server Error" });
+        }
+    },
+
     // Meliora Master Insert Data
     getBedMasterDetail: async (req, res) => {
         const data = req.body;
@@ -428,12 +590,7 @@ module.exports = {
                 )
                 : [];
 
-            // console.log({
-            //     filteredRoomType,
-            //     FilteredRoomCategory,
-            //     FilteredRoomMaster,
-            //     FilteredBedDetail
-            // });
+
 
             // If Nothing exist then send a response show no data found
             if (
