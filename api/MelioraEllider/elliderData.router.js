@@ -12,7 +12,10 @@ const { getOutlet,
     getCurrentPatient,
     getDisChargedPatient,
     getInpatientFollowUp,
-    getBedMasterDetail
+    getBedMasterDetail,
+    getPatientByIpNumber,
+    getPatientDetail,
+    UpdatePatientDetail
 } = require('./elliderData.controller')
 
 // router.get('/outlet', checkToken, getOutlet);
@@ -30,9 +33,13 @@ router.post('/getbed', getNursingBed)
 router.post('/inpatientdetil', getCurrentPatient)
 router.post('/getdischargepatient', getDisChargedPatient)
 
-router.get('/nurse',checkToken, getNursingStation);
+router.get('/nurse', checkToken, getNursingStation);
 router.post('/getipfollowup', checkToken, getInpatientFollowUp)
 router.post('/bed/import', checkToken, getBedMasterDetail)
+router.post('/getpatientbyip', checkToken, getPatientByIpNumber)
+router.post('/getpatientdetail', checkToken, getPatientDetail);
+
+router.post('/updatepatientdetail', checkToken, UpdatePatientDetail)
 
 
 
