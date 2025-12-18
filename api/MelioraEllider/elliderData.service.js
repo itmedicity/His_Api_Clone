@@ -815,6 +815,154 @@ module.exports = {
             }
         }
     },
+    getPatientByIpNumber: async (data, callBack) => {
+        let pool_ora = await oraConnection();
+        let conn_ora = await pool_ora.getConnection();
+        const sql = `
+        select ipadmiss.IP_NO,
+                    ipadmiss.IPD_DATE,
+                    ipadmiss.PT_NO,
+                    ipadmiss.PTC_PTNAME,
+                    ipadmiss.PTC_SEX,
+                    ipadmiss.PTD_DOB,
+                    ipadmiss.PTN_DAYAGE,
+                    ipadmiss.PTN_MONTHAGE,
+                    ipadmiss.PTN_YEARAGE,
+                    ipadmiss.PTC_LOADD1,
+                    ipadmiss.PTC_LOADD2,
+                    ipadmiss.PTC_LOADD3,
+                    ipadmiss.PTC_LOADD4,
+                    ipadmiss.PTC_LOPIN,
+                    ipadmiss.RC_CODE,
+                    ipadmiss.BD_CODE,
+                    ipadmiss.DO_CODE,
+                    ipadmiss.RS_CODE,
+                    ipadmiss.IPC_CURSTATUS,
+                    ipadmiss.PTC_MOBILE,
+                    ipadmiss.IPC_MHCODE,
+                    doctor.DOC_NAME,
+                    ipadmiss.IPD_DISC,
+                    ipadmiss.IPC_STATUS,
+                    ipadmiss.DMC_SLNO,
+                    ipadmiss.DMD_DATE,
+                    department.dpc_desc
+         from ipadmiss
+               LEFT JOIN doctor ON doctor.do_code = ipadmiss.do_code 
+               LEFT JOIN speciality ON doctor.SP_CODE=speciality.SP_CODE 
+               LEFT JOIN department ON speciality.DP_CODE=department.DP_CODE
+                    WHERE ipadmiss.ip_no=:IP_NO and ipc_ptflag='N' `;
+        try {
+            const result = await conn_ora.execute(
+                sql,
+                {
+                    IP_NO: data.ipnumber,
+                },
+                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
+            )
+            await result.resultSet?.getRows((err, rows) => {
+                callBack(err, rows)
+            })
+        }
+        catch (error) {
+            return callBack(error)
+        } finally {
+            if (conn_ora) {
+                await conn_ora.close();
+                await pool_ora.close();
+            }
+        }
+    },
+    getPatientDetail: async (data, callBack) => {
+        let pool_ora = await oraConnection();
+        let conn_ora = await pool_ora.getConnection();
+
+        const column = data.type === 1 ? "IPD_DATE" : "IPD_DISC";
+
+        const sql = `
+                select 
+                    ipadmiss.IP_NO,
+                    ipadmiss.IPD_DATE,
+                    ipadmiss.PT_NO,
+                    ipadmiss.PTC_PTNAME,
+                    ipadmiss.PTC_SEX,
+                    ipadmiss.PTD_DOB,
+                    ipadmiss.PTN_DAYAGE,
+                    ipadmiss.PTN_MONTHAGE,
+                    ipadmiss.PTN_YEARAGE,
+                    ipadmiss.PTC_LOADD1,
+                    ipadmiss.PTC_LOADD2,
+                    ipadmiss.PTC_LOADD3,
+                    ipadmiss.PTC_LOADD4,
+                    ipadmiss.PTC_LOPIN,
+                    ipadmiss.RC_CODE,
+                    ipadmiss.BD_CODE,
+                    ipadmiss.DO_CODE,
+                    ipadmiss.RS_CODE,
+                    ipadmiss.IPC_CURSTATUS,
+                    ipadmiss.PTC_MOBILE,
+                    ipadmiss.IPC_MHCODE,
+                    doctor.DOC_NAME,
+                    ipadmiss.IPD_DISC,
+                    ipadmiss.IPC_STATUS,
+                    ipadmiss.DMC_SLNO,
+                    ipadmiss.DMD_DATE,
+                    department.DPC_DESC
+                from ipadmiss
+                    LEFT JOIN doctor ON doctor.do_code = ipadmiss.do_code 
+                    LEFT JOIN speciality ON doctor.SP_CODE=speciality.SP_CODE 
+                    LEFT JOIN department ON speciality.DP_CODE=department.DP_CODE
+                        WHERE NVL(${column}, SYSDATE) >= TO_DATE(:FROM_DATE, 'YYYY-MM-DD HH24:MI:SS')
+                                AND NVL(${column}, SYSDATE) <= TO_DATE(:TO_DATE, 'YYYY-MM-DD HH24:MI:SS')
+                                and ipc_ptflag='N' 
+                                 group by ipadmiss.IP_NO,
+                    ipadmiss.IPD_DATE,
+                    ipadmiss.PT_NO,
+                    ipadmiss.PTC_PTNAME,
+                    ipadmiss.PTC_SEX,
+                    ipadmiss.PTD_DOB,
+                    ipadmiss.PTN_DAYAGE,
+                    ipadmiss.PTN_MONTHAGE,
+                    ipadmiss.PTN_YEARAGE,
+                    ipadmiss.PTC_LOADD1,
+                    ipadmiss.PTC_LOADD2,
+                    ipadmiss.PTC_LOADD3,
+                    ipadmiss.PTC_LOADD4,
+                    ipadmiss.PTC_LOPIN,
+                    ipadmiss.RC_CODE,
+                    ipadmiss.BD_CODE,
+                    ipadmiss.DO_CODE,
+                    ipadmiss.RS_CODE,
+                    ipadmiss.IPC_CURSTATUS,
+                    ipadmiss.PTC_MOBILE,
+                    ipadmiss.IPC_MHCODE,
+                    doctor.DOC_NAME,
+                    ipadmiss.IPD_DISC,
+                    ipadmiss.IPC_STATUS,
+                    ipadmiss.DMC_SLNO,
+                    ipadmiss.DMD_DATE,
+                    department.DPC_DESC
+    `;
+
+        try {
+            const result = await conn_ora.execute(
+                sql,
+                {
+                    FROM_DATE: data.fromDate,
+                    TO_DATE: data.toDate,
+                },
+                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
+            );
+
+            await result.resultSet?.getRows((err, rows) => {
+                callBack(err, rows);
+            });
+        } catch (error) {
+            return callBack(error);
+        } finally {
+            if (conn_ora) await conn_ora.close();
+            if (pool_ora) await pool_ora.close();
+        }
+    },
     getBedMasterDetail: async (data, callBack) => {
         let pool_ora = await oraConnection();
         let conn_ora = await pool_ora.getConnection();
@@ -887,6 +1035,102 @@ module.exports = {
         }
 
     },
+
+    getPatientDetailFromNursingStation: async (data, callBack) => {
+        let pool_ora = await oraConnection();
+        let conn_ora = await pool_ora.getConnection();
+        const sql = `
+        SELECT ipadmiss.IP_NO,
+       ipadmiss.IPD_DATE,
+       ipadmiss.PT_NO,
+       ipadmiss.PTC_PTNAME,
+       ipadmiss.PTC_SEX,
+       ipadmiss.PTD_DOB,
+       ipadmiss.PTN_DAYAGE,
+       ipadmiss.PTN_MONTHAGE,
+       ipadmiss.PTN_YEARAGE,
+       ipadmiss.PTC_LOADD1,
+       ipadmiss.PTC_LOADD2,
+       ipadmiss.PTC_LOADD3,
+       ipadmiss.PTC_LOADD4,
+       ipadmiss.PTC_LOPIN,
+       ipadmiss.RC_CODE,
+       ipadmiss.BD_CODE,
+       ipadmiss.DO_CODE,
+       ipadmiss.RS_CODE,
+       ipadmiss.IPC_CURSTATUS,
+       ipadmiss.PTC_MOBILE,
+       ipadmiss.IPC_MHCODE,
+       doctor.DOC_NAME,
+       ipadmiss.IPD_DISC,
+       ipadmiss.IPC_STATUS,
+       ipadmiss.DMC_SLNO,
+       ipadmiss.DMD_DATE,
+       department.dpc_desc
+FROM ipadmiss
+LEFT JOIN doctor      ON doctor.do_code = ipadmiss.do_code
+LEFT JOIN speciality  ON doctor.SP_CODE = speciality.SP_CODE
+LEFT JOIN department  ON speciality.DP_CODE = department.DP_CODE
+LEFT JOIN bed         ON ipadmiss.bd_code = bed.bd_code
+LEFT JOIN nurstation  ON bed.ns_code = nurstation.ns_code
+WHERE bed.ns_code = :NS_CODE
+  AND ( ipadmiss.ipd_disc IS NULL 
+        OR
+        (ipadmiss.ipd_disc IS NOT NULL  AND ipadmiss.ipd_disc >= SYSDATE - INTERVAL '12' HOUR))
+  AND ipc_ptflag = 'N'
+GROUP BY ipadmiss.IP_NO,
+         ipadmiss.IPD_DATE,
+         ipadmiss.PT_NO,
+         ipadmiss.PTC_PTNAME,
+         ipadmiss.PTC_SEX,
+         ipadmiss.PTD_DOB,
+         ipadmiss.PTN_DAYAGE,
+         ipadmiss.PTN_MONTHAGE,
+         ipadmiss.PTN_YEARAGE,
+         ipadmiss.PTC_LOADD1,
+         ipadmiss.PTC_LOADD2,
+         ipadmiss.PTC_LOADD3,
+         ipadmiss.PTC_LOADD4,
+         ipadmiss.PTC_LOPIN,
+         ipadmiss.RC_CODE,
+         ipadmiss.BD_CODE,
+         ipadmiss.DO_CODE,
+         ipadmiss.RS_CODE,
+         ipadmiss.IPC_CURSTATUS,
+         ipadmiss.PTC_MOBILE,
+         ipadmiss.IPC_MHCODE,
+         doctor.DOC_NAME,
+         ipadmiss.IPD_DISC,
+         ipadmiss.IPC_STATUS,
+         ipadmiss.DMC_SLNO,
+         ipadmiss.DMD_DATE,
+         department.dpc_desc
+`;
+
+
+        try {
+            const result = await conn_ora.execute(
+                sql,
+                {
+                    NS_CODE: data.NS_CODE,
+                },
+                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
+            )
+            await result.resultSet?.getRows((err, rows) => {
+                callBack(err, rows)
+            })
+        }
+        catch (error) {
+            return callBack(error)
+        } finally {
+            if (conn_ora) {
+                await conn_ora.close();
+                await pool_ora.close();
+            }
+        }
+
+    },
+
 
     getRoomDetailEllider: async (data, callBack) => {
         let pool_ora;
@@ -1375,9 +1619,71 @@ module.exports = {
             }
         );
     },
+    getPatientDetailMeliora: (data, callBack) => {
+        mysqlpool.query(
+            `SELECT DISTINCT
+                fb_ipadmiss.fb_ip_no
+                FROM fb_ipadmiss
+                LEFT JOIN fb_bed 
+                    ON fb_ipadmiss.fb_bd_code = fb_bed.fb_bd_code
+                LEFT JOIN fb_nurse_station_master 
+                    ON fb_bed.fb_ns_code = fb_nurse_station_master.fb_ns_code
+                WHERE fb_bed.fb_ns_code = ?
+                AND (
+                    fb_ipadmiss.fb_ipd_disc IS NULL
+                    OR fb_ipadmiss.fb_ipd_disc >= NOW() - INTERVAL 12 HOUR
+                ) and fb_ipadmiss.fb_ipc_curstatus != 'PCO' `,
+            [
+                data.NS_CODE
+            ],
+            (error, results) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+    InsertNsPatientDetailMeliora: (data, callBack) => {
+        mysqlpool.query(
+            `INSERT INTO fb_ipadmiss (
+                fb_ip_no, fb_ipd_date, fb_pt_no, fb_ptc_name, fb_ptc_sex,
+                fb_ptd_dob, fb_ptn_dayage, fb_ptn_monthage, fb_ptn_yearage,
+                fb_ptc_loadd1, fb_ptc_loadd2, fb_ptc_loadd3, fb_ptc_loadd4,
+                fb_ptc_lopin, fb_rc_code, fb_bd_code, fb_do_code, fb_rs_code,
+                fb_ipc_curstatus, fb_ptc_mobile, fb_ipc_mhcode, fb_doc_name,
+                fb_dep_desc,fb_ipd_disc,fb_ipc_status,fb_dmc_slno,fb_dmd_date
+            ) VALUES ? `,
+            [data],
+            (error, results) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    },
+    UpdatePatientDetail: (data, callBack) => {
+        const values = [...data.slice(1), data[0]];// IP_NO moved to last for WHERE
 
-
-
+        mysqlpool.query(
+            `UPDATE fb_ipadmiss SET
+                fb_ipd_date = ?, fb_pt_no = ?, fb_ptc_name = ?, fb_ptc_sex = ?,
+                fb_ptd_dob = ?, fb_ptn_dayage = ?, fb_ptn_monthage = ?, fb_ptn_yearage = ?,
+                fb_ptc_loadd1 = ?, fb_ptc_loadd2 = ?, fb_ptc_loadd3 = ?, fb_ptc_loadd4 = ?,
+                fb_ptc_lopin = ?, fb_rc_code = ?, fb_bd_code = ?, fb_do_code = ?, fb_rs_code = ?,
+                fb_ipc_curstatus = ?, fb_ptc_mobile = ?, fb_ipc_mhcode = ?, fb_doc_name = ?,
+                fb_dep_desc = ?, fb_ipd_disc = ?, fb_ipc_status = ?, fb_dmc_slno = ?, fb_dmd_date = ?
+            WHERE fb_ip_no = ? `,
+            values,
+            (error, results) => {
+                if (error) {
+                    return callBack(error);
+                }
+                return callBack(null, results);
+            }
+        );
+    }
 
 
 
