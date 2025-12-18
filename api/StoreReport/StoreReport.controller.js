@@ -25,6 +25,7 @@ module.exports = {
     },
     getGrmDetails: (req, res) => {
         const body = req.body;
+
         getGrmDetails(body, (err, results) => {
             if (err) {
                 return res.status(200).json({
