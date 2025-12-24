@@ -2,68 +2,19 @@ const cron = require("node-cron");
 const { oraConnection, oracledb, oraKmcConnection } = require("../config/oradbconfig");
 const pool = require("../config/dbconfig");
 const mysqlpool = require("../config/dbconfigmeliora");
-const { format, subHours, subMonths, parse, isValid } = require("date-fns");
+const { format, subHours, subMonths, parse, isValid, subMinutes } = require("date-fns");
 const bispool = require("../config/dbconfbis");
-const { endLogSuccess, endLogFailure, startLog, getCompanySlno } = require("./CronLogger");
+const { endLogSuccess, endLogFailure, startLog, getCompanySlno, mysqlExecuteTransaction, getLastTriggerDate } = require("./CronLogger");
+
 
 {/* %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% FEED BACK CRON-JOBS STARTS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% */ }
-// my sql transaction for patient insert Query
-const mysqlExecuteTransaction = (queries = []) => {
-  return new Promise((resolve, reject) => {
-    mysqlpool.getConnection((err, connection) => {
-      if (err) return reject(err);
 
-      connection.beginTransaction(async (transactionerror) => {
-        if (transactionerror) {
-          connection.release();
-          return reject(transactionerror);
-        }
-
-        try {
-          const results = [];
-
-          for (const { sql, values } of queries) {
-            const data = await new Promise((ok, fail) => {
-              connection.query(sql, values, (err, res) => {
-                if (err) return fail(err);
-                ok(res);
-              });
-            });
-            results.push(data);
-          }
-
-          connection.commit((commitErr) => {
-            if (commitErr) {
-              return connection.rollback(() => {
-                connection.release();
-                reject(commitErr);
-              });
-            }
-            connection.release();
-            resolve(results);
-          });
-        } catch (error) {
-          connection.rollback(() => {
-            connection.release();
-            reject(error);
-          });
-        }
-      });
-    });
-  });
-};
-
-//Get Inpaitent Detail
-// NEW
+// Get Inpaitent Detail
 const getInpatientDetail = async (callBack = () => { }) => {
   let pool_ora = null;
   let conn_ora = null;
   let resultSet = null;
   let logId = null;
-  let fromDate = "";
-  let toDate = "";
-  let detail = null;
-
   try {
 
     // 1. START LOG
@@ -75,7 +26,7 @@ const getInpatientDetail = async (callBack = () => { }) => {
       return callBack(err);
     }
 
-    // 2. GET COMPANY INFO (MySQL)
+    //2. GET COMPANY INFO (MySQL)
     let mh_Code = "";
     try {
       const companySlno = await getCompanySlno();
@@ -91,6 +42,11 @@ const getInpatientDetail = async (callBack = () => { }) => {
 
     // 3. GET LAST TRIGGER DATE (MySQL)
     let lastTrigger = null;
+    let fromDate = null;
+    let toDate = null;
+    let jobStartTime = null;
+    let detail = null;
+
     try {
 
       detail = await getLastTriggerDate(1);
@@ -98,10 +54,15 @@ const getInpatientDetail = async (callBack = () => { }) => {
         ? new Date(detail.fb_last_trigger_date)
         : subHours(new Date(), 1);
 
+
+      // FIXED job start time (VERY IMPORTANT)
+      jobStartTime = new Date();
+
       // FROM_DATE = last cycle’s TO_DATE
       fromDate = format(lastTrigger, "dd/MM/yyyy HH:mm:ss");
       // TO_DATE is NOW (but will be used as next cycle FROM)
-      toDate = format(new Date(), "dd/MM/yyyy HH:mm:ss");
+      toDate = format(jobStartTime, "dd/MM/yyyy HH:mm:ss");
+
 
 
     } catch (err) {
@@ -117,78 +78,41 @@ const getInpatientDetail = async (callBack = () => { }) => {
 
       pool_ora = await oraConnection();
       conn_ora = await pool_ora.getConnection();
-
       const oracleSql = `
-      SELECT  
-        IPADMISS.IP_NO, 
-        IPADMISS.IPD_DATE, 
-        IPADMISS.PT_NO,
-        IPADMISS.PTC_PTNAME,     
-        IPADMISS.PTC_TYPE,                            
-        IPADMISS.BD_CODE AS IPD_BD_CODE ,
-        IPADMISS.DO_CODE,
-        IPADMISS.PTC_SEX,
-        IPADMISS.PTD_DOB,
-        IPADMISS.PTN_DAYAGE,
-        IPADMISS.PTN_MONTHAGE,
-        IPADMISS.PTN_YEARAGE,
-        IPADMISS.PTC_LOADD1,
-        IPADMISS.PTC_LOADD2,
-        IPADMISS.PTC_LOADD3,
-        IPADMISS.PTC_LOADD4,
-        IPADMISS.PTC_LOPIN,
-        IPADMISS.PTC_LOPHONE,
-        IPADMISS.PTC_MOBILE,
-        IPADMISS.RC_CODE,
-        IPADMISS.RS_CODE,   
-        IPADMISS.IPC_CURSTATUS,   
-        IPADMISS.IPC_MHCODE,
-         DOCTOR.DOC_NAME ,
-         (SELECT department.DPC_DESC
-            FROM department
-            LEFT JOIN speciality ON department.DP_CODE = speciality.DP_CODE
-            LEFT JOIN doctor ON speciality.SP_CODE = doctor.SP_CODE
-            WHERE doctor.DO_CODE = ipadmiss.DO_CODE) AS DPC_DESC      
-              FROM IPADMISS
-               LEFT JOIN rmall ON rmall.ip_no = ipadmiss.ip_no
-               LEFT JOIN doctor ON doctor.do_code = ipadmiss.do_code 
-               LEFT JOIN speciality ON doctor.SP_CODE=speciality.SP_CODE 
-               LEFT JOIN department ON speciality.DP_CODE=department.DP_CODE
-                        WHERE ipadmiss.IPC_MHCODE = :MH_CODE 
-				                        AND NVL(IPD_DATE, SYSDATE) >= TO_DATE(:FROM_DATE, 'dd/MM/yyyy HH24:mi:ss')
-                                AND NVL(IPD_DATE, SYSDATE) <= TO_DATE(:TO_DATE, 'dd/MM/yyyy HH24:mi:ss')
-                                AND rmall.rmc_occupby IN ('P') 
-                                and ipc_ptflag='N'    
-                        Group by  IPADMISS.IP_NO, 
-                                                IPADMISS.IPD_DATE, 
-                                                IPADMISS.PT_NO,
-                                                IPADMISS.PTC_PTNAME,     
-                                                IPADMISS.PTC_TYPE,                            
-                                                IPADMISS.BD_CODE,
-                                                IPADMISS.DO_CODE,
-                                                IPADMISS.PTC_SEX,
-                                                IPADMISS.PTD_DOB,
-                                                IPADMISS.PTN_DAYAGE,
-                                                IPADMISS.PTN_MONTHAGE,
-                                                IPADMISS.PTN_YEARAGE,
-                                                IPADMISS.PTC_LOADD1,
-                                                IPADMISS.PTC_LOADD2,
-                                                IPADMISS.PTC_LOADD3,
-                                                IPADMISS.PTC_LOADD4,
-                                                IPADMISS.PTC_LOPIN,
-                                                IPADMISS.PTC_LOPHONE,
-                                                IPADMISS.PTC_MOBILE,
-                                                IPADMISS.RC_CODE,
-                                                IPADMISS.RS_CODE,   
-                                                IPADMISS.IPC_CURSTATUS,   
-                                                IPADMISS.IPC_MHCODE,
-                                                DOCTOR.DOC_NAME        
-                              ORDER BY  IPADMISS.IPD_DATE
-    `;
+          SELECT
+              IP.IP_NO,
+              IP.IPD_DATE,
+              IP.PT_NO,
+              IP.PTC_PTNAME,
+              IP.PTC_SEX,
+              IP.PTD_DOB,
+              IP.PTC_LOADD1,
+              IP.PTC_LOADD2,
+              IP.PTC_LOADD3,
+              IP.PTC_LOADD4,
+              IP.BD_CODE,
+              IP.DO_CODE,
+              DO.DOC_NAME,
+              DP.DPC_DESC,
+              IP.IPD_DISC,
+              IP.IPC_STATUS,
+              IP.DMC_SLNO,
+              IP.DMD_DATE,
+              IP.PTC_MOBILE,
+              IP.IPC_MHCODE,
+              IP.IPC_CURSTATUS
+          FROM IPADMISS IP
+          JOIN DOCTOR DO ON DO.DO_CODE = IP.DO_CODE
+          JOIN SPECIALITY SP ON SP.SP_CODE = DO.SP_CODE
+          JOIN DEPARTMENT DP ON DP.DP_CODE = SP.DP_CODE
+      WHERE IPD_DATE  >= TO_DATE (:FROM_DATE,'dd/MM/yyyy hh24:mi:ss')
+      AND IPD_DATE  <TO_DATE (:TO_DATE, 'dd/MM/yyyy hh24:mi:ss') AND IPC_PTFLAG='N' AND IP.IPC_MHCODE = :MH_CODE
+      `;
+
 
       const result = await conn_ora.execute(
         oracleSql,
-        { MH_CODE: mh_Code, FROM_DATE: fromDate, TO_DATE: toDate },
+        { FROM_DATE: fromDate, TO_DATE: toDate, MH_CODE: mh_Code },
         { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
       );
 
@@ -225,23 +149,18 @@ const getInpatientDetail = async (callBack = () => { }) => {
       item.PTC_PTNAME,
       item.PTC_SEX,
       item.PTD_DOB ? format(new Date(item.PTD_DOB), "yyyy-MM-dd HH:mm:ss") : null,
-      item.PTN_DAYAGE,
-      item.PTN_MONTHAGE,
-      item.PTN_YEARAGE,
-      item.PTC_LOADD1,
-      item.PTC_LOADD2,
-      item.PTC_LOADD3,
-      item.PTC_LOADD4,
-      item.PTC_LOPIN,
-      item.RC_CODE,
-      item.IPD_BD_CODE,
+      buildFullAddress(item),
+      item.BD_CODE,
       item.DO_CODE,
-      item.RS_CODE,
-      item.IPC_CURSTATUS,
+      item.DOC_NAME,
+      item.DPC_DESC,
+      item.IPD_DISC ? format(new Date(item.IPD_DISC), "yyyy-MM-dd HH:mm:ss") : null,
+      item.IPC_STATUS,
+      item.DMC_SLNO,
+      item.DMD_DATE ? format(new Date(item.DMD_DATE), "yyyy-MM-dd HH:mm:ss") : null,
       item.PTC_MOBILE,
       item.IPC_MHCODE,
-      item.DOC_NAME,
-      item.DPC_DESC
+      item.IPC_CURSTATUS
     ]));
 
     // 7. MYSQL INSERT
@@ -254,22 +173,15 @@ const getInpatientDetail = async (callBack = () => { }) => {
       const patientInsertQuery = {
         sql: `INSERT INTO fb_ipadmiss (
             fb_ip_no, fb_ipd_date, fb_pt_no, fb_ptc_name, fb_ptc_sex,
-            fb_ptd_dob, fb_ptn_dayage, fb_ptn_monthage, fb_ptn_yearage,
-            fb_ptc_loadd1, fb_ptc_loadd2, fb_ptc_loadd3, fb_ptc_loadd4,
-            fb_ptc_lopin, fb_rc_code, fb_bd_code, fb_do_code, fb_rs_code,
-            fb_ipc_curstatus, fb_ptc_mobile, fb_ipc_mhcode, fb_doc_name,
-            fb_dep_desc
+            fb_ptd_dob, fb_ptc_loadd1,fb_bd_code, fb_do_code,fb_doc_name,
+            fb_dep_desc,fb_ipd_disc,fb_ipc_status,fb_dmc_slno,fb_dmd_date,
+            fb_ptc_mobile,fb_ipc_mhcode,fb_ipc_curstatus
          ) VALUES ?`,
         values: [allValues]
       };
 
-      let parsedToDate = parse(toDate, "dd/MM/yyyy HH:mm:ss", new Date());
-      // fallback to lastTrigger if invalid
-      if (!toDate || !isValid(parsedToDate)) {
-        parsedToDate = lastTrigger;
-      }
       // convert to MySQL format
-      const mysqlToDate = format(parsedToDate, "yyyy-MM-dd HH:mm:ss");
+      const mysqlToDate = format(jobStartTime, "yyyy-MM-dd HH:mm:ss");
       // choose query type
       const logQuery = !detail
         ? {
@@ -281,9 +193,9 @@ const getInpatientDetail = async (callBack = () => { }) => {
           values: [mysqlToDate, 1]
         };
 
-
       // const mysqlResults = await mysqlExecuteTransaction(queries);
       const mysqlResults = await mysqlExecuteTransaction([patientInsertQuery, logQuery]);
+
       insertedRows = mysqlResults[0]?.affectedRows || 0;
 
       mysqlTime = Date.now() - mysqlStart;
@@ -319,8 +231,8 @@ const getInpatientDetail = async (callBack = () => { }) => {
   }
 };
 
+
 // UPDATE IPADMISS STATUS DETAILS
-// NEW
 const UpdateIpStatusDetails = async (callBack = () => { }) => {
 
   let pool_ora = null;
@@ -338,12 +250,28 @@ const UpdateIpStatusDetails = async (callBack = () => { }) => {
       console.error("Log start failed:", err);
       return callBack(err);
     }
-    // 2. GET LAST TRIGGER DATE (PROCESS ID = 2)
+
+    //2. GET COMPANY INFO (MySQL)
+    let mh_Code = "";
+    try {
+      const companySlno = await getCompanySlno();
+      if (isNaN(Number(companySlno))) {
+        await endLogFailure(logId, `Invalid company_slno: ${companySlno}`);
+        return callBack(new Error(`Invalid company_slno: ${companySlno}`));
+      }
+      mh_Code = Number(companySlno) === 1 ? "00" : "KC";
+    } catch (err) {
+      await endLogFailure(logId, "Error fetching company details");
+      return callBack(err);
+    }
+
+    // 3. GET LAST TRIGGER DATE (PROCESS ID = 2)
     let detail = null;
     let lastTrigger = null;
-    let fromDate = "";
-    let toDate = "";
-    // let mysqlToDate = "";
+    let fromDate = null;
+    let toDate = null;
+    let jobStartTime = null;
+
 
     try {
       detail = await getLastTriggerDate(2);
@@ -354,36 +282,36 @@ const UpdateIpStatusDetails = async (callBack = () => { }) => {
 
       if (isNaN(lastTrigger.getTime())) throw new Error("Invalid last trigger date");
 
+      // FIXED job start time (VERY IMPORTANT)
+      jobStartTime = new Date();
+
       fromDate = format(lastTrigger, "dd/MM/yyyy HH:mm:ss");
-      toDate = format(new Date(), "dd/MM/yyyy HH:mm:ss");
-      mysqlToDate = format(new Date(), "yyyy-MM-dd HH:mm:ss");
+      toDate = format(jobStartTime, "dd/MM/yyyy HH:mm:ss");
 
     } catch (err) {
       await endLogFailure(logId, `Error fetching last trigger date: ${err}`);
       return callBack(err);
     }
 
-    // 3. FETCH ORACLE DATA
+    // 4. FETCH ORACLE DATA
     let rows = [];
     let oracleTime = 0;
 
     try {
-
       const oracleStart = Date.now();
-
       const oracleSql = `
         SELECT 
-          ip_no,
-          do_code,
-          ipc_curstatus,
-          ipd_disc,
-          ipc_status,
-          dmd_date,
-          dmc_slno
-        FROM ipadmiss
-        WHERE ipc_ptflag = 'N'
-          AND ipd_actrelease >= TO_DATE(:FROM_DATE, 'dd/MM/yyyy HH24:mi:ss')
-          AND ipd_actrelease <= TO_DATE(:TO_DATE, 'dd/MM/yyyy HH24:mi:ss')
+          IP.ip_no,
+          IP.do_code,
+          IP.ipc_curstatus,
+          IP.ipd_disc,
+          IP.ipc_status,
+          IP.dmd_date,
+          IP.dmc_slno,
+          DO.DOC_NAME
+        FROM IPADMISS IP JOIN DOCTOR DO ON DO.DO_CODE = IP.DO_CODE
+        WHERE IP.DMD_DATE  >= TO_DATE(:FROM_DATE, 'dd/MM/yyyy hh24:mi:ss') AND IP.DMD_DATE < TO_DATE(:TO_DATE, 'dd/MM/yyyy hh24:mi:ss')
+        AND IP.ipc_ptflag = 'N' AND IP.IPC_MHCODE = :MH_CODE
       `;
 
       pool_ora = await oraConnection();
@@ -391,7 +319,7 @@ const UpdateIpStatusDetails = async (callBack = () => { }) => {
 
       const result = await conn_ora.execute(
         oracleSql,
-        { FROM_DATE: fromDate, TO_DATE: toDate },
+        { FROM_DATE: fromDate, TO_DATE: toDate, MH_CODE: mh_Code },
         { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
       );
 
@@ -406,7 +334,7 @@ const UpdateIpStatusDetails = async (callBack = () => { }) => {
       await endLogFailure(logId, `Oracle fetch failed: ${err}`);
       return callBack(err);
     }
-    // 4. IF NO ROWS → SUCCESS + EXIT
+    // 5. IF NO ROWS → SUCCESS + EXIT
     if (!rows || rows.length === 0) {
       await endLogSuccess(logId, {
         oracleRows: 0,
@@ -418,7 +346,7 @@ const UpdateIpStatusDetails = async (callBack = () => { }) => {
       return callBack(null, { message: "No status updates found" });
     }
 
-    // 5. TRANSFORM
+    // 6. TRANSFORM
     const updateValues = rows.map((item) => ([
       item.DO_CODE,
       item.IPC_CURSTATUS,
@@ -426,10 +354,11 @@ const UpdateIpStatusDetails = async (callBack = () => { }) => {
       item.IPC_STATUS,
       item.DMD_DATE ? format(new Date(item.DMD_DATE), "yyyy-MM-dd HH:mm:ss") : null,
       item.DMC_SLNO,
+      item.DOC_NAME,
       item.IP_NO
     ]));
 
-    // 6. MYSQL UPDATE TRANSACTION
+    // 7. MYSQL UPDATE TRANSACTION
     let mysqlTime = 0;
     let mysqlUpdated = 0
 
@@ -446,19 +375,14 @@ const UpdateIpStatusDetails = async (callBack = () => { }) => {
             fb_ipd_disc = ?,
             fb_ipc_status = ?,
             fb_dmd_date = ?,
-            fb_dmc_slno = ?
+            fb_dmc_slno = ?,
+            fb_doc_name = ?
           WHERE fb_ip_no = ?
         `,
         values: row
       }));
-
-      // correctly parsing the to date
-      let parsedToDate = parse(toDate, "dd/MM/yyyy HH:mm:ss", new Date());
-      // fallback to lastTrigger if invalid
-      if (!toDate || !isValid(parsedToDate)) { parsedToDate = lastTrigger }
       // convert to MySQL format
-      const mysqlToDate = format(parsedToDate, "yyyy-MM-dd HH:mm:ss");
-
+      const mysqlToDate = format(jobStartTime, "yyyy-MM-dd HH:mm:ss");
       // UPDATE / INSERT LOG DATE
       const logQuery = !detail
         ? {
@@ -485,7 +409,7 @@ const UpdateIpStatusDetails = async (callBack = () => { }) => {
       await endLogFailure(logId, `MySQL update failed: ${err}`);
       return callBack(err);
     }
-    // 7. SUCCESS LOG
+    // 8. SUCCESS LOG
     await endLogSuccess(logId, {
       oracleRows: rows.length,
       mysqlInserted: 0,
@@ -497,22 +421,17 @@ const UpdateIpStatusDetails = async (callBack = () => { }) => {
     return callBack(null, { updated: updateValues.length });
 
   } catch (err) {
-
     // GLOBAL ERROR
     if (logId) await endLogFailure(logId, `Error in UpdateIpStatusDetails: ${err}`);
     return callBack(err);
-
   } finally {
-
     try { if (resultSet) await resultSet.close(); } catch { }
     try { if (conn_ora) await conn_ora.close(); } catch { }
     try { if (pool_ora) await pool_ora.close(); } catch { }
-
   }
 };
 
 // UPDATE BED DETAILS STATUS DETAILS
-// NEW
 const UpdateInpatientDetailRmall = async (callBack = () => { }) => {
 
   let pool_ora = null;
@@ -534,8 +453,9 @@ const UpdateInpatientDetailRmall = async (callBack = () => { }) => {
     // 2. GET LAST TRIGGER DATE (PROCESS ID = 3)
     let detail = null;
     let lastTrigger = null;
-    let fromDate = "";
-    let toDate = "";
+    let jobStartTime = null;
+    let fromDate = null;
+    let toDate = null;
 
     try {
       detail = await getLastTriggerDate(3);
@@ -546,8 +466,11 @@ const UpdateInpatientDetailRmall = async (callBack = () => { }) => {
 
       if (isNaN(lastTrigger.getTime())) throw new Error("Invalid last trigger date");
 
+      // FIXED job start time (VERY IMPORTANT)
+      jobStartTime = new Date();
+
       fromDate = format(lastTrigger, "dd/MM/yyyy HH:mm:ss");
-      toDate = format(new Date(), "dd/MM/yyyy HH:mm:ss");
+      toDate = format(jobStartTime, "dd/MM/yyyy HH:mm:ss");
 
     } catch (err) {
       await endLogFailure(logId, `Error fetching last trigger date: ${err}`);
@@ -560,17 +483,17 @@ const UpdateInpatientDetailRmall = async (callBack = () => { }) => {
 
     try {
       const oracleStart = Date.now();
-
       const oracleSql = `
         SELECT 
           rmall.bd_code,
-          rmall.ip_no
+          rmall.ip_no,
+          RMALL.RMC_OCCUPBY
         FROM rmall
-        LEFT JOIN ipadmiss ON rmall.ip_no = ipadmiss.ip_no
+         JOIN ipadmiss ON rmall.ip_no = ipadmiss.ip_no
         WHERE ipadmiss.ipc_ptflag = 'N'
           AND rmall.rmd_relesedate IS NULL
-          AND rmall.rmd_occupdate >= TO_DATE(:FROM_DATE, 'dd/MM/yyyy HH24:mi:ss')
-          AND rmall.rmd_occupdate <= TO_DATE(:TO_DATE, 'dd/MM/yyyy HH24:mi:ss')
+          AND rmall.rmd_occupdate >= TO_DATE(:FROM_DATE, 'dd/MM/yyyy hh24:mi:ss')
+          AND rmall.rmd_occupdate < TO_DATE(:TO_DATE, 'dd/MM/yyyy hh24:mi:ss')
       `;
 
       pool_ora = await oraConnection();
@@ -629,13 +552,8 @@ const UpdateInpatientDetailRmall = async (callBack = () => { }) => {
         values: row
       }));
 
-      // Correctly parse toDate
-      let parsedToDate = parse(toDate, "dd/MM/yyyy HH:mm:ss", new Date());
-      if (!toDate || !isValid(parsedToDate)) {
-        parsedToDate = lastTrigger;
-      }
 
-      const mysqlToDate = format(parsedToDate, "yyyy-MM-dd HH:mm:ss");
+      const mysqlToDate = format(jobStartTime, "yyyy-MM-dd HH:mm:ss");
 
       // INSERT OR UPDATE LOG
       const logQuery = !detail
@@ -690,7 +608,6 @@ const UpdateInpatientDetailRmall = async (callBack = () => { }) => {
 };
 
 // UPDATE BED DETAILS  DETAILS ON BED TABLE
-//NEW
 const UpdateFbBedDetailMeliora = async (callBack = () => { }) => {
 
   let pool_ora = null;
@@ -712,8 +629,9 @@ const UpdateFbBedDetailMeliora = async (callBack = () => { }) => {
     // 2. GET LAST TRIGGER DATE (PROCESS ID = 4)
     let detail = null;
     let lastTrigger = null;
-    let fromDate = "";
-    let toDate = "";
+    let fromDate = null;
+    let toDate = null;
+    let jobStartTime = null;
 
     try {
       detail = await getLastTriggerDate(4);
@@ -724,8 +642,11 @@ const UpdateFbBedDetailMeliora = async (callBack = () => { }) => {
 
       if (isNaN(lastTrigger.getTime())) throw new Error("Invalid last trigger date");
 
+      // FIXED job start time (VERY IMPORTANT)
+      jobStartTime = new Date();
+
       fromDate = format(lastTrigger, "dd/MM/yyyy HH:mm:ss");
-      toDate = format(new Date(), "dd/MM/yyyy HH:mm:ss");
+      toDate = format(jobStartTime, "dd/MM/yyyy HH:mm:ss");
 
     } catch (err) {
       await endLogFailure(logId, `Error fetching last trigger date: ${err}`);
@@ -743,12 +664,12 @@ const UpdateFbBedDetailMeliora = async (callBack = () => { }) => {
         SELECT 
           BD.BDC_OCCUP,
           BD.BD_CODE,
-          SUM(BD.BDN_OCCNO) AS OCCU
+          BD.BDN_OCCNO
         FROM BED BD
         WHERE BD.BDC_STATUS = 'Y'
           AND BD.BDD_EDDATE >= TO_DATE(:FROM_DATE, 'dd/MM/yyyy HH24:mi:ss')
-          AND BD.BDD_EDDATE <= TO_DATE(:TO_DATE, 'dd/MM/yyyy HH24:mi:ss')
-        GROUP BY BD.BDC_OCCUP, BD.BD_CODE
+          AND BD.BDD_EDDATE < TO_DATE(:TO_DATE, 'dd/MM/yyyy HH24:mi:ss')
+
       `;
 
       pool_ora = await oraConnection();
@@ -787,7 +708,7 @@ const UpdateFbBedDetailMeliora = async (callBack = () => { }) => {
     // 5. PREPARE MYSQL VALUES
     const updateValues = rows.map(item => [
       item.BDC_OCCUP,
-      item.OCCU,
+      item.BDN_OCCNO,
       item.BD_CODE
     ]);
 
@@ -809,11 +730,7 @@ const UpdateFbBedDetailMeliora = async (callBack = () => { }) => {
         values: row
       }));
 
-      // Correctly parse toDate
-      let parsedToDate = parse(toDate, "dd/MM/yyyy HH:mm:ss", new Date());
-      if (!toDate || !isValid(parsedToDate)) parsedToDate = lastTrigger;
-
-      const mysqlToDate = format(parsedToDate, "yyyy-MM-dd HH:mm:ss");
+      const mysqlToDate = format(jobStartTime, "yyyy-MM-dd HH:mm:ss");
 
       // INSERT OR UPDATE LOG
       const logQuery = !detail
@@ -879,7 +796,7 @@ const InsertChilderDetailMeliora = async (callBack = () => { }) => {
 
     // 2. Oracle SQL
     const oracleSql = `
-      SELECT 
+      SELECT
         B.BR_SLNO,
         B.BRD_DATE,
         B.PT_NO,
@@ -901,7 +818,7 @@ const InsertChilderDetailMeliora = async (callBack = () => { }) => {
         L.BRN_WEIGHT AS CHILD_WEIGHT
       FROM BIRTHREGMAST B
       LEFT JOIN BRITHREGDETL L ON B.BR_SLNO = L.BR_SLNO
-      WHERE B.BRD_DATE >= TO_DATE(:GET_DATE, 'DD-MON-YYYY')
+      WHERE B.BRD_DATE >= :GET_DATE
     `;
 
     // 3. Execute Oracle
@@ -996,35 +913,9 @@ const InsertChilderDetailMeliora = async (callBack = () => { }) => {
     }
   }
 };
-// NEW
-/****************************/
-const getLastTriggerDate = async (processId) => {
-  return new Promise((resolve, reject) => {
-    mysqlpool.getConnection((err, connection) => {
-      if (err) {
-        console.log("MySQL DB not connected. Check connection.");
-        return reject(err);
-      }
-      const query = `
-        SELECT fb_last_trigger_date 
-        FROM fb_ipadmiss_logdtl 
-        WHERE fb_process_id = ? 
-        ORDER BY fb_log_slno DESC 
-        LIMIT 1;
-      `;
-      connection.query(query, [processId], (err, results) => {
-        connection.release();
-        if (err) {
-          return reject(err);
-        }
-        resolve(results.length > 0 ? results[0] : null);
-      });
-    });
-  });
-};
+
 
 {/* %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% FEED BACK CRON-JOBS ENDS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% */ }
-
 
 // const getAmsPatientDetails = async (callBack) => {
 //   let pool_ora = await oraConnection();
@@ -1889,6 +1780,20 @@ const rollback = (conn) => {
   });
 };
 
+
+
+const buildFullAddress = (item) => {
+  return [
+    item.PTC_LOADD1,
+    item.PTC_LOADD2,
+    item.PTC_LOADD3,
+    item.PTC_LOADD4
+  ]
+    .filter(v => v && v?.trim() !== "") // remove null/empty
+    .join(", "); // separator
+};
+
+
 //TMCH 
 const getBisTmcLastTriggerDate = async () => {
   return new Promise((resolve, reject) => {
@@ -2499,8 +2404,6 @@ const updateAmsPatientDetails = () => {
 };
 
 
-
-
 const getAmsLastUpdatedDate = async (processId) => {
   return new Promise((resolve, reject) => {
     mysqlpool.getConnection((err, connection) => {
@@ -2578,4 +2481,8 @@ cron.schedule("0 23 * * *", () => {
 // cron.schedule("0 22 * * *", () => {
 //   InsertTmcMedDesc();
 // });
+
+
+
+
 

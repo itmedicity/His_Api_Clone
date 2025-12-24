@@ -877,71 +877,44 @@ module.exports = {
         let conn_ora = await pool_ora.getConnection();
 
         const column = data.type === 1 ? "IPD_DATE" : "IPD_DISC";
-
+        
         const sql = `
-                select 
-                    ipadmiss.IP_NO,
-                    ipadmiss.IPD_DATE,
-                    ipadmiss.PT_NO,
-                    ipadmiss.PTC_PTNAME,
-                    ipadmiss.PTC_SEX,
-                    ipadmiss.PTD_DOB,
-                    ipadmiss.PTN_DAYAGE,
-                    ipadmiss.PTN_MONTHAGE,
-                    ipadmiss.PTN_YEARAGE,
-                    ipadmiss.PTC_LOADD1,
-                    ipadmiss.PTC_LOADD2,
-                    ipadmiss.PTC_LOADD3,
-                    ipadmiss.PTC_LOADD4,
-                    ipadmiss.PTC_LOPIN,
-                    ipadmiss.RC_CODE,
-                    ipadmiss.BD_CODE,
-                    ipadmiss.DO_CODE,
-                    ipadmiss.RS_CODE,
-                    ipadmiss.IPC_CURSTATUS,
-                    ipadmiss.PTC_MOBILE,
-                    ipadmiss.IPC_MHCODE,
-                    doctor.DOC_NAME,
-                    ipadmiss.IPD_DISC,
-                    ipadmiss.IPC_STATUS,
-                    ipadmiss.DMC_SLNO,
-                    ipadmiss.DMD_DATE,
-                    department.DPC_DESC
-                from ipadmiss
-                    LEFT JOIN doctor ON doctor.do_code = ipadmiss.do_code 
-                    LEFT JOIN speciality ON doctor.SP_CODE=speciality.SP_CODE 
-                    LEFT JOIN department ON speciality.DP_CODE=department.DP_CODE
-                        WHERE NVL(${column}, SYSDATE) >= TO_DATE(:FROM_DATE, 'YYYY-MM-DD HH24:MI:SS')
-                                AND NVL(${column}, SYSDATE) <= TO_DATE(:TO_DATE, 'YYYY-MM-DD HH24:MI:SS')
-                                and ipc_ptflag='N' 
-                                 group by ipadmiss.IP_NO,
-                    ipadmiss.IPD_DATE,
-                    ipadmiss.PT_NO,
-                    ipadmiss.PTC_PTNAME,
-                    ipadmiss.PTC_SEX,
-                    ipadmiss.PTD_DOB,
-                    ipadmiss.PTN_DAYAGE,
-                    ipadmiss.PTN_MONTHAGE,
-                    ipadmiss.PTN_YEARAGE,
-                    ipadmiss.PTC_LOADD1,
-                    ipadmiss.PTC_LOADD2,
-                    ipadmiss.PTC_LOADD3,
-                    ipadmiss.PTC_LOADD4,
-                    ipadmiss.PTC_LOPIN,
-                    ipadmiss.RC_CODE,
-                    ipadmiss.BD_CODE,
-                    ipadmiss.DO_CODE,
-                    ipadmiss.RS_CODE,
-                    ipadmiss.IPC_CURSTATUS,
-                    ipadmiss.PTC_MOBILE,
-                    ipadmiss.IPC_MHCODE,
-                    doctor.DOC_NAME,
-                    ipadmiss.IPD_DISC,
-                    ipadmiss.IPC_STATUS,
-                    ipadmiss.DMC_SLNO,
-                    ipadmiss.DMD_DATE,
-                    department.DPC_DESC
-    `;
+            SELECT 
+                IP.IP_NO,
+                IP.IPD_DATE,
+                IP.PT_NO,
+                IP.PTC_PTNAME,
+                IP.PTC_SEX,
+                IP.PTD_DOB,
+                IP.PTN_DAYAGE,
+                IP.PTN_MONTHAGE,
+                IP.PTN_YEARAGE,
+                IP.PTC_LOADD1,
+                IP.PTC_LOADD2,
+                IP.PTC_LOADD3,
+                IP.PTC_LOADD4,
+                IP.PTC_LOPIN,
+                IP.RC_CODE,
+                IP.BD_CODE,
+                IP.DO_CODE,
+                IP.RS_CODE,
+                IP.IPC_CURSTATUS,
+                IP.PTC_MOBILE,
+                IP.IPC_MHCODE,
+                DO.DOC_NAME,
+                IP.IPD_DISC,
+                IP.IPC_STATUS,
+                IP.DMC_SLNO,
+                IP.DMD_DATE,
+                DP.DPC_DESC
+            FROM ipadmiss IP
+            JOIN doctor DO ON DO.DO_CODE = IP.DO_CODE
+            JOIN speciality SP ON SP.SP_CODE = DO.SP_CODE
+            JOIN department DP ON DP.DP_CODE = SP.DP_CODE
+            WHERE IP.${column}  >= TO_DATE (:FROM_DATE,'YYYY-MM-DD HH24:MI:SS')
+            AND IP.${column}  <TO_DATE (:TO_DATE, 'YYYY-MM-DD HH24:MI:SS') AND IPC_PTFLAG='N'
+        `;
+
 
         try {
             const result = await conn_ora.execute(
@@ -960,7 +933,6 @@ module.exports = {
             return callBack(error);
         } finally {
             if (conn_ora) await conn_ora.close();
-            if (pool_ora) await pool_ora.close();
         }
     },
     getBedMasterDetail: async (data, callBack) => {

@@ -331,6 +331,7 @@ module.exports = {
             });
         });
     },
+    // not using
     UpdatePatientDetail: async (req, res) => {
         const body = req.body;
 

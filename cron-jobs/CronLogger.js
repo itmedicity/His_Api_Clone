@@ -54,7 +54,7 @@ const endLogFailure = async (logId, error) => {
     );
 };
 
-
+// Fetching Current company Slno
 const getCompanySlno = async () => {
     const crmResult = await mysqlExecute(
         "SELECT company_slno FROM crm_common LIMIT 1"
@@ -68,4 +68,74 @@ const getCompanySlno = async () => {
     return companySlno;
 };
 
-module.exports = { startLog, endLogSuccess, endLogFailure, mysqlExecute, getCompanySlno };
+
+
+// MySql transaction for patient insert Query
+const mysqlExecuteTransaction = (queries = []) => {
+    return new Promise((resolve, reject) => {
+        mysqlpool.getConnection((err, connection) => {
+            if (err) return reject(err);
+
+            connection.beginTransaction(async (transactionerror) => {
+                if (transactionerror) {
+                    connection.release();
+                    return reject(transactionerror);
+                }
+
+                try {
+                    const results = [];
+
+                    for (const { sql, values } of queries) {
+                        const data = await new Promise((ok, fail) => {
+                            connection.query(sql, values, (err, res) => {
+                                if (err) return fail(err);
+                                ok(res);
+                            });
+                        });
+                        results.push(data);
+                    }
+
+                    connection.commit((commitErr) => {
+                        if (commitErr) {
+                            return connection.rollback(() => {
+                                connection.release();
+                                reject(commitErr);
+                            });
+                        }
+                        connection.release();
+                        resolve(results);
+                    });
+                } catch (error) {
+                    connection.rollback(() => {
+                        connection.release();
+                        reject(error);
+                    });
+                }
+            });
+        });
+    });
+};
+
+
+
+
+const getLastTriggerDate = async (processId) => {
+    return new Promise((resolve, reject) => {
+        mysqlpool.getConnection((err, connection) => {
+            if (err) {
+                console.log("MySQL DB not connected. Check connection.");
+                return reject(err);
+            }
+            const query = ` SELECT fb_last_trigger_date FROM fb_ipadmiss_logdtl WHERE fb_process_id = ? `;
+            connection.query(query, [processId], (err, results) => {
+                connection.release();
+                if (err) {
+                    return reject(err);
+                }
+                resolve(results.length > 0 ? results[0] : null);
+            });
+        });
+    });
+};
+
+module.exports = { startLog, endLogSuccess, endLogFailure, mysqlExecute, getCompanySlno, mysqlExecuteTransaction, getLastTriggerDate };
