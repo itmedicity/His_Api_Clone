@@ -177,41 +177,58 @@ module.exports = {
    *
    */
   pharmacyGroupedAmntForTmch: async (req, res) => {
-    const body = req.body;
+    try {
+      const body = req.body;
+      // const pharmaGroup1 = await
+      // const pharmaGroup2 = await
+      // const pharmaGroup3 = await
+      // const pharmaGroup4 = await
+      // const pharmaGroup5 = await
+      // const pharmaGroup6 = await
+      // const pharmaGroup7 = await
 
-    const pharmaGroup1 = await TmchGroupedSalePart1(body);
-    const pharmaGroup2 = await TmchGroupedReturnPart1(body);
-    const pharmaGroup3 = await TmchGroupedSalePart2(body);
-    const pharmaGroup4 = await TmchGroupedReturnPart2(body);
-    const pharmaGroup5 = await TmchGroupedTsshSalePart3(body);
-    const pharmaGroup6 = await TmchGroupedTsshReturnPart3(body);
-    const pharmaGroup7 = await TmchGroupedRoundOffAmntTssh(body);
+      const [pharmaGroup1, pharmaGroup2, pharmaGroup3, pharmaGroup4, pharmaGroup5, pharmaGroup6, pharmaGroup7] = await Promise.all([
+        TmchGroupedSalePart1(body),
+        TmchGroupedReturnPart1(body),
+        TmchGroupedSalePart2(body),
+        TmchGroupedReturnPart2(body),
+        TmchGroupedTsshSalePart3(body),
+        TmchGroupedTsshReturnPart3(body),
+        TmchGroupedRoundOffAmntTssh(body),
+      ]);
+      const result = {
+        result1: pharmaGroup1?.success === 1 ? pharmaGroup1?.data : [],
+        result2: pharmaGroup2?.success === 1 ? pharmaGroup2?.data : [],
+        result3: pharmaGroup3?.success === 1 ? pharmaGroup3?.data : [],
+        result4: pharmaGroup4?.success === 1 ? pharmaGroup4?.data : [],
+        result5: pharmaGroup5?.success === 1 ? pharmaGroup5?.data : [],
+        result6: pharmaGroup6?.success === 1 ? pharmaGroup6?.data : [],
+        // result7 : pharmaGroup7?.success === 1 ? pharmaGroup7?.data : [],
+      };
 
-    const result = {
-      result1: pharmaGroup1?.success === 1 ? pharmaGroup1?.data : [],
-      result2: pharmaGroup2?.success === 1 ? pharmaGroup2?.data : [],
-      result3: pharmaGroup3?.success === 1 ? pharmaGroup3?.data : [],
-      result4: pharmaGroup4?.success === 1 ? pharmaGroup4?.data : [],
-      result5: pharmaGroup5?.success === 1 ? pharmaGroup5?.data : [],
-      result6: pharmaGroup6?.success === 1 ? pharmaGroup6?.data : [],
-      // result7 : pharmaGroup7?.success === 1 ? pharmaGroup7?.data : [],
-    };
+      const totals = {AMT: 0, GROSSAMT: 0, DISCOUNT: 0, COMP: 0, TAX: 0};
 
-    const data = Object.values(result);
+      Object.values(result)
+        .flat()
+        .forEach((item) => {
+          totals.AMT += Number(item.AMT ?? 0);
+          totals.GROSSAMT += Number(item.GROSSAMT ?? 0);
+          totals.DISCOUNT += Number(item.DISCOUNT ?? 0);
+          totals.COMP += Number(item.COMP ?? 0);
+          totals.TAX += Number(item.TAX ?? 0);
+        });
 
-    const totals = {AMT: 0, GROSSAMT: 0, DISCOUNT: 0, COMP: 0, TAX: 0};
-    data.flat().forEach((item) => {
-      totals.AMT += item.AMT ?? 0;
-      totals.GROSSAMT += item.GROSSAMT ?? 0;
-      totals.DISCOUNT += item.DISCOUNT ?? 0;
-      totals.COMP += item.COMP ?? 0;
-      totals.TAX += item.TAX ?? 0;
-    });
-
-    return res.status(200).json({
-      success: 1,
-      message: "PharmacyGroupedTmchAmount",
-      data: totals,
-    });
+      return res.status(200).json({
+        success: 1,
+        message: "PharmacyGroupedTmchAmount",
+        data: totals,
+      });
+    } catch (error) {
+      return res.status(200).json({
+        success: 0,
+        message: error.message,
+        data: [],
+      });
+    }
   },
 };

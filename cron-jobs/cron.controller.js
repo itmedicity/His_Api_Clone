@@ -1,22 +1,22 @@
 const cron = require("node-cron");
-const { oraConnection, oracledb, oraKmcConnection } = require("../config/oradbconfig");
+const {oraConnection, oracledb, oraKmcConnection} = require("../config/oradbconfig");
 const pool = require("../config/dbconfig");
 const mysqlpool = require("../config/dbconfigmeliora");
-const { format, subHours, subMonths, parse, isValid, subMinutes } = require("date-fns");
+const {format, subHours, subMonths, parse, isValid, subMinutes} = require("date-fns");
 const bispool = require("../config/dbconfbis");
-const { endLogSuccess, endLogFailure, startLog, getCompanySlno, mysqlExecuteTransaction, getLastTriggerDate } = require("./CronLogger");
+const {endLogSuccess, endLogFailure, startLog, getCompanySlno, mysqlExecuteTransaction, getLastTriggerDate} = require("./CronLogger");
 
-
-{/* %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% FEED BACK CRON-JOBS STARTS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% */ }
+{
+  /* %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% FEED BACK CRON-JOBS STARTS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% */
+}
 
 // Get Inpaitent Detail
-const getInpatientDetail = async (callBack = () => { }) => {
+const getInpatientDetail = async (callBack = () => {}) => {
   let pool_ora = null;
   let conn_ora = null;
   let resultSet = null;
   let logId = null;
   try {
-
     // 1. START LOG
     try {
       logId = await startLog("FB_IPADMISS_IMPORT");
@@ -48,12 +48,8 @@ const getInpatientDetail = async (callBack = () => { }) => {
     let detail = null;
 
     try {
-
       detail = await getLastTriggerDate(1);
-      lastTrigger = detail?.fb_last_trigger_date
-        ? new Date(detail.fb_last_trigger_date)
-        : subHours(new Date(), 1);
-
+      lastTrigger = detail?.fb_last_trigger_date ? new Date(detail.fb_last_trigger_date) : subHours(new Date(), 1);
 
       // FIXED job start time (VERY IMPORTANT)
       jobStartTime = new Date();
@@ -62,9 +58,6 @@ const getInpatientDetail = async (callBack = () => { }) => {
       fromDate = format(lastTrigger, "dd/MM/yyyy HH:mm:ss");
       // TO_DATE is NOW (but will be used as next cycle FROM)
       toDate = format(jobStartTime, "dd/MM/yyyy HH:mm:ss");
-
-
-
     } catch (err) {
       await endLogFailure(logId, "Error fetching last trigger date");
       return callBack(err);
@@ -109,12 +102,7 @@ const getInpatientDetail = async (callBack = () => { }) => {
       AND IPD_DATE  <TO_DATE (:TO_DATE, 'dd/MM/yyyy hh24:mi:ss') AND IPC_PTFLAG='N' AND IP.IPC_MHCODE = :MH_CODE
       `;
 
-
-      const result = await conn_ora.execute(
-        oracleSql,
-        { FROM_DATE: fromDate, TO_DATE: toDate, MH_CODE: mh_Code },
-        { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
-      );
+      const result = await conn_ora.execute(oracleSql, {FROM_DATE: fromDate, TO_DATE: toDate, MH_CODE: mh_Code}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
 
       resultSet = result.resultSet;
       rows = await resultSet.getRows(0);
@@ -123,7 +111,6 @@ const getInpatientDetail = async (callBack = () => { }) => {
       resultSet = null;
 
       oracleTime = Date.now() - oracleStart;
-
     } catch (err) {
       await endLogFailure(logId, "Oracle fetch failed");
       return callBack(err);
@@ -136,13 +123,13 @@ const getInpatientDetail = async (callBack = () => { }) => {
         mysqlInserted: 0,
         mysqlUpdated: 0,
         oracleTime,
-        mysqlTime: 0
+        mysqlTime: 0,
       });
-      return callBack(null, { message: "No rows from Oracle" });
+      return callBack(null, {message: "No rows from Oracle"});
     }
 
     // 6. TRANSFORM ROWS
-    const allValues = rows.map((item) => ([
+    const allValues = rows.map((item) => [
       item.IP_NO,
       item.IPD_DATE ? format(new Date(item.IPD_DATE), "yyyy-MM-dd HH:mm:ss") : null,
       item.PT_NO,
@@ -160,8 +147,8 @@ const getInpatientDetail = async (callBack = () => { }) => {
       item.DMD_DATE ? format(new Date(item.DMD_DATE), "yyyy-MM-dd HH:mm:ss") : null,
       item.PTC_MOBILE,
       item.IPC_MHCODE,
-      item.IPC_CURSTATUS
-    ]));
+      item.IPC_CURSTATUS,
+    ]);
 
     // 7. MYSQL INSERT
     let mysqlTime = 0;
@@ -177,7 +164,7 @@ const getInpatientDetail = async (callBack = () => { }) => {
             fb_dep_desc,fb_ipd_disc,fb_ipc_status,fb_dmc_slno,fb_dmd_date,
             fb_ptc_mobile,fb_ipc_mhcode,fb_ipc_curstatus
          ) VALUES ?`,
-        values: [allValues]
+        values: [allValues],
       };
 
       // convert to MySQL format
@@ -185,13 +172,13 @@ const getInpatientDetail = async (callBack = () => { }) => {
       // choose query type
       const logQuery = !detail
         ? {
-          sql: `INSERT INTO fb_ipadmiss_logdtl (fb_last_trigger_date, fb_process_id) VALUES (?, ?)`,
-          values: [mysqlToDate, 1]
-        }
+            sql: `INSERT INTO fb_ipadmiss_logdtl (fb_last_trigger_date, fb_process_id) VALUES (?, ?)`,
+            values: [mysqlToDate, 1],
+          }
         : {
-          sql: `UPDATE fb_ipadmiss_logdtl SET fb_last_trigger_date = ? WHERE fb_process_id = ?`,
-          values: [mysqlToDate, 1]
-        };
+            sql: `UPDATE fb_ipadmiss_logdtl SET fb_last_trigger_date = ? WHERE fb_process_id = ?`,
+            values: [mysqlToDate, 1],
+          };
 
       // const mysqlResults = await mysqlExecuteTransaction(queries);
       const mysqlResults = await mysqlExecuteTransaction([patientInsertQuery, logQuery]);
@@ -199,7 +186,6 @@ const getInpatientDetail = async (callBack = () => { }) => {
       insertedRows = mysqlResults[0]?.affectedRows || 0;
 
       mysqlTime = Date.now() - mysqlStart;
-
     } catch (err) {
       await endLogFailure(logId, `MySQL insert failed:${err}`);
       return callBack(err);
@@ -210,10 +196,10 @@ const getInpatientDetail = async (callBack = () => { }) => {
       mysqlInserted: insertedRows,
       mysqlUpdated: 0,
       oracleTime,
-      mysqlTime
+      mysqlTime,
     });
 
-    return callBack(null, { inserted: insertedRows });
+    return callBack(null, {inserted: insertedRows});
   } catch (err) {
     // UNEXPECTED FAILURE
     if (logId) await endLogFailure(logId, `Error in here ${err}`);
@@ -231,17 +217,14 @@ const getInpatientDetail = async (callBack = () => { }) => {
   }
 };
 
-
 // UPDATE IPADMISS STATUS DETAILS
-const UpdateIpStatusDetails = async (callBack = () => { }) => {
-
+const UpdateIpStatusDetails = async (callBack = () => {}) => {
   let pool_ora = null;
   let conn_ora = null;
   let resultSet = null;
   let logId = null;
 
   try {
-
     // 1. START LOG
     try {
       logId = await startLog("FB_IPSTATUS_IMPORT");
@@ -272,13 +255,10 @@ const UpdateIpStatusDetails = async (callBack = () => { }) => {
     let toDate = null;
     let jobStartTime = null;
 
-
     try {
       detail = await getLastTriggerDate(2);
 
-      lastTrigger = detail?.fb_last_trigger_date
-        ? new Date(detail.fb_last_trigger_date)
-        : subHours(new Date(), 1);
+      lastTrigger = detail?.fb_last_trigger_date ? new Date(detail.fb_last_trigger_date) : subHours(new Date(), 1);
 
       if (isNaN(lastTrigger.getTime())) throw new Error("Invalid last trigger date");
 
@@ -287,7 +267,6 @@ const UpdateIpStatusDetails = async (callBack = () => { }) => {
 
       fromDate = format(lastTrigger, "dd/MM/yyyy HH:mm:ss");
       toDate = format(jobStartTime, "dd/MM/yyyy HH:mm:ss");
-
     } catch (err) {
       await endLogFailure(logId, `Error fetching last trigger date: ${err}`);
       return callBack(err);
@@ -317,11 +296,7 @@ const UpdateIpStatusDetails = async (callBack = () => { }) => {
       pool_ora = await oraConnection();
       conn_ora = await pool_ora.getConnection();
 
-      const result = await conn_ora.execute(
-        oracleSql,
-        { FROM_DATE: fromDate, TO_DATE: toDate, MH_CODE: mh_Code },
-        { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
-      );
+      const result = await conn_ora.execute(oracleSql, {FROM_DATE: fromDate, TO_DATE: toDate, MH_CODE: mh_Code}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
 
       resultSet = result.resultSet;
       rows = await resultSet.getRows(0);
@@ -329,7 +304,6 @@ const UpdateIpStatusDetails = async (callBack = () => { }) => {
       resultSet = null;
 
       oracleTime = Date.now() - oracleStart;
-
     } catch (err) {
       await endLogFailure(logId, `Oracle fetch failed: ${err}`);
       return callBack(err);
@@ -341,13 +315,13 @@ const UpdateIpStatusDetails = async (callBack = () => { }) => {
         mysqlInserted: 0,
         mysqlUpdated: 0,
         oracleTime,
-        mysqlTime: 0
+        mysqlTime: 0,
       });
-      return callBack(null, { message: "No status updates found" });
+      return callBack(null, {message: "No status updates found"});
     }
 
     // 6. TRANSFORM
-    const updateValues = rows.map((item) => ([
+    const updateValues = rows.map((item) => [
       item.DO_CODE,
       item.IPC_CURSTATUS,
       item.IPD_DISC ? format(new Date(item.IPD_DISC), "yyyy-MM-dd HH:mm:ss") : null,
@@ -355,12 +329,12 @@ const UpdateIpStatusDetails = async (callBack = () => { }) => {
       item.DMD_DATE ? format(new Date(item.DMD_DATE), "yyyy-MM-dd HH:mm:ss") : null,
       item.DMC_SLNO,
       item.DOC_NAME,
-      item.IP_NO
-    ]));
+      item.IP_NO,
+    ]);
 
     // 7. MYSQL UPDATE TRANSACTION
     let mysqlTime = 0;
-    let mysqlUpdated = 0
+    let mysqlUpdated = 0;
 
     try {
       //start time
@@ -379,32 +353,29 @@ const UpdateIpStatusDetails = async (callBack = () => { }) => {
             fb_doc_name = ?
           WHERE fb_ip_no = ?
         `,
-        values: row
+        values: row,
       }));
       // convert to MySQL format
       const mysqlToDate = format(jobStartTime, "yyyy-MM-dd HH:mm:ss");
       // UPDATE / INSERT LOG DATE
       const logQuery = !detail
         ? {
-          sql: `INSERT INTO fb_ipadmiss_logdtl (fb_last_trigger_date, fb_process_id) VALUES (?, ?)`,
-          values: [mysqlToDate, 2]
-        }
+            sql: `INSERT INTO fb_ipadmiss_logdtl (fb_last_trigger_date, fb_process_id) VALUES (?, ?)`,
+            values: [mysqlToDate, 2],
+          }
         : {
-          sql: `UPDATE fb_ipadmiss_logdtl SET fb_last_trigger_date = ? WHERE fb_process_id = ?`,
-          values: [mysqlToDate, 2]
-        };
+            sql: `UPDATE fb_ipadmiss_logdtl SET fb_last_trigger_date = ? WHERE fb_process_id = ?`,
+            values: [mysqlToDate, 2],
+          };
 
       updateQueries.push(logQuery);
 
       const mysqlResults = await mysqlExecuteTransaction(updateQueries);
       //Using changedRows to calculate updated rows
-      mysqlUpdated = mysqlResults
-        .filter(r => r.changedRows !== undefined)
-        .reduce((sum, r) => sum + r.changedRows, 0);
+      mysqlUpdated = mysqlResults.filter((r) => r.changedRows !== undefined).reduce((sum, r) => sum + r.changedRows, 0);
 
       // calculating the end time
       mysqlTime = Date.now() - mysqlStart;
-
     } catch (err) {
       await endLogFailure(logId, `MySQL update failed: ${err}`);
       return callBack(err);
@@ -415,32 +386,35 @@ const UpdateIpStatusDetails = async (callBack = () => { }) => {
       mysqlInserted: 0,
       mysqlUpdated: mysqlUpdated,
       oracleTime,
-      mysqlTime
+      mysqlTime,
     });
 
-    return callBack(null, { updated: updateValues.length });
-
+    return callBack(null, {updated: updateValues.length});
   } catch (err) {
     // GLOBAL ERROR
     if (logId) await endLogFailure(logId, `Error in UpdateIpStatusDetails: ${err}`);
     return callBack(err);
   } finally {
-    try { if (resultSet) await resultSet.close(); } catch { }
-    try { if (conn_ora) await conn_ora.close(); } catch { }
-    try { if (pool_ora) await pool_ora.close(); } catch { }
+    try {
+      if (resultSet) await resultSet.close();
+    } catch {}
+    try {
+      if (conn_ora) await conn_ora.close();
+    } catch {}
+    try {
+      if (pool_ora) await pool_ora.close();
+    } catch {}
   }
 };
 
 // UPDATE BED DETAILS STATUS DETAILS
-const UpdateInpatientDetailRmall = async (callBack = () => { }) => {
-
+const UpdateInpatientDetailRmall = async (callBack = () => {}) => {
   let pool_ora = null;
   let conn_ora = null;
   let resultSet = null;
   let logId = null;
 
   try {
-
     // 1. START LOG
     try {
       logId = await startLog("FB_IPRMALL_IMPORT");
@@ -460,9 +434,7 @@ const UpdateInpatientDetailRmall = async (callBack = () => { }) => {
     try {
       detail = await getLastTriggerDate(3);
 
-      lastTrigger = detail?.fb_last_trigger_date
-        ? new Date(detail.fb_last_trigger_date)
-        : subHours(new Date(), 1);
+      lastTrigger = detail?.fb_last_trigger_date ? new Date(detail.fb_last_trigger_date) : subHours(new Date(), 1);
 
       if (isNaN(lastTrigger.getTime())) throw new Error("Invalid last trigger date");
 
@@ -471,7 +443,6 @@ const UpdateInpatientDetailRmall = async (callBack = () => { }) => {
 
       fromDate = format(lastTrigger, "dd/MM/yyyy HH:mm:ss");
       toDate = format(jobStartTime, "dd/MM/yyyy HH:mm:ss");
-
     } catch (err) {
       await endLogFailure(logId, `Error fetching last trigger date: ${err}`);
       return callBack(err);
@@ -499,11 +470,7 @@ const UpdateInpatientDetailRmall = async (callBack = () => { }) => {
       pool_ora = await oraConnection();
       conn_ora = await pool_ora.getConnection();
 
-      const result = await conn_ora.execute(
-        oracleSql,
-        { FROM_DATE: fromDate, TO_DATE: toDate },
-        { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
-      );
+      const result = await conn_ora.execute(oracleSql, {FROM_DATE: fromDate, TO_DATE: toDate}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
 
       resultSet = result.resultSet;
 
@@ -512,7 +479,6 @@ const UpdateInpatientDetailRmall = async (callBack = () => { }) => {
       resultSet = null;
 
       oracleTime = Date.now() - oracleStart;
-
     } catch (err) {
       await endLogFailure(logId, `Oracle fetch failed: ${err}`);
       return callBack(err);
@@ -525,16 +491,13 @@ const UpdateInpatientDetailRmall = async (callBack = () => { }) => {
         mysqlInserted: 0,
         mysqlUpdated: 0,
         oracleTime,
-        mysqlTime: 0
+        mysqlTime: 0,
       });
-      return callBack(null, { message: "No updates found" });
+      return callBack(null, {message: "No updates found"});
     }
 
     // 5. PREPARE MYSQL VALUES
-    const updateValues = rows.map(item => [
-      item.BD_CODE,
-      item.IP_NO
-    ]);
+    const updateValues = rows.map((item) => [item.BD_CODE, item.IP_NO]);
 
     // 6. MYSQL TRANSACTION
     let mysqlTime = 0;
@@ -543,40 +506,36 @@ const UpdateInpatientDetailRmall = async (callBack = () => { }) => {
     try {
       const mysqlStart = Date.now();
 
-      const updateQueries = updateValues.map(row => ({
+      const updateQueries = updateValues.map((row) => ({
         sql: `
           UPDATE fb_ipadmiss
           SET fb_bd_code = ?
           WHERE fb_ip_no = ?
         `,
-        values: row
+        values: row,
       }));
-
 
       const mysqlToDate = format(jobStartTime, "yyyy-MM-dd HH:mm:ss");
 
       // INSERT OR UPDATE LOG
       const logQuery = !detail
         ? {
-          sql: `INSERT INTO fb_ipadmiss_logdtl (fb_last_trigger_date, fb_process_id) VALUES (?, ?)`,
-          values: [mysqlToDate, 3]
-        }
+            sql: `INSERT INTO fb_ipadmiss_logdtl (fb_last_trigger_date, fb_process_id) VALUES (?, ?)`,
+            values: [mysqlToDate, 3],
+          }
         : {
-          sql: `UPDATE fb_ipadmiss_logdtl SET fb_last_trigger_date = ? WHERE fb_process_id = ?`,
-          values: [mysqlToDate, 3]
-        };
+            sql: `UPDATE fb_ipadmiss_logdtl SET fb_last_trigger_date = ? WHERE fb_process_id = ?`,
+            values: [mysqlToDate, 3],
+          };
 
       updateQueries.push(logQuery);
 
       const mysqlResults = await mysqlExecuteTransaction(updateQueries);
 
       // Count updated rows ONLY from update queries
-      mysqlUpdated = mysqlResults
-        .filter(r => r.changedRows !== undefined)
-        .reduce((sum, r) => sum + r.changedRows, 0);
+      mysqlUpdated = mysqlResults.filter((r) => r.changedRows !== undefined).reduce((sum, r) => sum + r.changedRows, 0);
 
       mysqlTime = Date.now() - mysqlStart;
-
     } catch (err) {
       await endLogFailure(logId, `MySQL update failed: ${err}`);
       return callBack(err);
@@ -588,35 +547,34 @@ const UpdateInpatientDetailRmall = async (callBack = () => { }) => {
       mysqlInserted: 0,
       mysqlUpdated,
       oracleTime,
-      mysqlTime
+      mysqlTime,
     });
 
-    return callBack(null, { updated: mysqlUpdated });
-
+    return callBack(null, {updated: mysqlUpdated});
   } catch (err) {
-
     if (logId) await endLogFailure(logId, `Error in UpdateInpatientDetailRmall: ${err}`);
     return callBack(err);
-
   } finally {
-
-    try { if (resultSet) await resultSet.close(); } catch { }
-    try { if (conn_ora) await conn_ora.close(); } catch { }
-    try { if (pool_ora) await pool_ora.close(); } catch { }
-
+    try {
+      if (resultSet) await resultSet.close();
+    } catch {}
+    try {
+      if (conn_ora) await conn_ora.close();
+    } catch {}
+    try {
+      if (pool_ora) await pool_ora.close();
+    } catch {}
   }
 };
 
 // UPDATE BED DETAILS  DETAILS ON BED TABLE
-const UpdateFbBedDetailMeliora = async (callBack = () => { }) => {
-
+const UpdateFbBedDetailMeliora = async (callBack = () => {}) => {
   let pool_ora = null;
   let conn_ora = null;
   let resultSet = null;
   let logId = null;
 
   try {
-
     // 1. START LOG
     try {
       logId = await startLog("FB_BED_IMPORT");
@@ -636,9 +594,7 @@ const UpdateFbBedDetailMeliora = async (callBack = () => { }) => {
     try {
       detail = await getLastTriggerDate(4);
 
-      lastTrigger = detail?.fb_last_trigger_date
-        ? new Date(detail.fb_last_trigger_date)
-        : subHours(new Date(), 1);
+      lastTrigger = detail?.fb_last_trigger_date ? new Date(detail.fb_last_trigger_date) : subHours(new Date(), 1);
 
       if (isNaN(lastTrigger.getTime())) throw new Error("Invalid last trigger date");
 
@@ -647,7 +603,6 @@ const UpdateFbBedDetailMeliora = async (callBack = () => { }) => {
 
       fromDate = format(lastTrigger, "dd/MM/yyyy HH:mm:ss");
       toDate = format(jobStartTime, "dd/MM/yyyy HH:mm:ss");
-
     } catch (err) {
       await endLogFailure(logId, `Error fetching last trigger date: ${err}`);
       return callBack(err);
@@ -675,11 +630,7 @@ const UpdateFbBedDetailMeliora = async (callBack = () => { }) => {
       pool_ora = await oraConnection();
       conn_ora = await pool_ora.getConnection();
 
-      const result = await conn_ora.execute(
-        oracleSql,
-        { FROM_DATE: fromDate, TO_DATE: toDate },
-        { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
-      );
+      const result = await conn_ora.execute(oracleSql, {FROM_DATE: fromDate, TO_DATE: toDate}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
 
       resultSet = result.resultSet;
       rows = await resultSet.getRows(0);
@@ -687,7 +638,6 @@ const UpdateFbBedDetailMeliora = async (callBack = () => { }) => {
       resultSet = null;
 
       oracleTime = Date.now() - oracleStart;
-
     } catch (err) {
       await endLogFailure(logId, `Oracle fetch failed: ${err}`);
       return callBack(err);
@@ -700,17 +650,13 @@ const UpdateFbBedDetailMeliora = async (callBack = () => { }) => {
         mysqlInserted: 0,
         mysqlUpdated: 0,
         oracleTime,
-        mysqlTime: 0
+        mysqlTime: 0,
       });
-      return callBack(null, { message: "No bed updates found" });
+      return callBack(null, {message: "No bed updates found"});
     }
 
     // 5. PREPARE MYSQL VALUES
-    const updateValues = rows.map(item => [
-      item.BDC_OCCUP,
-      item.BDN_OCCNO,
-      item.BD_CODE
-    ]);
+    const updateValues = rows.map((item) => [item.BDC_OCCUP, item.BDN_OCCNO, item.BD_CODE]);
 
     // 6. MYSQL TRANSACTION
     let mysqlTime = 0;
@@ -719,7 +665,7 @@ const UpdateFbBedDetailMeliora = async (callBack = () => { }) => {
     try {
       const mysqlStart = Date.now();
 
-      const updateQueries = updateValues.map(row => ({
+      const updateQueries = updateValues.map((row) => ({
         sql: `
           UPDATE fb_bed
           SET 
@@ -727,7 +673,7 @@ const UpdateFbBedDetailMeliora = async (callBack = () => { }) => {
             fb_bdn_cccno = ?
           WHERE fb_bd_code = ?
         `,
-        values: row
+        values: row,
       }));
 
       const mysqlToDate = format(jobStartTime, "yyyy-MM-dd HH:mm:ss");
@@ -735,25 +681,22 @@ const UpdateFbBedDetailMeliora = async (callBack = () => { }) => {
       // INSERT OR UPDATE LOG
       const logQuery = !detail
         ? {
-          sql: `INSERT INTO fb_ipadmiss_logdtl (fb_last_trigger_date, fb_process_id) VALUES (?, ?)`,
-          values: [mysqlToDate, 4]
-        }
+            sql: `INSERT INTO fb_ipadmiss_logdtl (fb_last_trigger_date, fb_process_id) VALUES (?, ?)`,
+            values: [mysqlToDate, 4],
+          }
         : {
-          sql: `UPDATE fb_ipadmiss_logdtl SET fb_last_trigger_date = ? WHERE fb_process_id = ?`,
-          values: [mysqlToDate, 4]
-        };
+            sql: `UPDATE fb_ipadmiss_logdtl SET fb_last_trigger_date = ? WHERE fb_process_id = ?`,
+            values: [mysqlToDate, 4],
+          };
 
       updateQueries.push(logQuery);
 
       const mysqlResults = await mysqlExecuteTransaction(updateQueries);
 
       // Count updated rows ONLY from update queries
-      mysqlUpdated = mysqlResults
-        .filter(r => r.changedRows !== undefined)
-        .reduce((sum, r) => sum + r.changedRows, 0);
+      mysqlUpdated = mysqlResults.filter((r) => r.changedRows !== undefined).reduce((sum, r) => sum + r.changedRows, 0);
 
       mysqlTime = Date.now() - mysqlStart;
-
     } catch (err) {
       await endLogFailure(logId, `MySQL update failed: ${err}`);
       return callBack(err);
@@ -765,27 +708,28 @@ const UpdateFbBedDetailMeliora = async (callBack = () => { }) => {
       mysqlInserted: 0,
       mysqlUpdated,
       oracleTime,
-      mysqlTime
+      mysqlTime,
     });
 
-    return callBack(null, { updated: mysqlUpdated });
-
+    return callBack(null, {updated: mysqlUpdated});
   } catch (err) {
-
     if (logId) await endLogFailure(logId, `Error in UpdateFbBedDetailMeliora: ${err}`);
     return callBack(err);
-
   } finally {
-
-    try { if (resultSet) await resultSet.close(); } catch { }
-    try { if (conn_ora) await conn_ora.close(); } catch { }
-    try { if (pool_ora) await pool_ora.close(); } catch { }
-
+    try {
+      if (resultSet) await resultSet.close();
+    } catch {}
+    try {
+      if (conn_ora) await conn_ora.close();
+    } catch {}
+    try {
+      if (pool_ora) await pool_ora.close();
+    } catch {}
   }
 };
 
 // GET CHILD DETAIL FROM ELLIDER
-const InsertChilderDetailMeliora = async (callBack = () => { }) => {
+const InsertChilderDetailMeliora = async (callBack = () => {}) => {
   let pool_ora = null;
   let conn_ora = null;
   let resultSet = null;
@@ -825,11 +769,7 @@ const InsertChilderDetailMeliora = async (callBack = () => { }) => {
     pool_ora = await oraConnection();
     conn_ora = await pool_ora.getConnection();
 
-    const result = await conn_ora.execute(
-      oracleSql,
-      { GET_DATE: formattedDate },
-      { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
-    );
+    const result = await conn_ora.execute(oracleSql, {GET_DATE: formattedDate}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
 
     resultSet = result.resultSet;
     const rows = await resultSet.getRows(0); // fetch all rows
@@ -838,7 +778,7 @@ const InsertChilderDetailMeliora = async (callBack = () => { }) => {
     resultSet = null;
 
     if (!rows || rows.length === 0) {
-      return callBack(null, { message: "No Birth Registered Today" });
+      return callBack(null, {message: "No Birth Registered Today"});
     }
 
     // 4. Convert rows to MySQL array values
@@ -861,7 +801,7 @@ const InsertChilderDetailMeliora = async (callBack = () => { }) => {
       item.MOTHER_IPNO,
       item.CHILD_PT_NO,
       item.CHILD_IPNO,
-      item.CHILD_WEIGHT
+      item.CHILD_WEIGHT,
     ]);
 
     // 5. Prepare MySQL transaction query
@@ -889,33 +829,38 @@ const InsertChilderDetailMeliora = async (callBack = () => { }) => {
           fb_child_weight
         ) VALUES ?
       `,
-      values: [insertValues]
+      values: [insertValues],
     };
 
     // 6. Run MySQL Transaction
     await mysqlExecuteTransaction([insertQuery]);
 
     // 7. Success callback
-    return callBack(null, { inserted: insertValues.length });
-
+    return callBack(null, {inserted: insertValues.length});
   } catch (err) {
     return callBack(err);
-
   } finally {
     if (resultSet) {
-      try { await resultSet.close(); } catch { }
+      try {
+        await resultSet.close();
+      } catch {}
     }
     if (conn_ora) {
-      try { await conn_ora.close(); } catch { }
+      try {
+        await conn_ora.close();
+      } catch {}
     }
     if (pool_ora) {
-      try { await pool_ora.close(); } catch { }
+      try {
+        await pool_ora.close();
+      } catch {}
     }
   }
 };
 
-
-{/* %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% FEED BACK CRON-JOBS ENDS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% */ }
+{
+  /* %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% FEED BACK CRON-JOBS ENDS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% */
+}
 
 // const getAmsPatientDetails = async (callBack) => {
 //   let pool_ora = await oraConnection();
@@ -923,7 +868,7 @@ const InsertChilderDetailMeliora = async (callBack = () => { }) => {
 
 //   try {
 //     const detail = await getAmsLastUpdatedDate(1);
-//     if (!detail?.ams_last_updated_date) {  
+//     if (!detail?.ams_last_updated_date) {
 //       return; // Exit early — don’t fetch or insert anything
 //     }
 
@@ -931,7 +876,6 @@ const InsertChilderDetailMeliora = async (callBack = () => { }) => {
 //     const fromDate = format(lastInsertDate, 'dd/MM/yyyy HH:mm:ss');
 //     const toDate = format(new Date(), 'dd/MM/yyyy HH:mm:ss');
 //     const mysqlsupportToDate = format(new Date(), 'yyyy-MM-dd HH:mm:ss');
-
 
 //     const itemCodes = await new Promise((resolve, reject) => {
 //       mysqlpool.query(
@@ -961,7 +905,7 @@ const InsertChilderDetailMeliora = async (callBack = () => { }) => {
 //              DECODE(PT.PTC_SEX, 'M', 'Male', 'F', 'Female') AS GENEDER,
 //              PT.PTN_YEARAGE,
 //              P.IP_NO,
-//              N.NSC_DESC,   
+//              N.NSC_DESC,
 //              D.DOC_NAME,
 //              DP.DPC_DESC,
 //              M.ITC_DESC,
@@ -1081,7 +1025,7 @@ const InsertChilderDetailMeliora = async (callBack = () => { }) => {
 //               patient_gender,
 //               patient_location,
 //               bed_code,
-//               consultant_department,            
+//               consultant_department,
 //               bill_date,
 //               doc_name
 //             ) VALUES ?`,
@@ -1089,8 +1033,8 @@ const InsertChilderDetailMeliora = async (callBack = () => { }) => {
 //             (err, result) => {
 //               if (err) {
 //                 connection.query(
-//                   `DELETE FROM ams_antibiotic_patient_details 
-//                    WHERE DATE(create_date) = CURDATE() 
+//                   `DELETE FROM ams_antibiotic_patient_details
+//                    WHERE DATE(create_date) = CURDATE()
 //                      AND TIME(create_date) >= TIME(DATE_SUB(NOW(), INTERVAL 2 MINUTE))`,
 //                   [],
 //                   () => connection.rollback(() => connection.release())
@@ -1127,23 +1071,23 @@ const InsertChilderDetailMeliora = async (callBack = () => { }) => {
 //                   (err2, result2) => {
 //                     if (err2) {
 //                       connection.query(
-//                         `DELETE FROM ams_antibiotic_patient_details 
-//                          WHERE DATE(create_date) = CURDATE() 
+//                         `DELETE FROM ams_antibiotic_patient_details
+//                          WHERE DATE(create_date) = CURDATE()
 //                            AND TIME(create_date) >= TIME(DATE_SUB(NOW(), INTERVAL 2 MINUTE))`,
 //                         [],
 //                         () => connection.rollback(() => connection.release())
 //                       );
 //                     } else {
 //                       connection.query(
-//                         `UPDATE ams_patient_details_last_updated_date 
-//                          SET ams_last_updated_date = ? 
+//                         `UPDATE ams_patient_details_last_updated_date
+//                          SET ams_last_updated_date = ?
 //                          WHERE ams_lastupdate_slno = 1`,
 //                         [mysqlsupportToDate],
 //                         (err, result) => {
 //                           if (err) {
 //                             connection.query(
-//                               `DELETE FROM ams_antibiotic_patient_details 
-//                                WHERE DATE(create_date) = CURDATE() 
+//                               `DELETE FROM ams_antibiotic_patient_details
+//                                WHERE DATE(create_date) = CURDATE()
 //                                  AND TIME(create_date) >= TIME(DATE_SUB(NOW(), INTERVAL 2 MINUTE))`,
 //                               [],
 //                               () => connection.rollback(() => connection.release())
@@ -1152,8 +1096,8 @@ const InsertChilderDetailMeliora = async (callBack = () => { }) => {
 //                             connection.commit(err => {
 //                               if (err) {
 //                                 connection.query(
-//                                   `DELETE FROM ams_antibiotic_patient_details 
-//                                    WHERE DATE(create_date) = CURDATE() 
+//                                   `DELETE FROM ams_antibiotic_patient_details
+//                                    WHERE DATE(create_date) = CURDATE()
 //                                      AND TIME(create_date) >= TIME(DATE_SUB(NOW(), INTERVAL 2 MINUTE))`,
 //                                   [],
 //                                   () => connection.rollback(() => connection.release())
@@ -1191,27 +1135,21 @@ const getAmsPatientDetails = async (callBack) => {
       return; // Exit early — don’t fetch or insert anything
     }
 
-
     const lastInsertDate = new Date(detail.ams_last_updated_date);
-    const fromDate = format(lastInsertDate, 'dd/MM/yyyy HH:mm:ss');
-    const toDate = format(new Date(), 'dd/MM/yyyy HH:mm:ss');
-    const mysqlsupportToDate = format(new Date(), 'yyyy-MM-dd HH:mm:ss');
-
+    const fromDate = format(lastInsertDate, "dd/MM/yyyy HH:mm:ss");
+    const toDate = format(new Date(), "dd/MM/yyyy HH:mm:ss");
+    const mysqlsupportToDate = format(new Date(), "yyyy-MM-dd HH:mm:ss");
 
     const itemCodes = await new Promise((resolve, reject) => {
-      mysqlpool.query(
-        `SELECT item_code FROM ams_antibiotic_master WHERE status = 1`,
-        [],
-        (err, results) => {
-          if (err) return reject(err);
-          resolve(results.map(row => row.item_code));
-        }
-      );
+      mysqlpool.query(`SELECT item_code FROM ams_antibiotic_master WHERE status = 1`, [], (err, results) => {
+        if (err) return reject(err);
+        resolve(results.map((row) => row.item_code));
+      });
     });
 
     if (itemCodes.length === 0) return;
 
-    const itemCodeBinds = itemCodes.map((_, i) => `:item_code_${i}`).join(',');
+    const itemCodeBinds = itemCodes.map((_, i) => `:item_code_${i}`).join(",");
     const itemCodeParams = {};
     itemCodes.forEach((code, i) => {
       itemCodeParams[`item_code_${i}`] = code;
@@ -1252,7 +1190,7 @@ const getAmsPatientDetails = async (callBack) => {
     const bindParams = {
       FROM_DATE: fromDate,
       TO_DATE: toDate,
-      ...itemCodeParams
+      ...itemCodeParams,
     };
 
     const result = await conn_ora.execute(oracleSql, bindParams, {
@@ -1265,7 +1203,7 @@ const getAmsPatientDetails = async (callBack) => {
 
       const formatDateTime = (dateStr) => {
         const date = new Date(dateStr);
-        return date.toISOString().slice(0, 19).replace('T', ' ');
+        return date.toISOString().slice(0, 19).replace("T", " ");
       };
 
       const filteredRows = rows.filter((item) => item.PT_NO != null && item.IP_NO != null);
@@ -1273,7 +1211,7 @@ const getAmsPatientDetails = async (callBack) => {
 
       const groupedMap = new Map();
 
-      filteredRows.forEach(item => {
+      filteredRows.forEach((item) => {
         const key = item.IP_NO;
         const formattedDate = formatDateTime(item.BMD_DATE);
 
@@ -1289,9 +1227,9 @@ const getAmsPatientDetails = async (callBack) => {
               BD_CODE: item.BD_CODE,
               DPC_DESC: item.DPC_DESC,
               DOC_NAME: item.DOC_NAME,
-              BMD_DATE: formattedDate
+              BMD_DATE: formattedDate,
             },
-            antibiotics: []
+            antibiotics: [],
           });
         }
 
@@ -1304,12 +1242,12 @@ const getAmsPatientDetails = async (callBack) => {
           item_code: item.IT_CODE,
           bill_no: item.BM_NO,
           bill_date: formattedDate,
-          item_status: 1
+          item_status: 1,
         });
       });
 
       const ipNos = Array.from(groupedMap.keys());
-      const placeholders = ipNos.map(() => '?').join(',');
+      const placeholders = ipNos.map(() => "?").join(",");
 
       mysqlpool.getConnection((err, connection) => {
         if (err) return;
@@ -1323,7 +1261,7 @@ const getAmsPatientDetails = async (callBack) => {
             if (err) return connection.release();
 
             const existingMap = new Map();
-            existingRows.forEach(row => {
+            existingRows.forEach((row) => {
               existingMap.set(row.patient_ip_no, row.ams_patient_detail_slno);
             });
 
@@ -1334,39 +1272,22 @@ const getAmsPatientDetails = async (callBack) => {
               const p = data.patient;
               if (existingMap.has(ip_no)) {
                 const existingId = existingMap.get(ip_no);
-                data.antibiotics.forEach(row => {
-                  antibioticsFinal.push([
-                    existingId,
-                    ip_no,
-                    row.item_code,
-                    row.bill_no,
-                    row.bill_date,
-                    row.item_status
-                  ]);
+                data.antibiotics.forEach((row) => {
+                  antibioticsFinal.push([existingId, ip_no, row.item_code, row.bill_no, row.bill_date, row.item_status]);
                 });
               } else {
-                newPatients.push([
-                  p.PT_NO,
-                  p.IP_NO,
-                  p.PTC_PTNAME,
-                  p.PTN_YEARAGE,
-                  p.GENEDER,
-                  p.NSC_DESC,
-                  p.BD_CODE,
-                  p.DPC_DESC,
-                  p.BMD_DATE,
-                  p.DOC_NAME
-                ]);
+                newPatients.push([p.PT_NO, p.IP_NO, p.PTC_PTNAME, p.PTN_YEARAGE, p.GENEDER, p.NSC_DESC, p.BD_CODE, p.DPC_DESC, p.BMD_DATE, p.DOC_NAME]);
               }
             }
 
-            connection.beginTransaction(err => {
+            connection.beginTransaction((err) => {
               if (err) return connection.release();
 
-              const insertNewPatients = newPatients.length > 0
-                ? new Promise((resolve, reject) => {
-                  connection.query(
-                    `INSERT INTO ams_antibiotic_patient_details (
+              const insertNewPatients =
+                newPatients.length > 0
+                  ? new Promise((resolve, reject) => {
+                      connection.query(
+                        `INSERT INTO ams_antibiotic_patient_details (
                         mrd_no,
                         patient_ip_no,
                         patient_name,
@@ -1378,35 +1299,28 @@ const getAmsPatientDetails = async (callBack) => {
                         bill_date,
                         doc_name
                       ) VALUES ?`,
-                    [newPatients],
-                    (err, result) => {
-                      if (err) return reject(err);
+                        [newPatients],
+                        (err, result) => {
+                          if (err) return reject(err);
 
-                      const insertedIds = Array.from({ length: result.affectedRows }, (_, i) => result.insertId + i);
-                      let index = 0;
+                          const insertedIds = Array.from({length: result.affectedRows}, (_, i) => result.insertId + i);
+                          let index = 0;
 
-                      for (const [ip_no, data] of groupedMap.entries()) {
-                        if (!existingMap.has(ip_no)) {
-                          const newId = insertedIds[index++];
-                          existingMap.set(ip_no, newId);
-                          data.antibiotics.forEach(row => {
-                            antibioticsFinal.push([
-                              newId,
-                              ip_no,
-                              row.item_code,
-                              row.bill_no,
-                              row.bill_date,
-                              row.item_status
-                            ]);
-                          });
+                          for (const [ip_no, data] of groupedMap.entries()) {
+                            if (!existingMap.has(ip_no)) {
+                              const newId = insertedIds[index++];
+                              existingMap.set(ip_no, newId);
+                              data.antibiotics.forEach((row) => {
+                                antibioticsFinal.push([newId, ip_no, row.item_code, row.bill_no, row.bill_date, row.item_status]);
+                              });
+                            }
+                          }
+
+                          resolve();
                         }
-                      }
-
-                      resolve();
-                    }
-                  );
-                })
-                : Promise.resolve();
+                      );
+                    })
+                  : Promise.resolve();
 
               insertNewPatients
                 .then(() => {
@@ -1430,7 +1344,7 @@ const getAmsPatientDetails = async (callBack) => {
                         [mysqlsupportToDate],
                         (err3) => {
                           if (err3) return connection.rollback(() => connection.release());
-                          connection.commit(err4 => {
+                          connection.commit((err4) => {
                             if (err4) return connection.rollback(() => connection.release());
                             connection.release();
                           });
@@ -1439,7 +1353,7 @@ const getAmsPatientDetails = async (callBack) => {
                     }
                   );
                 })
-                .catch(err => connection.rollback(() => connection.release()));
+                .catch((err) => connection.rollback(() => connection.release()));
             });
           }
         );
@@ -1447,11 +1361,13 @@ const getAmsPatientDetails = async (callBack) => {
     });
   } catch (error) {
     return callBack(error);
+  } finally {
+    if (conn_ora) {
+      await conn_ora.close();
+      await pool_ora.close();
+    }
   }
 };
-
-
-
 
 //bis module- jomol
 // Utility function
@@ -1485,9 +1401,6 @@ const getAmsPatientDetails = async (callBack) => {
 //     });
 //   });
 // };
-
-
-
 
 // const InsertKmcMedDesc = async (callBack) => {
 //   let pool_ora, conn_ora, mysqlConn;
@@ -1708,7 +1621,6 @@ const getAmsPatientDetails = async (callBack) => {
 //       [last_update_date]
 //     );
 
-
 //   } catch (err) {
 //     if (mysqlConn) await rollback(mysqlConn);
 //     console.error("InsertKmcMedDesc error:", err);
@@ -1719,14 +1631,10 @@ const getAmsPatientDetails = async (callBack) => {
 //   }
 // };
 
-
 // Run cron every minute
 // cron.schedule("* * * * *", () => {
 //   InsertKmcMedDesc();
 // });
-
-
-
 
 // TMC PROCESS
 
@@ -1780,21 +1688,13 @@ const rollback = (conn) => {
   });
 };
 
-
-
 const buildFullAddress = (item) => {
-  return [
-    item.PTC_LOADD1,
-    item.PTC_LOADD2,
-    item.PTC_LOADD3,
-    item.PTC_LOADD4
-  ]
-    .filter(v => v && v?.trim() !== "") // remove null/empty
+  return [item.PTC_LOADD1, item.PTC_LOADD2, item.PTC_LOADD3, item.PTC_LOADD4]
+    .filter((v) => v && v?.trim() !== "") // remove null/empty
     .join(", "); // separator
 };
 
-
-//TMCH 
+//TMCH
 const getBisTmcLastTriggerDate = async () => {
   return new Promise((resolve, reject) => {
     bispool.getConnection((err, connection) => {
@@ -1814,7 +1714,6 @@ const getBisTmcLastTriggerDate = async () => {
   });
 };
 
-
 const getTMCItCodesInChunks = (mysqlConn, fromDate, toDate, chunkSize = 1000) => {
   return new Promise((resolve, reject) => {
     const selectQuery = `
@@ -1824,7 +1723,7 @@ const getTMCItCodesInChunks = (mysqlConn, fromDate, toDate, chunkSize = 1000) =>
 
     mysqlConn.query(selectQuery, [fromDate, toDate], (err, results) => {
       if (err) return reject(err);
-      const numericItcodes = results?.map(val => val.it_code);
+      const numericItcodes = results?.map((val) => val.it_code);
       if (!numericItcodes || numericItcodes.length === 0) {
         return resolve([]);
       }
@@ -1844,8 +1743,6 @@ const getTMCItCodesInChunks = (mysqlConn, fromDate, toDate, chunkSize = 1000) =>
   });
 };
 
-
-
 // jomol code
 const InsertTmcMedDesc = async (callBack) => {
   let pool_ora, conn_ora, mysqlConn;
@@ -1857,8 +1754,8 @@ const InsertTmcMedDesc = async (callBack) => {
 
     const detail = await getBisTmcLastTriggerDate();
     const lastUpdateDate = detail?.last_insert_date ? new Date(detail.last_insert_date) : subMonths(new Date(), 1);
-    const fromDate = format(lastUpdateDate, 'yyyy-MM-dd HH:mm:ss');
-    const toDate = format(new Date(), 'yyyy-MM-dd HH:mm:ss');
+    const fromDate = format(lastUpdateDate, "yyyy-MM-dd HH:mm:ss");
+    const toDate = format(new Date(), "yyyy-MM-dd HH:mm:ss");
 
     // Step 1: Fetch insert data from Oracle
     const oracleSql = `
@@ -1892,11 +1789,7 @@ const InsertTmcMedDesc = async (callBack) => {
                meddesc.itc_breakable, meddesc.itn_breakqty, meddesc.itn_lprate, meddesc.itn_mrp,
                meddesc.itn_originalmrp, meddesc.itn_gendisper, meddesc.itn_genipdisper, meddesc.itd_date,
                meddesc.itd_eddate`; // keep your existing oracleSql query here
-    const insertResult = await conn_ora.execute(
-      oracleSql,
-      { FROM_DATE: fromDate, TO_DATE: toDate },
-      { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
-    );
+    const insertResult = await conn_ora.execute(oracleSql, {FROM_DATE: fromDate, TO_DATE: toDate}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
     const insertRows = await insertResult.resultSet.getRows();
     await insertResult.resultSet.close();
 
@@ -1905,28 +1798,50 @@ const InsertTmcMedDesc = async (callBack) => {
       return;
     }
 
-    const Values = insertRows.map(row => [
-      row.IT_CODE, row.ITC_DESC, row.ITC_ALIAS, row.ITN_STRIP,
-      row.MC_CODE, row.MCC_DESC, row.MG_CODE, row.MGC_DESC,
-      row.CMC_DESC, row.MTC_DESC, row.MEDICINE, row.CONSUMABLE,
-      row.HIGH_VALUE, row.HIGH_RISK, row.HAZARDOUS, row.VED,
-      row.BREAKABLE, row.ITN_BREAKQTY, row.ITN_LPRATE, row.ITN_MRP,
-      row.ITN_ORIGINALMRP, row.ITN_GENDISPER, row.ITN_GENIPDISPER,
-      row.ITD_DATE, row.ITD_EDDATE
+    const Values = insertRows.map((row) => [
+      row.IT_CODE,
+      row.ITC_DESC,
+      row.ITC_ALIAS,
+      row.ITN_STRIP,
+      row.MC_CODE,
+      row.MCC_DESC,
+      row.MG_CODE,
+      row.MGC_DESC,
+      row.CMC_DESC,
+      row.MTC_DESC,
+      row.MEDICINE,
+      row.CONSUMABLE,
+      row.HIGH_VALUE,
+      row.HIGH_RISK,
+      row.HAZARDOUS,
+      row.VED,
+      row.BREAKABLE,
+      row.ITN_BREAKQTY,
+      row.ITN_LPRATE,
+      row.ITN_MRP,
+      row.ITN_ORIGINALMRP,
+      row.ITN_GENDISPER,
+      row.ITN_GENIPDISPER,
+      row.ITD_DATE,
+      row.ITD_EDDATE,
     ]);
 
     // Step 2: Begin transaction
     await mysqlConn.beginTransaction();
 
     // Step 3: Insert into bis_kmc_med_desc_mast
-    await queryPromise(mysqlConn, `
+    await queryPromise(
+      mysqlConn,
+      `
       INSERT INTO bis_tmc_med_desc_mast (
         it_code, itc_desc, itc_alias, itn_strip, mc_code, mcc_desc,
         mg_code, mgc_desc, cmc_desc, mtc_desc, itc_medicine, itc_consumable,
         itc_highvalue, itc_highrisk, itc_hazardous, itc_ved, itc_breakable,
         itn_breakqty, itn_lprate, itn_mrp, itn_originalmrp, itn_gendisper,
         itn_genipdisper, create_date, edit_date
-      ) VALUES ?`, [Values]);
+      ) VALUES ?`,
+      [Values]
+    );
 
     // Step 4: Fetch chunks for medstore insert
     const insertedChunks = await getTMCItCodesInChunks(mysqlConn, fromDate, toDate, 1000);
@@ -1942,10 +1857,9 @@ const InsertTmcMedDesc = async (callBack) => {
 
       const medstoreQuery = `
         SELECT IT_CODE, ST_CODE FROM MEDSTORE 
-        WHERE IT_CODE IN (${keys.join(',')})`;
+        WHERE IT_CODE IN (${keys.join(",")})`;
 
-      const medstoreResult = await conn_ora.execute(
-        medstoreQuery, bindParams, { outFormat: oracledb.OUT_FORMAT_OBJECT });
+      const medstoreResult = await conn_ora.execute(medstoreQuery, bindParams, {outFormat: oracledb.OUT_FORMAT_OBJECT});
 
       if (medstoreResult.rows.length) {
         medstoreData.push(...medstoreResult.rows);
@@ -1953,17 +1867,25 @@ const InsertTmcMedDesc = async (callBack) => {
     }
 
     if (medstoreData.length) {
-      const medstoreValues = medstoreData.map(row => [row.IT_CODE, row.ST_CODE]);
-      await queryPromise(mysqlConn, `
-        INSERT INTO bis_tmc_med_store (it_code, st_code) VALUES ?`, [medstoreValues]);
+      const medstoreValues = medstoreData.map((row) => [row.IT_CODE, row.ST_CODE]);
+      await queryPromise(
+        mysqlConn,
+        `
+        INSERT INTO bis_tmc_med_store (it_code, st_code) VALUES ?`,
+        [medstoreValues]
+      );
     }
 
     // Step 5: Update trigger table
-    const currentDate = format(new Date(), 'yyyy-MM-dd HH:mm:ss');
-    await queryPromise(mysqlConn, `
+    const currentDate = format(new Date(), "yyyy-MM-dd HH:mm:ss");
+    await queryPromise(
+      mysqlConn,
+      `
       UPDATE bis_tmc_trigger_details 
       SET last_insert_date = ?, last_update_date = ? 
-      WHERE trgr_slno = 1`, [currentDate, currentDate]);
+      WHERE trgr_slno = 1`,
+      [currentDate, currentDate]
+    );
 
     // Step 6: Fetch update records
     const oracleSqlquery = ` 
@@ -1997,18 +1919,14 @@ const InsertTmcMedDesc = async (callBack) => {
                meddesc.itc_breakable, meddesc.itn_breakqty, meddesc.itn_lprate, meddesc.itn_mrp,
                meddesc.itn_originalmrp, meddesc.itn_gendisper, meddesc.itn_genipdisper, meddesc.itd_date,
                meddesc.itd_eddate`; // keep your existing update Oracle SQL query here
-    const updateResult = await conn_ora.execute(
-      oracleSqlquery,
-      { FROM_DATE: fromDate, TO_DATE: toDate },
-      { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
-    );
+    const updateResult = await conn_ora.execute(oracleSqlquery, {FROM_DATE: fromDate, TO_DATE: toDate}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
     const updateRows = await updateResult.resultSet.getRows();
     await updateResult.resultSet.close();
 
     const updateItCodes = await getTMCItCodesInChunks(mysqlConn, fromDate, toDate, 1000);
     const updateSet = new Set(updateItCodes.flat());
 
-    const filteredUpdates = updateRows.filter(row => updateSet.has(row.IT_CODE));
+    const filteredUpdates = updateRows.filter((row) => updateSet.has(row.IT_CODE));
 
     // Step 7: Perform updates
     if (filteredUpdates.length) {
@@ -2024,22 +1942,43 @@ const InsertTmcMedDesc = async (callBack) => {
 
       for (const row of filteredUpdates) {
         const updateValues = [
-          row.ITC_DESC, row.ITC_ALIAS, row.ITN_STRIP,
-          row.MC_CODE, row.MCC_DESC, row.MG_CODE, row.MGC_DESC,
-          row.CMC_DESC, row.MTC_DESC, row.MEDICINE, row.CONSUMABLE,
-          row.HIGH_VALUE, row.HIGH_RISK, row.HAZARDOUS, row.VED,
-          row.BREAKABLE, row.ITN_BREAKQTY, row.ITN_LPRATE, row.ITN_MRP,
-          row.ITN_ORIGINALMRP, row.ITN_GENDISPER, row.ITN_GENIPDISPER,
-          row.ITD_DATE, row.ITD_EDDATE,
-          row.IT_CODE
+          row.ITC_DESC,
+          row.ITC_ALIAS,
+          row.ITN_STRIP,
+          row.MC_CODE,
+          row.MCC_DESC,
+          row.MG_CODE,
+          row.MGC_DESC,
+          row.CMC_DESC,
+          row.MTC_DESC,
+          row.MEDICINE,
+          row.CONSUMABLE,
+          row.HIGH_VALUE,
+          row.HIGH_RISK,
+          row.HAZARDOUS,
+          row.VED,
+          row.BREAKABLE,
+          row.ITN_BREAKQTY,
+          row.ITN_LPRATE,
+          row.ITN_MRP,
+          row.ITN_ORIGINALMRP,
+          row.ITN_GENDISPER,
+          row.ITN_GENIPDISPER,
+          row.ITD_DATE,
+          row.ITD_EDDATE,
+          row.IT_CODE,
         ];
         await queryPromise(mysqlConn, updateQuery, updateValues);
       }
 
       // Step 8: Update trigger (again, just in case)
-      await queryPromise(mysqlConn, `
+      await queryPromise(
+        mysqlConn,
+        `
         UPDATE bis_tmc_trigger_details SET last_update_date = ? 
-        WHERE trgr_slno = 1`, [currentDate]);
+        WHERE trgr_slno = 1`,
+        [currentDate]
+      );
     }
 
     //  Step 9: Commit transaction
@@ -2058,7 +1997,7 @@ const InsertTmcMedDesc = async (callBack) => {
 
 ///////////////////////////////////KMC*******************************
 
-//TMCH 
+//TMCH
 const getBisKmcLastTriggerDate = async () => {
   return new Promise((resolve, reject) => {
     bispool.getConnection((err, connection) => {
@@ -2078,7 +2017,6 @@ const getBisKmcLastTriggerDate = async () => {
   });
 };
 
-
 const getKMCItCodesInChunks = (mysqlConn, fromDate, toDate, chunkSize = 1000) => {
   return new Promise((resolve, reject) => {
     const selectQuery = `
@@ -2088,7 +2026,7 @@ const getKMCItCodesInChunks = (mysqlConn, fromDate, toDate, chunkSize = 1000) =>
 
     mysqlConn.query(selectQuery, [fromDate, toDate], (err, results) => {
       if (err) return reject(err);
-      const numericItcodes = results?.map(val => val.it_code);
+      const numericItcodes = results?.map((val) => val.it_code);
       if (!numericItcodes || numericItcodes.length === 0) {
         return resolve([]);
       }
@@ -2108,7 +2046,6 @@ const getKMCItCodesInChunks = (mysqlConn, fromDate, toDate, chunkSize = 1000) =>
   });
 };
 
-
 // jomol code
 const InsertKmcMedDesc = async (callBack) => {
   let pool_ora, conn_ora, mysqlConn;
@@ -2120,8 +2057,8 @@ const InsertKmcMedDesc = async (callBack) => {
 
     const detail = await getBisKmcLastTriggerDate();
     const lastUpdateDate = detail?.last_insert_date ? new Date(detail.last_insert_date) : subMonths(new Date(), 1);
-    const fromDate = format(lastUpdateDate, 'yyyy-MM-dd HH:mm:ss');
-    const toDate = format(new Date(), 'yyyy-MM-dd HH:mm:ss');
+    const fromDate = format(lastUpdateDate, "yyyy-MM-dd HH:mm:ss");
+    const toDate = format(new Date(), "yyyy-MM-dd HH:mm:ss");
 
     // Step 1: Fetch insert data from Oracle
     const oracleSql = `
@@ -2155,11 +2092,7 @@ const InsertKmcMedDesc = async (callBack) => {
                meddesc.itc_breakable, meddesc.itn_breakqty, meddesc.itn_lprate, meddesc.itn_mrp,
                meddesc.itn_originalmrp, meddesc.itn_gendisper, meddesc.itn_genipdisper, meddesc.itd_date,
                meddesc.itd_eddate`; // keep your existing oracleSql query here
-    const insertResult = await conn_ora.execute(
-      oracleSql,
-      { FROM_DATE: fromDate, TO_DATE: toDate },
-      { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
-    );
+    const insertResult = await conn_ora.execute(oracleSql, {FROM_DATE: fromDate, TO_DATE: toDate}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
     const insertRows = await insertResult.resultSet.getRows();
     await insertResult.resultSet.close();
 
@@ -2168,28 +2101,50 @@ const InsertKmcMedDesc = async (callBack) => {
       return;
     }
 
-    const Values = insertRows.map(row => [
-      row.IT_CODE, row.ITC_DESC, row.ITC_ALIAS, row.ITN_STRIP,
-      row.MC_CODE, row.MCC_DESC, row.MG_CODE, row.MGC_DESC,
-      row.CMC_DESC, row.MTC_DESC, row.MEDICINE, row.CONSUMABLE,
-      row.HIGH_VALUE, row.HIGH_RISK, row.HAZARDOUS, row.VED,
-      row.BREAKABLE, row.ITN_BREAKQTY, row.ITN_LPRATE, row.ITN_MRP,
-      row.ITN_ORIGINALMRP, row.ITN_GENDISPER, row.ITN_GENIPDISPER,
-      row.ITD_DATE, row.ITD_EDDATE
+    const Values = insertRows.map((row) => [
+      row.IT_CODE,
+      row.ITC_DESC,
+      row.ITC_ALIAS,
+      row.ITN_STRIP,
+      row.MC_CODE,
+      row.MCC_DESC,
+      row.MG_CODE,
+      row.MGC_DESC,
+      row.CMC_DESC,
+      row.MTC_DESC,
+      row.MEDICINE,
+      row.CONSUMABLE,
+      row.HIGH_VALUE,
+      row.HIGH_RISK,
+      row.HAZARDOUS,
+      row.VED,
+      row.BREAKABLE,
+      row.ITN_BREAKQTY,
+      row.ITN_LPRATE,
+      row.ITN_MRP,
+      row.ITN_ORIGINALMRP,
+      row.ITN_GENDISPER,
+      row.ITN_GENIPDISPER,
+      row.ITD_DATE,
+      row.ITD_EDDATE,
     ]);
 
     // Step 2: Begin transaction
     await mysqlConn.beginTransaction();
 
     // Step 3: Insert into bis_kmc_med_desc_mast
-    await queryPromise(mysqlConn, `
+    await queryPromise(
+      mysqlConn,
+      `
       INSERT INTO bis_kmc_med_desc_mast (
         it_code, itc_desc, itc_alias, itn_strip, mc_code, mcc_desc,
         mg_code, mgc_desc, cmc_desc, mtc_desc, itc_medicine, itc_consumable,
         itc_highvalue, itc_highrisk, itc_hazardous, itc_ved, itc_breakable,
         itn_breakqty, itn_lprate, itn_mrp, itn_originalmrp, itn_gendisper,
         itn_genipdisper, create_date, edit_date
-      ) VALUES ?`, [Values]);
+      ) VALUES ?`,
+      [Values]
+    );
 
     // Step 4: Fetch chunks for medstore insert
     const insertedChunks = await getKMCItCodesInChunks(mysqlConn, fromDate, toDate, 1000);
@@ -2205,10 +2160,9 @@ const InsertKmcMedDesc = async (callBack) => {
 
       const medstoreQuery = `
         SELECT IT_CODE, ST_CODE FROM MEDSTORE 
-        WHERE IT_CODE IN (${keys.join(',')})`;
+        WHERE IT_CODE IN (${keys.join(",")})`;
 
-      const medstoreResult = await conn_ora.execute(
-        medstoreQuery, bindParams, { outFormat: oracledb.OUT_FORMAT_OBJECT });
+      const medstoreResult = await conn_ora.execute(medstoreQuery, bindParams, {outFormat: oracledb.OUT_FORMAT_OBJECT});
 
       if (medstoreResult.rows.length) {
         medstoreData.push(...medstoreResult.rows);
@@ -2216,17 +2170,25 @@ const InsertKmcMedDesc = async (callBack) => {
     }
 
     if (medstoreData.length) {
-      const medstoreValues = medstoreData.map(row => [row.IT_CODE, row.ST_CODE]);
-      await queryPromise(mysqlConn, `
-        INSERT INTO bis_kmc_med_store (it_code, st_code) VALUES ?`, [medstoreValues]);
+      const medstoreValues = medstoreData.map((row) => [row.IT_CODE, row.ST_CODE]);
+      await queryPromise(
+        mysqlConn,
+        `
+        INSERT INTO bis_kmc_med_store (it_code, st_code) VALUES ?`,
+        [medstoreValues]
+      );
     }
 
     // Step 5: Update trigger table
-    const currentDate = format(new Date(), 'yyyy-MM-dd HH:mm:ss');
-    await queryPromise(mysqlConn, `
+    const currentDate = format(new Date(), "yyyy-MM-dd HH:mm:ss");
+    await queryPromise(
+      mysqlConn,
+      `
       UPDATE bis_kmc_trigger_details 
       SET last_insert_date = ?, last_update_date = ? 
-      WHERE trgr_slno = 1`, [currentDate, currentDate]);
+      WHERE trgr_slno = 1`,
+      [currentDate, currentDate]
+    );
 
     // Step 6: Fetch update records
     const oracleSqlquery = ` 
@@ -2260,18 +2222,14 @@ const InsertKmcMedDesc = async (callBack) => {
                meddesc.itc_breakable, meddesc.itn_breakqty, meddesc.itn_lprate, meddesc.itn_mrp,
                meddesc.itn_originalmrp, meddesc.itn_gendisper, meddesc.itn_genipdisper, meddesc.itd_date,
                meddesc.itd_eddate`; // keep your existing update Oracle SQL query here
-    const updateResult = await conn_ora.execute(
-      oracleSqlquery,
-      { FROM_DATE: fromDate, TO_DATE: toDate },
-      { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
-    );
+    const updateResult = await conn_ora.execute(oracleSqlquery, {FROM_DATE: fromDate, TO_DATE: toDate}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
     const updateRows = await updateResult.resultSet.getRows();
     await updateResult.resultSet.close();
 
     const updateItCodes = await getKMCItCodesInChunks(mysqlConn, fromDate, toDate, 1000);
     const updateSet = new Set(updateItCodes.flat());
 
-    const filteredUpdates = updateRows.filter(row => updateSet.has(row.IT_CODE));
+    const filteredUpdates = updateRows.filter((row) => updateSet.has(row.IT_CODE));
 
     // Step 7: Perform updates
     if (filteredUpdates.length) {
@@ -2287,22 +2245,43 @@ const InsertKmcMedDesc = async (callBack) => {
 
       for (const row of filteredUpdates) {
         const updateValues = [
-          row.ITC_DESC, row.ITC_ALIAS, row.ITN_STRIP,
-          row.MC_CODE, row.MCC_DESC, row.MG_CODE, row.MGC_DESC,
-          row.CMC_DESC, row.MTC_DESC, row.MEDICINE, row.CONSUMABLE,
-          row.HIGH_VALUE, row.HIGH_RISK, row.HAZARDOUS, row.VED,
-          row.BREAKABLE, row.ITN_BREAKQTY, row.ITN_LPRATE, row.ITN_MRP,
-          row.ITN_ORIGINALMRP, row.ITN_GENDISPER, row.ITN_GENIPDISPER,
-          row.ITD_DATE, row.ITD_EDDATE,
-          row.IT_CODE
+          row.ITC_DESC,
+          row.ITC_ALIAS,
+          row.ITN_STRIP,
+          row.MC_CODE,
+          row.MCC_DESC,
+          row.MG_CODE,
+          row.MGC_DESC,
+          row.CMC_DESC,
+          row.MTC_DESC,
+          row.MEDICINE,
+          row.CONSUMABLE,
+          row.HIGH_VALUE,
+          row.HIGH_RISK,
+          row.HAZARDOUS,
+          row.VED,
+          row.BREAKABLE,
+          row.ITN_BREAKQTY,
+          row.ITN_LPRATE,
+          row.ITN_MRP,
+          row.ITN_ORIGINALMRP,
+          row.ITN_GENDISPER,
+          row.ITN_GENIPDISPER,
+          row.ITD_DATE,
+          row.ITD_EDDATE,
+          row.IT_CODE,
         ];
         await queryPromise(mysqlConn, updateQuery, updateValues);
       }
 
       // Step 8: Update trigger (again, just in case)
-      await queryPromise(mysqlConn, `
+      await queryPromise(
+        mysqlConn,
+        `
         UPDATE bis_kmc_trigger_details SET last_update_date = ? 
-        WHERE trgr_slno = 1`, [currentDate]);
+        WHERE trgr_slno = 1`,
+        [currentDate]
+      );
     }
 
     //  Step 9: Commit transaction
@@ -2323,13 +2302,10 @@ const InsertKmcMedDesc = async (callBack) => {
 //   InsertKmcMedDesc();
 // });
 
-
 // // for 5 mints
 // cron.schedule('*/5 * * * *', () => {
 //   InsertKmcMedDesc();
 // });
-
-
 
 const updateAmsPatientDetails = () => {
   mysqlpool.getConnection((err, connection) => {
@@ -2377,8 +2353,8 @@ const updateAmsPatientDetails = () => {
         WHERE ams_patient_detail_slno = ? AND patient_ip_no = ?
       `;
 
-      const updatePromises = results.map(row => {
-        const { fb_bd_code, fb_ns_name, ams_patient_detail_slno, patient_ip_no } = row;
+      const updatePromises = results.map((row) => {
+        const {fb_bd_code, fb_ns_name, ams_patient_detail_slno, patient_ip_no} = row;
         return new Promise((resolve, reject) => {
           connection.query(updateQuery, [fb_bd_code, fb_ns_name, ams_patient_detail_slno, patient_ip_no], (updateErr) => {
             if (updateErr) {
@@ -2394,7 +2370,6 @@ const updateAmsPatientDetails = () => {
       Promise.allSettled(updatePromises)
         .then(() => {
           connection.release();
-
         })
         .catch(() => {
           connection.release();
@@ -2402,7 +2377,6 @@ const updateAmsPatientDetails = () => {
     });
   });
 };
-
 
 const getAmsLastUpdatedDate = async (processId) => {
   return new Promise((resolve, reject) => {
@@ -2426,8 +2400,6 @@ const getAmsLastUpdatedDate = async (processId) => {
   });
 };
 
-
-
 /****************************/
 
 // auto sync at an interval of 10 min/2
@@ -2450,13 +2422,12 @@ cron.schedule("*/17 * * * *", () => {
   UpdateFbBedDetailMeliora();
 });
 
-
-cron.schedule('*/49 * * * *', () => {
+cron.schedule("*/49 * * * *", () => {
   getAmsPatientDetails();
 });
 
 // //runs at every 3 hours
-cron.schedule('0 */3 * * *', () => {
+cron.schedule("0 */3 * * *", () => {
   updateAmsPatientDetails();
 });
 
@@ -2464,9 +2435,6 @@ cron.schedule('0 */3 * * *', () => {
 cron.schedule("0 23 * * *", () => {
   InsertChilderDetailMeliora();
 });
-
-
-
 
 // Run via cron- Jomol for BIS
 // cron.schedule("*/2 * * * *", () => {
@@ -2481,8 +2449,3 @@ cron.schedule("0 23 * * *", () => {
 // cron.schedule("0 22 * * *", () => {
 //   InsertTmcMedDesc();
 // });
-
-
-
-
-
