@@ -82,6 +82,9 @@ const medlab = require("./api/Medlab/medlab.router");
 // CRON JOB FUNCTION
 const cronjob = require("./cron-jobs/cron.router");
 
+//store report
+const storeReport = require("./api/StoreReport/StoreReport.router");
+
 app.use(express.json());
 
 app.use((req, res, next) => {
@@ -173,6 +176,7 @@ app.use("/api/cronjob", cronjob);
 
 //COLLECTION REPORTS TMCH
 app.use("/api/collectionOnlyQmt", collectionTmc);
+app.use("/api/storeReport", storeReport);
 
 app.listen(process.env.APP_PORT, (val) => {
   console.log(`Server Up and Running ${process.env.APP_PORT}`);
