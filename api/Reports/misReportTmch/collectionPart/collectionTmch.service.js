@@ -12,8 +12,6 @@ module.exports = {
     const fromDate = data.from;
     const toDate = data.to;
 
-    console.log(ipNumberList);
-
     const sql = `SELECT SUM (NVL (ARN_AMOUNT, 0)) Amt, 0 tax
                             FROM OPADVANCE
                         WHERE NVL (ARC_CANCEL, 'N') = 'N'

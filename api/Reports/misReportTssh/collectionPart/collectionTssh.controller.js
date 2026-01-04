@@ -252,7 +252,6 @@ module.exports = {
         };
 
         getIpNumberFromPreviousDayCollection(datas, (err, getResult) => {
-          console.log(datas);
           if (err) {
             return res.status(200).json({
               success: 0,
@@ -268,9 +267,7 @@ module.exports = {
           }
 
           if (getResult) {
-            const notInclPat = results?.filter((e) =>
-              getResult?.find((v) => v.ip_no === e.IP_NO)
-            );
+            const notInclPat = results?.filter((e) => getResult?.find((v) => v.ip_no === e.IP_NO));
             if (Object.keys(getResult).length === 0) {
               return res.status(200).json({
                 success: 1,
@@ -328,9 +325,7 @@ module.exports = {
           }
 
           if (getResult) {
-            const notInclPat = results?.filter((e) =>
-              getResult?.find((v) => v.ip_no === e.IP_NO)
-            );
+            const notInclPat = results?.filter((e) => getResult?.find((v) => v.ip_no === e.IP_NO));
             if (Object.keys(getResult).length === 0) {
               return res.status(200).json({
                 success: 1,
