@@ -69,6 +69,9 @@ const crfpo = require("./api/CRFPurchase/purchase.router");
 const bisElliderData = require("./api/Version_1/BIS/bis_ellider_datas/bis_ellider_datas.router");
 const bisQuotationData = require("./api/Version_1/BIS/bis_quotation/bis_quotation.router");
 
+//COLLECTION REPORTS TMCH
+const collectionTmc = require("./api/Reports/CollectionReports/CollectionTmc/collectionTmc.router");
+
 //AMS Antibiotic
 const amsAntibioticData = require("./api/Ams/Ams.router");
 
@@ -167,6 +170,9 @@ app.use("/api/medlab", medlab);
 
 // CRON JOB FUNCTION
 app.use("/api/cronjob", cronjob);
+
+//COLLECTION REPORTS TMCH
+app.use("/api/collectionOnlyQmt", collectionTmc);
 
 app.listen(process.env.APP_PORT, (val) => {
   console.log(`Server Up and Running ${process.env.APP_PORT}`);
