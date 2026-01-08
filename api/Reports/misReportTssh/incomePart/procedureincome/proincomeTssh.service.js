@@ -512,37 +512,38 @@ module.exports = {
                                 AND Disbillmast.dmd_date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
                                 AND DISBILLMAST.IP_NO IN (${ipNumberList})
                                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-                        GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
-                        UNION ALL
-                        SELECT Misincexpgroup.Dg_desc,
-                                Misincexpgroup.Dg_grcode AS Code,
-                                SUM (receiptdetl.rpn_netamt) Amt,
-                                SUM (NVL (Receiptdetl.RPN_TOTTAX, 0)) tax,
-                                SUM ( NVL (receiptdetl.rpn_netamt, 0) + NVL (receiptdetl.rpn_disamt, 0)) GrossAmt,
-                                SUM (0) AS Comp,
-                                SUM (NVL (receiptdetl.rpn_disamt, 0)) discount
-                        FROM Receiptdetl,
-                                Receiptmast,
-                                Prodescription,
-                                Progroup,
-                                Misincexpdtl,
-                                Misincexpgroup,
-                                Opbillmast
-                        WHERE     Receiptmast.RPC_SLNO = Receiptdetl.RPC_SLNO
-                                AND Receiptdetl.Opc_Slno = Opbillmast.Opc_Slno
-                                AND Receiptdetl.pd_code = Prodescription.pd_code
-                                AND Prodescription.pg_code = Progroup.pg_code
-                                AND Misincexpdtl.dg_grcode = Misincexpgroup.dg_grcode
-                                AND Misincexpdtl.Dg_type = 'R'
-                                AND Misincexpdtl.Pc_code = Progroup.pc_code
-                                AND Receiptmast.RPC_CANCEL IS NULL
-                                AND NVL (Opbillmast.Opn_cancel, 'N') = 'N'
-                                AND Opbillmast.Opc_Cacr <> 'M'
-                                AND Receiptmast.RPC_CAcr = 'O'
-                                AND Opbillmast.Opd_date >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND Opbillmast.Opd_date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc`;
+
+    // UNION ALL
+    // SELECT Misincexpgroup.Dg_desc,
+    //         Misincexpgroup.Dg_grcode AS Code,
+    //         SUM (receiptdetl.rpn_netamt) Amt,
+    //         SUM (NVL (Receiptdetl.RPN_TOTTAX, 0)) tax,
+    //         SUM ( NVL (receiptdetl.rpn_netamt, 0) + NVL (receiptdetl.rpn_disamt, 0)) GrossAmt,
+    //         SUM (0) AS Comp,
+    //         SUM (NVL (receiptdetl.rpn_disamt, 0)) discount
+    // FROM Receiptdetl,
+    //         Receiptmast,
+    //         Prodescription,
+    //         Progroup,
+    //         Misincexpdtl,
+    //         Misincexpgroup,
+    //         Opbillmast
+    // WHERE     Receiptmast.RPC_SLNO = Receiptdetl.RPC_SLNO
+    //         AND Receiptdetl.Opc_Slno = Opbillmast.Opc_Slno
+    //         AND Receiptdetl.pd_code = Prodescription.pd_code
+    //         AND Prodescription.pg_code = Progroup.pg_code
+    //         AND Misincexpdtl.dg_grcode = Misincexpgroup.dg_grcode
+    //         AND Misincexpdtl.Dg_type = 'R'
+    //         AND Misincexpdtl.Pc_code = Progroup.pc_code
+    //         AND Receiptmast.RPC_CANCEL IS NULL
+    //         AND NVL (Opbillmast.Opn_cancel, 'N') = 'N'
+    //         AND Opbillmast.Opc_Cacr <> 'M'
+    //         AND Receiptmast.RPC_CAcr = 'O'
+    //         AND Opbillmast.Opd_date >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+    //         AND Opbillmast.Opd_date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+    //         AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+    // GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc`;
     try {
       const result = await conn_ora.execute(sql, {}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
       await result.resultSet?.getRows((err, rows) => {
