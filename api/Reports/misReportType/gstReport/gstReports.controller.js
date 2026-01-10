@@ -1,76 +1,15 @@
-const { getPurchaseMastDatas, getGrmDetails, getpendingApprovalQtn, getPurchaseDetails, getItemDetails } = require('./StoreReport.service')
+const {
+    gstreportsPartOne,
+    gstreportsPartTwo,
+    gstreportsPartThree,
+    gstreportsPartFour,
+    gstreportsPartFive
+} = require('./gstReports.service');
 
 module.exports = {
-    getPurchaseMastDatas: (req, res) => {
+    getGstreportsPartOne: (req, res) => {
         const body = req.body;
-        getPurchaseMastDatas(body, (err, results) => {
-            if (err) {
-                return res.status(200).json({
-                    success: 0,
-                    message: err
-                })
-            }
-            if (Object.keys(results).length === 0) {
-                return res.status(200).json({
-                    success: 1,
-                    message: 'No Data Found'
-                })
-            }
-            return res.status(200).json({
-                success: 2,
-                message: "Fetched Purchase Datas",
-                data: results
-            });
-        });
-    },
-    getGrmDetails: (req, res) => {
-        const body = req.body;
-        getGrmDetails(body, (err, results) => {
-            if (err) {
-                return res.status(200).json({
-                    success: 0,
-                    message: err
-                })
-            }
-            if (Object.keys(results).length === 0) {
-                return res.status(200).json({
-                    success: 1,
-                    message: 'No Data Found'
-                })
-            }
-            return res.status(200).json({
-                success: 2,
-                message: "Fetched GRN Datas",
-                data: results
-            });
-        });
-    },
-
-    getpendingApprovalQtn: (req, res) => {
-        getpendingApprovalQtn((err, results) => {
-            if (err) {
-                return res.status(200).json({
-                    success: 0,
-                    message: err
-                })
-            }
-            if (Object.keys(results).length === 0) {
-                return res.status(200).json({
-                    success: 2,
-                    message: "No Data Found"
-
-                })
-            }
-            return res.status(200).json({
-                success: 1,
-                data: results
-            })
-        })
-    },
-    getPurchaseDetails: (req, res) => {
-        const id = req.params.id;
-        // console.log("id");
-        getPurchaseDetails(id, (err, results) => {
+        gstreportsPartOne(body, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -86,15 +25,14 @@ module.exports = {
             }
             return res.status(200).json({
                 success: 1,
-                message: "Purchase Details",
+                message: "Gst Reports",
                 data: results
             });
         })
     },
-    getItemDetails: (req, res) => {
-        const id = req.params.id;
-        // console.log("id");
-        getItemDetails(id, (err, results) => {
+    getGstreportsPartTwo: (req, res) => {
+        const body = req.body;
+        gstreportsPartTwo(body, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -110,10 +48,78 @@ module.exports = {
             }
             return res.status(200).json({
                 success: 1,
-                message: "PItem Details",
+                message: "Gst Reports",
+                data: results
+            });
+        })
+    },
+    getGstreportsPartThree: (req, res) => {
+        const body = req.body;
+        gstreportsPartThree(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err.message
+                });
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Result",
+                    data: []
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                message: "Gst Reports",
+                data: results
+            });
+        })
+    },
+    getGstreportsPartFour: (req, res) => {
+        const body = req.body;
+        gstreportsPartFour(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err.message
+                });
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Result",
+                    data: []
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                message: "Gst Reports",
+                data: results
+            });
+        })
+    },
+    getGstreportsPartFive: (req, res) => {
+        const body = req.body;
+        gstreportsPartFive(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err.message
+                });
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Result",
+                    data: []
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                message: "Gst Reports",
                 data: results
             });
         })
     },
 }
-

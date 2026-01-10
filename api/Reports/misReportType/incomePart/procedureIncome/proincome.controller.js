@@ -1,76 +1,15 @@
-const { getPurchaseMastDatas, getGrmDetails, getpendingApprovalQtn, getPurchaseDetails, getItemDetails } = require('./StoreReport.service')
+const {
+    proIncomePart1,
+    proIncomePart2,
+    proIncomePart3,
+    proIncomePart4,
+    theaterIncome
+} = require('./proincome.service')
 
 module.exports = {
-    getPurchaseMastDatas: (req, res) => {
+    getproIncomePart1: (req, res) => {
         const body = req.body;
-        getPurchaseMastDatas(body, (err, results) => {
-            if (err) {
-                return res.status(200).json({
-                    success: 0,
-                    message: err
-                })
-            }
-            if (Object.keys(results).length === 0) {
-                return res.status(200).json({
-                    success: 1,
-                    message: 'No Data Found'
-                })
-            }
-            return res.status(200).json({
-                success: 2,
-                message: "Fetched Purchase Datas",
-                data: results
-            });
-        });
-    },
-    getGrmDetails: (req, res) => {
-        const body = req.body;
-        getGrmDetails(body, (err, results) => {
-            if (err) {
-                return res.status(200).json({
-                    success: 0,
-                    message: err
-                })
-            }
-            if (Object.keys(results).length === 0) {
-                return res.status(200).json({
-                    success: 1,
-                    message: 'No Data Found'
-                })
-            }
-            return res.status(200).json({
-                success: 2,
-                message: "Fetched GRN Datas",
-                data: results
-            });
-        });
-    },
-
-    getpendingApprovalQtn: (req, res) => {
-        getpendingApprovalQtn((err, results) => {
-            if (err) {
-                return res.status(200).json({
-                    success: 0,
-                    message: err
-                })
-            }
-            if (Object.keys(results).length === 0) {
-                return res.status(200).json({
-                    success: 2,
-                    message: "No Data Found"
-
-                })
-            }
-            return res.status(200).json({
-                success: 1,
-                data: results
-            })
-        })
-    },
-    getPurchaseDetails: (req, res) => {
-        const id = req.params.id;
-        // console.log("id");
-        getPurchaseDetails(id, (err, results) => {
+        proIncomePart1(body, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -80,21 +19,19 @@ module.exports = {
             if (Object.keys(results).length === 0) {
                 return res.status(200).json({
                     success: 2,
-                    message: "No Result",
-                    data: []
+                    message: "No Result"
                 });
             }
             return res.status(200).json({
                 success: 1,
-                message: "Purchase Details",
+                message: "Procedure Income",
                 data: results
             });
         })
     },
-    getItemDetails: (req, res) => {
-        const id = req.params.id;
-        // console.log("id");
-        getItemDetails(id, (err, results) => {
+    getproIncomePart2: (req, res) => {
+        const body = req.body;
+        proIncomePart2(body, (err, results) => {
             if (err) {
                 return res.status(200).json({
                     success: 0,
@@ -104,16 +41,80 @@ module.exports = {
             if (Object.keys(results).length === 0) {
                 return res.status(200).json({
                     success: 2,
-                    message: "No Result",
-                    data: []
+                    message: "No Result"
                 });
             }
             return res.status(200).json({
                 success: 1,
-                message: "PItem Details",
+                message: "Procedure Income",
+                data: results
+            });
+        })
+    },
+    getproIncomePart3: (req, res) => {
+        const body = req.body;
+        proIncomePart3(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err.message
+                });
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Result"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                message: "Procedure Income",
+                data: results
+            });
+        })
+    },
+    getproIncomePart4: (req, res) => {
+        const body = req.body;
+        proIncomePart4(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err.message
+                });
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Result"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                message: "Procedure Income",
+                data: results
+            });
+        })
+    },
+    gettheaterIncome: (req, res) => {
+        const body = req.body;
+        theaterIncome(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err.message
+                });
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Result"
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                message: "Theater income",
                 data: results
             });
         })
     },
 }
-

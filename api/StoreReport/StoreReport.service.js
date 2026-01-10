@@ -402,6 +402,154 @@ JOIN SUPPLIER SU ON SU.SU_CODE = PUR.SU_CODE
         }
     },
 
+    getpendingApprovalQtn: async (callBack) => {
+        let pool_ora = await oraConnection();
+        let conn_ora = await pool_ora.getConnection();
+        const sql = `
+             SELECT 
+                   QM.QU_NO "QUOTATION #",
+                   QM.QUC_SLNO,
+                   QM.QUD_DATE "QUOTATION DATE",
+                   QM.SU_CODE ,
+                   SU.SUC_NAME "SUPPLIER",
+                   QM.QUC_DESC "QUOTATION REMARK",
+                   QM.QUN_AMOUNT "QUOTATION AMOUNT" 
+               FROM QUOTATIONMAST QM 
+                   JOIN SUPPLIER SU ON SU.SU_CODE = QM.SU_CODE
+               WHERE QM.QUC_STCODE = 'C002' 
+               AND QM.QUC_CANCEL IS NULL 
+               AND QM.QOT_TOTAPPROVALSREQ = 5
+               AND QM.QOT_TOTAPPROVALSCOMP IN (3,4)
+               AND QM.QOT_REJECT IS NULL
+
+            `;
+        try {
+            const result = await conn_ora.execute(
+                sql,
+                {},
+                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
+            )
+            await result.resultSet?.getRows((err, rows) => {
+                callBack(err, rows)
+            })
+        }
+        catch (error) {
+            return callBack(error)
+        } finally {
+            if (conn_ora) {
+                await conn_ora.close();
+                await pool_ora.close();
+            }
+        }
+
+    },
+    getPurchaseDetails: async (data, callBack) => {
+        let pool_ora = await oraConnection();
+        let conn_ora = await pool_ora.getConnection();
+        try {
+            const result = await conn_ora.execute(
+                ` 
+                               SELECT 
+                    QD.QU_NO "QUOTATION #",
+                    QD.QUD_DATE "QUOT DATE",
+                    QD.IT_CODE,
+                    MD.ITC_DESC "ITEM",
+                    QD.QUN_QTY "QTY",
+                    TX.TXC_DESC "GST",
+                    QD.QUN_DISPER "DIS %",
+                    QD.QUN_DISAMT "DIS AMNT",
+                    QD.QUN_FREEQTY "FREE QTY",
+                    QD.QUN_RATE "RATE",
+                    QD.QUN_TAXAMT "GST AMT",
+                    QD.QUN_NETAMT "RATE + GST",
+                    round(QD.QUN_MRP / (1 + (TX.TXN_PURPER / 100)) ,2) "SELLING RATE",
+                    QD.QUN_MRP "MRP - INCL GST",
+                    ((round(QD.QUN_MRP / (1 + (TX.TXN_PURPER / 100)) ,2)) - QD.QUN_RATE ) "MARGIN AMT",
+                    ROUND((((QD.QUN_MRP / (1 + (TX.TXN_PURPER / 100))) - QD.QUN_RATE) / QD.QUN_RATE ) * 100,2) "MARGIN %", 
+                    QD.QUN_NETUNITRATE "QUN NET AMT"
+               FROM QUOTATIONDETL QD
+                   JOIN MEDDESC MD ON MD.IT_CODE = QD.IT_CODE
+                   JOIN TAX TX ON TX.TX_CODE = QD.TX_CODE
+               WHERE QD.QUC_SLNO = :quc_slno
+               AND (QD.QUC_ACTIVE = 'Y' OR QD.QUC_ACTIVE IS NULL)
+                `,
+                {
+                    quc_slno: data,
+                },
+                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
+            )
+            await result.resultSet?.getRows((err, rows) => {
+                callBack(err, rows)
+            })
+
+        } catch (error) {
+        } finally {
+            if (conn_ora) {
+                await conn_ora.close();
+                await pool_ora.close();
+            }
+        }
+    },
+    getItemDetails: async (data, callBack) => {
+        let pool_ora = await oraConnection();
+        let conn_ora = await pool_ora.getConnection();
+        try {
+            const result = await conn_ora.execute(
+                ` 
+                   SELECT 
+                  PD.PUD_DATE "PURCHASE DATE",
+                  PD.SU_CODE,
+                  SP.SUC_NAME "SUPPLIER",
+                  PD.IT_CODE,
+                  MD.ITC_DESC "ITEM",
+                  SUM(PD.PDN_QTY) "QTY",
+                  PD.PDN_TAXPER "GST %",
+                  1 + (PD.PDN_TAXPER / 100) "PDN_TAXPER",
+                  PD.PDN_RATE "COST RATE",
+                  PD.PDN_TAXAMT "GST AMT",
+                  PD.PDN_STVAL "COST INCL GST",
+                  PD.ITN_MRP "MRP WOUT GST",
+                  PD.ITN_ORIGINALMRP "MRP INCL GST",
+                  PD.PDN_FREE,
+                  PD.PDN_DISPER,
+                  ROUND(((PD.ITN_MRP - PD.PDN_RATE)/ PD.PDN_RATE ) * 100) "MARGIN %"
+              FROM PURDETL PD
+                  JOIN MEDDESC MD ON MD.IT_CODE = PD.IT_CODE
+                  JOIN SUPPLIER SP ON SP.SU_CODE = PD.SU_CODE
+              WHERE PD.IT_CODE = :st_code
+              AND PD.ST_CODE = 'C002'
+              GROUP BY
+                  PD.PUD_DATE,
+                  PD.SU_CODE,
+                  SP.SUC_NAME,
+                  PD.IT_CODE,
+                  MD.ITC_DESC,
+                  PD.PDN_TAXPER,
+                  PD.PDN_RATE,
+                  PD.PDN_TAXAMT,
+                  PD.PDN_STVAL,
+                  PD.ITN_MRP,
+                  PD.ITN_ORIGINALMRP,
+                  PD.PDN_FREE,
+                  PD.PDN_DISPER       
+                `,
+                {
+                    st_code: data,
+                },
+                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
+            )
+            await result.resultSet?.getRows((err, rows) => {
+                callBack(err, rows)
+            })
+
+        } catch (error) {
+        } finally {
+            if (conn_ora) {
+                await conn_ora.close();
+                await pool_ora.close();
+            }
+        }
+    },
 }
 
 
