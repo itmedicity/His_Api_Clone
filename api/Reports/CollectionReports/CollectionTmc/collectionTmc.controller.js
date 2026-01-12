@@ -6,7 +6,6 @@ module.exports = {
 
     try {
       const results = await unsettledAmountUserWise(fromDate, toDate);
-      console.log(results);
       return res.status(200).json({
         success: 1,
         message: "Unsettled Amount User Wise",
