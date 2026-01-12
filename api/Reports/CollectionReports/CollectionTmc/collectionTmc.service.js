@@ -65,7 +65,6 @@ GROUP BY A.Usc_name, A.Us_code`;
     try {
       const result = await conn.execute(sql, {}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
       const rows = await result.resultSet?.getRows();
-      console.log(rows);
       return rows;
     } catch (error) {
       console.log(error);

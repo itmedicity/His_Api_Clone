@@ -2402,39 +2402,39 @@ const getAmsLastUpdatedDate = async (processId) => {
 
 /****************************/
 
-// auto sync at an interval of 10 min/2
-cron.schedule("*/10 * * * *", () => {
-  getInpatientDetail();
-});
+// // auto sync at an interval of 10 min/2
+// cron.schedule("*/10 * * * *", () => {
+//   getInpatientDetail();
+// });
 
-// //  auto sync at an interval of 13 min
-cron.schedule("*/13 * * * *", () => {
-  UpdateIpStatusDetails();
-});
+// // //  auto sync at an interval of 13 min
+// cron.schedule("*/13 * * * *", () => {
+//   UpdateIpStatusDetails();
+// });
 
-// //  auto sync at an interval of 15 min
-cron.schedule("*/15 * * * *", () => {
-  UpdateInpatientDetailRmall();
-});
+// // //  auto sync at an interval of 15 min
+// cron.schedule("*/15 * * * *", () => {
+//   UpdateInpatientDetailRmall();
+// });
 
-// //  test triggering
-cron.schedule("*/17 * * * *", () => {
-  UpdateFbBedDetailMeliora();
-});
+// // //  test triggering
+// cron.schedule("*/17 * * * *", () => {
+//   UpdateFbBedDetailMeliora();
+// });
 
-cron.schedule("*/49 * * * *", () => {
-  getAmsPatientDetails();
-});
+// cron.schedule("*/49 * * * *", () => {
+//   getAmsPatientDetails();
+// });
 
-// //runs at every 3 hours
-cron.schedule("0 */3 * * *", () => {
-  updateAmsPatientDetails();
-});
+// // //runs at every 3 hours
+// cron.schedule("0 */3 * * *", () => {
+//   updateAmsPatientDetails();
+// });
 
-// // Running InsertChilderDetailMeliora at midnight... 11.00 pm
-cron.schedule("0 23 * * *", () => {
-  InsertChilderDetailMeliora();
-});
+// // // Running InsertChilderDetailMeliora at midnight... 11.00 pm
+// cron.schedule("0 23 * * *", () => {
+//   InsertChilderDetailMeliora();
+// });
 
 // Run via cron- Jomol for BIS
 // cron.schedule("*/2 * * * *", () => {

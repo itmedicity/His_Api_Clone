@@ -1,10 +1,6 @@
 // @ts-ignore
 const pool = require("../../../../config/dbconfig");
-const {
-  oracledb,
-  connectionClose,
-  oraConnection,
-} = require("../../../../config/oradbconfig");
+const {oracledb, connectionClose, oraConnection} = require("../../../../config/oradbconfig");
 
 module.exports = {
   //Advance Collection (C)
@@ -12,8 +8,7 @@ module.exports = {
     let pool_ora = await oraConnection();
     let conn_ora = await pool_ora.getConnection();
 
-    const ipNumberList =
-      (data?.ptno?.length > 0 && data.ptno.join(",")) || null;
+    const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(",")) || null;
     const fromDate = data.from;
     const toDate = data.to;
     const sql = ` SELECT SUM (NVL (ARN_AMOUNT, 0)) Amt, 0 tax
@@ -41,11 +36,7 @@ module.exports = {
                                 AND IPADVANCE.IP_NO IN (${ipNumberList})`;
 
     try {
-      const result = await conn_ora.execute(
-        sql,
-        {},
-        { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
-      );
+      const result = await conn_ora.execute(sql, {}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
       await result.resultSet?.getRows((err, rows) => {
         callBack(err, rows);
       });
@@ -62,8 +53,7 @@ module.exports = {
     let pool_ora = await oraConnection();
     let conn_ora = await pool_ora.getConnection();
 
-    const ipNumberList =
-      (data?.ptno?.length > 0 && data.ptno.join(",")) || null;
+    const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(",")) || null;
     const fromDate = data.from;
     const toDate = data.to;
     const advanceRefndSql = `SELECT SUM (NVL (REFUNDOPADVANCE.RFN_AMT, 0)) Amt, 0 tax
@@ -107,11 +97,7 @@ module.exports = {
             HAVING SUM (NVL (ADVANCERETURN.RAN_AMT, 0)) > 0`;
 
     try {
-      const result = await conn_ora.execute(
-        advanceRefndSql,
-        {},
-        { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
-      );
+      const result = await conn_ora.execute(advanceRefndSql, {}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
       await result.resultSet?.getRows((err, rows) => {
         callBack(err, rows);
       });
@@ -129,8 +115,7 @@ module.exports = {
     let pool_ora = await oraConnection();
     let conn_ora = await pool_ora.getConnection();
 
-    const ipNumberList =
-      (data?.ptno?.length > 0 && data.ptno.join(",")) || null;
+    const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(",")) || null;
     const fromDate = data.from;
     const toDate = data.to;
 
@@ -183,11 +168,7 @@ module.exports = {
                                             AND BILLMAST.BMC_CACR = 'I'`;
 
     try {
-      const result = await conn_ora.execute(
-        advanceSettledSql,
-        {},
-        { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
-      );
+      const result = await conn_ora.execute(advanceSettledSql, {}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
       await result.resultSet?.getRows((err, rows) => {
         callBack(err, rows);
       });
@@ -205,8 +186,7 @@ module.exports = {
     let pool_ora = await oraConnection();
     let conn_ora = await pool_ora.getConnection();
 
-    const ipNumberList =
-      (data?.ptno?.length > 0 && data.ptno.join(",")) || null;
+    const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(",")) || null;
     const fromDate = data.from;
     const toDate = data.to;
 
@@ -224,11 +204,7 @@ module.exports = {
                             AND DISBILLMAST.IP_NO IN  (${ipNumberList})`;
 
     try {
-      const result = await conn_ora.execute(
-        sql,
-        {},
-        { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
-      );
+      const result = await conn_ora.execute(sql, {}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
       await result.resultSet?.getRows((err, rows) => {
         callBack(err, rows);
       });
@@ -246,8 +222,7 @@ module.exports = {
     let pool_ora = await oraConnection();
     let conn_ora = await pool_ora.getConnection();
 
-    const ipNumberList =
-      (data?.ptno?.length > 0 && data.ptno.join(",")) || null;
+    const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(",")) || null;
     const fromDate = data.from;
     const toDate = data.to;
 
@@ -262,11 +237,7 @@ module.exports = {
                         AND ipreceiptrefund.IRC_MHCODE IN (SELECT MH_CODE FROM multihospital)
                         AND IPRECEIPTREFUND.IP_NO IN (${ipNumberList})`;
     try {
-      const result = await conn_ora.execute(
-        sql,
-        {},
-        { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
-      );
+      const result = await conn_ora.execute(sql, {}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
       await result.resultSet?.getRows((err, rows) => {
         callBack(err, rows);
       });
@@ -309,11 +280,7 @@ module.exports = {
                             AND DMD_DATE <=TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')`;
 
     try {
-      const result = await conn_ora.execute(
-        sql,
-        {},
-        { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
-      );
+      const result = await conn_ora.execute(sql, {}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
 
       await result.resultSet?.getRows((err, rows) => {
         callBack(err, rows);
@@ -331,9 +298,8 @@ module.exports = {
   creditInsuranceBillCollectionTssh: async (data, callBack) => {
     let pool_ora = await oraConnection();
     let conn_ora = await pool_ora.getConnection();
-
-    const ipNumberList =
-      (data?.ptno?.length > 0 && data.ptno.join(",")) || null;
+    // console.log(data);
+    const ipNumberList = (data?.ipNoColl?.length > 0 && data.ipNoColl.join(",")) || null;
     const fromDate = data.from;
     const toDate = data.to;
 
@@ -372,11 +338,7 @@ module.exports = {
                                 AND RECPCOLLECTIONDETL.RCD_DATE <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss') 
                                 AND RECPCOLLECTIONDETL.IP_NO  IN  (${ipNumberList}))`;
     try {
-      const result = await conn_ora.execute(
-        sql,
-        {},
-        { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
-      );
+      const result = await conn_ora.execute(sql, {}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
       await result.resultSet?.getRows((err, rows) => {
         callBack(err, rows);
       });
@@ -394,8 +356,7 @@ module.exports = {
     let pool_ora = await oraConnection();
     let conn_ora = await pool_ora.getConnection();
 
-    const ipNumberList =
-      (data?.ptno?.length > 0 && data.ptno.join(",")) || null;
+    const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(",")) || null;
     const fromDate = data.from;
     const toDate = data.to;
 
@@ -410,11 +371,7 @@ module.exports = {
                                 AND IP_NO IN (${ipNumberList})`;
 
     try {
-      const result = await conn_ora.execute(
-        sql,
-        {},
-        { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
-      );
+      const result = await conn_ora.execute(sql, {}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
       await result.resultSet?.getRows((err, rows) => {
         callBack(err, rows);
       });
@@ -432,8 +389,7 @@ module.exports = {
     let pool_ora = await oraConnection();
     let conn_ora = await pool_ora.getConnection();
 
-    const ipNumberList =
-      (data?.ptno?.length > 0 && data.ptno.join(",")) || null;
+    const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(",")) || null;
     const fromDate = data.from;
     const toDate = data.to;
 
@@ -453,11 +409,7 @@ module.exports = {
                                 AND NVL (irn_discount, 0) > 0`;
 
     try {
-      const result = await conn_ora.execute(
-        sql,
-        {},
-        { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
-      );
+      const result = await conn_ora.execute(sql, {}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
       await result.resultSet?.getRows((err, rows) => {
         callBack(err, rows);
       });
@@ -475,8 +427,7 @@ module.exports = {
     let pool_ora = await oraConnection();
     let conn_ora = await pool_ora.getConnection();
 
-    const ipNumberList =
-      (data?.ipNoColl?.length > 0 && data.ipNoColl.join(",")) || null;
+    const ipNumberList = (data?.ipNoColl?.length > 0 && data.ipNoColl.join(",")) || null;
     const fromDate = data.from;
     const toDate = data.to;
 
@@ -492,11 +443,7 @@ module.exports = {
                             group by DISBILLMAST.IP_NO`;
 
     try {
-      const result = await conn_ora.execute(
-        sql,
-        {},
-        { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
-      );
+      const result = await conn_ora.execute(sql, {}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
       await result.resultSet?.getRows((err, rows) => {
         callBack(err, rows);
       });
@@ -514,8 +461,7 @@ module.exports = {
     let pool_ora = await oraConnection();
     let conn_ora = await pool_ora.getConnection();
 
-    const ipNumberList =
-      (data?.ipNoColl?.length > 0 && data.ipNoColl.join(",")) || null;
+    const ipNumberList = (data?.ipNoColl?.length > 0 && data.ipNoColl.join(",")) || null;
     const fromDate = data.from;
     const toDate = data.to;
 
@@ -538,11 +484,7 @@ module.exports = {
                             AND ird_date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
                             AND Irc_cancel IS NULL group by  DISBILLMAST.IP_NO`;
     try {
-      const result = await conn_ora.execute(
-        sql,
-        {},
-        { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
-      );
+      const result = await conn_ora.execute(sql, {}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
 
       await result.resultSet?.getRows((err, rows) => {
         callBack(err, rows);
@@ -561,8 +503,7 @@ module.exports = {
     let pool_ora = await oraConnection();
     let conn_ora = await pool_ora.getConnection();
 
-    const ipNumberList =
-      (data?.ptno?.length > 0 && data.ptno.join(",")) || null;
+    const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(",")) || null;
     const fromDate = data.from;
     const toDate = data.to;
 
@@ -614,11 +555,7 @@ module.exports = {
                                         + NVL (Ipreceipt.irn_refcard, 0))
                                     + NVL (ipreceipt.irn_discount, 0)) <> 0) A`;
     try {
-      const result = await conn_ora.execute(
-        sql,
-        {},
-        { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
-      );
+      const result = await conn_ora.execute(sql, {}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
       await result.resultSet?.getRows((err, rows) => {
         callBack(err, rows);
       });
@@ -636,11 +573,7 @@ module.exports = {
     let pool_ora = await oraConnection();
     let conn_ora = await pool_ora.getConnection();
     try {
-      const result = await conn_ora.execute(
-        `SELECT * FROM MISINCEXPMAST`,
-        {},
-        { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
-      );
+      const result = await conn_ora.execute(`SELECT * FROM MISINCEXPMAST`, {}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
 
       await result.resultSet?.getRows((err, rows) => {
         callBack(err, rows);
@@ -658,11 +591,7 @@ module.exports = {
     let pool_ora = await oraConnection();
     let conn_ora = await pool_ora.getConnection();
     try {
-      const result = await conn_ora.execute(
-        `SELECT * FROM Misincexpgroup`,
-        {},
-        { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
-      );
+      const result = await conn_ora.execute(`SELECT * FROM Misincexpgroup`, {}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
 
       await result.resultSet?.getRows((err, rows) => {
         callBack(err, rows);
@@ -684,11 +613,7 @@ module.exports = {
     const toDate = data.to;
 
     try {
-      const result = await conn_ora.execute(
-        `SELECT 0 AMT,0 TAX FROM DUAL`,
-        {},
-        { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
-      );
+      const result = await conn_ora.execute(`SELECT 0 AMT,0 TAX FROM DUAL`, {}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
       await result.resultSet?.getRows((err, rows) => {
         callBack(err, rows);
       });
