@@ -1,16 +1,16 @@
 // @ts-ignore
-const { oracledb, connectionClose, oraConnection } = require('../../../../../config/oradbconfig');
+const {oracledb, connectionClose, oraConnection} = require("../../../../../config/oradbconfig");
 
 module.exports = {
-        proIncomePart1Tssh: async (data, callBack) => {
-                let pool_ora = await oraConnection();
-                let conn_ora = await pool_ora.getConnection();
+  proIncomePart1Tssh: async (data, callBack) => {
+    let pool_ora = await oraConnection();
+    let conn_ora = await pool_ora.getConnection();
 
-                const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(',')) || null;
-                const fromDate = data.from;
-                const toDate = data.to;
+    const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(",")) || null;
+    const fromDate = data.from;
+    const toDate = data.to;
 
-                const sql = `SELECT Misincexpgroup.Dg_desc,
+    const sql = `SELECT Misincexpgroup.Dg_desc,
                                 Misincexpgroup.Dg_grcode AS Code,
                                 SUM (NVL (SVN_QTY * SVN_RATE, 0) - NVL (SVN_DISAMT, 0)) Amt,
                                 SUM (NVL (PATSERVICE.SVN_TOTTAX, 0)) tax,
@@ -426,33 +426,29 @@ module.exports = {
                                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                         ORDER BY Dg_desc`;
-                try {
-                        const result = await conn_ora.execute(
-                                sql,
-                                {},
-                                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-                        )
-                        await result.resultSet?.getRows((err, rows) => {
-                                callBack(err, rows)
-                        })
-                } catch (error) {
-                        console.log(error)
-                } finally {
-                        if (conn_ora) {
-                                await conn_ora.close();
-                                await pool_ora.close();
-                        }
-                }
-        },
-        proIncomePart2Tssh: async (data, callBack) => {
-                let pool_ora = await oraConnection();
-                let conn_ora = await pool_ora.getConnection();
+    try {
+      const result = await conn_ora.execute(sql, {}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
+      await result.resultSet?.getRows((err, rows) => {
+        callBack(err, rows);
+      });
+    } catch (error) {
+      console.log(error);
+    } finally {
+      if (conn_ora) {
+        await conn_ora.close();
+        await pool_ora.close();
+      }
+    }
+  },
+  proIncomePart2Tssh: async (data, callBack) => {
+    let pool_ora = await oraConnection();
+    let conn_ora = await pool_ora.getConnection();
 
-                const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(',')) || null;
-                const fromDate = data.from;
-                const toDate = data.to;
+    const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(",")) || null;
+    const fromDate = data.from;
+    const toDate = data.to;
 
-                const sql = ` SELECT Misincexpgroup.Dg_desc,
+    const sql = ` SELECT Misincexpgroup.Dg_desc,
                                 Misincexpgroup.Dg_grcode AS Code,
                                 SUM (refundbilldetl.rfn_netamt) * -1 Amt,
                                 SUM (NVL (REFUNDBILLDETL.RFN_TOTTAX, 0)) * -1 tax,
@@ -516,95 +512,61 @@ module.exports = {
                                 AND Disbillmast.dmd_date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
                                 AND DISBILLMAST.IP_NO IN (${ipNumberList})
                                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-                        GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
-                        UNION ALL
-                        SELECT Misincexpgroup.Dg_desc,
-                                Misincexpgroup.Dg_grcode AS Code,
-                                SUM (receiptdetl.rpn_netamt) Amt,
-                                SUM (NVL (Receiptdetl.RPN_TOTTAX, 0)) tax,
-                                SUM ( NVL (receiptdetl.rpn_netamt, 0) + NVL (receiptdetl.rpn_disamt, 0)) GrossAmt,
-                                SUM (0) AS Comp,
-                                SUM (NVL (receiptdetl.rpn_disamt, 0)) discount
-                        FROM Receiptdetl,
-                                Receiptmast,
-                                Prodescription,
-                                Progroup,
-                                Misincexpdtl,
-                                Misincexpgroup,
-                                Opbillmast
-                        WHERE     Receiptmast.RPC_SLNO = Receiptdetl.RPC_SLNO
-                                AND Receiptdetl.Opc_Slno = Opbillmast.Opc_Slno
-                                AND Receiptdetl.pd_code = Prodescription.pd_code
-                                AND Prodescription.pg_code = Progroup.pg_code
-                                AND Misincexpdtl.dg_grcode = Misincexpgroup.dg_grcode
-                                AND Misincexpdtl.Dg_type = 'R'
-                                AND Misincexpdtl.Pc_code = Progroup.pc_code
-                                AND Receiptmast.RPC_CANCEL IS NULL
-                                AND NVL (Opbillmast.Opn_cancel, 'N') = 'N'
-                                AND Opbillmast.Opc_Cacr <> 'M'
-                                AND Receiptmast.RPC_CAcr = 'O'
-                                AND Opbillmast.Opd_date >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND Opbillmast.Opd_date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc`;
 
-                try {
-                        const result = await conn_ora.execute(
-                                sql,
-                                {},
-                                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-                        )
-                        await result.resultSet?.getRows((err, rows) => {
-                                callBack(err, rows)
-                        })
-                } catch (error) {
-                        console.log(error)
-                } finally {
-                        if (conn_ora) {
-                                await conn_ora.close();
-                                await pool_ora.close();
-                        }
-                }
-        },
-        proIncomePart3Tssh: async (data, callBack) => {
-                let pool_ora = await oraConnection();
-                let conn_ora = await pool_ora.getConnection();
+    // UNION ALL
+    // SELECT Misincexpgroup.Dg_desc,
+    //         Misincexpgroup.Dg_grcode AS Code,
+    //         SUM (receiptdetl.rpn_netamt) Amt,
+    //         SUM (NVL (Receiptdetl.RPN_TOTTAX, 0)) tax,
+    //         SUM ( NVL (receiptdetl.rpn_netamt, 0) + NVL (receiptdetl.rpn_disamt, 0)) GrossAmt,
+    //         SUM (0) AS Comp,
+    //         SUM (NVL (receiptdetl.rpn_disamt, 0)) discount
+    // FROM Receiptdetl,
+    //         Receiptmast,
+    //         Prodescription,
+    //         Progroup,
+    //         Misincexpdtl,
+    //         Misincexpgroup,
+    //         Opbillmast
+    // WHERE     Receiptmast.RPC_SLNO = Receiptdetl.RPC_SLNO
+    //         AND Receiptdetl.Opc_Slno = Opbillmast.Opc_Slno
+    //         AND Receiptdetl.pd_code = Prodescription.pd_code
+    //         AND Prodescription.pg_code = Progroup.pg_code
+    //         AND Misincexpdtl.dg_grcode = Misincexpgroup.dg_grcode
+    //         AND Misincexpdtl.Dg_type = 'R'
+    //         AND Misincexpdtl.Pc_code = Progroup.pc_code
+    //         AND Receiptmast.RPC_CANCEL IS NULL
+    //         AND NVL (Opbillmast.Opn_cancel, 'N') = 'N'
+    //         AND Opbillmast.Opc_Cacr <> 'M'
+    //         AND Receiptmast.RPC_CAcr = 'O'
+    //         AND Opbillmast.Opd_date >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+    //         AND Opbillmast.Opd_date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+    //         AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+    // GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc`;
+    try {
+      const result = await conn_ora.execute(sql, {}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
+      await result.resultSet?.getRows((err, rows) => {
+        callBack(err, rows);
+      });
+    } catch (error) {
+      console.log(error);
+    } finally {
+      if (conn_ora) {
+        await conn_ora.close();
+        await pool_ora.close();
+      }
+    }
+  },
+  proIncomePart3Tssh: async (data, callBack) => {
+    let pool_ora = await oraConnection();
+    let conn_ora = await pool_ora.getConnection();
 
-                const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(',')) || null;
-                const fromDate = data.from;
-                const toDate = data.to;
+    const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(",")) || null;
+    const fromDate = data.from;
+    const toDate = data.to;
 
-                const sql = `SELECT Misincexpgroup.Dg_desc,
-                            Misincexpgroup.Dg_grcode AS Code,
-                            SUM ( (Billdetl.pdn_rate * pdn_qty) - NVL (Billdetl.bmn_disamt, 0)) Amt,
-                            SUM (NVL (Billdetl.BDN_TOTTAX, 0)) tax,
-                            SUM ( (Billdetl.pdn_rate * pdn_qty)) GrossAmt,
-                            SUM (0) AS Comp,
-                            SUM (NVL (Billdetl.bmn_disamt, 0)) Discount
-                    FROM Billdetl,
-                            Billmast,
-                            Prodescription,
-                            Progroup,
-                            Misincexpdtl,
-                            Misincexpgroup,
-                            Opbillmast
-                    WHERE Billmast.Bmc_Slno = Billdetl.Bmc_Slno
-                            AND Billdetl.Opc_Slno = Opbillmast.Opc_Slno
-                            AND Billdetl.pd_code = Prodescription.pd_code
-                            AND Prodescription.pg_code = Progroup.pg_code
-                            AND Misincexpdtl.dg_grcode = Misincexpgroup.dg_grcode
-                            AND Misincexpdtl.Dg_type = 'R'
-                            AND Misincexpdtl.Pc_code = Progroup.pc_code
-                            AND Opbillmast.Opc_Cacr <> 'M'
-                            AND Billmast.Bmc_Cacr = 'O'
-                            AND NVL (Billmast.BMC_CANCEL, 'N') = 'N'
-                            AND NVL (Opbillmast.Opn_cancel, 'N') = 'N'
-                            AND Opbillmast.Opd_date >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
-                            AND Opbillmast.Opd_date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
-                            AND billmast.mh_code IN (SELECT MH_CODE FROM multihospital)
-                    GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
-                    UNION ALL
-                    SELECT Misincexpgroup.DG_DESC,
+    const sql = `SELECT Misincexpgroup.DG_DESC,
                             Misincexpgroup.DG_GRCODE AS Code,
                             SUM ( DECODE ( billmast.Bmc_Cacr,  'C', (Billdetl.pdn_rate * pdn_qty)  - NVL (Billdetl.bmn_disamt, 0), 'R', (Billdetl.pdn_rate * pdn_qty) - NVL (Billdetl.bmn_disamt, 0),  0))  Amt,
                             SUM (NVL (Billdetl.BDN_TOTTAX, 0)) tax,
@@ -661,33 +623,28 @@ module.exports = {
                             AND Disbillmast.dmd_date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
                             AND DISBILLMAST.IP_NO IN (${ipNumberList})
                     GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc`;
+    try {
+      const result = await conn_ora.execute(sql, {}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
+      await result.resultSet?.getRows((err, rows) => {
+        callBack(err, rows);
+      });
+    } catch (error) {
+      console.log(error);
+    } finally {
+      if (conn_ora) {
+        await conn_ora.close();
+        await pool_ora.close();
+      }
+    }
+  },
+  proIncomePart4Tssh: async (data, callBack) => {
+    let pool_ora = await oraConnection();
+    let conn_ora = await pool_ora.getConnection();
 
-                try {
-                        const result = await conn_ora.execute(
-                                sql,
-                                {},
-                                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-                        )
-                        await result.resultSet?.getRows((err, rows) => {
-                                callBack(err, rows)
-                        })
-                } catch (error) {
-                        console.log(error)
-                } finally {
-                        if (conn_ora) {
-                                await conn_ora.close();
-                                await pool_ora.close();
-                        }
-                }
-        },
-        proIncomePart4Tssh: async (data, callBack) => {
-                let pool_ora = await oraConnection();
-                let conn_ora = await pool_ora.getConnection();
+    const fromDate = data.from;
+    const toDate = data.to;
 
-                const fromDate = data.from;
-                const toDate = data.to;
-
-                const sql = `SELECT 
+    const sql = `SELECT 
                             '' DG_DESC,
                             0 CODE,
                             0 AMT,
@@ -697,33 +654,29 @@ module.exports = {
                             0 DISCOUNT
                     FROM Misincexpgroup
                     WHERE DG_TYPE = 'E'`;
-                try {
-                        const result = await conn_ora.execute(
-                                sql,
-                                {},
-                                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-                        )
-                        await result.resultSet?.getRows((err, rows) => {
-                                callBack(err, rows)
-                        })
-                } catch (error) {
-                        console.log(error)
-                } finally {
-                        if (conn_ora) {
-                                await conn_ora.close();
-                                await pool_ora.close();
-                        }
-                }
-        },
-        theaterIncomeTssh: async (data, callBack) => {
-                let pool_ora = await oraConnection();
-                let conn_ora = await pool_ora.getConnection();
+    try {
+      const result = await conn_ora.execute(sql, {}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
+      await result.resultSet?.getRows((err, rows) => {
+        callBack(err, rows);
+      });
+    } catch (error) {
+      console.log(error);
+    } finally {
+      if (conn_ora) {
+        await conn_ora.close();
+        await pool_ora.close();
+      }
+    }
+  },
+  theaterIncomeTssh: async (data, callBack) => {
+    let pool_ora = await oraConnection();
+    let conn_ora = await pool_ora.getConnection();
 
-                const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(',')) || null;
-                const fromDate = data.from;
-                const toDate = data.to;
+    const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(",")) || null;
+    const fromDate = data.from;
+    const toDate = data.to;
 
-                const sql = `SELECT Misincexpgroup.Dg_desc,
+    const sql = `SELECT Misincexpgroup.Dg_desc,
                                 Misincexpgroup.Dg_grcode AS Code,
                                 SUM (NVL (srn_operation, 0) - (NVL (Patsurgery.srn_operdis, 0))) Amt,
                                 SUM (NVL (Patsurgery.SRN_OPERTOTTAX, 0)) tax,
@@ -1045,23 +998,18 @@ module.exports = {
                                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         GROUP BY Misincexpgroup.Dg_Grcode, Misincexpgroup.Dg_Desc
                         ORDER BY Dg_desc`;
-                try {
-                        const result = await conn_ora.execute(
-                                sql,
-                                {},
-                                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-                        )
-                        await result.resultSet?.getRows((err, rows) => {
-                                callBack(err, rows)
-                        })
-                } catch (error) {
-                        console.log(error)
-                } finally {
-                        if (conn_ora) {
-                                await conn_ora.close();
-                                await pool_ora.close();
-                        }
-                }
-        },
-}
-
+    try {
+      const result = await conn_ora.execute(sql, {}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
+      await result.resultSet?.getRows((err, rows) => {
+        callBack(err, rows);
+      });
+    } catch (error) {
+      console.log(error);
+    } finally {
+      if (conn_ora) {
+        await conn_ora.close();
+        await pool_ora.close();
+      }
+    }
+  },
+};

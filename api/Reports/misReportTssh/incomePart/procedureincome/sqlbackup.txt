@@ -1,0 +1,88 @@
+const sql = `SELECT Misincexpgroup.Dg_desc,
+                            Misincexpgroup.Dg_grcode AS Code,
+                            SUM ( (Billdetl.pdn_rate * pdn_qty) - NVL (Billdetl.bmn_disamt, 0)) Amt,
+                            SUM (NVL (Billdetl.BDN_TOTTAX, 0)) tax,
+                            SUM ( (Billdetl.pdn_rate * pdn_qty)) GrossAmt,
+                            SUM (0) AS Comp,
+                            SUM (NVL (Billdetl.bmn_disamt, 0)) Discount
+                    FROM Billdetl,
+                            Billmast,
+                            Prodescription,
+                            Progroup,
+                            Misincexpdtl,
+                            Misincexpgroup,
+                            Opbillmast
+                    WHERE Billmast.Bmc_Slno = Billdetl.Bmc_Slno
+                            AND Billdetl.Opc_Slno = Opbillmast.Opc_Slno
+                            AND Billdetl.pd_code = Prodescription.pd_code
+                            AND Prodescription.pg_code = Progroup.pg_code
+                            AND Misincexpdtl.dg_grcode = Misincexpgroup.dg_grcode
+                            AND Misincexpdtl.Dg_type = 'R'
+                            AND Misincexpdtl.Pc_code = Progroup.pc_code
+                            AND Opbillmast.Opc_Cacr <> 'M'
+                            AND Billmast.Bmc_Cacr = 'O'
+                            AND NVL (Billmast.BMC_CANCEL, 'N') = 'N'
+                            AND NVL (Opbillmast.Opn_cancel, 'N') = 'N'
+                            AND Opbillmast.Opd_date >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                            AND Opbillmast.Opd_date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                            AND billmast.mh_code IN (SELECT MH_CODE FROM multihospital)
+                    GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
+                    UNION ALL
+                    SELECT Misincexpgroup.DG_DESC,
+                            Misincexpgroup.DG_GRCODE AS Code,
+                            SUM ( DECODE ( billmast.Bmc_Cacr,  'C', (Billdetl.pdn_rate * pdn_qty)  - NVL (Billdetl.bmn_disamt, 0), 'R', (Billdetl.pdn_rate * pdn_qty) - NVL (Billdetl.bmn_disamt, 0),  0))  Amt,
+                            SUM (NVL (Billdetl.BDN_TOTTAX, 0)) tax,
+                            SUM ( DECODE (billmast.Bmc_Cacr,  'C', (Billdetl.pdn_rate * pdn_qty),  'R', (Billdetl.pdn_rate * pdn_qty))) GrossAmt,
+                            SUM ( DECODE ( billmast.Bmc_Cacr,  'M', (Billdetl.pdn_rate * pdn_qty)  - NVL (Billdetl.bmn_disamt, 0), 0)) AS Comp,
+                            SUM ( DECODE (billmast.Bmc_Cacr,  'C', (Billdetl.bmn_disamt),  'R', (Billdetl.bmn_disamt))) Discount
+                    FROM Billmast,
+                            Billdetl,
+                            Misincexpdtl,
+                            Prodescription,
+                            Progroup,
+                            Misincexpgroup
+                    WHERE Billmast.Bmc_Slno = Billdetl.Bmc_Slno
+                            AND billmast.BMC_COLLCNCODE IS NOT NULL
+                            AND Billdetl.pd_code = Prodescription.pd_code
+                            AND Prodescription.pg_code = Progroup.pg_code
+                            AND Progroup.pc_code = Misincexpdtl.pc_code
+                            AND Misincexpdtl.dg_grcode = Misincexpgroup.dg_grcode
+                            AND Misincexpdtl.Dg_type = 'R'
+                            AND Billmast.Bmc_Cacr IN ('C', 'R')
+                            AND NVL (Billmast.BMC_CANCEL, 'N') = 'N'
+                            AND Billmast.BMD_COLLDATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                            AND billmast.mh_code IN (SELECT MH_CODE FROM multihospital)
+                            AND Billmast.BMD_COLLDATE <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                    GROUP BY Misincexpgroup.DG_GRCODE, Misincexpgroup.DG_DESC
+                    UNION ALL
+                    SELECT Misincexpgroup.Dg_desc,
+                            Misincexpgroup.Dg_grcode AS Code,
+                            SUM ( (Billdetl.pdn_rate * pdn_qty) - NVL (Billdetl.bmn_disamt, 0)) Amt,
+                            SUM (NVL (Billdetl.BDN_TOTTAX, 0)) tax,
+                            SUM ( (Billdetl.pdn_rate * pdn_qty)) GrossAmt,
+                            SUM (0) AS Comp,
+                            SUM (NVL (Billdetl.bmn_disamt, 0)) Discount
+                    FROM Billdetl,
+                            Billmast,
+                            Prodescription,
+                            Progroup,
+                            Misincexpdtl,
+                            Misincexpgroup,
+                            Disbillmast
+                    WHERE Billmast.Bmc_Slno = Billdetl.Bmc_Slno
+                            AND Billmast.Dmc_Slno = Disbillmast.Dmc_Slno
+                            AND Billdetl.pd_code = Prodescription.pd_code
+                            AND Prodescription.pg_code = Progroup.pg_code
+                            AND Misincexpdtl.dg_grcode = Misincexpgroup.dg_grcode
+                            AND Misincexpdtl.Dg_type = 'R'
+                            AND Misincexpdtl.Pc_code = Progroup.pc_code
+                            AND Disbillmast.Dmc_Cacr <> 'M'
+                            AND Billmast.Bmc_Cacr = 'I'
+                            AND NVL (Billmast.BMC_CANCEL, 'N') = 'N'
+                            AND NVL (Disbillmast.Dmc_cancel, 'N') = 'N'
+                            AND Disbillmast.dmd_date >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                            AND billmast.mh_code IN (SELECT MH_CODE FROM multihospital)
+                            AND Disbillmast.dmd_date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                            AND DISBILLMAST.IP_NO IN (${ipNumberList})
+                    GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc`;
+    console.log(`sql statement proIncomePart3grp  ====>>>>`, sql);
