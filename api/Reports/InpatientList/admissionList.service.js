@@ -386,7 +386,7 @@ module.exports = {
                 ip_no
             FROM tssh_ipadmiss
             WHERE dis_status = 'Y' 
-            AND date BETWEEN ? AND ?`,
+            AND date BETWEEN ? AND ? AND tmch_status = 0`,
       [data.from, data.to],
       (error, results, feilds) => {
         if (error) {
