@@ -396,6 +396,22 @@ module.exports = {
       }
     );
   },
+  getDischargedIpInfoFromTMCH: (data, callBack) => {
+    pool.query(
+      `SELECT 
+                ip_no
+            FROM tssh_ipadmiss
+            WHERE dis_status = 'Y' 
+            AND date BETWEEN ? AND ?`,
+      [data.from, data.to],
+      (error, results, feilds) => {
+        if (error) {
+          return callBack(error);
+        }
+        return callBack(null, results);
+      }
+    );
+  },
   getTsshIpNoFromMysqlGrouping: (data, callBack) => {
     //For grouping
     pool.query(
