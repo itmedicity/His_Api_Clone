@@ -70,6 +70,35 @@ const getCompanySlno = async () => {
 
 
 
+const getSchemaByCompanyAndModule = async (companySlno, moduleCode) => {
+
+    const schemaDetail = await mysqlExecute(
+        `
+        SELECT schema_name
+        FROM hsp_company_schema_map
+        WHERE hsp_company_slno = ?
+          AND hsp_module_code  = ?
+          AND hsp_map_status = 1
+        `,
+        [companySlno, moduleCode]
+    );
+
+    // MySQL returns array of rows
+    if (!schemaDetail || schemaDetail?.length === 0) {
+        throw new Error(
+            `Schema not found for company ${companySlno}, module ${moduleCode}`
+        );
+    }
+    const schemaName = schemaDetail[0].schema_name;
+    // SECURITY CHECK REMOVE INVALID SECHEMA
+    if (!/^[A-Z0-9_]+$/i.test(schemaName)) {
+        throw new Error('Invalid schema name');
+    }
+    return schemaName;
+};
+
+
+
 // MySql transaction for patient insert Query
 const mysqlExecuteTransaction = (queries = []) => {
     return new Promise((resolve, reject) => {
@@ -138,4 +167,4 @@ const getLastTriggerDate = async (processId) => {
     });
 };
 
-module.exports = { startLog, endLogSuccess, endLogFailure, mysqlExecute, getCompanySlno, mysqlExecuteTransaction, getLastTriggerDate };
+module.exports = { startLog, endLogSuccess, endLogFailure, mysqlExecute, getCompanySlno, mysqlExecuteTransaction, getLastTriggerDate, getSchemaByCompanyAndModule };

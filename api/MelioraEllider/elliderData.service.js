@@ -1,5 +1,6 @@
 const mysqlpool = require('../../config/dbconfigmeliora');
 const { oraConnection, oracledb } = require('../../config/oradbconfig');
+const { getCompanySlno, getSchemaByCompanyAndModule } = require('../../cron-jobs/CronLogger');
 module.exports = {
 
     //using
@@ -787,34 +788,51 @@ module.exports = {
             }
         }
     },
+
+
     getInpatientFollowUp: async (data, callBack) => {
-        let pool_ora = await oraConnection();
-        let conn_ora = await pool_ora.getConnection();
-        const sql = `SELECT DSC_DESCRIPTION 
-                     FROM CLINICAL.DISCHARGESUMMARYHTML DS
-                     LEFT JOIN CLINICAL.DISCHARGESUMMARY D ON DS.DS_SLNO=D.DS_SLNO
-                     WHERE D.DSC_APPROVAL='Y' AND DS.DSC_HEAD = 'DSC_FOLLOWUP' AND  DS.IP_NO = :IP_NO`;
+        let pool_ora, conn_ora;
         try {
+            pool_ora = await oraConnection();
+            conn_ora = await pool_ora.getConnection();
+
+            const companySlno = await getCompanySlno();
+            if (isNaN(Number(companySlno))) {
+                return callBack(new Error(`Invalid company_slno: ${companySlno}`));
+            }
+
+            // FOR DYNAMICALLY FETCHING DETAIL BASED ON SCHEMA
+            const SCHEMA_NAME = await getSchemaByCompanyAndModule(companySlno, '00');
+
+            const sql = `
+            SELECT DSC_DESCRIPTION 
+            FROM ${SCHEMA_NAME}.DISCHARGESUMMARYHTML DS
+            LEFT JOIN ${SCHEMA_NAME}.DISCHARGESUMMARY D
+                   ON DS.DS_SLNO = D.DS_SLNO
+            WHERE D.DSC_APPROVAL = 'Y'
+              AND DS.DSC_HEAD = 'DSC_FOLLOWUP'
+              AND DS.IP_NO = :IP_NO
+        `;
+
             const result = await conn_ora.execute(
                 sql,
-                {
-                    IP_NO: data.IP_NO,
-                },
-                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-            )
-            await result.resultSet?.getRows((err, rows) => {
-                callBack(err, rows)
-            })
-        }
-        catch (error) {
-            return callBack(error)
+                { IP_NO: data.IP_NO },
+                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
+            );
+
+            result.resultSet.getRows((err, rows) => {
+                callBack(err, rows);
+                result.resultSet.close(() => { });
+            });
+
+        } catch (error) {
+            callBack(error);
         } finally {
-            if (conn_ora) {
-                await conn_ora.close();
-                await pool_ora.close();
-            }
+            if (conn_ora) await conn_ora.close();
         }
     },
+
+
     getPatientByIpNumber: async (data, callBack) => {
         let pool_ora = await oraConnection();
         let conn_ora = await pool_ora.getConnection();
@@ -877,7 +895,7 @@ module.exports = {
         let conn_ora = await pool_ora.getConnection();
 
         const column = data.type === 1 ? "IPD_DATE" : "IPD_DISC";
-        
+
         const sql = `
             SELECT 
                 IP.IP_NO,

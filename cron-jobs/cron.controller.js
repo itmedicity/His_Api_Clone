@@ -2436,6 +2436,10 @@ cron.schedule("0 23 * * *", () => {
   InsertChilderDetailMeliora();
 });
 
+
+
+//JOMOL BIS
+
 // Run via cron- Jomol for BIS
 // cron.schedule("*/2 * * * *", () => {
 //   InsertKmcMedDesc();
