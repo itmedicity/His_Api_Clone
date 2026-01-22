@@ -1,14 +1,11 @@
 // const pool = require('../../config/dbconfig');
-const { oraConnection, oracledb } = require('../../../../config/oradbconfig');
+const {getTmcConnection, oracledb} = require("../../../../config/oradbconfig");
 module.exports = {
+  getOpdatas: async (data, callBack) => {
+    // console.log("data", data);
 
-    getOpdatas: async (data, callBack) => {
-        // console.log("data", data);
-
-        let pool_ora = await oraConnection();
-        let conn_ora = await pool_ora.getConnection();
-        const sql =
-            `
+    let conn_ora = await getTmcConnection();
+    const sql = `
                          SELECT DATEE "DATEE",
                          SUM(NEW_REG) "NEW_REG",
                          SUM(R_VISIT) "R_VISIT",
@@ -31,46 +28,39 @@ module.exports = {
                          GROUP BY DATEE
                          ORDER BY DATEE`;
 
-        // ` SELECT 
-        //             VISIT_DATE,
-        //             SUM(N) "NEW",
-        //             SUM(V) "VISIT"
-        //          FROM (
-        //                  SELECT 
-        //                         DECODE(VSC_ENT,'N',1,0 ) N,
-        //                         DECODE(VSC_ENT,'V',1,0,'C',1,0 ) V,
-        //                         TO_CHAR(VSD_DATE, 'yyyy-mm-dd') AS VISIT_DATE
-        //                  FROM VISITMAST 
-        //                         WHERE ( VSD_DATE >= TO_DATE(:FROM_DATE, 'dd/MM/yyyy hh24:mi:ss') AND VSD_DATE <= TO_DATE(:TO_DATE, 'dd/MM/yyyy hh24:mi:ss') )
-        //                         AND VSC_PTFLAG = 'N' 
-        //                         AND VSC_CANCEL IS NULL) GROUP BY VISIT_DATE`;
-        try {
-            const result = await conn_ora.execute(
-                sql,
-                {
-                    FROM_DATE: data.fromdate,
-                    TO_DATE: data.todate
-                },
-                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-            )
-            await result.resultSet?.getRows((err, rows) => {
-                callBack(err, rows)
-            })
-        }
-        catch (error) {
-            return callBack(error)
-        } finally {
-            if (conn_ora) {
-                await conn_ora.close();
-                await pool_ora.close();
-            }
-        }
-    },
+    // ` SELECT
+    //             VISIT_DATE,
+    //             SUM(N) "NEW",
+    //             SUM(V) "VISIT"
+    //          FROM (
+    //                  SELECT
+    //                         DECODE(VSC_ENT,'N',1,0 ) N,
+    //                         DECODE(VSC_ENT,'V',1,0,'C',1,0 ) V,
+    //                         TO_CHAR(VSD_DATE, 'yyyy-mm-dd') AS VISIT_DATE
+    //                  FROM VISITMAST
+    //                         WHERE ( VSD_DATE >= TO_DATE(:FROM_DATE, 'dd/MM/yyyy hh24:mi:ss') AND VSD_DATE <= TO_DATE(:TO_DATE, 'dd/MM/yyyy hh24:mi:ss') )
+    //                         AND VSC_PTFLAG = 'N'
+    //                         AND VSC_CANCEL IS NULL) GROUP BY VISIT_DATE`;
+    try {
+      const result = await conn_ora.execute(
+        sql,
+        {
+          FROM_DATE: data.fromdate,
+          TO_DATE: data.todate,
+        },
+        {outFormat: oracledb.OUT_FORMAT_OBJECT},
+      );
+      callBack(null, result.rows);
+    } catch (error) {
+      return callBack(error);
+    } finally {
+      if (conn_ora) await conn_ora.close();
+    }
+  },
 
-    getCashcredit: async (data, callBack) => {
-        let pool_ora = await oraConnection();
-        let conn_ora = await pool_ora.getConnection();
-        const sql = `                   
+  getCashcredit: async (data, callBack) => {
+    let conn_ora = await getTmcConnection();
+    const sql = `                   
                      SELECT DATEE"DATEE",SUM(N_REG)"N_REG",SUM(R_VST)"R_VST",SUM(REFUND)"REFUND",SUM(N_REG + R_VST)"TOTAL"
                      FROM (SELECT TO_CHAR(RECEIPTMAST.RPD_DATE,'yyyy-mm-dd') DATEE,
                      SUM(DECODE(RECEIPTMAST.RPC_ENT,'N',RPN_NETAMT,0)) N_REG,
@@ -83,33 +73,26 @@ module.exports = {
                      GROUP BY Rpd_date having SUM(nvl(RPN_NETAMT,0)) <> 0 )
                      GROUP BY DATEE
                      ORDER BY DATEE`;
-        try {
-            const result = await conn_ora.execute(
-                sql,
-                {
-                    FROM_DATE: data.fromdate,
-                    TO_DATE: data.todate
-                },
-                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-            )
-            await result.resultSet?.getRows((err, rows) => {
-                callBack(err, rows)
-            })
-        }
-        catch (error) {
-            return callBack(error)
-        } finally {
-            if (conn_ora) {
-                await conn_ora.close();
-                await pool_ora.close();
-            }
-        }
-    },
+    try {
+      const result = await conn_ora.execute(
+        sql,
+        {
+          FROM_DATE: data.fromdate,
+          TO_DATE: data.todate,
+        },
+        {outFormat: oracledb.OUT_FORMAT_OBJECT},
+      );
+      callBack(null, result.rows);
+    } catch (error) {
+      return callBack(error);
+    } finally {
+      if (conn_ora) await conn_ora.close();
+    }
+  },
 
-    getIpAddmissionCount: async (data, callBack) => {
-        let pool_ora = await oraConnection();
-        let conn_ora = await pool_ora.getConnection();
-        const sql = `                   
+  getIpAddmissionCount: async (data, callBack) => {
+    let conn_ora = await getTmcConnection();
+    const sql = `                   
                  SELECT 
             ADM_DATE, 
             SUM(COUNT) ADM_COUNT
@@ -122,34 +105,26 @@ module.exports = {
              IPADMISS.IPD_DATE <= TO_DATE(:TO_DATE,'dd/MM/yyyy hh24:mi:ss'))
             AND (IPADMISS.IPC_PTFLAG ='N')
             GROUP BY IPADMISS.IPD_DATE) GROUP BY ADM_DATE`;
-        try {
-            const result = await conn_ora.execute(
-                sql,
-                {
-                    FROM_DATE: data.fromdate,
-                    TO_DATE: data.todate
-                },
-                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-            )
-            await result.resultSet?.getRows((err, rows) => {
-                callBack(err, rows)
-            })
+    try {
+      const result = await conn_ora.execute(
+        sql,
+        {
+          FROM_DATE: data.fromdate,
+          TO_DATE: data.todate,
+        },
+        {outFormat: oracledb.OUT_FORMAT_OBJECT},
+      );
+      callBack(null, result.rows);
+    } catch (error) {
+      return callBack(error);
+    } finally {
+      if (conn_ora) await conn_ora.close();
+    }
+  },
 
-        }
-        catch (error) {
-            return callBack(error)
-        } finally {
-            if (conn_ora) {
-                await conn_ora.close();
-                await pool_ora.close();
-            }
-        }
-    },
-
-    getDischargeCount: async (data, callBack) => {
-        let pool_ora = await oraConnection();
-        let conn_ora = await pool_ora.getConnection();
-        const sql = `                   
+  getDischargeCount: async (data, callBack) => {
+    let conn_ora = await getTmcConnection();
+    const sql = `                   
                   SELECT 
                 DIS_DATE ,
                 SUM(DIS_COUNT) DIS_COUNT 
@@ -162,28 +137,20 @@ module.exports = {
                     AND (IPADMISS.IPC_PTFLAG =  'N')
                 GROUP BY IPADMISS.IPD_DISC)
            GROUP BY DIS_DATE`;
-        try {
-            const result = await conn_ora.execute(
-                sql,
-                {
-                    FROM_DATE: data.fromdate,
-                    TO_DATE: data.todate
-                },
-                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-            )
-            await result.resultSet?.getRows((err, rows) => {
-                callBack(err, rows)
-            })
-
-        }
-        catch (error) {
-            return callBack(error)
-        } finally {
-            if (conn_ora) {
-                await conn_ora.close();
-                await pool_ora.close();
-            }
-        }
-    },
-
-}
+    try {
+      const result = await conn_ora.execute(
+        sql,
+        {
+          FROM_DATE: data.fromdate,
+          TO_DATE: data.todate,
+        },
+        {outFormat: oracledb.OUT_FORMAT_OBJECT},
+      );
+      callBack(null, result.rows);
+    } catch (error) {
+      return callBack(error);
+    } finally {
+      if (conn_ora) await conn_ora.close();
+    }
+  },
+};

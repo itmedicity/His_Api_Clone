@@ -1,11 +1,10 @@
-const { oraConnection, oracledb } = require('../../config/oradbconfig');
+const {getTmcConnection, oracledb} = require("../../config/oradbconfig");
 module.exports = {
-    GetElliderPatientList: async (data, callBack) => {
-        let pool_ora = await oraConnection();
-        let conn_ora = await pool_ora.getConnection();
-        try {
-            const result = await conn_ora.execute(
-                `SELECT
+  GetElliderPatientList: async (data, callBack) => {
+    let conn_ora = await getTmcConnection();
+    try {
+      const result = await conn_ora.execute(
+        `SELECT
                        VISITDETL.PT_NO,PATIENT.PTC_PTNAME,PATIENT.PTC_SEX,PATIENT.PTN_DAYAGE,PATIENT.PTN_MONTHAGE,PATIENT.PTN_YEARAGE,
                        PATIENT.PTC_LOADD1,PATIENT.PTC_LOADD2,PATIENT.PTC_LOADD3,PATIENT.PTC_LOADD4,PATIENT.PTC_MOBILE, VISITMAST.VSD_DATE,
                        DOCTOR.DO_CODE,DOCTOR.DOC_NAME,SPECIALITY.DP_CODE,VISITDETL.VSN_TOKEN  
@@ -21,33 +20,30 @@ module.exports = {
                       AND DOCTOR.SP_CODE= SPECIALITY.SP_CODE
                       AND SPECIALITY.DP_CODE=:depCode
                       AND PATIENT.PT_NO=VISITDETL.PT_NO`,
-                {
-                    date1: data.from,
-                    date2: data.to,
-                    depCode: data.depCode
-                },
-                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
-            )
-            const hisData = await result.resultSet?.getRows();
-            return callBack(null, hisData)
-        }
-        catch (error) {
-            return callBack(error)
-        }
-        finally {
-            if (conn_ora) {
-                await conn_ora.close();
-                await pool_ora.close();
-            }
-        }
-    },
+        {
+          date1: data.from,
+          date2: data.to,
+          depCode: data.depCode,
+        },
+        {outFormat: oracledb.OUT_FORMAT_OBJECT},
+      );
+      const hisData = result.rows;
+      return callBack(null, hisData);
+    } catch (error) {
+      return callBack(error);
+    } finally {
+      if (conn_ora) {
+        await conn_ora.close();
+        // await pool_ora.close();
+      }
+    }
+  },
 
-    GetEndoscopyIPInfo: async (id, callBack) => {
-        let pool_ora = await oraConnection();
-        let conn_ora = await pool_ora.getConnection();
-        try {
-            const result = await conn_ora.execute(
-                `SELECT
+  GetEndoscopyIPInfo: async (id, callBack) => {
+    let conn_ora = await getTmcConnection();
+    try {
+      const result = await conn_ora.execute(
+        `SELECT
                        IP_NO,IPD_DATE,PT_NO,PTC_PTNAME,PTC_TYPE,PTC_SEX,PTN_YEARAGE,PTN_MONTHAGE,PTN_DAYAGE,
                        PTC_LOADD1,PTC_LOADD2,PTC_LOADD3,PTC_LOADD4,PTC_MOBILE,IPADMISS.BD_CODE,BDC_NO,IPADMISS.DO_CODE,
                        IPD_DISC,IPC_STATUS,DOC_NAME,BED.NS_CODE,NSC_DESC
@@ -58,31 +54,27 @@ module.exports = {
                     LEFT JOIN DOCTOR ON DOCTOR.DO_CODE=IPADMISS.DO_CODE
                  WHERE
                        IPC_PTFLAG='N' AND IPD_DISC IS NULL AND IP_NO=:ipno`,
-                {
-                    ipno: id
-                },
-                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
-            )
-            const hisData = await result.resultSet?.getRows();
-            return callBack(null, hisData)
-        }
-        catch (error) {
-            return callBack(error)
-        }
-        finally {
-            if (conn_ora) {
-                await conn_ora.close();
-                await pool_ora.close();
-            }
-        }
-    },
+        {
+          ipno: id,
+        },
+        {outFormat: oracledb.OUT_FORMAT_OBJECT},
+      );
+      const hisData = result.rows;
+      return callBack(null, hisData);
+    } catch (error) {
+      return callBack(error);
+    } finally {
+      if (conn_ora) {
+        await conn_ora.close();
+      }
+    }
+  },
 
-    GetInitialAssessmentDetails: async (data, callBack) => {
-        let pool_ora = await oraConnection();
-        let conn_ora = await pool_ora.getConnection();
-        try {
-            const result = await conn_ora.execute(
-                `SELECT
+  GetInitialAssessmentDetails: async (data, callBack) => {
+    let conn_ora = await getTmcConnection();
+    try {
+      const result = await conn_ora.execute(
+        `SELECT
                       VISITMAST.VSC_SLNO,VISITMAST.VSD_DATE,VISITDETL.PT_NO,PATIENT.PTC_PTNAME,PATIENT.PTC_MOBILE,
                       MIN(NURSE_ASSESSMENT.ENT_DATE) AS ASSESS_START_DATE,MAX(NURSE_ASSESSMENT.EDT_DATE) AS ASSESS_END_DATE,
                       ROUND((MAX(NURSE_ASSESSMENT.EDT_DATE)- MIN(NURSE_ASSESSMENT.ENT_DATE)) * 24 * 60) AS SERVICE_TIME,
@@ -115,33 +107,29 @@ module.exports = {
                       PATIENT.PTN_DAYAGE,PATIENT.PTN_MONTHAGE,PATIENT.PTN_YEARAGE,PATIENT.PTC_LOADD1,PATIENT.PTC_LOADD3,
                       PATIENT.PTC_MOBILE,DOCTOR.DOC_NAME,OPPATIENTCONSULT.CONSULT_START_DATE,COMPLAINTEXAM.ED_DATE,
                       OPPATIENTINVGST.EDT_DATE,VISITREQMAST.VRD_DATE`,
-                {
-                    date1: data.from,
-                    date2: data.to,
-                    depCode: data.depCode
-                },
-                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
-            )
-            const hisData = await result.resultSet?.getRows();
-            return callBack(null, hisData)
-        }
-        catch (error) {
-            return callBack(error)
-        }
-        finally {
-            if (conn_ora) {
-                await conn_ora.close();
-                await pool_ora.close();
-            }
-        }
-    },
+        {
+          date1: data.from,
+          date2: data.to,
+          depCode: data.depCode,
+        },
+        {outFormat: oracledb.OUT_FORMAT_OBJECT},
+      );
+      const hisData = result.rows;
+      return callBack(null, hisData);
+    } catch (error) {
+      return callBack(error);
+    } finally {
+      if (conn_ora) {
+        await conn_ora.close();
+      }
+    }
+  },
 
-    GetEndoscopyPatientsQI: async (data, callBack) => {
-        let pool_ora = await oraConnection();
-        let conn_ora = await pool_ora.getConnection();
-        try {
-            const result = await conn_ora.execute(
-                `SELECT
+  GetEndoscopyPatientsQI: async (data, callBack) => {
+    let conn_ora = await getTmcConnection();
+    try {
+      const result = await conn_ora.execute(
+        `SELECT
                        NURSE_ASSESSMENT.VSC_SLNO,
                        VISITMAST.VSD_DATE,
                        NURSE_ASSESSMENT.PT_NO,
@@ -161,33 +149,29 @@ module.exports = {
                        NURSE_ASSESSMENT.VSC_SLNO,
                        VISITMAST.VSD_DATE,
                        NURSE_ASSESSMENT.PT_NO`,
-                {
-                    date1: data.from,
-                    depCode: data.depCode,
-                    ptno: data.ptno
-                },
-                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
-            )
-            const hisData = await result.resultSet?.getRows();
-            return callBack(null, hisData)
-        }
-        catch (error) {
-            return callBack(error)
-        }
-        finally {
-            if (conn_ora) {
-                await conn_ora.close();
-                await pool_ora.close();
-            }
-        }
-    },
+        {
+          date1: data.from,
+          depCode: data.depCode,
+          ptno: data.ptno,
+        },
+        {outFormat: oracledb.OUT_FORMAT_OBJECT},
+      );
+      const hisData = await result.rows;
+      return callBack(null, hisData);
+    } catch (error) {
+      return callBack(error);
+    } finally {
+      if (conn_ora) {
+        await conn_ora.close();
+      }
+    }
+  },
 
-    GetIPPatientList: async (data, callBack) => {
-        let pool_ora = await oraConnection();
-        let conn_ora = await pool_ora.getConnection();
-        try {
-            const result = await conn_ora.execute(
-                `SELECT
+  GetIPPatientList: async (data, callBack) => {
+    let conn_ora = await getTmcConnection();
+    try {
+      const result = await conn_ora.execute(
+        `SELECT
                        IP_NO,IPD_DATE,PT_NO,PTC_PTNAME,PTC_TYPE,PTC_SEX,PTN_YEARAGE,PTN_MONTHAGE,PTN_DAYAGE,PTC_LOADD1,
                        PTC_LOADD2,PTC_MOBILE,IPADMISS.BD_CODE,BDC_NO,IPADMISS.DO_CODE,IPD_DISC,IPC_STATUS,DOC_NAME
                  FROM 
@@ -199,27 +183,21 @@ module.exports = {
                        IPD_DATE <= TO_DATE(:date2,'dd/MM/yyyy hh24:mi:ss') AND
                        IPC_PTFLAG='N'AND
                        BED.NS_CODE=:nsCode`,
-                {
-                    date1: data.from,
-                    date2: data.to,
-                    nsCode: data.nsCode
-                },
-                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
-            )
-            const hisData = await result.resultSet?.getRows();
-            return callBack(null, hisData)
-        }
-        catch (error) {
-            return callBack(error)
-        }
-        finally {
-            if (conn_ora) {
-                await conn_ora.close();
-                await pool_ora.close();
-            }
-        }
-    },
-}
-
-
-
+        {
+          date1: data.from,
+          date2: data.to,
+          nsCode: data.nsCode,
+        },
+        {outFormat: oracledb.OUT_FORMAT_OBJECT},
+      );
+      const hisData = result.rows;
+      return callBack(null, hisData);
+    } catch (error) {
+      return callBack(error);
+    } finally {
+      if (conn_ora) {
+        await conn_ora.close();
+      }
+    }
+  },
+};

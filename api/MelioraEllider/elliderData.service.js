@@ -1,12 +1,10 @@
-const mysqlpool = require('../../config/dbconfigmeliora');
-const { oraConnection, oracledb } = require('../../config/oradbconfig');
+const mysqlpool = require("../../config/dbconfigmeliora");
+const {oracledb, getTmcConnection} = require("../../config/oradbconfig");
 module.exports = {
-
-    //using
-    getOutlet: async (callBack) => {
-        let pool_ora = await oraConnection();
-        let conn_ora = await pool_ora.getConnection();
-        const sql = `SELECT 
+  //using
+  getOutlet: async (callBack) => {
+    let conn_ora = await getTmcConnection();
+    const sql = `SELECT 
                            OU_CODE,
                            OUC_DESC,
                            OUC_ALIAS
@@ -15,35 +13,24 @@ module.exports = {
                      WHERE 
                            OUC_STATUS='Y'
                      ORDER BY OUC_DESC    `;
-        try {
-            const result = await conn_ora.execute(
-                sql,
-                [],
-                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-            )
-
-            await result.resultSet?.getRows((err, rows) => {
-                callBack(err, rows)
-            })
-            // const outletFromOra = await result.resultSet?.getRows();
-            // console.log(outletFromOra);
-            // return callBack(null, outletFromOra)
-        }
-        catch (error) {
-            return callBack(error)
-        } finally {
-            if (conn_ora) {
-                await conn_ora.close();
-                await pool_ora.close();
-            }
-        }
-
-    },
-    //using
-    getNursingStation: async (callBack) => {
-        let pool_ora = await oraConnection();
-        let conn_ora = await pool_ora.getConnection();
-        const sql = `SELECT 
+    try {
+      const result = await conn_ora.execute(sql, [], {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      // await result.resultSet?.getRows((err, rows) => {
+      // })
+      callBack(err, result.rows);
+      // const outletFromOra = await result.resultSet?.getRows();
+      // console.log(outletFromOra);
+      // return callBack(null, outletFromOra)
+    } catch (error) {
+      return callBack(error);
+    } finally {
+      await conn_ora.close();
+    }
+  },
+  //using
+  getNursingStation: async (callBack) => {
+    let conn_ora = await getTmcConnection();
+    const sql = `SELECT 
                         NS_CODE,
                         NSC_DESC,
                         NSC_ALIAS
@@ -52,31 +39,21 @@ module.exports = {
                     WHERE 
                         NSC_STATUS='Y'
                     ORDER BY NSC_DESC`;
-        try {
-            const result = await conn_ora.execute(
-                sql,
-                [],
-                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-            )
-            await result.resultSet?.getRows((err, rows) => {
-                callBack(err, rows)
-            })
-        }
-        catch (error) {
-            return callBack(error)
-        } finally {
-            if (conn_ora) {
-                await conn_ora.close();
-                await pool_ora.close();
-            }
-        }
+    try {
+      const result = await conn_ora.execute(sql, [], {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      //   await result.resultSet?.getRows((err, rows) => {
+      // });
+      callBack(err, result.rows);
+    } catch (error) {
+      return callBack(error);
+    } finally {
+      await conn_ora.close();
+    }
+  },
 
-    },
-
-    getRoomType: async (callBack) => {
-        let pool_ora = await oraConnection();
-        let conn_ora = await pool_ora.getConnection();
-        const sql = `SELECT 
+  getRoomType: async (callBack) => {
+    let conn_ora = await getTmcConnection();
+    const sql = `SELECT 
                            RT_CODE,
                            RTC_DESC,
                            RTC_ALIAS
@@ -85,31 +62,21 @@ module.exports = {
                      WHERE 
                            RTC_STATUS='Y'
                      ORDER BY RTC_DESC`;
-        try {
-            const result = await conn_ora.execute(
-                sql,
-                [],
-                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-            )
-            await result.resultSet?.getRows((err, rows) => {
-                callBack(err, rows)
-            })
-        }
-        catch (error) {
-            return callBack(error)
-        } finally {
-            if (conn_ora) {
-                await conn_ora.close();
-                await pool_ora.close();
-            }
-        }
-    },
+    try {
+      const result = await conn_ora.execute(sql, [], {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      //   await result.resultSet?.getRows((err, rows) => {
+      // });
+      callBack(err, result.rows);
+    } catch (error) {
+      return callBack(error);
+    } finally {
+      await conn_ora.close();
+    }
+  },
 
-
-    getRoomCategory: async (callBack) => {
-        let pool_ora = await oraConnection();
-        let conn_ora = await pool_ora.getConnection();
-        const sql = `SELECT 
+  getRoomCategory: async (callBack) => {
+    let conn_ora = await getTmcConnection();
+    const sql = `SELECT 
                            RC_CODE,
                            RCC_DESC,
                            RCC_ALIAS
@@ -118,30 +85,21 @@ module.exports = {
                      WHERE 
                            RCC_STATUS='Y'
                      ORDER BY RCC_DESC      `;
-        try {
-            const result = await conn_ora.execute(
-                sql,
-                [],
-                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-            )
-            await result.resultSet?.getRows((err, rows) => {
-                callBack(err, rows)
-            })
-        }
-        catch (error) {
-            return callBack(error)
-        } finally {
-            if (conn_ora) {
-                await conn_ora.close();
-                await pool_ora.close();
-            }
-        }
-    },
+    try {
+      const result = await conn_ora.execute(sql, [], {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      //   await result.resultSet?.getRows((err, rows) => {
+      // });
+      callBack(err, result.rows);
+    } catch (error) {
+      return callBack(error);
+    } finally {
+      await conn_ora.close();
+    }
+  },
 
-    getRoomDetails: async (callBack) => {
-        let pool_ora = await oraConnection();
-        let conn_ora = await pool_ora.getConnection();
-        const sql = `SELECT 
+  getRoomDetails: async (callBack) => {
+    let conn_ora = await getTmcConnection();
+    const sql = `SELECT 
                            RM_CODE,
                            RMC_DESC,
                            RMC_ALIAS
@@ -150,30 +108,21 @@ module.exports = {
                      WHERE 
                            RMC_STATUS='Y'
                      ORDER BY RMC_DESC`;
-        try {
-            const result = await conn_ora.execute(
-                sql,
-                [],
-                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-            )
-            await result.resultSet?.getRows((err, rows) => {
-                callBack(err, rows)
-            })
-        }
-        catch (error) {
-            return callBack(error)
-        } finally {
-            if (conn_ora) {
-                await conn_ora.close();
-                await pool_ora.close();
-            }
-        }
-    },
-    //using
-    getInpatientDetails: async (data, callBack) => {
-        let pool_ora = await oraConnection();
-        let conn_ora = await pool_ora.getConnection();
-        const sql = `
+    try {
+      const result = await conn_ora.execute(sql, [], {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      //   await result.resultSet?.getRows((err, rows) => {
+      // });
+      callBack(err, result.rows);
+    } catch (error) {
+      return callBack(error);
+    } finally {
+      await conn_ora.close();
+    }
+  },
+  //using
+  getInpatientDetails: async (data, callBack) => {
+    let conn_ora = await getTmcConnection();
+    const sql = `
                 SELECT  IPADMISS.IP_NO, 
                             IPADMISS.IPD_DATE, 
                             IPADMISS.PT_NO,
@@ -290,34 +239,29 @@ module.exports = {
                         and patient.SA_CODE = Salutation.sa_code(+) 
                         and ipadmiss.rc_code=roomtype.rc_code ORDER BY bdc_no
            `;
-        try {
-            const result = await conn_ora.execute(
-                sql,
-                {
-                    NS_CODE: data.NS_CODE,
-                    TO_DATE: data.TO_DATE
-                },
-                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-            )
-            await result.resultSet?.getRows((err, rows) => {
-                callBack(err, rows)
-            })
-        }
-        catch (error) {
-            console.log(error)
-        } finally {
-            if (conn_ora) {
-                await conn_ora.close();
-                await pool_ora.close();
-            }
-        }
-    },
+    try {
+      const result = await conn_ora.execute(
+        sql,
+        {
+          NS_CODE: data.NS_CODE,
+          TO_DATE: data.TO_DATE,
+        },
+        {outFormat: oracledb.OUT_FORMAT_OBJECT},
+      );
+      //   await result.resultSet?.getRows((err, rows) => {
+      // });
+      callBack(err, result.rows);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      await conn_ora.close();
+    }
+  },
 
-    //not using
-    getPatientDetails: async (callBack) => {
-        let pool_ora = await oraConnection();
-        let conn_ora = await pool_ora.getConnection();
-        const sql = `SELECT 
+  //not using
+  getPatientDetails: async (callBack) => {
+    let conn_ora = await getTmcConnection();
+    const sql = `SELECT 
                            PT_NO,                 
                            PTD_DATE,             
                            PTC_PTNAME,            
@@ -481,30 +425,21 @@ module.exports = {
                     WHERE 
                            PTC_PTFLAG='N'
                        ORDER BY PTD_DATE`;
-        try {
-            const result = await conn_ora.execute(
-                sql,
-                {},
-                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-            )
-            await result.resultSet?.getRows((err, rows) => {
-                callBack(err, rows)
-            })
-        }
-        catch (error) {
-            console.log(error)
-        } finally {
-            if (conn_ora) {
-                await conn_ora.close();
-                await pool_ora.close();
-            }
-        }
-    },
-    //using
-    getNursingBed: async (data, callBack) => {
-        let pool_ora = await oraConnection();
-        let conn_ora = await pool_ora.getConnection();
-        const sql = `SELECT 
+    try {
+      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      //   await result.resultSet?.getRows((err, rows) => {
+      // });
+      callBack(err, result.rows);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      await conn_ora.close();
+    }
+  },
+  //using
+  getNursingBed: async (data, callBack) => {
+    let conn_ora = await getTmcConnection();
+    const sql = `SELECT 
          N.NS_CODE,  
          N.NSC_DESC,
          N.NSC_STATUS,
@@ -531,33 +466,28 @@ module.exports = {
      LEFT JOIN ROOMCATEGORY C ON R.RC_CODE=C.RC_CODE
      WHERE N.NSC_STATUS='Y' AND BD.BDC_STATUS='Y' AND R.RTC_STATUS='Y' AND N.NS_CODE=:NS_CODE
      GROUP BY N.NS_CODE,N.NSC_DESC,N.NSC_STATUS,BD.BDC_NO,BD.BDC_OCCUP,BD.BD_CODE,BD.BDC_VIPBED,R.RTC_DESC,C.RCC_DESC,R.ICU,BD.RT_CODE,BD.BDC_STATUS,BD.HKD_CLEANINGREQ,BD.RM_CODE,BD.BDC_MHCODE,R.RC_CODE,R.RTC_STATUS,R.ICU,R.RTC_MHCODE
-     ORDER BY BD.BDC_NO `
-        try {
-            const result = await conn_ora.execute(
-                sql,
-                {
-                    NS_CODE: data.NS_CODE
-                },
-                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-            )
-            await result.resultSet?.getRows((err, rows) => {
-                callBack(err, rows)
-            })
-        }
-        catch (error) {
-            return callBack(error)
-        } finally {
-            if (conn_ora) {
-                await conn_ora.close();
-                await pool_ora.close();
-            }
-        }
-    },
-    //using
-    getCurrentPatient: async (data, callBack) => {
-        let pool_ora = await oraConnection();
-        let conn_ora = await pool_ora.getConnection();
-        const sql = `SELECT 
+     ORDER BY BD.BDC_NO `;
+    try {
+      const result = await conn_ora.execute(
+        sql,
+        {
+          NS_CODE: data.NS_CODE,
+        },
+        {outFormat: oracledb.OUT_FORMAT_OBJECT},
+      );
+      //   await result.resultSet?.getRows((err, rows) => {
+      // });
+      callBack(err, result.rows);
+    } catch (error) {
+      return callBack(error);
+    } finally {
+      await conn_ora.close();
+    }
+  },
+  //using
+  getCurrentPatient: async (data, callBack) => {
+    let conn_ora = await getTmcConnection();
+    const sql = `SELECT 
                            IP_NO,                      
                            IPD_DATE,                   
                            PT_NO,                        
@@ -705,33 +635,28 @@ module.exports = {
                        AND NURSTATION.NS_CODE =:NS_CODE
                        AND IPADMISS.BD_CODE =:BD_CODE
                        ORDER BY IPADMISS.IP_NO`;
-        try {
-            const result = await conn_ora.execute(
-                sql,
-                {
-                    NS_CODE: data.NS_CODE,
-                    BD_CODE: data.BD_CODE
-                },
-                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-            )
-            await result.resultSet?.getRows((err, rows) => {
-                callBack(err, rows)
-            })
-        }
-        catch (error) {
-            console.log(error)
-        } finally {
-            if (conn_ora) {
-                await conn_ora.close();
-                await pool_ora.close();
-            }
-        }
-    },
-    //using
-    getDisChargedPatient: async (data, callBack) => {
-        let pool_ora = await oraConnection();
-        let conn_ora = await pool_ora.getConnection();
-        const sql = `
+    try {
+      const result = await conn_ora.execute(
+        sql,
+        {
+          NS_CODE: data.NS_CODE,
+          BD_CODE: data.BD_CODE,
+        },
+        {outFormat: oracledb.OUT_FORMAT_OBJECT},
+      );
+      //   await result.resultSet?.getRows((err, rows) => {
+      // });
+      callBack(err, result.rows);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      await conn_ora.close();
+    }
+  },
+  //using
+  getDisChargedPatient: async (data, callBack) => {
+    let conn_ora = await getTmcConnection();
+    const sql = `
         SELECT Row_Number( ) Over (Partition By 1 Order By  Ipadmiss.ipd_disc,Nurstation.nsc_alias) "Slno", 
        Ipadmiss.ipd_date"Admission_Date", 
        Ipadmiss.ipd_disc"Discharge_Date", 
@@ -765,60 +690,50 @@ module.exports = {
           Patient.ptc_ptflag in ('N       ') and 
           Nvl(Disbillmast.Dmc_cancel,'N') ='N' and  
           Trunc(Ipadmiss.ipd_disc)  between to_date(:FROM_DATE,'dd/MM/yyyy hh24:mi:ss') and to_date(:TO_DATE,'dd/MM/yyyy hh24:mi:ss')`;
-        try {
-            const result = await conn_ora.execute(
-                sql,
-                {
-                    TO_DATE: data.TO_DATE,
-                    FROM_DATE: data.FROM_DATE
-                },
-                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-            )
-            await result.resultSet?.getRows((err, rows) => {
-                callBack(err, rows)
-            })
-        }
-        catch (error) {
-            return callBack(error)
-        } finally {
-            if (conn_ora) {
-                await conn_ora.close();
-                await pool_ora.close();
-            }
-        }
-    },
-    getInpatientFollowUp: async (data, callBack) => {
-        let pool_ora = await oraConnection();
-        let conn_ora = await pool_ora.getConnection();
-        const sql = `SELECT DSC_DESCRIPTION 
+    try {
+      const result = await conn_ora.execute(
+        sql,
+        {
+          TO_DATE: data.TO_DATE,
+          FROM_DATE: data.FROM_DATE,
+        },
+        {outFormat: oracledb.OUT_FORMAT_OBJECT},
+      );
+      //   await result.resultSet?.getRows((err, rows) => {
+      // });
+      callBack(err, result.rows);
+    } catch (error) {
+      return callBack(error);
+    } finally {
+      await conn_ora.close();
+    }
+  },
+  getInpatientFollowUp: async (data, callBack) => {
+    let conn_ora = await getTmcConnection();
+    const sql = `SELECT DSC_DESCRIPTION 
                      FROM CLINICAL.DISCHARGESUMMARYHTML DS
                      LEFT JOIN CLINICAL.DISCHARGESUMMARY D ON DS.DS_SLNO=D.DS_SLNO
                      WHERE D.DSC_APPROVAL='Y' AND DS.DSC_HEAD = 'DSC_FOLLOWUP' AND  DS.IP_NO = :IP_NO`;
-        try {
-            const result = await conn_ora.execute(
-                sql,
-                {
-                    IP_NO: data.IP_NO,
-                },
-                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-            )
-            await result.resultSet?.getRows((err, rows) => {
-                callBack(err, rows)
-            })
-        }
-        catch (error) {
-            return callBack(error)
-        } finally {
-            if (conn_ora) {
-                await conn_ora.close();
-                await pool_ora.close();
-            }
-        }
-    },
-    getPatientByIpNumber: async (data, callBack) => {
-        let pool_ora = await oraConnection();
-        let conn_ora = await pool_ora.getConnection();
-        const sql = `
+    try {
+      const result = await conn_ora.execute(
+        sql,
+        {
+          IP_NO: data.IP_NO,
+        },
+        {outFormat: oracledb.OUT_FORMAT_OBJECT},
+      );
+      //   await result.resultSet?.getRows((err, rows) => {
+      // });
+      callBack(err, result.rows);
+    } catch (error) {
+      return callBack(error);
+    } finally {
+      await conn_ora.close();
+    }
+  },
+  getPatientByIpNumber: async (data, callBack) => {
+    let conn_ora = await getTmcConnection();
+    const sql = `
         select ipadmiss.IP_NO,
                     ipadmiss.IPD_DATE,
                     ipadmiss.PT_NO,
@@ -851,34 +766,29 @@ module.exports = {
                LEFT JOIN speciality ON doctor.SP_CODE=speciality.SP_CODE 
                LEFT JOIN department ON speciality.DP_CODE=department.DP_CODE
                     WHERE ipadmiss.ip_no=:IP_NO and ipc_ptflag='N' `;
-        try {
-            const result = await conn_ora.execute(
-                sql,
-                {
-                    IP_NO: data.ipnumber,
-                },
-                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-            )
-            await result.resultSet?.getRows((err, rows) => {
-                callBack(err, rows)
-            })
-        }
-        catch (error) {
-            return callBack(error)
-        } finally {
-            if (conn_ora) {
-                await conn_ora.close();
-                await pool_ora.close();
-            }
-        }
-    },
-    getPatientDetail: async (data, callBack) => {
-        let pool_ora = await oraConnection();
-        let conn_ora = await pool_ora.getConnection();
+    try {
+      const result = await conn_ora.execute(
+        sql,
+        {
+          IP_NO: data.ipnumber,
+        },
+        {outFormat: oracledb.OUT_FORMAT_OBJECT},
+      );
+      //   await result.resultSet?.getRows((err, rows) => {
+      // });
+      callBack(err, result.rows);
+    } catch (error) {
+      return callBack(error);
+    } finally {
+      await conn_ora.close();
+    }
+  },
+  getPatientDetail: async (data, callBack) => {
+    let conn_ora = await getTmcConnection();
 
-        const column = data.type === 1 ? "IPD_DATE" : "IPD_DISC";
-        
-        const sql = `
+    const column = data.type === 1 ? "IPD_DATE" : "IPD_DISC";
+
+    const sql = `
             SELECT 
                 IP.IP_NO,
                 IP.IPD_DATE,
@@ -915,30 +825,27 @@ module.exports = {
             AND IP.${column}  <TO_DATE (:TO_DATE, 'YYYY-MM-DD HH24:MI:SS') AND IPC_PTFLAG='N'
         `;
 
-
-        try {
-            const result = await conn_ora.execute(
-                sql,
-                {
-                    FROM_DATE: data.fromDate,
-                    TO_DATE: data.toDate,
-                },
-                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
-            );
-
-            await result.resultSet?.getRows((err, rows) => {
-                callBack(err, rows);
-            });
-        } catch (error) {
-            return callBack(error);
-        } finally {
-            if (conn_ora) await conn_ora.close();
-        }
-    },
-    getBedMasterDetail: async (data, callBack) => {
-        let pool_ora = await oraConnection();
-        let conn_ora = await pool_ora.getConnection();
-        const sql = `
+    try {
+      const result = await conn_ora.execute(
+        sql,
+        {
+          FROM_DATE: data.fromDate,
+          TO_DATE: data.toDate,
+        },
+        {outFormat: oracledb.OUT_FORMAT_OBJECT},
+      );
+      //   await result.resultSet?.getRows((err, rows) => {
+      // });
+      callBack(err, result.rows);
+    } catch (error) {
+      return callBack(error);
+    } finally {
+      if (conn_ora) await conn_ora.close();
+    }
+  },
+  getBedMasterDetail: async (data, callBack) => {
+    let conn_ora = await getTmcConnection();
+    const sql = `
         SELECT
             B.BD_CODE,
             B.BDC_NO,
@@ -984,34 +891,27 @@ module.exports = {
             AND TRUNC(N.NSD_EDDATE) >= TO_DATE(:TO_DATE, 'DD-MON-YYYY')
 `;
 
+    try {
+      const result = await conn_ora.execute(
+        sql,
+        {
+          TO_DATE: data.lastUpdteDate,
+        },
+        {outFormat: oracledb.OUT_FORMAT_OBJECT},
+      );
+      //   await result.resultSet?.getRows((err, rows) => {
+      // });
+      callBack(err, result.rows);
+    } catch (error) {
+      return callBack(error);
+    } finally {
+      await conn_ora.close();
+    }
+  },
 
-        try {
-            const result = await conn_ora.execute(
-                sql,
-                {
-                    TO_DATE: data.lastUpdteDate,
-                },
-                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-            )
-            await result.resultSet?.getRows((err, rows) => {
-                callBack(err, rows)
-            })
-        }
-        catch (error) {
-            return callBack(error)
-        } finally {
-            if (conn_ora) {
-                await conn_ora.close();
-                await pool_ora.close();
-            }
-        }
-
-    },
-
-    getPatientDetailFromNursingStation: async (data, callBack) => {
-        let pool_ora = await oraConnection();
-        let conn_ora = await pool_ora.getConnection();
-        const sql = `
+  getPatientDetailFromNursingStation: async (data, callBack) => {
+    let conn_ora = await getTmcConnection();
+    const sql = `
         SELECT ipadmiss.IP_NO,
        ipadmiss.IPD_DATE,
        ipadmiss.PT_NO,
@@ -1079,48 +979,40 @@ GROUP BY ipadmiss.IP_NO,
          department.dpc_desc
 `;
 
+    try {
+      const result = await conn_ora.execute(
+        sql,
+        {
+          NS_CODE: data.NS_CODE,
+        },
+        {outFormat: oracledb.OUT_FORMAT_OBJECT},
+      );
+      //   await result.resultSet?.getRows((err, rows) => {
+      // });
+      callBack(err, result.rows);
+    } catch (error) {
+      return callBack(error);
+    } finally {
+      await conn_ora.close();
+    }
+  },
 
-        try {
-            const result = await conn_ora.execute(
-                sql,
-                {
-                    NS_CODE: data.NS_CODE,
-                },
-                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-            )
-            await result.resultSet?.getRows((err, rows) => {
-                callBack(err, rows)
-            })
-        }
-        catch (error) {
-            return callBack(error)
-        } finally {
-            if (conn_ora) {
-                await conn_ora.close();
-                await pool_ora.close();
-            }
-        }
+  getRoomDetailEllider: async (data, callBack) => {
+    // let pool_ora;
+    // let conn_ora;
+    try {
+      let conn_ora = await getTmcConnection();
 
-    },
-
-
-    getRoomDetailEllider: async (data, callBack) => {
-        let pool_ora;
-        let conn_ora;
-        try {
-            pool_ora = await oraConnection();
-            conn_ora = await pool_ora.getConnection();
-
-            if (!data || data.length === 0) {
-                return callBack(null, []); // no codes to query
-            }
-            //  Join the codes directly into the query
-            const codes = data.map(code => `'${code}'`).join(',');
-            const sql = `
+      if (!data || data.length === 0) {
+        return callBack(null, []); // no codes to query
+      }
+      //  Join the codes directly into the query
+      const codes = data.map((code) => `'${code}'`).join(",");
+      const sql = `
             SELECT 
                 RT_CODE,
                 RTC_DESC,
-                RTC_ALIAS,
+                 RTC_ALIAS,
                 RC_CODE,
                 RTC_STATUS,
                 ICU,
@@ -1131,32 +1023,31 @@ GROUP BY ipadmiss.IP_NO,
                 RT_CODE IN (${codes})
         `;
 
-            const result = await conn_ora.execute(sql, [], {
-                outFormat: oracledb.OUT_FORMAT_OBJECT
-            });
+      const result = await conn_ora.execute(sql, [], {
+        outFormat: oracledb.OUT_FORMAT_OBJECT,
+      });
 
-            callBack(null, result.rows);
-        } catch (error) {
-            console.log("Oracle Error:", error);
-            callBack(error);
-        } finally {
-            if (conn_ora) await conn_ora.close();
-            if (pool_ora) await pool_ora.close();
-        }
-    },
-    getRoomCategoryDetailEllider: async (data, callBack) => {
-        let pool_ora;
-        let conn_ora;
-        try {
-            pool_ora = await oraConnection();
-            conn_ora = await pool_ora.getConnection();
+      callBack(null, result.rows);
+    } catch (error) {
+      console.log("Oracle Error:", error);
+      callBack(error);
+    } finally {
+      if (conn_ora) await conn_ora.close();
+      //   if (pool_ora) await pool_ora.close();
+    }
+  },
+  getRoomCategoryDetailEllider: async (data, callBack) => {
+    // let pool_ora;
+    // let conn_ora;
+    try {
+      let conn_ora = await getTmcConnection();
 
-            if (!data || data.length === 0) {
-                return callBack(null, []); // no codes to query
-            }
-            //  Join the codes directly into the query
-            const codes = data.map(code => `'${code}'`).join(',');
-            const sql = `
+      if (!data || data.length === 0) {
+        return callBack(null, []); // no codes to query
+      }
+      //  Join the codes directly into the query
+      const codes = data.map((code) => `'${code}'`).join(",");
+      const sql = `
             SELECT 
                 RC_CODE,
                 RCC_DESC,
@@ -1169,32 +1060,30 @@ GROUP BY ipadmiss.IP_NO,
                 RC_CODE IN (${codes})
         `;
 
-            const result = await conn_ora.execute(sql, [], {
-                outFormat: oracledb.OUT_FORMAT_OBJECT
-            });
+      const result = await conn_ora.execute(sql, [], {
+        outFormat: oracledb.OUT_FORMAT_OBJECT,
+      });
 
-            callBack(null, result.rows);
-        } catch (error) {
-            console.log("Oracle Error:", error);
-            callBack(error);
-        } finally {
-            if (conn_ora) await conn_ora.close();
-            if (pool_ora) await pool_ora.close();
-        }
-    },
-    getRoomMasterDetailEllider: async (data, callBack) => {
-        let pool_ora;
-        let conn_ora;
-        try {
-            pool_ora = await oraConnection();
-            conn_ora = await pool_ora.getConnection();
-
-            if (!data || data.length === 0) {
-                return callBack(null, []); // no codes to query
-            }
-            //  Join the codes directly into the query
-            const codes = data.map(code => `'${code}'`).join(',');
-            const sql = `
+      callBack(null, result.rows);
+    } catch (error) {
+      console.log("Oracle Error:", error);
+      callBack(error);
+    } finally {
+      if (conn_ora) await conn_ora.close();
+      //   if (pool_ora) await pool_ora.close();
+    }
+  },
+  getRoomMasterDetailEllider: async (data, callBack) => {
+    // let pool_ora;
+    // let conn_ora;
+    try {
+      let conn_ora = await getTmcConnection();
+      if (!data || data.length === 0) {
+        return callBack(null, []); // no codes to query
+      }
+      //  Join the codes directly into the query
+      const codes = data.map((code) => `'${code}'`).join(",");
+      const sql = `
             SELECT 
                 RM_CODE,
                 RMC_DESC,
@@ -1208,32 +1097,31 @@ GROUP BY ipadmiss.IP_NO,
                 RM_CODE IN (${codes})
         `;
 
-            const result = await conn_ora.execute(sql, [], {
-                outFormat: oracledb.OUT_FORMAT_OBJECT
-            });
+      const result = await conn_ora.execute(sql, [], {
+        outFormat: oracledb.OUT_FORMAT_OBJECT,
+      });
 
-            callBack(null, result.rows);
-        } catch (error) {
-            console.log("Oracle Error:", error);
-            callBack(error);
-        } finally {
-            if (conn_ora) await conn_ora.close();
-            if (pool_ora) await pool_ora.close();
-        }
-    },
-    getNsDetailEllider: async (data, callBack) => {
-        let pool_ora;
-        let conn_ora;
-        try {
-            pool_ora = await oraConnection();
-            conn_ora = await pool_ora.getConnection();
+      callBack(null, result.rows);
+    } catch (error) {
+      console.log("Oracle Error:", error);
+      callBack(error);
+    } finally {
+      if (conn_ora) await conn_ora.close();
+      //   if (pool_ora) await pool_ora.close();
+    }
+  },
+  getNsDetailEllider: async (data, callBack) => {
+    // let pool_ora;
+    // let conn_ora;
+    try {
+      let conn_ora = await getTmcConnection();
 
-            if (!data || data.length === 0) {
-                return callBack(null, []); // no codes to query
-            }
-            //  Join the codes directly into the query
-            const codes = data.map(code => `'${code}'`).join(',');
-            const sql = `
+      if (!data || data.length === 0) {
+        return callBack(null, []); // no codes to query
+      }
+      //  Join the codes directly into the query
+      const codes = data.map((code) => `'${code}'`).join(",");
+      const sql = `
             SELECT 
                 NS_CODE,
                 NSC_DESC,
@@ -1245,40 +1133,39 @@ GROUP BY ipadmiss.IP_NO,
                 NS_CODE IN (${codes})
         `;
 
-            const result = await conn_ora.execute(sql, [], {
-                outFormat: oracledb.OUT_FORMAT_OBJECT
-            });
+      const result = await conn_ora.execute(sql, [], {
+        outFormat: oracledb.OUT_FORMAT_OBJECT,
+      });
 
-            callBack(null, result.rows);
-        } catch (error) {
-            console.log("Oracle Error:", error);
-            callBack(error);
-        } finally {
-            if (conn_ora) await conn_ora.close();
-            if (pool_ora) await pool_ora.close();
-        }
-    },
-    getBedDetailEllider: (data, callBack) => {
-        mysqlpool.query(
-            ` SELECT 
+      callBack(null, result.rows);
+    } catch (error) {
+      console.log("Oracle Error:", error);
+      callBack(error);
+    } finally {
+      if (conn_ora) await conn_ora.close();
+      //   if (pool_ora) await pool_ora.close();
+    }
+  },
+  getBedDetailEllider: (data, callBack) => {
+    mysqlpool.query(
+      ` SELECT 
                 fb_bd_code,
                 fb_bdc_no
              from 
                 fb_bed`,
-            [
-
-            ]
-            , (error, results, fields) => {
-                if (error) {
-                    return callBack(error)
-                }
-                return callBack(null, results)
-            })
-    },
-    insertFbBedMeliora: (data, callBack) => {
-        try {
-            mysqlpool.query(
-                `INSERT INTO fb_bed (
+      [],
+      (error, results, fields) => {
+        if (error) {
+          return callBack(error);
+        }
+        return callBack(null, results);
+      },
+    );
+  },
+  insertFbBedMeliora: (data, callBack) => {
+    try {
+      mysqlpool.query(
+        `INSERT INTO fb_bed (
                 fb_bd_code,
                 fb_bdc_no,
                 fb_ns_code,
@@ -1292,23 +1179,21 @@ GROUP BY ipadmiss.IP_NO,
                 fb_bdc_vipbed
             ) VALUES ?
             `,
-                [
-                    data
-                ],
-                (error, results, fields) => {
-                    if (error) {
-                        return callBack(error);
-                    }
-                    return callBack(null, { insertId: results.insertId });
-                }
-            );
-        } catch (err) {
-            return callBack(err);
-        }
-    },
-    processRoomType: (data, callBack) => {
-        mysqlpool.query(
-            `SELECT 
+        [data],
+        (error, results, fields) => {
+          if (error) {
+            return callBack(error);
+          }
+          return callBack(null, {insertId: results.insertId});
+        },
+      );
+    } catch (err) {
+      return callBack(err);
+    }
+  },
+  processRoomType: (data, callBack) => {
+    mysqlpool.query(
+      `SELECT 
                 fb_rt_code,
                 fb_rtc_desc,
                 fb_rtc_alias,
@@ -1317,103 +1202,92 @@ GROUP BY ipadmiss.IP_NO,
                 fb_room_type
             WHERE 
                 fb_rt_code IN (?)`,
-            [
-                data
-            ],
-            (error, results) => {
-                if (error) {
-                    return callBack(error);
-                }
-                return callBack(null, results);
-            }
-        );
-
-    },
-    processRoomCategory: (data, callBack) => {
-        mysqlpool.query(
-            `SELECT 
+      [data],
+      (error, results) => {
+        if (error) {
+          return callBack(error);
+        }
+        return callBack(null, results);
+      },
+    );
+  },
+  processRoomCategory: (data, callBack) => {
+    mysqlpool.query(
+      `SELECT 
                 fb_rc_code,
                 fb_rcc_desc
             FROM 
                 fb_room_category
             WHERE 
                 fb_rc_code IN (?)`,
-            [
-                data
-            ],
-            (error, results) => {
-                if (error) {
-                    return callBack(error);
-                }
-                return callBack(null, results);
-            }
-        );
-    },
-    processRoomMaster: (data, callBack) => {
-        mysqlpool.query(
-            `SELECT 
+      [data],
+      (error, results) => {
+        if (error) {
+          return callBack(error);
+        }
+        return callBack(null, results);
+      },
+    );
+  },
+  processRoomMaster: (data, callBack) => {
+    mysqlpool.query(
+      `SELECT 
                 fb_rm_code,
                 fb_rmc_desc
             FROM 
                 fb_room_master
             WHERE 
                 fb_rm_code IN (?)`,
-            [
-                data
-            ],
-            (error, results) => {
-                if (error) {
-                    return callBack(error);
-                }
-                return callBack(null, results);
-            }
-        );
-    },
-    processNursingStation: (data, callBack) => {
-        mysqlpool.query(
-            `SELECT 
+      [data],
+      (error, results) => {
+        if (error) {
+          return callBack(error);
+        }
+        return callBack(null, results);
+      },
+    );
+  },
+  processNursingStation: (data, callBack) => {
+    mysqlpool.query(
+      `SELECT 
                 fb_ns_code,
                 fb_ns_name
             FROM 
                 fb_nurse_station_master
             WHERE 
                 fb_ns_code IN (?)`,
-            [
-                data
-            ],
-            (error, results) => {
-                if (error) {
-                    return callBack(error);
-                }
-                return callBack(null, results);
-            }
-        );
-    },
-    processBedDetail: (data, callBack) => {
-        mysqlpool.query(
-            `SELECT 
+      [data],
+      (error, results) => {
+        if (error) {
+          return callBack(error);
+        }
+        return callBack(null, results);
+      },
+    );
+  },
+  processBedDetail: (data, callBack) => {
+    mysqlpool.query(
+      `SELECT 
                 fb_bd_code,
                 fb_bdc_no
             FROM 
                 fb_bed
             WHERE 
                 fb_bd_code IN (?)`,
-            [
-                data
-            ],
-            (error, results) => {
-                if (error) {
-                    return callBack(error);
-                }
-                return callBack(null, results);
-            }
-        );
-    },
+      [data],
+      (error, results) => {
+        if (error) {
+          return callBack(error);
+        }
+        return callBack(null, results);
+      },
+    );
+  },
 
-    insertRoomTypeMeliora: (data, callBack) => {
-        try {
-            mysqlpool.query(
-                `INSERT INTO fb_room_type (
+  insertRoomTypeMeliora: (data, callBack) => {
+    try {
+      mysqlpool.query(
+        `INSERT INTO fb_room_type (
                 fb_rt_code,
                 fb_rtc_desc,
                 fb_rtc_alias,
@@ -1423,25 +1297,23 @@ GROUP BY ipadmiss.IP_NO,
                 fb_rtc_mhcode
             ) VALUES ?
             `,
-                [
-                    data
-                ],
-                (error, results, fields) => {
-                    if (error) {
-                        return callBack(error);
-                    }
-                    return callBack(null, { insertId: results.insertId });
-                }
-            );
-        } catch (err) {
-            return callBack(err);
-        }
-    },
+        [data],
+        (error, results, fields) => {
+          if (error) {
+            return callBack(error);
+          }
+          return callBack(null, {insertId: results.insertId});
+        },
+      );
+    } catch (err) {
+      return callBack(err);
+    }
+  },
 
-    insertRoomCategoryTypeMeliora: (data, callBack) => {
-        try {
-            mysqlpool.query(
-                `INSERT INTO fb_room_category (
+  insertRoomCategoryTypeMeliora: (data, callBack) => {
+    try {
+      mysqlpool.query(
+        `INSERT INTO fb_room_category (
                 fb_rc_code,
                 fb_rcc_desc,
                 fb_rcc_alias,
@@ -1449,24 +1321,22 @@ GROUP BY ipadmiss.IP_NO,
                 fb_rcc_mhocde
             ) VALUES ?
             `,
-                [
-                    data
-                ],
-                (error, results, fields) => {
-                    if (error) {
-                        return callBack(error);
-                    }
-                    return callBack(null, { insertId: results.insertId });
-                }
-            );
-        } catch (err) {
-            return callBack(err);
-        }
-    },
-    insertRoomMasterTypeMeliora: (data, callBack) => {
-        try {
-            mysqlpool.query(
-                `INSERT INTO fb_room_master (
+        [data],
+        (error, results, fields) => {
+          if (error) {
+            return callBack(error);
+          }
+          return callBack(null, {insertId: results.insertId});
+        },
+      );
+    } catch (err) {
+      return callBack(err);
+    }
+  },
+  insertRoomMasterTypeMeliora: (data, callBack) => {
+    try {
+      mysqlpool.query(
+        `INSERT INTO fb_room_master (
                  fb_rm_code,
                 fb_rmc_desc,
                 fb_rmc_alias,
@@ -1475,46 +1345,42 @@ GROUP BY ipadmiss.IP_NO,
                 fb_ns_code
             ) VALUES ?
             `,
-                [
-                    data
-                ],
-                (error, results, fields) => {
-                    if (error) {
-                        return callBack(error);
-                    }
-                    return callBack(null, { insertId: results.insertId });
-                }
-            );
-        } catch (err) {
-            return callBack(err);
-        }
-    },
-    insertnurseStationMeliora: (data, callBack) => {
-        try {
-            mysqlpool.query(
-                `INSERT INTO fb_nurse_station_master (
+        [data],
+        (error, results, fields) => {
+          if (error) {
+            return callBack(error);
+          }
+          return callBack(null, {insertId: results.insertId});
+        },
+      );
+    } catch (err) {
+      return callBack(err);
+    }
+  },
+  insertnurseStationMeliora: (data, callBack) => {
+    try {
+      mysqlpool.query(
+        `INSERT INTO fb_nurse_station_master (
                  fb_ns_code,
                 fb_ns_name
             ) VALUES ?
             `,
-                [
-                    data
-                ],
-                (error, results, fields) => {
-                    if (error) {
-                        return callBack(error);
-                    }
-                    return callBack(null, { insertId: results.insertId });
-                }
-            );
-        } catch (err) {
-            return callBack(err);
-        }
-    },
+        [data],
+        (error, results, fields) => {
+          if (error) {
+            return callBack(error);
+          }
+          return callBack(null, {insertId: results.insertId});
+        },
+      );
+    } catch (err) {
+      return callBack(err);
+    }
+  },
 
-    getAllRoomTypeDetail: (callBack) => {
-        mysqlpool.query(
-            `SELECT 
+  getAllRoomTypeDetail: (callBack) => {
+    mysqlpool.query(
+      `SELECT 
             fb_rt_code,
             fb_rtc_desc,
             fb_rtc_alias,
@@ -1524,19 +1390,19 @@ GROUP BY ipadmiss.IP_NO,
             fb_rtc_mhcode
         FROM
             fb_room_type`,
-            [],
-            (error, results) => {
-                if (error) {
-                    return callBack(error);
-                }
-                return callBack(null, results);
-            }
-        );
-    },
+      [],
+      (error, results) => {
+        if (error) {
+          return callBack(error);
+        }
+        return callBack(null, results);
+      },
+    );
+  },
 
-    getAllRoomCategoryDetail: (callBack) => {
-        mysqlpool.query(
-            `SELECT 
+  getAllRoomCategoryDetail: (callBack) => {
+    mysqlpool.query(
+      `SELECT 
             fb_rc_code,
             fb_rcc_desc,
             fb_rcc_alias,
@@ -1544,20 +1410,19 @@ GROUP BY ipadmiss.IP_NO,
             fb_rcc_mhocde
         FROM
             fb_room_category`,
-            [],
-            (error, results) => {
-                if (error) {
-                    return callBack(error);
-                }
-                return callBack(null, results);
-            }
-        );
+      [],
+      (error, results) => {
+        if (error) {
+          return callBack(error);
+        }
+        return callBack(null, results);
+      },
+    );
+  },
 
-    },
-
-    getAllRoomMasterDetail: (callBack) => {
-        mysqlpool.query(
-            `SELECT 
+  getAllRoomMasterDetail: (callBack) => {
+    mysqlpool.query(
+      `SELECT 
                 fb_rm_code,
                 fb_rmc_desc,
                 fb_rmc_alias,
@@ -1566,34 +1431,34 @@ GROUP BY ipadmiss.IP_NO,
                 fb_ns_code
             FROM
                 fb_room_master`,
-            [],
-            (error, results) => {
-                if (error) {
-                    return callBack(error);
-                }
-                return callBack(null, results);
-            }
-        );
-    },
+      [],
+      (error, results) => {
+        if (error) {
+          return callBack(error);
+        }
+        return callBack(null, results);
+      },
+    );
+  },
 
-    getAllBedDetail: (callBack) => {
-        mysqlpool.query(
-            `SELECT 
+  getAllBedDetail: (callBack) => {
+    mysqlpool.query(
+      `SELECT 
                 fb_bd_code
             FROM
                 fb_bed`,
-            [],
-            (error, results) => {
-                if (error) {
-                    return callBack(error);
-                }
-                return callBack(null, results);
-            }
-        );
-    },
-    getPatientDetailMeliora: (data, callBack) => {
-        mysqlpool.query(
-            `SELECT DISTINCT
+      [],
+      (error, results) => {
+        if (error) {
+          return callBack(error);
+        }
+        return callBack(null, results);
+      },
+    );
+  },
+  getPatientDetailMeliora: (data, callBack) => {
+    mysqlpool.query(
+      `SELECT DISTINCT
                 fb_ipadmiss.fb_ip_no
                 FROM fb_ipadmiss
                 LEFT JOIN fb_bed 
@@ -1605,20 +1470,18 @@ GROUP BY ipadmiss.IP_NO,
                     fb_ipadmiss.fb_ipd_disc IS NULL
                     OR fb_ipadmiss.fb_ipd_disc >= NOW() - INTERVAL 12 HOUR
                 ) and fb_ipadmiss.fb_ipc_curstatus != 'PCO' `,
-            [
-                data.NS_CODE
-            ],
-            (error, results) => {
-                if (error) {
-                    return callBack(error);
-                }
-                return callBack(null, results);
-            }
-        );
-    },
-    InsertNsPatientDetailMeliora: (data, callBack) => {
-        mysqlpool.query(
-            `INSERT INTO fb_ipadmiss (
+      [data.NS_CODE],
+      (error, results) => {
+        if (error) {
+          return callBack(error);
+        }
+        return callBack(null, results);
+      },
+    );
+  },
+  InsertNsPatientDetailMeliora: (data, callBack) => {
+    mysqlpool.query(
+      `INSERT INTO fb_ipadmiss (
                 fb_ip_no, fb_ipd_date, fb_pt_no, fb_ptc_name, fb_ptc_sex,
                 fb_ptd_dob, fb_ptn_dayage, fb_ptn_monthage, fb_ptn_yearage,
                 fb_ptc_loadd1, fb_ptc_loadd2, fb_ptc_loadd3, fb_ptc_loadd4,
@@ -1626,20 +1489,20 @@ GROUP BY ipadmiss.IP_NO,
                 fb_ipc_curstatus, fb_ptc_mobile, fb_ipc_mhcode, fb_doc_name,
                 fb_dep_desc,fb_ipd_disc,fb_ipc_status,fb_dmc_slno,fb_dmd_date
             ) VALUES ? `,
-            [data],
-            (error, results) => {
-                if (error) {
-                    return callBack(error);
-                }
-                return callBack(null, results);
-            }
-        );
-    },
-    UpdatePatientDetail: (data, callBack) => {
-        const values = [...data.slice(1), data[0]];// IP_NO moved to last for WHERE
+      [data],
+      (error, results) => {
+        if (error) {
+          return callBack(error);
+        }
+        return callBack(null, results);
+      },
+    );
+  },
+  UpdatePatientDetail: (data, callBack) => {
+    const values = [...data.slice(1), data[0]]; // IP_NO moved to last for WHERE
 
-        mysqlpool.query(
-            `UPDATE fb_ipadmiss SET
+    mysqlpool.query(
+      `UPDATE fb_ipadmiss SET
                 fb_ipd_date = ?, fb_pt_no = ?, fb_ptc_name = ?, fb_ptc_sex = ?,
                 fb_ptd_dob = ?, fb_ptn_dayage = ?, fb_ptn_monthage = ?, fb_ptn_yearage = ?,
                 fb_ptc_loadd1 = ?, fb_ptc_loadd2 = ?, fb_ptc_loadd3 = ?, fb_ptc_loadd4 = ?,
@@ -1647,21 +1510,13 @@ GROUP BY ipadmiss.IP_NO,
                 fb_ipc_curstatus = ?, fb_ptc_mobile = ?, fb_ipc_mhcode = ?, fb_doc_name = ?,
                 fb_dep_desc = ?, fb_ipd_disc = ?, fb_ipc_status = ?, fb_dmc_slno = ?, fb_dmd_date = ?
             WHERE fb_ip_no = ? `,
-            values,
-            (error, results) => {
-                if (error) {
-                    return callBack(error);
-                }
-                return callBack(null, results);
-            }
-        );
-    }
-
-
-
-
-
-
-
-
-}
+      values,
+      (error, results) => {
+        if (error) {
+          return callBack(error);
+        }
+        return callBack(null, results);
+      },
+    );
+  },
+};

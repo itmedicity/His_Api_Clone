@@ -1,9 +1,8 @@
 // @ts-ignore
-const {oracledb, connectionClose, oraConnection} = require("../../../../../config/oradbconfig");
+const {oracledb, getTmcConnection} = require("../../../../../config/oradbconfig");
 
 module.exports = {
   proIncomePart1Tssh: async (data, callBack) => {
-    let pool_ora = await oraConnection();
     let conn_ora = await pool_ora.getConnection();
 
     const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(",")) || null;
@@ -427,21 +426,15 @@ module.exports = {
                         GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                         ORDER BY Dg_desc`;
     try {
-      const result = await conn_ora.execute(sql, {}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
-      await result.resultSet?.getRows((err, rows) => {
-        callBack(err, rows);
-      });
+      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      callBack(err, result.rows);
     } catch (error) {
       console.log(error);
     } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-        await pool_ora.close();
-      }
+      if (conn_ora) await pool_ora.close();
     }
   },
   proIncomePart2Tssh: async (data, callBack) => {
-    let pool_ora = await oraConnection();
     let conn_ora = await pool_ora.getConnection();
 
     const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(",")) || null;
@@ -545,21 +538,15 @@ module.exports = {
     //         AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
     // GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc`;
     try {
-      const result = await conn_ora.execute(sql, {}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
-      await result.resultSet?.getRows((err, rows) => {
-        callBack(err, rows);
-      });
+      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      callBack(err, result.rows);
     } catch (error) {
       console.log(error);
     } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-        await pool_ora.close();
-      }
+      if (conn_ora) await pool_ora.close();
     }
   },
   proIncomePart3Tssh: async (data, callBack) => {
-    let pool_ora = await oraConnection();
     let conn_ora = await pool_ora.getConnection();
 
     const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(",")) || null;
@@ -624,21 +611,15 @@ module.exports = {
                             AND DISBILLMAST.IP_NO IN (${ipNumberList})
                     GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc`;
     try {
-      const result = await conn_ora.execute(sql, {}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
-      await result.resultSet?.getRows((err, rows) => {
-        callBack(err, rows);
-      });
+      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      callBack(err, result.rows);
     } catch (error) {
       console.log(error);
     } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-        await pool_ora.close();
-      }
+      if (conn_ora) await pool_ora.close();
     }
   },
   proIncomePart4Tssh: async (data, callBack) => {
-    let pool_ora = await oraConnection();
     let conn_ora = await pool_ora.getConnection();
 
     const fromDate = data.from;
@@ -655,21 +636,15 @@ module.exports = {
                     FROM Misincexpgroup
                     WHERE DG_TYPE = 'E'`;
     try {
-      const result = await conn_ora.execute(sql, {}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
-      await result.resultSet?.getRows((err, rows) => {
-        callBack(err, rows);
-      });
+      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      callBack(err, result.rows);
     } catch (error) {
       console.log(error);
     } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-        await pool_ora.close();
-      }
+      if (conn_ora) await pool_ora.close();
     }
   },
   theaterIncomeTssh: async (data, callBack) => {
-    let pool_ora = await oraConnection();
     let conn_ora = await pool_ora.getConnection();
 
     const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(",")) || null;
@@ -999,17 +974,12 @@ module.exports = {
                         GROUP BY Misincexpgroup.Dg_Grcode, Misincexpgroup.Dg_Desc
                         ORDER BY Dg_desc`;
     try {
-      const result = await conn_ora.execute(sql, {}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
-      await result.resultSet?.getRows((err, rows) => {
-        callBack(err, rows);
-      });
+      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      callBack(err, result.rows);
     } catch (error) {
       console.log(error);
     } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-        await pool_ora.close();
-      }
+      if (conn_ora) await pool_ora.close();
     }
   },
 };

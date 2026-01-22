@@ -1,11 +1,10 @@
 // @ts-ignore
-const {oracledb, connectionClose, oraConnection} = require("../../../config/oradbconfig");
+const {oracledb, getTmcConnection} = require("../../../config/oradbconfig");
 const pool = require("../../../config/dbconfig");
 
 module.exports = {
   ipAdmissionList: async (data, callBack) => {
-    let pool_ora = await oraConnection();
-    let conn_ora = await pool_ora.getConnection();
+    let conn_ora = await getTmcConnection();
     try {
       const result = await conn_ora.execute(
         ` SELECT 
@@ -23,18 +22,19 @@ module.exports = {
           date0: data.from,
           date1: data.to,
         },
-        {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT}
+        {outFormat: oracledb.OUT_FORMAT_OBJECT},
       );
-      await result.resultSet?.getRows((err, rows) => {
-        callBack(err, rows);
-      });
+      // await result.resultSet?.getRows((err, rows) => {
+      // });
+      callBack(err, result.rows);
     } catch (error) {
       console.log(error);
     } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-        await pool_ora.close();
-      }
+      if (conn_ora) await pool_ora.close();
+      //    {
+      //   await conn_ora.close();
+      //   await pool_ora.close();
+      // }
     }
   },
   insertTsshPatient: (body) => {
@@ -52,10 +52,10 @@ module.exports = {
                 return reject(error);
               }
               return resolve(results);
-            }
+            },
           );
         });
-      })
+      }),
     );
   },
   insertAsRemoveTmcPatient: (data, callBack) => {
@@ -69,7 +69,7 @@ module.exports = {
           return callBack(error);
         }
         return callBack(null, results);
-      }
+      },
     );
   },
   checkPatientInserted: (data, callBack) => {
@@ -85,7 +85,7 @@ module.exports = {
           return callBack(error);
         }
         return callBack(null, results);
-      }
+      },
     );
   },
   getTsshPatientDateWise: (data, callBack) => {
@@ -105,8 +105,7 @@ module.exports = {
     });
   },
   getPatientData: async (data, callBack) => {
-    let pool_ora = await oraConnection();
-    let conn_ora = await pool_ora.getConnection();
+    let conn_ora = await getTmcConnection();
     try {
       const result = await conn_ora.execute(
         ` SELECT 
@@ -121,17 +120,17 @@ module.exports = {
         {
           ptno: data,
         },
-        {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT}
+        {outFormat: oracledb.OUT_FORMAT_OBJECT},
       );
-      await result.resultSet?.getRows((err, rows) => {
-        callBack(err, rows);
-      });
+      // await result.resultSet?.getRows((err, rows) => {
+      // });
+      callBack(err, result.rows);
     } catch (error) {
       console.log(error);
     } finally {
       if (conn_ora) {
         await conn_ora.close();
-        await pool_ora.close();
+        // await pool_ora.close();
       }
     }
   },
@@ -147,13 +146,11 @@ module.exports = {
           return callBack(error);
         }
         return callBack(null, results);
-      }
+      },
     );
   },
   getTotalPatientList: async (data, callBack) => {
-    let pool_ora = await oraConnection();
-    let conn_ora = await pool_ora.getConnection();
-
+    let conn_ora = await getTmcConnection();
     const fromDate = data.from;
     const toDate = data.to;
 
@@ -178,24 +175,23 @@ module.exports = {
                         AND DMD_DATE > TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss') 
                         AND IPD_DATE < TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')`;
     try {
-      const result = await conn_ora.execute(sql, {}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
-      await result.resultSet?.getRows((err, rows) => {
-        callBack(err, rows);
-      });
+      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      // await result.resultSet?.getRows((err, rows) => {
+      // });
+      callBack(err, result.rows);
     } catch (error) {
+      callBack(error);
       console.log(error);
     } finally {
       if (conn_ora) {
         await conn_ora.close();
-        await pool_ora.close();
+        // await pool_ora.close();
       }
     }
   },
   // GET DISCHARGE INFO FROM ORACLE
   getDischargePatientList: async (data, callBack) => {
-    let pool_ora = await oraConnection();
-    let conn_ora = await pool_ora.getConnection();
-
+    let conn_ora = await getTmcConnection();
     const fromDate = data.from;
     const toDate = data.to;
 
@@ -207,16 +203,16 @@ module.exports = {
                     AND DMD_DATE <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
                     AND IPADMISS.IPC_PTFLAG = 'N'`;
     try {
-      const result = await conn_ora.execute(sql, {}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
-      await result.resultSet?.getRows((err, rows) => {
-        callBack(err, rows);
-      });
+      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      // await result.resultSet?.getRows((err, rows) => {
+      // });
+      callBack(err, result.rows);
     } catch (error) {
       console.log(error);
     } finally {
       if (conn_ora) {
         await conn_ora.close();
-        await pool_ora.close();
+        // await pool_ora.close();
       }
     }
   },
@@ -232,7 +228,7 @@ module.exports = {
           return callBack(error);
         }
         return callBack(null, results);
-      }
+      },
     );
   },
   getLastDischargeUpdateDate: (callBack) => {
@@ -257,7 +253,7 @@ module.exports = {
               return reject(error);
             }
             return resolve(results);
-          }
+          },
         );
       });
     });
@@ -293,7 +289,7 @@ module.exports = {
           return callBack(error);
         }
         return callBack(null, results);
-      }
+      },
     );
   },
   getTsshIpNoFromMysql: (data, callBack) => {
@@ -321,12 +317,11 @@ module.exports = {
           return callBack(error);
         }
         return callBack(null, results);
-      }
+      },
     );
   },
   getIpadmissChecks: async (data, callBack) => {
-    let pool_ora = await oraConnection();
-    let conn_ora = await pool_ora.getConnection();
+    let conn_ora = await getTmcConnection();
     try {
       const result = await conn_ora.execute(
         ` SELECT
@@ -336,25 +331,23 @@ module.exports = {
         {
           ptno: data,
         },
-        {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT}
+        {outFormat: oracledb.OUT_FORMAT_OBJECT},
       );
-      await result.resultSet?.getRows((err, rows) => {
-        callBack(err, rows);
-      });
+      // await result.resultSet?.getRows((err, rows) => {
+      // });
+      callBack(err, result.rows);
     } catch (error) {
       console.log(error);
     } finally {
       if (conn_ora) {
         await conn_ora.close();
-        await pool_ora.close();
+        // await pool_ora.close();
       }
     }
   },
   getIpReceiptPatientInfo: async (data, callBack) => {
     // GET DISCHARGE INFO FROM ORACLE
-    let pool_ora = await oraConnection();
-    let conn_ora = await pool_ora.getConnection();
-
+    let conn_ora = await getTmcConnection();
     const fromDate = data.from;
     const toDate = data.to;
 
@@ -367,16 +360,16 @@ module.exports = {
                     AND IRD_DATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')  
                     AND  IRD_DATE <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')`;
     try {
-      const result = await conn_ora.execute(sql, {}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
-      await result.resultSet?.getRows((err, rows) => {
-        callBack(err, rows);
-      });
+      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      // await result.resultSet?.getRows((err, rows) => {
+      // });
+      callBack(err, result.rows);
     } catch (error) {
       console.log(error);
     } finally {
       if (conn_ora) {
         await conn_ora.close();
-        await pool_ora.close();
+        // await pool_ora.close();
       }
     }
   },
@@ -393,7 +386,7 @@ module.exports = {
           return callBack(error);
         }
         return callBack(null, results);
-      }
+      },
     );
   },
   getTsshIpNoFromMysqlGrouping: (data, callBack) => {
@@ -422,7 +415,7 @@ module.exports = {
           return callBack(error);
         }
         return callBack(null, results);
-      }
+      },
     );
   },
   getDischargedIpInfoFromMysqlGrouped: (data, callBack) => {
@@ -439,7 +432,7 @@ module.exports = {
           return callBack(error);
         }
         return callBack(null, results);
-      }
+      },
     );
   },
   getGroupedPatientList: (data, callBack) => {
@@ -458,7 +451,7 @@ module.exports = {
           return callBack(error);
         }
         return callBack(null, results);
-      }
+      },
     );
   },
   getTmcIncomeReport: (data, callBack) => {
@@ -519,7 +512,7 @@ module.exports = {
           return callBack(error);
         }
         return callBack(null, results);
-      }
+      },
     );
   },
   getTsshIncomeReport: (data, callBack) => {
@@ -580,7 +573,7 @@ module.exports = {
           return callBack(error);
         }
         return callBack(null, results);
-      }
+      },
     );
   },
   getIpNumberTsshGrouped: (data, callBack) => {
@@ -606,7 +599,7 @@ module.exports = {
           return callBack(error);
         }
         return callBack(null, results);
-      }
+      },
     );
   },
 };

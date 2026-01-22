@@ -1,12 +1,9 @@
-
-const pool = require('../../config/dbconfig');
-const { oraConnection, oracledb } = require('../../config/oradbconfig');
+const pool = require("../../config/dbconfig");
+const {getTmcConnection, oracledb} = require("../../config/oradbconfig");
 module.exports = {
-    getSupplierList: async (data, callBack) => {  
-        
-        let pool_ora = await oraConnection();
-        let conn_ora = await pool_ora.getConnection();
-        const sql = `SELECT
+  getSupplierList: async (data, callBack) => {
+    let conn_ora = await getTmcConnection();
+    const sql = `SELECT
                            SU_CODE,SUC_NAME,SUC_ALIAS,SUC_STATUS,SUC_PERSON,SUC_ADD1,SUC_ADD2,SUC_ADD3,SUC_ADD4,SUC_PHONE,
                            SUC_FAX,SUC_MOBILE,SUC_CSTNO,SUC_KGSTNO,SUC_TAXDATE,SUC_DLNO1,SUC_DLNO2,SUC_DLNO3,SUC_DLNO4,
                            SUD_DLDATE,SUN_CRDPERIOD,SUN_CRDLIMIT,SUN_OUTSTANDING,SUN_LEADTIME,SUN_SUPPLY,SUC_EMAIL,SUN_RANK,
@@ -18,32 +15,26 @@ module.exports = {
                            SUPPLIER
                      WHERE
                            SUC_STATUS='Y' AND SUC_NAME LIKE:supname`;
-        try {
-            const result = await conn_ora.execute(
-                sql,
-                {
-                    supname: '%' + data.SUC_NAME + '%'
-                },
-                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-            )
-            await result.resultSet?.getRows((err, rows) => {
-                callBack(err, rows)
-            })
-        }
-        catch (error) {
-            return callBack(error)
-        } finally {
-            if (conn_ora) {
-                await conn_ora.close();
-                await pool_ora.close();
-            }
-        }
-
-    },
-    getActiveSupplierList: async (callBack) => {
-        let pool_ora = await oraConnection();
-        let conn_ora = await pool_ora.getConnection();
-        const sql = `SELECT
+    try {
+      const result = await conn_ora.execute(
+        sql,
+        {
+          supname: "%" + data.SUC_NAME + "%",
+        },
+        {outFormat: oracledb.OUT_FORMAT_OBJECT},
+      );
+      callBack(null, result.rows);
+    } catch (error) {
+      return callBack(error);
+    } finally {
+      if (conn_ora) {
+        await conn_ora.close();
+      }
+    }
+  },
+  getActiveSupplierList: async (callBack) => {
+    let conn_ora = await getTmcConnection();
+    const sql = `SELECT
                            SUPPLIER.SU_CODE,SUC_NAME,SUC_ALIAS,SUC_STATUS
                      FROM
                            SUPPLIER
@@ -55,39 +46,13 @@ module.exports = {
                            AND PORDMAST.PON_TOTAPPROVALSCOMP=3
                      GROUP BY  SUPPLIER.SU_CODE,SUC_NAME,SUC_ALIAS,SUC_STATUS
                      ORDER BY SUC_NAME`;
-        try {
-            const result = await conn_ora.execute(
-                sql,
-                {},
-                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-            )
-            await result.resultSet?.getRows((err, rows) => {
-                callBack(err, rows)
-            })
-        }
-        catch (error) {
-            return callBack(error)
-        } finally {
-            if (conn_ora) {
-                await conn_ora.close();
-                await pool_ora.close();
-            }
-        }
-
-    },
-
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    try {
+      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      callBack(null, result.rows);
+    } catch (error) {
+      return callBack(error);
+    } finally {
+      if (conn_ora) await conn_ora.close();
+    }
+  },
+};

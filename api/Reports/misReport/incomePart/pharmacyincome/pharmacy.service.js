@@ -1,13 +1,12 @@
 // @ts-ignore
-const { oracledb, connectionClose, oraConnection } = require('../../../../../config/oradbconfig');
+const {oracledb, getTmcConnection} = require("../../../../../config/oradbconfig");
 
 module.exports = {
-    pharmacySalePart1: async (data, callBack) => {
-        let pool_ora = await oraConnection();
-        let conn_ora = await pool_ora.getConnection();
-        try {
-            const result = await conn_ora.execute(
-                `SELECT SUM (A.Billamt) Amt,
+  pharmacySalePart1: async (data, callBack) => {
+    let conn_ora = await getTmcConnection();
+    try {
+      const result = await conn_ora.execute(
+        `SELECT SUM (A.Billamt) Amt,
                             SUM (A.GrossAmt) GrossAmt,
                             SUM (A.Discount) Discount,
                             SUM (A.Comp) Comp,   
@@ -81,32 +80,30 @@ module.exports = {
                                     AND MRETDETL.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     AND Mretdetl.Mrd_Date <=
                                         TO_DATE (:date4,'dd/MM/yyyy hh24:mi:ss')) A`,
-                {
-                    date1: data.from,
-                    date2: data.to,
-                    date3: data.from,
-                    date4: data.to,
-                },
-                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-            )
-            await result.resultSet?.getRows((err, rows) => {
-                callBack(err, rows)
-            })
-        } catch (error) {
-            console.log(error)
-        } finally {
-            if (conn_ora) {
-                await conn_ora.close();
-                await pool_ora.close();
-            }
-        }
-    },
-    phamracyReturnPart1: async (data, callBack) => {
-        let pool_ora = await oraConnection();
-        let conn_ora = await pool_ora.getConnection();
-        try {
-            const result = await conn_ora.execute(
-                `SELECT SUM (NVL (Mretdetl.MRN_AMOUNT, 0) - NVL (MRN_DISAMT, 0)) * -1 Amt,
+        {
+          date1: data.from,
+          date2: data.to,
+          date3: data.from,
+          date4: data.to,
+        },
+        {outFormat: oracledb.OUT_FORMAT_OBJECT},
+      );
+      // await result.resultSet?.getRows((err, rows) => {
+      // })
+      callBack(err, result.rows);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      if (conn_ora) {
+        await conn_ora.close();
+      }
+    }
+  },
+  phamracyReturnPart1: async (data, callBack) => {
+    let conn_ora = await getTmcConnection();
+    try {
+      const result = await conn_ora.execute(
+        `SELECT SUM (NVL (Mretdetl.MRN_AMOUNT, 0) - NVL (MRN_DISAMT, 0)) * -1 Amt,
                         SUM (NVL (Mretdetl.MRN_AMOUNT, 0)) * -1 GrossAmt,
                         SUM (NVL (MRN_DISAMT, 0)) * -1 Discount,
                         SUM (0) AS Comp,
@@ -124,30 +121,29 @@ module.exports = {
                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         AND Disbillmast.Dmd_Date <=
                             TO_DATE (:date2, 'dd/MM/yyyy hh24:mi:ss')`,
-                {
-                    date1: data.from,
-                    date2: data.to,
-                },
-                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-            )
-            await result.resultSet?.getRows((err, rows) => {
-                callBack(err, rows)
-            })
-        } catch (error) {
-            console.log(error)
-        } finally {
-            if (conn_ora) {
-                await conn_ora.close();
-                await pool_ora.close();
-            }
-        }
-    },
-    phamracySalePart2: async (data, callBack) => {
-        let pool_ora = await oraConnection();
-        let conn_ora = await pool_ora.getConnection();
-        try {
-            const result = await conn_ora.execute(
-                `SELECT SUM (A.Billamt) Amt,
+        {
+          date1: data.from,
+          date2: data.to,
+        },
+        {outFormat: oracledb.OUT_FORMAT_OBJECT},
+      );
+      //   await result.resultSet?.getRows((err, rows) => {
+      // });
+      callBack(err, result.rows);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      if (conn_ora) {
+        await conn_ora.close();
+        // await pool_ora.close();
+      }
+    }
+  },
+  phamracySalePart2: async (data, callBack) => {
+    let conn_ora = await getTmcConnection();
+    try {
+      const result = await conn_ora.execute(
+        `SELECT SUM (A.Billamt) Amt,
                             SUM (A.GrossAmt) GrossAmt,
                             SUM (A.Discount) Discount,
                             SUM (A.Comp) Comp,
@@ -221,32 +217,31 @@ module.exports = {
                                     AND MRETDETL.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     AND Mretmast.Mrd_RETDate <=
                                         TO_DATE (:date4,'dd/MM/yyyy hh24:mi:ss')) A`,
-                {
-                    date1: data.from,
-                    date2: data.to,
-                    date3: data.from,
-                    date4: data.to,
-                },
-                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-            )
-            await result.resultSet?.getRows((err, rows) => {
-                callBack(err, rows)
-            })
-        } catch (error) {
-            console.log(error)
-        } finally {
-            if (conn_ora) {
-                await conn_ora.close();
-                await pool_ora.close();
-            }
-        }
-    },
-    phamracyReturnPart2: async (data, callBack) => {
-        let pool_ora = await oraConnection();
-        let conn_ora = await pool_ora.getConnection();
-        try {
-            const result = await conn_ora.execute(
-                `SELECT SUM (NVL (Pbilldetl.Bdn_amount, 0)) Amt,
+        {
+          date1: data.from,
+          date2: data.to,
+          date3: data.from,
+          date4: data.to,
+        },
+        {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT},
+      );
+      //   await result.resultSet?.getRows((err, rows) => {
+      // });
+      callBack(err, result.rows);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      if (conn_ora) {
+        await conn_ora.close();
+        // await pool_ora.close();
+      }
+    }
+  },
+  phamracyReturnPart2: async (data, callBack) => {
+    let conn_ora = await getTmcConnection();
+    try {
+      const result = await conn_ora.execute(
+        `SELECT SUM (NVL (Pbilldetl.Bdn_amount, 0)) Amt,
                             SUM (NVL (Pbilldetl.Bdn_amount, 0) + NVL (Pbilldetl.Bmn_disamt, 0))
                             GrossAmt,
                             SUM (NVL (Pbilldetl.Bmn_disamt, 0)) Discount,
@@ -264,30 +259,29 @@ module.exports = {
                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             AND Disbillmast.Dmd_Date <=
                                 TO_DATE (:date2, 'dd/MM/yyyy hh24:mi:ss')`,
-                {
-                    date1: data.from,
-                    date2: data.to,
-                },
-                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-            )
-            await result.resultSet?.getRows((err, rows) => {
-                callBack(err, rows)
-            })
-        } catch (error) {
-            console.log(error)
-        } finally {
-            if (conn_ora) {
-                await conn_ora.close();
-                await pool_ora.close();
-            }
-        }
-    },
-    phamracySalePart3: async (data, callBack) => {
-        let pool_ora = await oraConnection();
-        let conn_ora = await pool_ora.getConnection();
-        try {
-            const result = await conn_ora.execute(
-                `SELECT SUM (NVL (Pbilldetl.Bdn_amount, 0)) Amt,
+        {
+          date1: data.from,
+          date2: data.to,
+        },
+        {outFormat: oracledb.OUT_FORMAT_OBJECT},
+      );
+      //   await result.resultSet?.getRows((err, rows) => {
+      // });
+      callBack(err, result.rows);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      if (conn_ora) {
+        await conn_ora.close();
+        // await pool_ora.close();
+      }
+    }
+  },
+  phamracySalePart3: async (data, callBack) => {
+    let conn_ora = await getTmcConnection();
+    try {
+      const result = await conn_ora.execute(
+        `SELECT SUM (NVL (Pbilldetl.Bdn_amount, 0)) Amt,
                         SUM (NVL (Pbilldetl.Bdn_amount, 0) + NVL (Pbilldetl.Bmn_disamt, 0))
                         GrossAmt,
                         SUM (NVL (Pbilldetl.Bmn_disamt, 0)) Discount,
@@ -305,30 +299,29 @@ module.exports = {
                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         AND Opbillmast.Opd_Date <=
                             TO_DATE (:date2, 'dd/MM/yyyy hh24:mi:ss')`,
-                {
-                    date1: data.from,
-                    date2: data.to,
-                },
-                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-            )
-            await result.resultSet?.getRows((err, rows) => {
-                callBack(err, rows)
-            })
-        } catch (error) {
-            console.log(error)
-        } finally {
-            if (conn_ora) {
-                await conn_ora.close();
-                await pool_ora.close();
-            }
-        }
-    },
-    phamracyReturnPart3: async (data, callBack) => {
-        let pool_ora = await oraConnection();
-        let conn_ora = await pool_ora.getConnection();
-        try {
-            const result = await conn_ora.execute(
-                `SELECT SUM (NVL (Iprefunditemdetl.Rin_Netamt, 0)) * -1 Amt,
+        {
+          date1: data.from,
+          date2: data.to,
+        },
+        {outFormat: oracledb.OUT_FORMAT_OBJECT},
+      );
+      //   await result.resultSet?.getRows((err, rows) => {
+      // });
+      callBack(err, result.rows);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      if (conn_ora) {
+        await conn_ora.close();
+        // await pool_ora.close();
+      }
+    }
+  },
+  phamracyReturnPart3: async (data, callBack) => {
+    let conn_ora = await getTmcConnection();
+    try {
+      const result = await conn_ora.execute(
+        `SELECT SUM (NVL (Iprefunditemdetl.Rin_Netamt, 0)) * -1 Amt,
                         SUM (
                         NVL (Iprefunditemdetl.Rin_Netamt, 0)
                         + NVL (Iprefunditemdetl.Rin_Disamt, 0))
@@ -347,23 +340,22 @@ module.exports = {
                         AND IPREFUNDMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         AND Iprefundmast.Rid_Date <=
                             TO_DATE (:date2, 'dd/MM/yyyy hh24:mi:ss')`,
-                {
-                    date1: data.from,
-                    date2: data.to,
-                },
-                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-            )
-            await result.resultSet?.getRows((err, rows) => {
-                callBack(err, rows)
-            })
-        } catch (error) {
-            console.log(error)
-        } finally {
-            if (conn_ora) {
-                await conn_ora.close();
-                await pool_ora.close();
-            }
-        }
-    },
-}
-
+        {
+          date1: data.from,
+          date2: data.to,
+        },
+        {outFormat: oracledb.OUT_FORMAT_OBJECT},
+      );
+      //   await result.resultSet?.getRows((err, rows) => {
+      // });
+      callBack(err, result.rows);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      if (conn_ora) {
+        await conn_ora.close();
+        // await pool_ora.close();
+      }
+    }
+  },
+};

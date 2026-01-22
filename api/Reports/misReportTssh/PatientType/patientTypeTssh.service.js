@@ -1,17 +1,15 @@
 // @ts-ignore
-const { oracledb, connectionClose, oraConnection } = require('../../../../config/oradbconfig');
+const {oracledb, getTmcConnection} = require("../../../../config/oradbconfig");
 
 module.exports = {
-   patientTypeDiscountTssh: async (data, callBack) => {
+  patientTypeDiscountTssh: async (data, callBack) => {
+    let conn_ora = await getTmcConnection();
 
-      let pool_ora = await oraConnection();
-      let conn_ora = await pool_ora.getConnection();
+    const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(",")) || null;
+    const fromDate = data.from;
+    const toDate = data.to;
 
-      const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(',')) || null;
-      const fromDate = data.from;
-      const toDate = data.to;
-
-      const sql = `SELECT 
+    const sql = `SELECT 
         Ptc_Desc, 
         SUM (Discount) Discount, 
         SUM (tax) tax
@@ -2154,22 +2152,15 @@ FROM (
                                 GROUP BY Ptc_Desc
                                 ORDER BY 1`;
 
-      try {
-         const result = await conn_ora.execute(
-            sql,
-            {},
-            { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-         )
-         await result.resultSet?.getRows((err, rows) => {
-            callBack(err, rows)
-         })
-      } catch (error) {
-         console.log(error)
-      } finally {
-         if (conn_ora) {
-            await conn_ora.close();
-            await pool_ora.close();
-         }
-      }
-   },
-}
+    try {
+      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      // await result.resultSet?.getRows((err, rows) => {
+      // });
+      callBack(err, result.rows);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      if (conn_ora) await conn_ora.close();
+    }
+  },
+};

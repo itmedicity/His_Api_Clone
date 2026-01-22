@@ -1,17 +1,15 @@
 // @ts-ignore
-const { oracledb, connectionClose, oraConnection } = require('../../../config/oradbconfig');
+const {oracledb, getTmcConnection} = require("../../../config/oradbconfig");
 
 module.exports = {
+  getAllPharmacySales: async (data, callBack) => {
+    let conn_ora = await getTmcConnection();
+    // const ouCode = data.ouCode.join(',');
+    const ouCode = data.ouCode;
+    const fromDate = data.from;
+    const toDate = data.to;
 
-    getAllPharmacySales: async (data, callBack) => {
-        let pool_ora = await oraConnection();
-        let conn_ora = await pool_ora.getConnection();
-        // const ouCode = data.ouCode.join(',');
-        const ouCode = data.ouCode;
-        const fromDate = data.from;
-        const toDate = data.to;
-
-        const sql = `SELECT 
+    const sql = `SELECT 
                         BMD_DATE,
                         OU_CODE,
                         IT_CODE,
@@ -37,32 +35,25 @@ module.exports = {
                        ) MONTHTABLE
                      GROUP BY OU_CODE,IT_CODE,BMD_DATE,ITC_DESC
                      ORDER BY ITC_DESC`;
-        try {
-            const result = await conn_ora.execute(
-                sql,
-                {},
-                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-            )
-            await result.resultSet?.getRows((err, rows) => {
-                callBack(err, rows)
-            })
-        } catch (error) {
-            console.log(error)
-        } finally {
-            if (conn_ora) {
-                await conn_ora.close();
-                await pool_ora.close();
-            }
-        }
-    },
-    getOpCountMonthWise: async (data, callBack) => {
+    try {
+      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      await result.resultSet?.getRows((err, rows) => {
+        callBack(err, rows);
+      });
+    } catch (error) {
+      console.log(error);
+    } finally {
+      if (conn_ora) {
+        await conn_ora.close();
+      }
+    }
+  },
+  getOpCountMonthWise: async (data, callBack) => {
+    let conn_ora = await getTmcConnection();
+    const fromDate = data.from;
+    const toDate = data.to;
 
-        let pool_ora = await oraConnection();
-        let conn_ora = await pool_ora.getConnection();
-        const fromDate = data.from;
-        const toDate = data.to;
-
-        const sql = `SELECT 
+    const sql = `SELECT 
                         MONTHS,
                         COUNT(VS_NO) COUNT
                     FROM ( 
@@ -76,31 +67,26 @@ module.exports = {
                         AND VISITMAST.VSC_CANCEL IS NULL) A 
                     GROUP BY MONTHS  
                     ORDER BY MONTHS`;
-        try {
-            const result = await conn_ora.execute(
-                sql,
-                {},
-                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-            )
-            await result.resultSet?.getRows((err, rows) => {
-                callBack(err, rows)
-            })
-        } catch (error) {
-            console.log(error)
-        } finally {
-            if (conn_ora) {
-                await conn_ora.close();
-                await pool_ora.close();
-            }
-        }
-    },
-    getIpCountMonthWise: async (data, callBack) => {
-        let pool_ora = await oraConnection();
-        let conn_ora = await pool_ora.getConnection();
-        const fromDate = data.from;
-        const toDate = data.to;
+    try {
+      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      // await result.resultSet?.getRows((err, rows) => {
+      // })
+      callBack(err, result.rows);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      if (conn_ora) {
+        await conn_ora.close();
+        // await pool_ora.close();
+      }
+    }
+  },
+  getIpCountMonthWise: async (data, callBack) => {
+    let conn_ora = await getTmcConnection();
+    const fromDate = data.from;
+    const toDate = data.to;
 
-        const sql = `SELECT 
+    const sql = `SELECT 
                         MONTHS,
                         COUNT(IP_NO) COUNT
                     FROM (     
@@ -109,27 +95,23 @@ module.exports = {
                             IP_NO
                         FROM 
                             IPADMISS 
-                        WHERE IPADMISS.IPD_DATE   >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss') 
-                        AND IPADMISS.IPD_DATE <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                        WHERE IPADMISS.IPD_DATE   >= TO_DATE (:frDate, 'dd/MM/yyyy hh24:mi:ss') 
+                        AND IPADMISS.IPD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                         AND IPADMISS.IPC_PTFLAG = 'N' ) A
                     GROUP BY MONTHS  
                     ORDER BY MONTHS `;
-        try {
-            const result = await conn_ora.execute(
-                sql,
-                {},
-                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-            )
-            await result.resultSet?.getRows((err, rows) => {
-                callBack(err, rows)
-            })
-        } catch (error) {
-            console.log(error)
-        } finally {
-            if (conn_ora) {
-                await conn_ora.close();
-                await pool_ora.close();
-            }
-        }
-    },
-}
+    try {
+      const result = await conn_ora.execute(sql, {frDate: fromDate, toDate: toDate}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      //   await result.resultSet?.getRows((err, rows) => {
+      // });
+      callBack(err, result.rows);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      if (conn_ora) {
+        await conn_ora.close();
+        // await pool_ora.close();
+      }
+    }
+  },
+};

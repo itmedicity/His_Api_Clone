@@ -1317,7 +1317,7 @@ const getAmsPatientDetails = async (callBack) => {
                           }
 
                           resolve();
-                        }
+                        },
                       );
                     })
                   : Promise.resolve();
@@ -1348,14 +1348,14 @@ const getAmsPatientDetails = async (callBack) => {
                             if (err4) return connection.rollback(() => connection.release());
                             connection.release();
                           });
-                        }
+                        },
                       );
-                    }
+                    },
                   );
                 })
                 .catch((err) => connection.rollback(() => connection.release()));
             });
-          }
+          },
         );
       });
     });
@@ -1840,7 +1840,7 @@ const InsertTmcMedDesc = async (callBack) => {
         itn_breakqty, itn_lprate, itn_mrp, itn_originalmrp, itn_gendisper,
         itn_genipdisper, create_date, edit_date
       ) VALUES ?`,
-      [Values]
+      [Values],
     );
 
     // Step 4: Fetch chunks for medstore insert
@@ -1872,7 +1872,7 @@ const InsertTmcMedDesc = async (callBack) => {
         mysqlConn,
         `
         INSERT INTO bis_tmc_med_store (it_code, st_code) VALUES ?`,
-        [medstoreValues]
+        [medstoreValues],
       );
     }
 
@@ -1884,7 +1884,7 @@ const InsertTmcMedDesc = async (callBack) => {
       UPDATE bis_tmc_trigger_details 
       SET last_insert_date = ?, last_update_date = ? 
       WHERE trgr_slno = 1`,
-      [currentDate, currentDate]
+      [currentDate, currentDate],
     );
 
     // Step 6: Fetch update records
@@ -1977,7 +1977,7 @@ const InsertTmcMedDesc = async (callBack) => {
         `
         UPDATE bis_tmc_trigger_details SET last_update_date = ? 
         WHERE trgr_slno = 1`,
-        [currentDate]
+        [currentDate],
       );
     }
 
@@ -2143,7 +2143,7 @@ const InsertKmcMedDesc = async (callBack) => {
         itn_breakqty, itn_lprate, itn_mrp, itn_originalmrp, itn_gendisper,
         itn_genipdisper, create_date, edit_date
       ) VALUES ?`,
-      [Values]
+      [Values],
     );
 
     // Step 4: Fetch chunks for medstore insert
@@ -2175,7 +2175,7 @@ const InsertKmcMedDesc = async (callBack) => {
         mysqlConn,
         `
         INSERT INTO bis_kmc_med_store (it_code, st_code) VALUES ?`,
-        [medstoreValues]
+        [medstoreValues],
       );
     }
 
@@ -2187,7 +2187,7 @@ const InsertKmcMedDesc = async (callBack) => {
       UPDATE bis_kmc_trigger_details 
       SET last_insert_date = ?, last_update_date = ? 
       WHERE trgr_slno = 1`,
-      [currentDate, currentDate]
+      [currentDate, currentDate],
     );
 
     // Step 6: Fetch update records
@@ -2280,7 +2280,7 @@ const InsertKmcMedDesc = async (callBack) => {
         `
         UPDATE bis_kmc_trigger_details SET last_update_date = ? 
         WHERE trgr_slno = 1`,
-        [currentDate]
+        [currentDate],
       );
     }
 
@@ -2402,34 +2402,34 @@ const getAmsLastUpdatedDate = async (processId) => {
 
 /****************************/
 
-// // auto sync at an interval of 10 min/2
-// cron.schedule("*/10 * * * *", () => {
-//   getInpatientDetail();
-// });
+// auto sync at an interval of 10 min/2
+cron.schedule("*/10 * * * *", () => {
+  getInpatientDetail();
+});
 
-// // //  auto sync at an interval of 13 min
-// cron.schedule("*/13 * * * *", () => {
-//   UpdateIpStatusDetails();
-// });
+// //  auto sync at an interval of 13 min
+cron.schedule("*/13 * * * *", () => {
+  UpdateIpStatusDetails();
+});
 
-// // //  auto sync at an interval of 15 min
-// cron.schedule("*/15 * * * *", () => {
-//   UpdateInpatientDetailRmall();
-// });
+// //  auto sync at an interval of 15 min
+cron.schedule("*/15 * * * *", () => {
+  UpdateInpatientDetailRmall();
+});
 
-// // //  test triggering
-// cron.schedule("*/17 * * * *", () => {
-//   UpdateFbBedDetailMeliora();
-// });
+// //  test triggering
+cron.schedule("*/17 * * * *", () => {
+  UpdateFbBedDetailMeliora();
+});
 
-// cron.schedule("*/49 * * * *", () => {
-//   getAmsPatientDetails();
-// });
+cron.schedule("*/49 * * * *", () => {
+  getAmsPatientDetails();
+});
 
-// // //runs at every 3 hours
-// cron.schedule("0 */3 * * *", () => {
-//   updateAmsPatientDetails();
-// });
+// //runs at every 3 hours
+cron.schedule("0 */3 * * *", () => {
+  updateAmsPatientDetails();
+});
 
 // // // Running InsertChilderDetailMeliora at midnight... 11.00 pm
 // cron.schedule("0 23 * * *", () => {

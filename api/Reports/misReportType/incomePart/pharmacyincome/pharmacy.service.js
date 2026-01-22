@@ -1,10 +1,9 @@
 // @ts-ignore
-const {oracledb, connectionClose, oraConnection} = require("../../../../../config/oradbconfig");
+const {oracledb, getTmcConnection} = require("../../../../../config/oradbconfig");
 
 module.exports = {
   pharmacySalePart1: async (data, callBack) => {
-    let pool_ora = await oraConnection();
-    let conn_ora = await pool_ora.getConnection();
+    let conn_ora = await getTmcConnection();
     try {
       const result = await conn_ora.execute(
         `SELECT 
@@ -57,23 +56,17 @@ module.exports = {
           fromDate: data.from,
           toDate: data.to,
         },
-        {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT}
+        {outFormat: oracledb.OUT_FORMAT_OBJECT},
       );
-      await result.resultSet?.getRows((err, rows) => {
-        callBack(err, rows);
-      });
+      callBack(null, result.rows);
     } catch (error) {
       console.log(error);
     } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-        await pool_ora.close();
-      }
+      if (conn_ora) await conn_ora.close();
     }
   },
   phamracyReturnPart1: async (data, callBack) => {
-    let pool_ora = await oraConnection();
-    let conn_ora = await pool_ora.getConnection();
+    let conn_ora = await getTmcConnection();
     try {
       const result = await conn_ora.execute(
         `SELECT 
@@ -97,23 +90,17 @@ module.exports = {
           fromDate: data.from,
           toDate: data.to,
         },
-        {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT}
+        {outFormat: oracledb.OUT_FORMAT_OBJECT},
       );
-      await result.resultSet?.getRows((err, rows) => {
-        callBack(err, rows);
-      });
+      callBack(null, result.rows);
     } catch (error) {
       console.log(error);
     } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-        await pool_ora.close();
-      }
+      if (conn_ora) await conn_ora.close();
     }
   },
   phamracySalePart2: async (data, callBack) => {
-    let pool_ora = await oraConnection();
-    let conn_ora = await pool_ora.getConnection();
+    let conn_ora = await getTmcConnection();
     try {
       const result = await conn_ora.execute(
         `SELECT 
@@ -165,23 +152,17 @@ module.exports = {
           fromDate: data.from,
           toDate: data.to,
         },
-        {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT}
+        {outFormat: oracledb.OUT_FORMAT_OBJECT},
       );
-      await result.resultSet?.getRows((err, rows) => {
-        callBack(err, rows);
-      });
+      callBack(null, result.rows);
     } catch (error) {
       console.log(error);
     } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-        await pool_ora.close();
-      }
+      if (conn_ora) await conn_ora.close();
     }
   },
   phamracyReturnPart2: async (data, callBack) => {
-    let pool_ora = await oraConnection();
-    let conn_ora = await pool_ora.getConnection();
+    let conn_ora = await getTmcConnection();
     try {
       const result = await conn_ora.execute(
         `SELECT 
@@ -205,23 +186,17 @@ module.exports = {
           fromDate: data.from,
           toDate: data.to,
         },
-        {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT}
+        {outFormat: oracledb.OUT_FORMAT_OBJECT},
       );
-      await result.resultSet?.getRows((err, rows) => {
-        callBack(err, rows);
-      });
+      callBack(null, result.rows);
     } catch (error) {
       console.log(error);
     } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-        await pool_ora.close();
-      }
+      if (conn_ora) await conn_ora.close();
     }
   },
   phamracySalePart3: async (data, callBack) => {
-    let pool_ora = await oraConnection();
-    let conn_ora = await pool_ora.getConnection();
+    let conn_ora = await getTmcConnection();
     try {
       const result = await conn_ora.execute(
         ` SELECT 
@@ -246,23 +221,17 @@ module.exports = {
           fromDate: data.from,
           toDate: data.to,
         },
-        {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT}
+        {outFormat: oracledb.OUT_FORMAT_OBJECT},
       );
-      await result.resultSet?.getRows((err, rows) => {
-        callBack(err, rows);
-      });
+      callBack(null, result.rows);
     } catch (error) {
       console.log(error);
     } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-        await pool_ora.close();
-      }
+      if (conn_ora) await conn_ora.close();
     }
   },
   phamracyReturnPart3: async (data, callBack) => {
-    let pool_ora = await oraConnection();
-    let conn_ora = await pool_ora.getConnection();
+    let conn_ora = await getTmcConnection();
     try {
       const result = await conn_ora.execute(
         `SELECT 
@@ -285,18 +254,13 @@ module.exports = {
           fromDate: data.from,
           toDate: data.to,
         },
-        {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT}
+        {outFormat: oracledb.OUT_FORMAT_OBJECT},
       );
-      await result.resultSet?.getRows((err, rows) => {
-        callBack(err, rows);
-      });
+      callBack(null, result.rows);
     } catch (error) {
       console.log(error);
     } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-        await pool_ora.close();
-      }
+      if (conn_ora) await conn_ora.close();
     }
   },
 };

@@ -1,21 +1,17 @@
-const { format, parseISO } = require('date-fns');
-const { oraConnection, oracledb } = require('../../config/oradbconfig');
+const {format, parseISO} = require("date-fns");
+const {getTmcConnection, oracledb} = require("../../config/oradbconfig");
 
 module.exports = {
+  getPurchaseMastDatas: async (data, callBack) => {
+    const {fromDate, toDate} = data;
+    const from = fromDate ? parseISO(fromDate) : null;
+    const to = toDate ? parseISO(toDate) : null;
+    // Format to Oracle format
+    const FROM_DATE = from ? format(from, "dd/MM/yyyy HH:mm:ss") : null;
+    const TO_DATE = to ? format(to, "dd/MM/yyyy HH:mm:ss") : null;
 
-    getPurchaseMastDatas: async (data, callBack) => {
-
-        const { fromDate, toDate } = data
-        const from = fromDate ? parseISO(fromDate) : null;
-        const to = toDate ? parseISO(toDate) : null;
-        // Format to Oracle format
-        const FROM_DATE = from ? format(from, "dd/MM/yyyy HH:mm:ss") : null;
-        const TO_DATE = to ? format(to, "dd/MM/yyyy HH:mm:ss") : null;
-
-        let pool_ora = await oraConnection();
-        let conn_ora = await pool_ora.getConnection();
-        const sql =
-            `
+    let conn_ora = await getTmcConnection();
+    const sql = `
                SELECT 
     PU_NO AS "GRN NO",
     PU_DATE AS "GRN DATE",
@@ -182,46 +178,36 @@ FROM (
         LEFT JOIN QUOTATIONDETL QD ON QD.QU_NO = O.QU_NO AND O.IT_CODE = QD.IT_CODE ) PUR 
 LEFT JOIN TAX ON PUR.QU_TXCODE = TAX.TX_CODE 
 LEFT JOIN MEDDESC ON MEDDESC.IT_CODE = PUR.PU_ITEM
-`
+`;
 
+    try {
+      const result = await conn_ora.execute(
+        sql,
+        {
+          FROM_DATE: FROM_DATE,
+          TO_DATE: TO_DATE,
+        },
+        {outFormat: oracledb.OUT_FORMAT_OBJECT},
+      );
+      callBack(null, result.rows);
+    } catch (error) {
+      return callBack(error);
+    } finally {
+      if (conn_ora) await conn_ora.close();
+    }
+  },
 
-        try {
-            const result = await conn_ora.execute(
-                sql,
-                {
-                    FROM_DATE: FROM_DATE,
-                    TO_DATE: TO_DATE
-                },
-                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-            )
-            await result.resultSet?.getRows((err, rows) => {
-                callBack(err, rows)
-            })
-        }
-        catch (error) {
-            return callBack(error)
-        } finally {
-            if (conn_ora) {
-                await conn_ora.close();
-                await pool_ora.close();
-            }
-        }
-    },
+  //Grm Details
+  getGrmDetails: async (data, callBack) => {
+    const {fromDate, toDate} = data;
+    const from = fromDate ? parseISO(fromDate) : null;
+    const to = toDate ? parseISO(toDate) : null;
+    // Format to Oracle format
+    const FROM_DATE = from ? format(from, "dd/MM/yyyy HH:mm:ss") : null;
+    const TO_DATE = to ? format(to, "dd/MM/yyyy HH:mm:ss") : null;
 
-    //Grm Details
-    getGrmDetails: async (data, callBack) => {
-
-        const { fromDate, toDate } = data
-        const from = fromDate ? parseISO(fromDate) : null;
-        const to = toDate ? parseISO(toDate) : null;
-        // Format to Oracle format
-        const FROM_DATE = from ? format(from, "dd/MM/yyyy HH:mm:ss") : null;
-        const TO_DATE = to ? format(to, "dd/MM/yyyy HH:mm:ss") : null;
-
-        let pool_ora = await oraConnection();
-        let conn_ora = await pool_ora.getConnection();
-        const sql =
-            `
+    let conn_ora = await getTmcConnection();
+    const sql = `
           SELECT 
     PU_NO AS "GRN NO",
     PU_DATE AS "GRN DATE",
@@ -378,34 +364,27 @@ FROM (
 LEFT JOIN TAX ON PUR.QU_TXCODE = TAX.TX_CODE 
 LEFT JOIN MEDDESC ON MEDDESC.IT_CODE = PUR.PU_ITEM
 JOIN SUPPLIER SU ON SU.SU_CODE = PUR.SU_CODE
-`
-        try {
-            const result = await conn_ora.execute(
-                sql,
-                {
-                    FROM_DATE: FROM_DATE,
-                    TO_DATE: TO_DATE
-                },
-                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-            )
-            await result.resultSet?.getRows((err, rows) => {
-                callBack(err, rows)
-            })
-        }
-        catch (error) {
-            return callBack(error)
-        } finally {
-            if (conn_ora) {
-                await conn_ora.close();
-                await pool_ora.close();
-            }
-        }
-    },
+`;
+    try {
+      const result = await conn_ora.execute(
+        sql,
+        {
+          FROM_DATE: FROM_DATE,
+          TO_DATE: TO_DATE,
+        },
+        {outFormat: oracledb.OUT_FORMAT_OBJECT},
+      );
+      callBack(null, result.rows);
+    } catch (error) {
+      return callBack(error);
+    } finally {
+      if (conn_ora) await conn_ora.close();
+    }
+  },
 
-    getpendingApprovalQtn: async (callBack) => {
-        let pool_ora = await oraConnection();
-        let conn_ora = await pool_ora.getConnection();
-        const sql = `
+  getpendingApprovalQtn: async (callBack) => {
+    let conn_ora = await getTmcConnection();
+    const sql = `
              SELECT 
                    QM.QU_NO "QUOTATION #",
                    QM.QUC_SLNO,
@@ -423,32 +402,20 @@ JOIN SUPPLIER SU ON SU.SU_CODE = PUR.SU_CODE
                AND QM.QOT_REJECT IS NULL
 
             `;
-        try {
-            const result = await conn_ora.execute(
-                sql,
-                {},
-                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-            )
-            await result.resultSet?.getRows((err, rows) => {
-                callBack(err, rows)
-            })
-        }
-        catch (error) {
-            return callBack(error)
-        } finally {
-            if (conn_ora) {
-                await conn_ora.close();
-                await pool_ora.close();
-            }
-        }
-
-    },
-    getPurchaseDetails: async (data, callBack) => {
-        let pool_ora = await oraConnection();
-        let conn_ora = await pool_ora.getConnection();
-        try {
-            const result = await conn_ora.execute(
-                ` 
+    try {
+      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      callBack(null, result.rows);
+    } catch (error) {
+      return callBack(error);
+    } finally {
+      if (conn_ora) await conn_ora.close();
+    }
+  },
+  getPurchaseDetails: async (data, callBack) => {
+    let conn_ora = await getTmcConnection();
+    try {
+      const result = await conn_ora.execute(
+        ` 
                                SELECT 
                     QD.QU_NO "QUOTATION #",
                     QD.QUD_DATE "QUOT DATE",
@@ -473,29 +440,22 @@ JOIN SUPPLIER SU ON SU.SU_CODE = PUR.SU_CODE
                WHERE QD.QUC_SLNO = :quc_slno
                AND (QD.QUC_ACTIVE = 'Y' OR QD.QUC_ACTIVE IS NULL)
                 `,
-                {
-                    quc_slno: data,
-                },
-                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-            )
-            await result.resultSet?.getRows((err, rows) => {
-                callBack(err, rows)
-            })
-
-        } catch (error) {
-        } finally {
-            if (conn_ora) {
-                await conn_ora.close();
-                await pool_ora.close();
-            }
-        }
-    },
-    getItemDetails: async (data, callBack) => {
-        let pool_ora = await oraConnection();
-        let conn_ora = await pool_ora.getConnection();
-        try {
-            const result = await conn_ora.execute(
-                ` 
+        {
+          quc_slno: data,
+        },
+        {outFormat: oracledb.OUT_FORMAT_OBJECT},
+      );
+      callBack(null, result.rows);
+    } catch (error) {
+    } finally {
+      if (conn_ora) await conn_ora.close();
+    }
+  },
+  getItemDetails: async (data, callBack) => {
+    let conn_ora = await getTmcConnection();
+    try {
+      const result = await conn_ora.execute(
+        ` 
                    SELECT 
                   PD.PUD_DATE "PURCHASE DATE",
                   PD.SU_CODE,
@@ -533,24 +493,15 @@ JOIN SUPPLIER SU ON SU.SU_CODE = PUR.SU_CODE
                   PD.PDN_FREE,
                   PD.PDN_DISPER       
                 `,
-                {
-                    st_code: data,
-                },
-                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-            )
-            await result.resultSet?.getRows((err, rows) => {
-                callBack(err, rows)
-            })
-
-        } catch (error) {
-        } finally {
-            if (conn_ora) {
-                await conn_ora.close();
-                await pool_ora.close();
-            }
-        }
-    },
-}
-
-
-
+        {
+          st_code: data,
+        },
+        {outFormat: oracledb.OUT_FORMAT_OBJECT},
+      );
+      callBack(null, result.rows);
+    } catch (error) {
+    } finally {
+      if (conn_ora) await conn_ora.close();
+    }
+  },
+};

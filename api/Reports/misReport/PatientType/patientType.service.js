@@ -1,14 +1,12 @@
 // @ts-ignore
-const { oracledb, connectionClose, oraConnection } = require('../../../../config/oradbconfig');
+const {oracledb, getTmcConnection} = require("../../../../config/oradbconfig");
 
 module.exports = {
-       patientTypeDiscount: async (data, callBack) => {
-
-              let pool_ora = await oraConnection();
-              let conn_ora = await pool_ora.getConnection();
-              try {
-                     const result = await conn_ora.execute(
-                            `SELECT Ptc_Desc, SUM (Discount) Discount, SUM (tax) tax
+  patientTypeDiscount: async (data, callBack) => {
+    let conn_ora = await getTmcConnection();
+    try {
+      const result = await conn_ora.execute(
+        `SELECT Ptc_Desc, SUM (Discount) Discount, SUM (tax) tax
                        FROM (  SELECT Receiptmast.Rpc_Slno Slno,
                                       Receiptmast.Rp_No BillNo,
                                       Receiptmast.Rpd_Date BillDate,
@@ -2397,103 +2395,102 @@ module.exports = {
                                                                    INITCAP (Pattype.Ptc_Desc))
                    GROUP BY Ptc_Desc
                    ORDER BY 1`,
-                            {
-                                   date1: data.from,
-                                   date2: data.to,
-                                   date3: data.from,
-                                   date4: data.to,
-                                   date5: data.from,
-                                   date6: data.to,
-                                   date7: data.from,
-                                   date8: data.to,
-                                   date9: data.from,
-                                   date10: data.to,
-                                   date11: data.from,
-                                   date12: data.to,
-                                   date13: data.from,
-                                   date14: data.to,
-                                   date15: data.from,
-                                   date16: data.to,
-                                   date17: data.from,
-                                   date18: data.to,
-                                   date19: data.from,
-                                   date20: data.to,
-                                   date21: data.from,
-                                   date22: data.to,
-                                   date23: data.from,
-                                   date24: data.to,
-                                   date25: data.from,
-                                   date26: data.to,
-                                   date27: data.from,
-                                   date28: data.to,
-                                   date29: data.from,
-                                   date30: data.to,
-                                   date31: data.from,
-                                   date32: data.to,
-                                   date33: data.from,
-                                   date34: data.to,
-                                   date35: data.from,
-                                   date36: data.to,
-                                   date37: data.from,
-                                   date38: data.to,
-                                   date39: data.from,
-                                   date40: data.to,
-                                   date41: data.from,
-                                   date42: data.to,
-                                   date43: data.from,
-                                   date44: data.to,
-                                   date45: data.from,
-                                   date46: data.to,
-                                   date47: data.from,
-                                   date48: data.to,
-                                   date49: data.from,
-                                   date50: data.to,
-                                   date51: data.from,
-                                   date52: data.to,
-                                   date53: data.from,
-                                   date54: data.to,
-                                   date55: data.from,
-                                   date56: data.to,
-                                   date57: data.from,
-                                   date58: data.to,
-                                   date59: data.from,
-                                   date60: data.to,
-                                   date61: data.from,
-                                   date62: data.to,
-                                   date63: data.from,
-                                   date64: data.to,
-                                   date65: data.from,
-                                   date66: data.to,
-                                   date67: data.from,
-                                   date68: data.to,
-                                   date69: data.from,
-                                   date70: data.to,
-                                   date71: data.from,
-                                   date72: data.to,
-                                   date73: data.from,
-                                   date74: data.to,
-                                   date75: data.from,
-                                   date76: data.to,
-                                   date77: data.from,
-                                   date78: data.to,
-                                   date79: data.from,
-                                   date80: data.to,
-                                   date81: data.from,
-                                   date82: data.to
-                            },
-                            { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-                     )
-                     await result.resultSet?.getRows((err, rows) => {
-                            callBack(err, rows)
-                     })
-              } catch (error) {
-                     console.log(error)
-              } finally {
-                     if (conn_ora) {
-                            await conn_ora.close();
-                            await pool_ora.close();
-                     }
-              }
-
-       },
-}
+        {
+          date1: data.from,
+          date2: data.to,
+          date3: data.from,
+          date4: data.to,
+          date5: data.from,
+          date6: data.to,
+          date7: data.from,
+          date8: data.to,
+          date9: data.from,
+          date10: data.to,
+          date11: data.from,
+          date12: data.to,
+          date13: data.from,
+          date14: data.to,
+          date15: data.from,
+          date16: data.to,
+          date17: data.from,
+          date18: data.to,
+          date19: data.from,
+          date20: data.to,
+          date21: data.from,
+          date22: data.to,
+          date23: data.from,
+          date24: data.to,
+          date25: data.from,
+          date26: data.to,
+          date27: data.from,
+          date28: data.to,
+          date29: data.from,
+          date30: data.to,
+          date31: data.from,
+          date32: data.to,
+          date33: data.from,
+          date34: data.to,
+          date35: data.from,
+          date36: data.to,
+          date37: data.from,
+          date38: data.to,
+          date39: data.from,
+          date40: data.to,
+          date41: data.from,
+          date42: data.to,
+          date43: data.from,
+          date44: data.to,
+          date45: data.from,
+          date46: data.to,
+          date47: data.from,
+          date48: data.to,
+          date49: data.from,
+          date50: data.to,
+          date51: data.from,
+          date52: data.to,
+          date53: data.from,
+          date54: data.to,
+          date55: data.from,
+          date56: data.to,
+          date57: data.from,
+          date58: data.to,
+          date59: data.from,
+          date60: data.to,
+          date61: data.from,
+          date62: data.to,
+          date63: data.from,
+          date64: data.to,
+          date65: data.from,
+          date66: data.to,
+          date67: data.from,
+          date68: data.to,
+          date69: data.from,
+          date70: data.to,
+          date71: data.from,
+          date72: data.to,
+          date73: data.from,
+          date74: data.to,
+          date75: data.from,
+          date76: data.to,
+          date77: data.from,
+          date78: data.to,
+          date79: data.from,
+          date80: data.to,
+          date81: data.from,
+          date82: data.to,
+        },
+        {outFormat: oracledb.OUT_FORMAT_OBJECT},
+      );
+      //       await result.resultSet?.getRows((err, rows) => {
+      // });
+      callBack(err, result.rows);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      if (conn_ora) {
+        await conn_ora.close();
+        //  await pool_ora.close();
+      }
+    }
+  },
+};

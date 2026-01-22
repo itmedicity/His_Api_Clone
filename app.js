@@ -1,8 +1,19 @@
 require("dotenv").config();
-
 const express = require("express");
-
 const app = express();
+const {initializePools, closeConnection} = require("./config/oradbconfig");
+
+(async () => {
+  try {
+    await initializePools();
+  } catch (err) {
+    console.error("Oracle initialization failed", err);
+    process.exit(1);
+  }
+})();
+
+process.on("SIGINT", closeConnection);
+process.on("SIGTERM", closeConnection);
 
 //IMPORT MODULES
 const emplyeeRoutes = require("./api/employee/emp.router");

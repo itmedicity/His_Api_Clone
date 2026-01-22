@@ -1,10 +1,9 @@
 // @ts-ignore
-const {oracledb, connectionClose, oraConnection} = require("../../../../../config/oradbconfig");
+const {oracledb, getTmcConnection} = require("../../../../../config/oradbconfig");
 
 module.exports = {
   pharmacyTmchSalePart1: async (data, callBack) => {
-    let pool_ora = await oraConnection();
-    let conn_ora = await pool_ora.getConnection();
+    let conn_ora = await getTmcConnection();
 
     // const ipNumberList = data.ptno.join(',');
     const fromDate = data.from;
@@ -51,22 +50,20 @@ module.exports = {
                                         AND Mretdetl.Mrd_Date <= TO_DATE ('${toDate}','dd/MM/yyyy hh24:mi:ss')) A`;
 
     try {
-      const result = await conn_ora.execute(sql, {}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
-      await result.resultSet?.getRows((err, rows) => {
-        callBack(err, rows);
-      });
+      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      callBack(err, result.rows);
+      // await result.resultSet?.getRows((err, rows) => {
+      // });
     } catch (error) {
       console.log(error);
     } finally {
       if (conn_ora) {
         await conn_ora.close();
-        await pool_ora.close();
       }
     }
   },
   phamracyTmchReturnPart1: async (data, callBack) => {
-    let pool_ora = await oraConnection();
-    let conn_ora = await pool_ora.getConnection();
+    let conn_ora = await getTmcConnection();
 
     const ipNumberList = data.phar.join(",");
     const fromDate = data.from;
@@ -90,22 +87,21 @@ module.exports = {
                         AND Disbillmast.Dmd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
                         AND DISBILLMAST.IP_NO NOT IN (${ipNumberList})`;
     try {
-      const result = await conn_ora.execute(sql, {}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
-      await result.resultSet?.getRows((err, rows) => {
-        callBack(err, rows);
-      });
+      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      callBack(err, result.rows);
+      // await result.resultSet?.getRows((err, rows) => {
+      // });
     } catch (error) {
       console.log(error);
     } finally {
       if (conn_ora) {
         await conn_ora.close();
-        await pool_ora.close();
+        // await pool_ora.close();
       }
     }
   },
   phamracyTmchSalePart2: async (data, callBack) => {
-    let pool_ora = await oraConnection();
-    let conn_ora = await pool_ora.getConnection();
+    let conn_ora = await getTmcConnection();
 
     const fromDate = data.from;
     const toDate = data.to;
@@ -150,22 +146,21 @@ module.exports = {
                                     AND Mretmast.Mrd_RETDate <= TO_DATE ('${toDate}','dd/MM/yyyy hh24:mi:ss')) A`;
 
     try {
-      const result = await conn_ora.execute(sql, {}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
-      await result.resultSet?.getRows((err, rows) => {
-        callBack(err, rows);
-      });
+      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      callBack(err, result.rows);
+      // await result.resultSet?.getRows((err, rows) => {
+      // });
     } catch (error) {
       console.log(error);
     } finally {
       if (conn_ora) {
         await conn_ora.close();
-        await pool_ora.close();
+        // await pool_ora.close();
       }
     }
   },
   phamracyTmchReturnPart2: async (data, callBack) => {
-    let pool_ora = await oraConnection();
-    let conn_ora = await pool_ora.getConnection();
+    let conn_ora = await getTmcConnection();
 
     const ipNumberList = data.phar.join(",");
     const fromDate = data.from;
@@ -190,23 +185,21 @@ module.exports = {
                                 AND Disbillmast.IP_NO NOT IN (${ipNumberList})`;
 
     try {
-      const result = await conn_ora.execute(sql, {}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
-      await result.resultSet?.getRows((err, rows) => {
-        callBack(err, rows);
-      });
+      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      // await result.resultSet?.getRows((err, rows) => {
+      // });
+      callBack(err, result.rows);
     } catch (error) {
       console.log(error);
     } finally {
       if (conn_ora) {
         await conn_ora.close();
-        await pool_ora.close();
+        // await pool_ora.close();
       }
     }
   },
   phamracyTmchSalePart3: async (data, callBack) => {
-    let pool_ora = await oraConnection();
-    let conn_ora = await pool_ora.getConnection();
-
+    let conn_ora = await getTmcConnection();
     const ipNumberList = data.phar.join(",");
     const fromDate = data.from;
     const toDate = data.to;
@@ -230,22 +223,21 @@ module.exports = {
 
     // AND PBILLMAST.IP_NO NOT IN (${ipNumberList})
     try {
-      const result = await conn_ora.execute(sql, {}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
-      await result.resultSet?.getRows((err, rows) => {
-        callBack(err, rows);
-      });
+      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      callBack(err, result.rows);
+      // await result.resultSet?.getRows((err, rows) => {
+      // });
     } catch (error) {
       console.log(error);
     } finally {
       if (conn_ora) {
         await conn_ora.close();
-        await pool_ora.close();
+        // await pool_ora.close();
       }
     }
   },
   phamracyTmchReturnPart3: async (data, callBack) => {
-    let pool_ora = await oraConnection();
-    let conn_ora = await pool_ora.getConnection();
+    let conn_ora = await getTmcConnection();
 
     const fromDate = data.from;
     const toDate = data.to;
@@ -265,16 +257,16 @@ module.exports = {
                                 AND Iprefundmast.Rid_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')`;
 
     try {
-      const result = await conn_ora.execute(sql, {}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
-      await result.resultSet?.getRows((err, rows) => {
-        callBack(err, rows);
-      });
+      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      callBack(err, result.rows);
+      // await result.resultSet?.getRows((err, rows) => {
+      // });
     } catch (error) {
       console.log(error);
     } finally {
       if (conn_ora) {
         await conn_ora.close();
-        await pool_ora.close();
+        // await pool_ora.close();
       }
     }
   },

@@ -1,15 +1,13 @@
-const pool = require('../../../config/dbconfig');
-const { oraConnection, oracledb } = require('../../../config/oradbconfig')
+const pool = require("../../../config/dbconfig");
+const {getTmcConnection, oracledb} = require("../../../config/oradbconfig");
 
 module.exports = {
+  getGstReportOfPharmacy: async (data, callBack) => {
+    let conn_ora = await getTmcConnection();
+    const fromDate = data.from;
+    const toDate = data.to;
 
-    getGstReportOfPharmacy: async (data, callBack) => {
-        let pool_ora = await oraConnection();
-        let conn_ora = await pool_ora.getConnection();
-        const fromDate = data.from;
-        const toDate = data.to;
-
-        const sql = `SELECT OUCODE,CODE,BILL,BILLDATE,CACR,QTY,LOOSE,PRATE,MRP,ACTMRP,AMT,DIS,TAXCODE,TAXPER,TAXAMT,OUTLET.OUC_DESC,MEDDESC.ITC_DESC,TAX.TXC_DESC
+    const sql = `SELECT OUCODE,CODE,BILL,BILLDATE,CACR,QTY,LOOSE,PRATE,MRP,ACTMRP,AMT,DIS,TAXCODE,TAXPER,TAXAMT,OUTLET.OUC_DESC,MEDDESC.ITC_DESC,TAX.TXC_DESC
                 FROM (
                 SELECT
                             PBILLDETL.OU_CODE OUCODE,
@@ -33,9 +31,9 @@ module.exports = {
                             AND NVL (Pbillmast.Bmc_cancel, 'N') = 'N'
                             AND Pbillmast.Bmc_Cacr IN ('C', 'R', 'M')
                             AND Pbillmast.BMD_DATE >=
-                                   TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                   TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                             AND Pbillmast.Bmd_Date <=
-                                   TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                   TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                             AND pbillmast.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                     UNION ALL
                 SELECT
@@ -66,10 +64,10 @@ module.exports = {
                             AND NVL (mretmast.Mrc_cancel, 'N') = 'N'
                             AND Mretdetl.MRC_CACR IN ('C', 'R')
                             AND Mretdetl.MRD_DATE >=
-                                    TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                    TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                             AND MRETDETL.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             AND Mretdetl.Mrd_Date <=
-                                  TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                  TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                         ) A , MEDDESC, OUTLET,TAX
                         WHERE  A.OUCODE = OUTLET.OU_CODE
                             AND A.CODE = MEDDESC.IT_CODE
@@ -101,10 +99,10 @@ module.exports = {
                             AND NVL (Dmc_Cancel, 'N') = 'N'
                             AND Disbillmast.Dmc_Cacr <> 'M'
                             AND Disbillmast.Dmd_date >=
-                                  TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                  TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             AND Disbillmast.Dmd_Date <=
-                                  TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                  TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                             ) A,MEDDESC, OUTLET,TAX
                         WHERE  A.OUCODE = OUTLET.OU_CODE
                             AND A.CODE = MEDDESC.IT_CODE
@@ -135,9 +133,9 @@ module.exports = {
                             AND NVL (Pbillmast.Bmc_cancel, 'N') = 'N'
                             AND Pbillmast.Bmc_Cacr IN ('C', 'R', 'M')
                             AND Pbillmast.BMD_COLLDATE >=
-                                TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                             AND Pbillmast.BMD_COLLDATE <=
-                                TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                             AND pbillmast.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                     UNION ALL
                     SELECT
@@ -168,10 +166,10 @@ module.exports = {
                             AND NVL (mretmast.Mrc_cancel, 'N') = 'N'
                             AND Mretdetl.MRC_CACR IN ('C', 'R')
                             AND Mretmast.MRD_RETDATE >=
-                                TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                             AND MRETDETL.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             AND Mretmast.Mrd_RETDate <=
-                                TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                             ) A  , MEDDESC, OUTLET,TAX
                     WHERE  A.OUCODE = OUTLET.OU_CODE
                             AND A.CODE = MEDDESC.IT_CODE
@@ -203,49 +201,39 @@ module.exports = {
                             AND NVL (Dmc_Cancel, 'N') = 'N'
                             AND Disbillmast.Dmc_Cacr <> 'M'
                             AND Disbillmast.Dmd_date >=
-                                TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             AND Disbillmast.Dmd_Date <=
-                                TO_DATE('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                TO_DATE(:toDate, 'dd/MM/yyyy hh24:mi:ss')
                             ) A ,MEDDESC, OUTLET,TAX
                     WHERE  A.OUCODE = OUTLET.OU_CODE
                             AND A.CODE = MEDDESC.IT_CODE
                             AND A.TAXCODE = TAX.TX_CODE`;
+    let result;
+    try {
+      result = await conn_ora.execute(
+        sql,
+        {
+          fromDate: fromDate,
+          toDate: toDate,
+        },
+        {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT},
+      );
+      const gstReportFromOra = await result.resultSet?.getRows();
+      return callBack(null, gstReportFromOra);
+    } catch (error) {
+      return callBack(error);
+    } finally {
+      if (result) await result.resultSet.close();
+      if (conn_ora) await conn_ora.close();
+    }
+  },
 
-
-        try {
-            const result = await conn_ora.execute(
-                sql,
-                {},
-                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
-            )
-            const gstReportFromOra = await result.resultSet?.getRows();
-            return callBack(null, gstReportFromOra)
-        }
-        catch (error) {
-            return callBack(error)
-        }
-        finally {
-            if (conn_ora) {
-                await conn_ora.close();
-                await pool_ora.close();
-            }
-        }
-
-    },
-
-
-
-
-
-
-    getGstReportPharmacyWise: async (data, callBack) => {
-
-        let pool_ora = await oraConnection();
-        let conn_ora = await pool_ora.getConnection();
-        const fromDate = data.from;
-        const toDate = data.to;
-        const sql = `SELECT OUCODE,CODE,BILL,BILLDATE,CACR,QTY,LOOSE,PRATE,MRP,ACTMRP,AMT,DIS,TAXCODE,TAXPER,TAXAMT,OUTLET.OUC_DESC,MEDDESC.ITC_DESC,TAX.TXC_DESC
+  getGstReportPharmacyWise: async (data, callBack) => {
+    let conn_ora = await getTmcConnection();
+    const fromDate = data.from;
+    const toDate = data.to;
+    const sql = `SELECT OUCODE,CODE,BILL,BILLDATE,CACR,QTY,LOOSE,PRATE,MRP,ACTMRP,AMT,DIS,TAXCODE,TAXPER,TAXAMT,OUTLET.OUC_DESC,MEDDESC.ITC_DESC,TAX.TXC_DESC
         FROM (
           SELECT 
                     PBILLDETL.OU_CODE OUCODE,
@@ -269,9 +257,9 @@ module.exports = {
                     AND NVL (Pbillmast.Bmc_cancel, 'N') = 'N'
                     AND Pbillmast.Bmc_Cacr IN ('C', 'R', 'M')
                     AND Pbillmast.BMD_DATE >=
-                        TO_DATE ('${fromDate}','dd/MM/yyyy hh24:mi:ss')
+                        TO_DATE (:fromDate,'dd/MM/yyyy hh24:mi:ss')
                     AND Pbillmast.Bmd_Date <=
-                        TO_DATE ('${toDate}','dd/MM/yyyy hh24:mi:ss')
+                        TO_DATE (:toDate,'dd/MM/yyyy hh24:mi:ss')
                     AND pbillmast.MH_CODE IN (SELECT MH_CODE FROM multihospital)
             UNION ALL                   
             SELECT 
@@ -302,43 +290,32 @@ module.exports = {
                     AND NVL (mretmast.Mrc_cancel, 'N') = 'N'
                     AND Mretdetl.MRC_CACR IN ('C', 'R')
                     AND Mretdetl.MRD_DATE >=
-                        TO_DATE ('${fromDate}','dd/MM/yyyy hh24:mi:ss')
+                        TO_DATE (:fromDate,'dd/MM/yyyy hh24:mi:ss')
                     AND MRETDETL.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                     AND Mretdetl.Mrd_Date <=
-                        TO_DATE ('${toDate}','dd/MM/yyyy hh24:mi:ss') 
+                        TO_DATE (:toDate,'dd/MM/yyyy hh24:mi:ss') 
                 ) A , MEDDESC, OUTLET,TAX
                 WHERE  A.OUCODE = OUTLET.OU_CODE
                     AND A.CODE = MEDDESC.IT_CODE
                     AND A.TAXCODE = TAX.TX_CODE`;
+    let result;
+    try {
+      result = await conn_ora.execute(sql, {fromDate: fromDate, toDate: toDate}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const gstReportFromOra = await result.resultSet?.getRows();
+      return callBack(null, gstReportFromOra);
+    } catch (error) {
+      return callBack(error);
+    } finally {
+      if (result && result.resultSet) await result.resultSet.close();
+      if (conn_ora) await conn_ora.close();
+    }
+  },
 
-        try {
-            const result = await conn_ora.execute(
-                sql,
-                {},
-                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
-            )
-            const gstReportFromOra = await result.resultSet?.getRows();
-            return callBack(null, gstReportFromOra)
-        }
-        catch (error) {
-            return callBack(error)
-        }
-        finally {
-            if (conn_ora) {
-                await conn_ora.close();
-                await pool_ora.close();
-            }
-        }
-
-    },
-
-    getInPatientMedReturn: async (data, callBack) => {
-
-        let pool_ora = await oraConnection();
-        let conn_ora = await pool_ora.getConnection();
-        const fromDate = data.from;
-        const toDate = data.to;
-        const sql = `SELECT OUCODE,CODE,BILL,BILLDATE,CACR,QTY,LOOSE,PRATE,MRP,ACTMRP,AMT,DIS,TAXCODE,TAXPER,TAXAMT,OUTLET.OUC_DESC,MEDDESC.ITC_DESC,TAX.TXC_DESC
+  getInPatientMedReturn: async (data, callBack) => {
+    let conn_ora = await getTmcConnection();
+    const fromDate = data.from;
+    const toDate = data.to;
+    const sql = `SELECT OUCODE,CODE,BILL,BILLDATE,CACR,QTY,LOOSE,PRATE,MRP,ACTMRP,AMT,DIS,TAXCODE,TAXPER,TAXAMT,OUTLET.OUC_DESC,MEDDESC.ITC_DESC,TAX.TXC_DESC
                                     FROM (
                                     SELECT 
                                         MRETDETL.OU_CODE OUCODE,
@@ -365,42 +342,30 @@ module.exports = {
                             AND NVL (Dmc_Cancel, 'N') = 'N'
                             AND Disbillmast.Dmc_Cacr <> 'M'
                             AND Disbillmast.Dmd_date >=
-                            TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                            TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             AND Disbillmast.Dmd_Date <=
-                            TO_DATE('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                            TO_DATE(:toDate , 'dd/MM/yyyy hh24:mi:ss')
                             ) A,MEDDESC, OUTLET,TAX
                                     WHERE  A.OUCODE = OUTLET.OU_CODE
                                         AND A.CODE = MEDDESC.IT_CODE
                                         AND A.ACTAX = TAX.TX_CODE`;
-        try {
-            const result = await conn_ora.execute(
-                sql,
-                {},
-                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
-            )
-            const gstReportFromOra = await result.resultSet?.getRows();
-            return callBack(null, gstReportFromOra)
-        }
-        catch (error) {
-            return callBack(error)
-        }
-        finally {
-            if (conn_ora) {
-                await conn_ora.close();
-                await pool_ora.close();
-            }
-        }
+    try {
+      const result = await conn_ora.execute(sql, {fromDate: fromDate, toDate: toDate}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const gstReportFromOra = result.rows;
+      return callBack(null, gstReportFromOra);
+    } catch (error) {
+      return callBack(error);
+    } finally {
+      if (conn_ora) await conn_ora.close();
+    }
+  },
 
-    },
-
-    getInPatientMedSale: async (data, callBack) => {
-
-        let pool_ora = await oraConnection();
-        let conn_ora = await pool_ora.getConnection();
-        const fromDate = data.from;
-        const toDate = data.to;
-        const sql = ` SELECT OUCODE,CODE,BILL,BILLDATE,CACR,QTY,LOOSE,PRATE,MRP,ACTMRP,AMT,DIS,TAXCODE,TAXPER,TAXAMT,OUTLET.OUC_DESC,MEDDESC.ITC_DESC,TAX.TXC_DESC
+  getInPatientMedSale: async (data, callBack) => {
+    let conn_ora = await getTmcConnection();
+    const fromDate = data.from;
+    const toDate = data.to;
+    const sql = ` SELECT OUCODE,CODE,BILL,BILLDATE,CACR,QTY,LOOSE,PRATE,MRP,ACTMRP,AMT,DIS,TAXCODE,TAXPER,TAXAMT,OUTLET.OUC_DESC,MEDDESC.ITC_DESC,TAX.TXC_DESC
         FROM (
     SELECT
                     PBILLDETL.OU_CODE OUCODE,
@@ -427,42 +392,30 @@ module.exports = {
             AND NVL (Dmc_Cancel, 'N') = 'N'
             AND Disbillmast.Dmc_Cacr <> 'M'
             AND Disbillmast.Dmd_date >=
-            TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+            TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
             AND Disbillmast.Dmd_Date <=
-            TO_DATE('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+            TO_DATE(:toDate , 'dd/MM/yyyy hh24:mi:ss')
         ) A ,MEDDESC, OUTLET,TAX
                 WHERE  A.OUCODE = OUTLET.OU_CODE
                     AND A.CODE = MEDDESC.IT_CODE
                     AND A.ACTAX = TAX.TX_CODE`;
-        try {
-            const result = await conn_ora.execute(
-                sql,
-                {},
-                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
-            )
-            const gstReportFromOra = await result.resultSet?.getRows();
-            return callBack(null, gstReportFromOra)
-        }
-        catch (error) {
-            return callBack(error)
-        }
-        finally {
-            if (conn_ora) {
-                await conn_ora.close();
-                await pool_ora.close();
-            }
-        }
+    try {
+      const result = await conn_ora.execute(sql, {fromDate: fromDate, toDate: toDate}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const gstReportFromOra = result.rows;
+      return callBack(null, gstReportFromOra);
+    } catch (error) {
+      return callBack(error);
+    } finally {
+      if (conn_ora) await conn_ora.close();
+    }
+  },
 
-    },
-
-
-    getSumOfAmountTaxDisc: async (data, callBack) => {
-        let pool_ora = await oraConnection();
-        let conn_ora = await pool_ora.getConnection();
-        const fromDate = data.from;
-        const toDate = data.to;
-        const sql = `SELECT sum(AMT)amount,sum(DIS)discount,SUM(TAXAMT)taxamount
+  getSumOfAmountTaxDisc: async (data, callBack) => {
+    let conn_ora = await getTmcConnection();
+    const fromDate = data.from;
+    const toDate = data.to;
+    const sql = `SELECT sum(AMT)amount,sum(DIS)discount,SUM(TAXAMT)taxamount
         FROM (
           SELECT 
                     PBILLDETL.OU_CODE OUCODE,
@@ -486,9 +439,9 @@ module.exports = {
                     AND NVL (Pbillmast.Bmc_cancel, 'N') = 'N'
                     AND Pbillmast.Bmc_Cacr IN ('C', 'R', 'M')
                     AND Pbillmast.BMD_DATE >=
-                    TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                    TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND Pbillmast.Bmd_Date <=
-                    TO_DATE('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                    TO_DATE(:toDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND pbillmast.MH_CODE IN (SELECT MH_CODE FROM multihospital)
             UNION ALL                   
             SELECT 
@@ -519,43 +472,30 @@ module.exports = {
                     AND NVL (mretmast.Mrc_cancel, 'N') = 'N'
                     AND Mretdetl.MRC_CACR IN ('C', 'R')
                     AND Mretdetl.MRD_DATE >=
-                    TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                    TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND MRETDETL.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                     AND Mretdetl.Mrd_Date <=
-                    TO_DATE('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                    TO_DATE(:toDate, 'dd/MM/yyyy hh24:mi:ss')
                 ) A , MEDDESC, OUTLET,TAX
                 WHERE  A.OUCODE = OUTLET.OU_CODE
                     AND A.CODE = MEDDESC.IT_CODE
                     AND A.TAXCODE = TAX.TX_CODE`;
-        try {
-            const result = await conn_ora.execute(
-                sql,
-                {},
-                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
-            )
-            const gstReportFromOra = await result.resultSet?.getRows();
-            return callBack(null, gstReportFromOra)
-        }
-        catch (error) {
-            return callBack(error)
-        }
-        finally {
-            if (conn_ora) {
-                await conn_ora.close();
-                await pool_ora.close();
-            }
-        }
+    try {
+      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const gstReportFromOra = result.rows;
+      return callBack(null, gstReportFromOra);
+    } catch (error) {
+      return callBack(error);
+    } finally {
+      if (conn_ora) await conn_ora.close();
+    }
+  },
 
-    },
-
-
-
-    getInPatientMedReturnSum: async (data, callBack) => {
-        let pool_ora = await oraConnection();
-        let conn_ora = await pool_ora.getConnection();
-        const fromDate = data.from;
-        const toDate = data.to;
-        const sql = ` SELECT  sum(AMT),sum(DIS),SUM(TAXAMT)
+  getInPatientMedReturnSum: async (data, callBack) => {
+    let conn_ora = await getTmcConnection();
+    const fromDate = data.from;
+    const toDate = data.to;
+    const sql = ` SELECT  sum(AMT),sum(DIS),SUM(TAXAMT)
         FROM (
    SELECT 
                     MRETDETL.OU_CODE OUCODE,
@@ -581,44 +521,30 @@ WHERE     Pbillmast.Bmc_Slno = Mretdetl.Bmc_Slno
         AND NVL (Dmc_Cancel, 'N') = 'N'
         AND Disbillmast.Dmc_Cacr <> 'M'
         AND Disbillmast.Dmd_date >=
-        TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+        TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
         AND Disbillmast.Dmd_Date <=
-        TO_DATE('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+        TO_DATE(:toDate, 'dd/MM/yyyy hh24:mi:ss')
         ) A,MEDDESC, OUTLET,TAX
                 WHERE  A.OUCODE = OUTLET.OU_CODE
                     AND A.CODE = MEDDESC.IT_CODE
                     AND A.TAXCODE = TAX.TX_CODE`;
-        try {
-            const result = await conn_ora.execute(
-                sql,
-                {},
-                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
-            )
-            const gstReportFromOra = await result.resultSet?.getRows();
-            return callBack(null, gstReportFromOra)
-        }
-        catch (error) {
-            return callBack(error)
-        }
-        finally {
-            if (conn_ora) {
-                await conn_ora.close();
-                await pool_ora.close();
-            }
-        }
+    try {
+      const result = await conn_ora.execute(sql, {fromDate: fromDate, toDate: toDate}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const gstReportFromOra = result.rows;
+      return callBack(null, gstReportFromOra);
+    } catch (error) {
+      return callBack(error);
+    } finally {
+      if (conn_ora) await conn_ora.close();
+    }
+  },
 
-    },
-
-
-
-
-    getOpCreditPharmSale: async (data, callBack) => {
-        let pool_ora = await oraConnection();
-        let conn_ora = await pool_ora.getConnection();
-        const fromDate = data.from;
-        const toDate = data.to;
-        const sql = `  SELECT 
+  getOpCreditPharmSale: async (data, callBack) => {
+    let conn_ora = await getTmcConnection();
+    const fromDate = data.from;
+    const toDate = data.to;
+    const sql = `  SELECT 
         PBILLDETL.OU_CODE OUCODE,
         PBILLDETL.IT_CODE CODE,
         PBILLDETL.BM_NO BILL,
@@ -643,37 +569,26 @@ AND Pbillmast.Bmc_Cacr = 'O'
 AND Opbillmast.Opc_Cacr <> 'M'
 AND NVL (Opbillmast.Opn_cancel, 'N') = 'N'
 AND Opbillmast.Opd_date >=
-TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
 AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
 AND Opbillmast.Opd_Date <=
-TO_DATE('${toDate}', 'dd/MM/yyyy hh24:mi:ss')`;
-        try {
-            const result = await conn_ora.execute(
-                sql,
-                {},
-                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
-            )
-            const gstReportFromOra = await result.resultSet?.getRows();
-            return callBack(null, gstReportFromOra)
-        }
-        catch (error) {
-            return callBack(error)
-        }
-        finally {
-            if (conn_ora) {
-                await conn_ora.close();
-                await pool_ora.close();
-            }
-        }
+TO_DATE(:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
+    try {
+      const result = await conn_ora.execute(sql, {fromDate: fromDate, toDate: toDate}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const gstReportFromOra = result.rows;
+      return callBack(null, gstReportFromOra);
+    } catch (error) {
+      return callBack(error);
+    } finally {
+      if (conn_ora) await conn_ora.close();
+    }
+  },
 
-    },
-
-    getGstReportPharmCollection: async (data, callBack) => {
-        let pool_ora = await oraConnection();
-        let conn_ora = await pool_ora.getConnection();
-        const fromDate = data.from;
-        const toDate = data.to;
-        const sql = ` SELECT OUCODE,CODE,BILL,BILLDATE,CACR,QTY,LOOSE,PRATE,MRP,ACTMRP,AMT,DIS,TAXCODE,TAXPER,TAXAMT,OUTLET.OUC_DESC,MEDDESC.ITC_DESC,TAX.TXC_DESC
+  getGstReportPharmCollection: async (data, callBack) => {
+    let conn_ora = await getTmcConnection();
+    const fromDate = data.from;
+    const toDate = data.to;
+    const sql = ` SELECT OUCODE,CODE,BILL,BILLDATE,CACR,QTY,LOOSE,PRATE,MRP,ACTMRP,AMT,DIS,TAXCODE,TAXPER,TAXAMT,OUTLET.OUC_DESC,MEDDESC.ITC_DESC,TAX.TXC_DESC
             FROM (
             SELECT 
                     PBILLDETL.OU_CODE OUCODE,
@@ -698,9 +613,9 @@ TO_DATE('${toDate}', 'dd/MM/yyyy hh24:mi:ss')`;
                     AND NVL (Pbillmast.Bmc_cancel, 'N') = 'N'
                     AND Pbillmast.Bmc_Cacr IN ('C', 'R', 'M')
                     AND Pbillmast.BMD_COLLDATE >=
-                    TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                    TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND Pbillmast.BMD_COLLDATE <=
-                    TO_DATE('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                    TO_DATE(:toDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND pbillmast.MH_CODE IN (SELECT MH_CODE FROM multihospital)
             UNION ALL
             SELECT 
@@ -732,43 +647,32 @@ TO_DATE('${toDate}', 'dd/MM/yyyy hh24:mi:ss')`;
                     AND NVL (mretmast.Mrc_cancel, 'N') = 'N'
                     AND Mretdetl.MRC_CACR IN ('C', 'R')
                     AND Mretmast.MRD_RETDATE >=
-                    TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                    TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND MRETDETL.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                     AND Mretmast.Mrd_RETDate <=
-                    TO_DATE('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                    TO_DATE(:toDate, 'dd/MM/yyyy hh24:mi:ss')
              ) A  , MEDDESC, OUTLET,TAX
                 WHERE  A.OUCODE = OUTLET.OU_CODE
                     AND A.CODE = MEDDESC.IT_CODE
                     AND A.ACTAX = TAX.TX_CODE`;
-        try {
-            const result = await conn_ora.execute(
-                sql,
-                {},
-                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
-            )
-            const gstReportFromOra = await result.resultSet?.getRows();
-            return callBack(null, gstReportFromOra)
-        }
-        catch (error) {
-            return callBack(error)
-        }
-        finally {
-            if (conn_ora) {
-                await conn_ora.close();
-                await pool_ora.close();
-            }
-        }
+    try {
+      const result = await conn_ora.execute(sql, {fromDate: fromDate, toDate: toDate}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const gstReportFromOra = result.rows;
+      return callBack(null, gstReportFromOra);
+    } catch (error) {
+      return callBack(error);
+    } finally {
+      if (conn_ora) await conn_ora.close();
+    }
+  }, // TSSH PHARMACY GST REPORTS
+  tsshPharmacyGstRptOne: async (data, callBack) => {
+    let conn_ora = await getTmcConnection();
 
-    }, // TSSH PHARMACY GST REPORTS
-    tsshPharmacyGstRptOne: async (data, callBack) => {
-        let pool_ora = await oraConnection();
-        let conn_ora = await pool_ora.getConnection();
+    const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(",")) || null;
+    const fromDate = data.from;
+    const toDate = data.to;
 
-        const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(',')) || null;
-        const fromDate = data.from;
-        const toDate = data.to;
-
-        const sql = `SELECT 
+    const sql = `SELECT 
                             Mretdetl.IT_CODE CODE,
                             MEDDESC.ITC_DESC,
                             Mretdetl.ITN_PRATE PRATE,
@@ -796,35 +700,25 @@ TO_DATE('${toDate}', 'dd/MM/yyyy hh24:mi:ss')`;
                     AND TAX.TX_CODE = MRETDETL.MRC_ACTTXCODE
                     AND DISBILLMAST.IP_NO IN (${ipNumberList})`;
 
-        try {
-            const result = await conn_ora.execute(
-                sql,
-                {},
-                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-            )
-            await result.resultSet?.getRows((err, rows) => {
-                callBack(err, rows)
-            })
-        } catch (error) {
-            console.log(error)
-        } finally {
-            if (conn_ora) {
-                await conn_ora.close();
-                await pool_ora.close();
-            }
-        }
-    },
-    tsshPharmacyGstRptTwo: async (data, callBack) => {
-        let pool_ora = await oraConnection();
-        let conn_ora = await pool_ora.getConnection();
+    try {
+      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      callBack(err, result.rows);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      if (conn_ora) await conn_ora.close();
+    }
+  },
+  tsshPharmacyGstRptTwo: async (data, callBack) => {
+    let conn_ora = await getTmcConnection();
 
-        const group = data?.group;
-        const ipNumberList = group === 1 ? null : (data?.ptno?.length > 0 && data.ptno.join(',')) || null;
-        // const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(',')) || null;
-        const fromDate = data.from;
-        const toDate = data.to;
+    const group = data?.group;
+    const ipNumberList = group === 1 ? null : (data?.ptno?.length > 0 && data.ptno.join(",")) || null;
+    // const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(',')) || null;
+    const fromDate = data.from;
+    const toDate = data.to;
 
-        const sql = `SELECT 
+    const sql = `SELECT 
                         PBILLDETL.IT_CODE CODE,
                         MEDDESC.ITC_DESC,
                         PBILLDETL.ITN_PRATE PRATE,
@@ -852,34 +746,24 @@ TO_DATE('${toDate}', 'dd/MM/yyyy hh24:mi:ss')`;
                             AND TAX.TX_CODE = PBILLDETL.PBC_ACTTXCODE
                             AND Disbillmast.IP_NO IN (${ipNumberList})`;
 
-        try {
-            const result = await conn_ora.execute(
-                sql,
-                {},
-                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-            )
-            result.resultSet?.getRows((err, rows) => {
-                callBack(err, rows);
-            })
-        } catch (error) {
-            console.log(error)
-        } finally {
-            if (conn_ora) {
-                await conn_ora.close();
-                await pool_ora.close();
-            }
-        }
-    },
-    tsshPharmacyGstRptthree: async (data, callBack) => {
-        let pool_ora = await oraConnection();
-        let conn_ora = await pool_ora.getConnection();
+    try {
+      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      callBack(err, result.rows);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      if (conn_ora) await conn_ora.close();
+    }
+  },
+  tsshPharmacyGstRptthree: async (data, callBack) => {
+    let conn_ora = await getTmcConnection();
 
-        const group = data?.group;
-        const ipNumberList = group === 1 ? null : (data?.ptno?.length > 0 && data.ptno.join(',')) || null;
-        const fromDate = data.from;
-        const toDate = data.to;
+    const group = data?.group;
+    const ipNumberList = group === 1 ? null : (data?.ptno?.length > 0 && data.ptno.join(",")) || null;
+    const fromDate = data.from;
+    const toDate = data.to;
 
-        const sql = `SELECT 
+    const sql = `SELECT 
                             PBILLDETL.IT_CODE CODE,
                             MEDDESC.ITC_DESC,
                             PBILLDETL.ITN_PRATE PRATE,
@@ -907,33 +791,23 @@ TO_DATE('${toDate}', 'dd/MM/yyyy hh24:mi:ss')`;
                             AND TAX.TX_CODE = PBILLDETL.PBC_ACTTXCODE
                             AND PBILLMAST.IP_NO IN (${ipNumberList})`;
 
-        try {
-            const result = await conn_ora.execute(
-                sql,
-                {},
-                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-            )
-            result.resultSet?.getRows((err, rows) => {
-                callBack(err, rows);
-            })
-        } catch (error) {
-            console.log(error)
-        } finally {
-            if (conn_ora) {
-                await conn_ora.close();
-                await pool_ora.close();
-            }
-        }
-    },
-    tsshPharmacyGstRptFour: async (data, callBack) => {
-        let pool_ora = await oraConnection();
-        let conn_ora = await pool_ora.getConnection();
+    try {
+      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      callBack(err, result.rows);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      if (conn_ora) await conn_ora.close();
+    }
+  },
+  tsshPharmacyGstRptFour: async (data, callBack) => {
+    let conn_ora = await getTmcConnection();
 
-        const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(',')) || null;
-        const fromDate = data.from;
-        const toDate = data.to;
+    const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(",")) || null;
+    const fromDate = data.from;
+    const toDate = data.to;
 
-        const sql = `SELECT 
+    const sql = `SELECT 
                             Mretdetl.IT_CODE CODE,
                             MEDDESC.ITC_DESC,
                             Mretdetl.ITN_PRATE PRATE,
@@ -1011,48 +885,36 @@ TO_DATE('${toDate}', 'dd/MM/yyyy hh24:mi:ss')`;
                             AND TAX.TX_CODE = PBILLDETL.PBC_ACTTXCODE
                             AND PBILLMAST.IP_NO IN (${ipNumberList})`;
 
-        try {
-            const result = await conn_ora.execute(
-                sql,
-                {},
-                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-            )
-            result.resultSet?.getRows((err, rows) => {
-                callBack(err, rows);
-            })
-        } catch (error) {
-            console.log(error)
-        } finally {
-            if (conn_ora) {
-                await conn_ora.close();
-                await pool_ora.close();
-            }
-        }
-    },
+    try {
+      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      callBack(err, result.rows);
+    } catch (error) {
+      callBack(error, null);
+    } finally {
+      if (conn_ora) await conn_ora.close();
+    }
+  },
 
-    //COLLLECTION REPORTS
-    collectionTmch: (data, callBack) => {
-        pool.query(
-            `SELECT 
+  //COLLLECTION REPORTS
+  collectionTmch: (data, callBack) => {
+    pool.query(
+      `SELECT 
                 code,name,SUM(amount) amount
             FROM collection 
             WHERE date BETWEEN ? AND ?
             GROUP BY code,name`,
-            [
-                data.from,
-                data.to
-            ],
-            (error, results, feilds) => {
-                if (error) {
-                    return callBack(error);
-                }
-                return callBack(null, results)
-            }
-        )
-    },
-    pharmacySaleGst: (data, callBack) => {
-        pool.query(
-            `SELECT 
+      [data.from, data.to],
+      (error, results, feilds) => {
+        if (error) {
+          return callBack(error);
+        }
+        return callBack(null, results);
+      },
+    );
+  },
+  pharmacySaleGst: (data, callBack) => {
+    pool.query(
+      `SELECT 
                 sum(ip) ip,
                 sum(op_0) op0,
                 sum(op_5) op5,
@@ -1065,28 +927,24 @@ TO_DATE('${toDate}', 'dd/MM/yyyy hh24:mi:ss')`;
                 sum(tax_28) tax28
             FROM pharmacysalegst
             WHERE date BETWEEN ? AND ?`,
-            [
-                data.from,
-                data.to
-            ],
-            (error, results, feilds) => {
-                if (error) {
-                    return callBack(error);
-                }
-                return callBack(null, results)
-            }
-        )
-    },
-    tmchGstReport: async (data) => {
-        //GST FIRST REPORTS
-        const reportTmch_One = new Promise(async (resolve, reject) => {
-            let pool_ora = await oraConnection();
-            let conn_ora = await pool_ora.getConnection();
+      [data.from, data.to],
+      (error, results, feilds) => {
+        if (error) {
+          return callBack(error);
+        }
+        return callBack(null, results);
+      },
+    );
+  },
+  tmchGstReport: async (data) => {
+    //GST FIRST REPORTS
+    const reportTmch_One = new Promise(async (resolve, reject) => {
+      let conn_ora = await getTmcConnection();
 
-            const ipNumberListString = data?.ptno?.map(item => `'${item}'`).join(',') || null;
-            const fromDate = data.from;
-            const toDate = data.to;
-            const sql = `SELECT 
+      const ipNumberListString = data?.ptno?.map((item) => `'${item}'`).join(",") || null;
+      const fromDate = data.from;
+      const toDate = data.to;
+      const sql = `SELECT 
                             PBILLDETL.IT_CODE CODE,
                             MEDDESC.ITC_DESC,
                             PBILLDETL.ITN_PRATE PRATE,
@@ -1151,42 +1009,32 @@ TO_DATE('${toDate}', 'dd/MM/yyyy hh24:mi:ss')`;
                             AND MEDDESC.IT_CODE = MRETDETL.IT_CODE
                             AND MRETDETL.OU_CODE = OUTLET.OU_CODE
                             AND TAX.TX_CODE = MRETDETL.MRC_ACTTXCODE`;
-            // console.log(sql)
-            try {
+      // console.log(sql)
+      try {
+        const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+        resolve({status: 1, message: err, data: result.rows});
 
-                const result = await conn_ora.execute(
-                    sql,
-                    {},
-                    { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-                )
+        // result.resultSet?.getRows((err, rows) => {
+        //   if (err) {
+        //     reject({status: 0, message: err, data: []});
+        //   } else {
+        // }
+        // });
+      } catch (error) {
+        reject({status: 0, message: error, data: []});
+      } finally {
+        if (conn_ora) await conn_ora.close();
+      }
+    });
 
-                result.resultSet?.getRows((err, rows) => {
-                    if (err) {
-                        reject({ status: 0, message: err, data: [] })
-                    } else {
-                        resolve({ status: 1, message: err, data: rows })
-                    }
-                })
-            } catch (error) {
-                reject({ status: 0, message: error, data: [] })
-            } finally {
-                if (conn_ora) {
-                    await conn_ora.close();
-                    await pool_ora.close();
-                }
-            }
-        })
+    /// SECOND REPORT
+    const reportTmch_Two = new Promise(async (resolve, reject) => {
+      let conn_ora = await getTmcConnection();
+      const ipNumberListString = data?.ptno?.map((item) => `'${item}'`).join(",") || null;
+      const fromDate = data.from;
+      const toDate = data.to;
 
-        /// SECOND REPORT
-        const reportTmch_Two = new Promise(async (resolve, reject) => {
-            let pool_ora = await oraConnection();
-            let conn_ora = await pool_ora.getConnection();
-
-            const ipNumberListString = data?.ptno?.map(item => `'${item}'`).join(',') || null;
-            const fromDate = data.from;
-            const toDate = data.to;
-
-            const sql = `SELECT
+      const sql = `SELECT
                                 Mretdetl.IT_CODE CODE,
                                 MEDDESC.ITC_DESC,
                                 Mretdetl.ITN_PRATE PRATE,
@@ -1218,42 +1066,34 @@ TO_DATE('${toDate}', 'dd/MM/yyyy hh24:mi:ss')`;
                             AND TAX.TX_CODE = MRETDETL.MRC_ACTTXCODE
                             AND MRETDETL.OU_CODE = OUTLET.OU_CODE
                             AND DISBILLMAST.IP_NO NOT IN (${ipNumberListString})`;
-            // console.log(sql)
+      // console.log(sql)
 
-            try {
-                const result = await conn_ora.execute(
-                    sql,
-                    {},
-                    { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-                )
-                result.resultSet?.getRows((err, rows) => {
-                    if (err) {
-                        reject({ status: 0, message: err, data: [] })
-                    } else {
-                        resolve({ status: 1, message: err, data: rows })
-                    }
-                })
-            } catch (error) {
-                reject({ status: 0, message: error, data: [] })
-            } finally {
-                if (conn_ora) {
-                    await conn_ora.close();
-                    await pool_ora.close();
-                }
-            }
-        })
+      try {
+        const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+        //     result.resultSet?.getRows((err, rows) => {
+        //       if (err) {
+        //         reject({status: 0, message: err, data: []});
+        //       } else {
+        //     }
+        // });
+        resolve({status: 1, message: err, data: result.rows});
+      } catch (error) {
+        reject({status: 0, message: error, data: []});
+      } finally {
+        if (conn_ora) await conn_ora.close();
+      }
+    });
 
-        // THIR REPORTS
+    // THIR REPORTS
 
-        const reportTmch_Three = new Promise(async (resolve, reject) => {
-            let pool_ora = await oraConnection();
-            let conn_ora = await pool_ora.getConnection();
+    const reportTmch_Three = new Promise(async (resolve, reject) => {
+      let conn_ora = await getTmcConnection();
 
-            const ipNumberListString = data?.ptno?.map(item => `'${item}'`).join(',') || null;
-            const fromDate = data.from;
-            const toDate = data.to;
+      const ipNumberListString = data?.ptno?.map((item) => `'${item}'`).join(",") || null;
+      const fromDate = data.from;
+      const toDate = data.to;
 
-            const sql = `SELECT 
+      const sql = `SELECT 
                                 PBILLDETL.IT_CODE CODE,
                                 MEDDESC.ITC_DESC,
                                 PBILLDETL.ITN_PRATE PRATE,
@@ -1318,40 +1158,32 @@ TO_DATE('${toDate}', 'dd/MM/yyyy hh24:mi:ss')`;
                                 AND MEDDESC.IT_CODE = MRETDETL.IT_CODE
                                 AND MRETDETL.OU_CODE = OUTLET.OU_CODE
                                 AND TAX.TX_CODE = MRETDETL.MRC_ACTTXCODE`;
-            // console.log(sql)
+      // console.log(sql)
 
-            try {
-                const result = await conn_ora.execute(
-                    sql,
-                    {},
-                    { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-                )
-                result.resultSet?.getRows((err, rows) => {
-                    if (err) {
-                        reject({ status: 0, message: err, data: [] })
-                    } else {
-                        resolve({ status: 1, message: err, data: rows })
-                    }
-                })
-            } catch (error) {
-                reject({ status: 0, message: error, data: [] })
-            } finally {
-                if (conn_ora) {
-                    await conn_ora.close();
-                    await pool_ora.close();
-                }
-            }
-        })
+      try {
+        const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+        //     result.resultSet?.getRows((err, rows) => {
+        //       if (err) {
+        //         reject({status: 0, message: err, data: []});
+        //       } else {
+        //     }
+        // });
+        resolve({status: 1, message: err, data: result.rows});
+      } catch (error) {
+        reject({status: 0, message: error, data: []});
+      } finally {
+        if (conn_ora) await conn_ora.close();
+      }
+    });
 
-        const reportTmch_Four = new Promise(async (resolve, reject) => {
-            let pool_ora = await oraConnection();
-            let conn_ora = await pool_ora.getConnection();
+    const reportTmch_Four = new Promise(async (resolve, reject) => {
+      let conn_ora = await getTmcConnection();
 
-            const ipNumberListString = data?.ptno?.map(item => `'${item}'`).join(',') || null;
-            const fromDate = data.from;
-            const toDate = data.to;
+      const ipNumberListString = data?.ptno?.map((item) => `'${item}'`).join(",") || null;
+      const fromDate = data.from;
+      const toDate = data.to;
 
-            const sql = `SELECT
+      const sql = `SELECT
                             PBILLDETL.IT_CODE CODE,
                             MEDDESC.ITC_DESC,
                             PBILLDETL.ITN_PRATE PRATE,
@@ -1383,40 +1215,31 @@ TO_DATE('${toDate}', 'dd/MM/yyyy hh24:mi:ss')`;
                                 AND TAX.TX_CODE = PBILLDETL.PBC_ACTTXCODE
                                 AND OUTLET.OU_CODE = PBILLMAST.OU_CODE
                                 AND Disbillmast.IP_NO NOT IN (${ipNumberListString})`;
-            // console.log(sql)
-            try {
-                const result = await conn_ora.execute(
-                    sql,
-                    {},
-                    { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-                )
-                result.resultSet?.getRows((err, rows) => {
-                    if (err) {
-                        reject({ status: 0, message: err, data: [] })
-                    } else {
-                        resolve({ status: 1, message: err, data: rows })
-                    }
-                })
-            } catch (error) {
-                reject({ status: 0, message: error, data: [] })
-            } finally {
-                if (conn_ora) {
-                    await conn_ora.close();
-                    await pool_ora.close();
-                }
-            }
-        })
+      // console.log(sql)
+      try {
+        const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+        //     result.resultSet?.getRows((err, rows) => {
+        //       if (err) {
+        //         reject({status: 0, message: err, data: []});
+        //       } else {
+        //     }
+        // });
+        resolve({status: 1, message: err, data: result.rows});
+      } catch (error) {
+        reject({status: 0, message: error, data: []});
+      } finally {
+        if (conn_ora) await conn_ora.close();
+      }
+    });
 
+    const reportTmch_Five = new Promise(async (resolve, reject) => {
+      let conn_ora = await getTmcConnection();
 
-        const reportTmch_Five = new Promise(async (resolve, reject) => {
-            let pool_ora = await oraConnection();
-            let conn_ora = await pool_ora.getConnection();
+      const ipNumberListString = data?.ptno?.map((item) => `'${item}'`).join(",") || null;
+      const fromDate = data.from;
+      const toDate = data.to;
 
-            const ipNumberListString = data?.ptno?.map(item => `'${item}'`).join(',') || null;
-            const fromDate = data.from;
-            const toDate = data.to;
-
-            const sql = `SELECT 
+      const sql = `SELECT 
                             PBILLDETL.IT_CODE CODE,
                             MEDDESC.ITC_DESC,
                             PBILLDETL.ITN_PRATE PRATE,
@@ -1448,54 +1271,49 @@ TO_DATE('${toDate}', 'dd/MM/yyyy hh24:mi:ss')`;
                             AND TAX.TX_CODE = PBILLDETL.PBC_ACTTXCODE
                             AND OUTLET.OU_CODE = PBILLMAST.OU_CODE
                             AND PBILLMAST.IP_NO NOT IN (${ipNumberListString})`;
-            // console.log(sql)
-            try {
-                const result = await conn_ora.execute(
-                    sql,
-                    {},
-                    { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-                )
-                result.resultSet?.getRows((err, rows) => {
-                    if (err) {
-                        reject({ status: 0, message: err, data: [] })
-                    } else {
-                        resolve({ status: 1, message: err, data: rows })
-                    }
-                })
-            } catch (error) {
-                reject({ status: 0, message: error, data: [] })
-            } finally {
-                if (conn_ora) {
-                    await conn_ora.close();
-                    await pool_ora.close();
-                }
-            }
-        })
+      // console.log(sql)
+      try {
+        const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+        //     result.resultSet?.getRows((err, rows) => {
+        //       if (err) {
+        //         reject({status: 0, message: err, data: []});
+        //       } else {
+        //     }
+        // });
+        resolve({status: 1, message: err, data: result.rows});
+      } catch (error) {
+        reject({status: 0, message: error, data: []});
+      } finally {
+        if (conn_ora) await conn_ora.close();
+      }
+    });
 
-        //call all promise data
-        return await Promise.all([reportTmch_One, reportTmch_Two, reportTmch_Three, reportTmch_Four, reportTmch_Five]).then((result) => {
-            const resultChcek = result?.find(e => e.status === 0)
-            const fiterdResult = result?.filter((e) => e.status === 1)?.map(e => e.data)?.flat()
-            if (resultChcek === undefined) {
-                return { status: 1, message: 'success', data: fiterdResult }
-            } else {
-                return { status: 0, message: resultChcek.message, data: [] }
-            }
-        }).catch((error) => {
-            return { status: 0, message: error, data: [] }
-        })
+    //call all promise data
+    return await Promise.all([reportTmch_One, reportTmch_Two, reportTmch_Three, reportTmch_Four, reportTmch_Five])
+      .then((result) => {
+        const resultChcek = result?.find((e) => e.status === 0);
+        const fiterdResult = result
+          ?.filter((e) => e.status === 1)
+          ?.map((e) => e.data)
+          ?.flat();
+        if (resultChcek === undefined) {
+          return {status: 1, message: "success", data: fiterdResult};
+        } else {
+          return {status: 0, message: resultChcek.message, data: []};
+        }
+      })
+      .catch((error) => {
+        return {status: 0, message: error, data: []};
+      });
+  },
+  tsshGstReports: async (data) => {
+    const reportTssh_One = new Promise(async (resolve, reject) => {
+      let conn_ora = await getTmcConnection();
 
-    },
-    tsshGstReports: async (data) => {
-
-        const reportTssh_One = new Promise(async (resolve, reject) => {
-            let pool_ora = await oraConnection();
-            let conn_ora = await pool_ora.getConnection();
-
-            const ipNumberListString = data?.ptno?.map(item => `'${item}'`).join(',') || null;
-            const fromDate = data.from;
-            const toDate = data.to;
-            const sql = `SELECT 
+      const ipNumberListString = data?.ptno?.map((item) => `'${item}'`).join(",") || null;
+      const fromDate = data.from;
+      const toDate = data.to;
+      const sql = `SELECT 
                             Mretdetl.IT_CODE CODE,
                             MEDDESC.ITC_DESC,
                             Mretdetl.ITN_PRATE PRATE,
@@ -1528,40 +1346,34 @@ TO_DATE('${toDate}', 'dd/MM/yyyy hh24:mi:ss')`;
                         AND MRETDETL.OU_CODE = OUTLET.OU_CODE
                         AND DISBILLMAST.IP_NO IN (${ipNumberListString})`;
 
-            try {
+      try {
+        const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
 
-                const result = await conn_ora.execute(
-                    sql,
-                    {},
-                    { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-                )
+        //     result.resultSet?.getRows((err, rows) => {
+        //       if (err) {
+        //         reject({status: 0, message: err, data: []});
+        //       } else {
+        //     }
+        // });
+        resolve({status: 1, message: err, data: result.rows});
+      } catch (error) {
+        reject({status: 0, message: error, data: []});
+      } finally {
+        if (conn_ora) await conn_ora.close();
+        //      {
+        //   await conn_ora.close();
+        //   await pool_ora.close();
+        // }
+      }
+    });
 
-                result.resultSet?.getRows((err, rows) => {
-                    if (err) {
-                        reject({ status: 0, message: err, data: [] })
-                    } else {
-                        resolve({ status: 1, message: err, data: rows })
-                    }
-                })
-            } catch (error) {
-                reject({ status: 0, message: error, data: [] })
-            } finally {
-                if (conn_ora) {
-                    await conn_ora.close();
-                    await pool_ora.close();
-                }
-            }
-        })
+    const reportTssh_Two = new Promise(async (resolve, reject) => {
+      let conn_ora = await getTmcConnection();
 
-
-        const reportTssh_Two = new Promise(async (resolve, reject) => {
-            let pool_ora = await oraConnection();
-            let conn_ora = await pool_ora.getConnection();
-
-            const ipNumberListString = data?.ptno?.map(item => `'${item}'`).join(',') || null;
-            const fromDate = data.from;
-            const toDate = data.to;
-            const sql = `SELECT 
+      const ipNumberListString = data?.ptno?.map((item) => `'${item}'`).join(",") || null;
+      const fromDate = data.from;
+      const toDate = data.to;
+      const sql = `SELECT 
                             PBILLDETL.IT_CODE CODE,
                             MEDDESC.ITC_DESC,
                             PBILLDETL.ITN_PRATE PRATE,
@@ -1593,40 +1405,33 @@ TO_DATE('${toDate}', 'dd/MM/yyyy hh24:mi:ss')`;
                                 AND TAX.TX_CODE = PBILLDETL.PBC_ACTTXCODE
                                 AND OUTLET.OU_CODE = PBILLMAST.OU_CODE
                                 AND Disbillmast.IP_NO IN (${ipNumberListString})`;
-            try {
+      try {
+        const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
 
-                const result = await conn_ora.execute(
-                    sql,
-                    {},
-                    { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-                )
+        //     result.resultSet?.getRows((err, rows) => {
+        //       if (err) {
+        //         reject({status: 0, message: err, data: []});
+        //       } else {
+        //     }
+        // });
+        resolve({status: 1, message: err, data: result.rows});
+      } catch (error) {
+        reject({status: 0, message: error, data: []});
+      } finally {
+        if (conn_ora) await conn_ora.close();
+        //     {
 
-                result.resultSet?.getRows((err, rows) => {
-                    if (err) {
-                        reject({ status: 0, message: err, data: [] })
-                    } else {
-                        resolve({ status: 1, message: err, data: rows })
-                    }
-                })
-            } catch (error) {
-                reject({ status: 0, message: error, data: [] })
-            } finally {
-                if (conn_ora) {
-                    await conn_ora.close();
-                    await pool_ora.close();
-                }
-            }
-        })
+        //   await pool_ora.close();
+        // }
+      }
+    });
 
-
-        const reportTssh_Three = new Promise(async (resolve, reject) => {
-            let pool_ora = await oraConnection();
-            let conn_ora = await pool_ora.getConnection();
-
-            const ipNumberListString = data?.ptno?.map(item => `'${item}'`).join(',') || null;
-            const fromDate = data.from;
-            const toDate = data.to;
-            const sql = `SELECT 
+    const reportTssh_Three = new Promise(async (resolve, reject) => {
+      let conn_ora = await getTmcConnection();
+      const ipNumberListString = data?.ptno?.map((item) => `'${item}'`).join(",") || null;
+      const fromDate = data.from;
+      const toDate = data.to;
+      const sql = `SELECT 
                             PBILLDETL.IT_CODE CODE,
                             MEDDESC.ITC_DESC,
                             PBILLDETL.ITN_PRATE PRATE,
@@ -1658,43 +1463,42 @@ TO_DATE('${toDate}', 'dd/MM/yyyy hh24:mi:ss')`;
                                 AND TAX.TX_CODE = PBILLDETL.PBC_ACTTXCODE
                                 AND OUTLET.OU_CODE = PBILLMAST.OU_CODE
                                 AND PBILLMAST.IP_NO IN (${ipNumberListString})`;
-            try {
+      try {
+        const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
 
-                const result = await conn_ora.execute(
-                    sql,
-                    {},
-                    { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-                )
+        //     result.resultSet?.getRows((err, rows) => {
+        //       if (err) {
+        //         reject({status: 0, message: err, data: []});
+        //       } else {
+        //     }
+        // });
+        resolve({status: 1, message: err, data: result.rows});
+      } catch (error) {
+        reject({status: 0, message: error, data: []});
+      } finally {
+        if (conn_ora) {
+          await conn_ora.close();
+          await pool_ora.close();
+        }
+      }
+    });
 
-                result.resultSet?.getRows((err, rows) => {
-                    if (err) {
-                        reject({ status: 0, message: err, data: [] })
-                    } else {
-                        resolve({ status: 1, message: err, data: rows })
-                    }
-                })
-            } catch (error) {
-                reject({ status: 0, message: error, data: [] })
-            } finally {
-                if (conn_ora) {
-                    await conn_ora.close();
-                    await pool_ora.close();
-                }
-            }
-        })
-
-
-        //call all promise data
-        return await Promise.all([reportTssh_One, reportTssh_Two, reportTssh_Three]).then((result) => {
-            const resultChcek = result?.find(e => e.status === 0)
-            const fiterdResult = result?.filter((e) => e.status === 1)?.map(e => e.data)?.flat()
-            if (resultChcek === undefined) {
-                return { status: 1, message: 'success', data: fiterdResult }
-            } else {
-                return { status: 0, message: resultChcek.message, data: [] }
-            }
-        }).catch((error) => {
-            return { status: 0, message: error, data: [] }
-        })
-    }
-}
+    //call all promise data
+    return await Promise.all([reportTssh_One, reportTssh_Two, reportTssh_Three])
+      .then((result) => {
+        const resultChcek = result?.find((e) => e.status === 0);
+        const fiterdResult = result
+          ?.filter((e) => e.status === 1)
+          ?.map((e) => e.data)
+          ?.flat();
+        if (resultChcek === undefined) {
+          return {status: 1, message: "success", data: fiterdResult};
+        } else {
+          return {status: 0, message: resultChcek.message, data: []};
+        }
+      })
+      .catch((error) => {
+        return {status: 0, message: error, data: []};
+      });
+  },
+};

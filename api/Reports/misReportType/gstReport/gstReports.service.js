@@ -1,13 +1,12 @@
 // @ts-ignore
-const { oracledb, connectionClose, oraConnection } = require('../../../../config/oradbconfig');
+const {oracledb, getTmcConnection} = require("../../../../config/oradbconfig");
 
 module.exports = {
-    gstreportsPartOne: async (data, callBack) => {
-        let pool_ora = await oraConnection();
-        let conn_ora = await pool_ora.getConnection();
-        try {
-            const result = await conn_ora.execute(
-                `SELECT 
+  gstreportsPartOne: async (data, callBack) => {
+    let conn_ora = await getTmcConnection();
+    try {
+      const result = await conn_ora.execute(
+        `SELECT 
                         OUCODE,CODE,BILL,BILLDATE,CACR,QTY,LOOSE,PRATE,MRP,ACTMRP,AMT,DIS,
                         TAXCODE,TAXPER,TAXAMT,OUTLET.OUC_DESC,MEDDESC.ITC_DESC,TAX.TXC_DESC
                     FROM (
@@ -70,33 +69,26 @@ module.exports = {
                             WHERE  A.OUCODE = OUTLET.OU_CODE
                                 AND A.CODE = MEDDESC.IT_CODE
                                 AND A.TAXCODE = TAX.TX_CODE`,
-                {
-                    date1: data.from,
-                    date2: data.to,
-                    date3: data.from,
-                    date4: data.to,
-                },
-                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-            )
-            await result.resultSet?.getRows((err, rows) => {
-                callBack(err, rows)
-            })
-
-        } catch (error) {
-            console.log(error)
-        } finally {
-            if (conn_ora) {
-                await conn_ora.close();
-                await pool_ora.close();
-            }
-        }
-    },
-    gstreportsPartTwo: async (data, callBack) => {
-        let pool_ora = await oraConnection();
-        let conn_ora = await pool_ora.getConnection();
-        try {
-            const result = await conn_ora.execute(
-                `SELECT 
+        {
+          date1: data.from,
+          date2: data.to,
+          date3: data.from,
+          date4: data.to,
+        },
+        {outFormat: oracledb.OUT_FORMAT_OBJECT},
+      );
+      callBack(err, result.rows);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      if (conn_ora) await conn_ora.close();
+    }
+  },
+  gstreportsPartTwo: async (data, callBack) => {
+    let conn_ora = await getTmcConnection();
+    try {
+      const result = await conn_ora.execute(
+        `SELECT 
                         OUCODE,CODE,BILL,BILLDATE,CACR,QTY,LOOSE,PRATE,MRP,ACTMRP,AMT,DIS,TAXCODE,
                         TAXPER,TAXAMT,OUTLET.OUC_DESC,MEDDESC.ITC_DESC,TAX.TXC_DESC
                     FROM (
@@ -130,31 +122,24 @@ module.exports = {
                             WHERE  A.OUCODE = OUTLET.OU_CODE
                             AND A.CODE = MEDDESC.IT_CODE
                             AND A.TAXCODE = TAX.TX_CODE`,
-                {
-                    date1: data.from,
-                    date2: data.to,
-                },
-                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-            )
-            await result.resultSet?.getRows((err, rows) => {
-                callBack(err, rows)
-            })
-
-        } catch (error) {
-            console.log(error)
-        } finally {
-            if (conn_ora) {
-                await conn_ora.close();
-                await pool_ora.close();
-            }
-        }
-    },
-    gstreportsPartThree: async (data, callBack) => {
-        let pool_ora = await oraConnection();
-        let conn_ora = await pool_ora.getConnection();
-        try {
-            const result = await conn_ora.execute(
-                `SELECT 
+        {
+          date1: data.from,
+          date2: data.to,
+        },
+        {outFormat: oracledb.OUT_FORMAT_OBJECT},
+      );
+      callBack(err, result.rows);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      if (conn_ora) await conn_ora.close();
+    }
+  },
+  gstreportsPartThree: async (data, callBack) => {
+    let conn_ora = await getTmcConnection();
+    try {
+      const result = await conn_ora.execute(
+        `SELECT 
                     OUCODE,CODE,BILL,BILLDATE,CACR,QTY,LOOSE,PRATE,MRP,ACTMRP,AMT,DIS,
                     TAXCODE,TAXPER,TAXAMT,OUTLET.OUC_DESC,MEDDESC.ITC_DESC,TAX.TXC_DESC
                 FROM (
@@ -217,33 +202,26 @@ module.exports = {
                         WHERE  A.OUCODE = OUTLET.OU_CODE
                             AND A.CODE = MEDDESC.IT_CODE
                             AND A.TAXCODE = TAX.TX_CODE`,
-                {
-                    date1: data.from,
-                    date2: data.to,
-                    date3: data.from,
-                    date4: data.to,
-                },
-                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-            )
-            await result.resultSet?.getRows((err, rows) => {
-                callBack(err, rows)
-            })
-
-        } catch (error) {
-            console.log(error)
-        } finally {
-            if (conn_ora) {
-                await conn_ora.close();
-                await pool_ora.close();
-            }
-        }
-    },
-    gstreportsPartFour: async (data, callBack) => {
-        let pool_ora = await oraConnection();
-        let conn_ora = await pool_ora.getConnection();
-        try {
-            const result = await conn_ora.execute(
-                `SELECT 
+        {
+          date1: data.from,
+          date2: data.to,
+          date3: data.from,
+          date4: data.to,
+        },
+        {outFormat: oracledb.OUT_FORMAT_OBJECT},
+      );
+      callBack(err, result.rows);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      if (conn_ora) await conn_ora.close();
+    }
+  },
+  gstreportsPartFour: async (data, callBack) => {
+    let conn_ora = await getTmcConnection();
+    try {
+      const result = await conn_ora.execute(
+        `SELECT 
                     OUCODE,CODE,BILL,BILLDATE,CACR,QTY,LOOSE,PRATE,MRP,ACTMRP,AMT,DIS,
                     TAXCODE,TAXPER,TAXAMT,OUTLET.OUC_DESC,MEDDESC.ITC_DESC,TAX.TXC_DESC
                 FROM (
@@ -277,31 +255,24 @@ module.exports = {
                                 WHERE  A.OUCODE = OUTLET.OU_CODE
                                     AND A.CODE = MEDDESC.IT_CODE
                                     AND A.TAXCODE = TAX.TX_CODE`,
-                {
-                    date1: data.from,
-                    date2: data.to,
-                },
-                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-            )
-            await result.resultSet?.getRows((err, rows) => {
-                callBack(err, rows)
-            })
-
-        } catch (error) {
-            console.log(error)
-        } finally {
-            if (conn_ora) {
-                await conn_ora.close();
-                await pool_ora.close();
-            }
-        }
-    },
-    gstreportsPartFive: async (data, callBack) => {
-        let pool_ora = await oraConnection();
-        let conn_ora = await pool_ora.getConnection();
-        try {
-            const result = await conn_ora.execute(
-                `SELECT 
+        {
+          date1: data.from,
+          date2: data.to,
+        },
+        {outFormat: oracledb.OUT_FORMAT_OBJECT},
+      );
+      callBack(err, result.rows);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      if (conn_ora) await conn_ora.close();
+    }
+  },
+  gstreportsPartFive: async (data, callBack) => {
+    let conn_ora = await getTmcConnection();
+    try {
+      const result = await conn_ora.execute(
+        `SELECT 
                     PBILLDETL.OU_CODE OUCODE,
                     PBILLDETL.IT_CODE CODE,
                     PBILLDETL.BM_NO BILL,
@@ -329,23 +300,17 @@ module.exports = {
                     AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                     AND Opbillmast.Opd_Date <=
                         TO_DATE (:date2, 'dd/MM/yyyy hh24:mi:ss')`,
-                {
-                    date1: data.from,
-                    date2: data.to,
-                },
-                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-            )
-            await result.resultSet?.getRows((err, rows) => {
-                callBack(err, rows)
-            })
-
-        } catch (error) {
-            console.log(error)
-        } finally {
-            if (conn_ora) {
-                await conn_ora.close();
-                await pool_ora.close();
-            }
-        }
-    },
-}
+        {
+          date1: data.from,
+          date2: data.to,
+        },
+        {outFormat: oracledb.OUT_FORMAT_OBJECT},
+      );
+      callBack(err, result.rows);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      if (conn_ora) await conn_ora.close();
+    }
+  },
+};

@@ -1,13 +1,11 @@
-const { format, subHours, setSeconds, setMinutes, setHours, startOfDay } = require('date-fns');
-const { oracledb, oraConnection } = require('../../config/oradbconfig');
+const {format, subHours, setSeconds, setMinutes, setHours, startOfDay} = require("date-fns");
+const {oracledb, getTmcConnection} = require("../../config/oradbconfig");
 
 module.exports = {
+  getAllPatientLabResults: async (callBack) => {
+    let conn_ora = await getTmcConnection();
 
-    getAllPatientLabResults: async (callBack) => {
-        let pool_ora = await oraConnection();
-        let conn_ora = await pool_ora.getConnection();
-
-        const sql = `
+    const sql = `
                     SELECT DISTINCT
                     PT.PT_NO,
                     PT.PTC_NAME,
@@ -31,41 +29,35 @@ module.exports = {
                 INNER JOIN TESTRESULT TS ON PT.BMC_SLNO = TS.BMC_SLNO
                 LEFT JOIN PRODESCRIPTION PD ON TS.PD_CODE = PD.PD_CODE
                      `;
-        try {
+    try {
+      const now = new Date();
+      const startOfToday = startOfDay(now); //eg : 01/09/2025 00:00:00
+      const fromDate = subHours(startOfToday, 7); // subtract 7 hours
+      const formattedFromDate = format(fromDate, "dd/MM/yyyy HH:mm:ss");
+      // To date: today at 23:59:59
+      const endOfDay = setSeconds(setMinutes(setHours(now, 23), 59), 59);
+      const toDate = format(endOfDay, "dd/MM/yyyy HH:mm:ss");
+      const result = await conn_ora.execute(
+        sql,
+        {
+          FROM_DATE: formattedFromDate,
+          TO_DATE: toDate,
+        },
+        {outFormat: oracledb.OUT_FORMAT_OBJECT},
+      );
+      // await result.resultSet?.getRows((err, rows) => {
+      // })
+      callBack(err, result.rows);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      await conn_ora.close();
+    }
+  },
+  getAllIcuBeds: async (callBack) => {
+    let conn_ora = await getTmcConnection();
 
-
-            const now = new Date();
-            const startOfToday = startOfDay(now); //eg : 01/09/2025 00:00:00
-            const fromDate = subHours(startOfToday, 7); // subtract 7 hours
-            const formattedFromDate = format(fromDate, 'dd/MM/yyyy HH:mm:ss');
-            // To date: today at 23:59:59
-            const endOfDay = setSeconds(setMinutes(setHours(now, 23), 59), 59);
-            const toDate = format(endOfDay, 'dd/MM/yyyy HH:mm:ss');
-            const result = await conn_ora.execute(
-                sql,
-                {
-                    FROM_DATE: formattedFromDate,
-                    TO_DATE: toDate
-                },
-                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-            )
-            await result.resultSet?.getRows((err, rows) => {
-                callBack(err, rows)
-            })
-        } catch (error) {
-            console.log(error)
-        } finally {
-            if (conn_ora) {
-                await conn_ora.close();
-                await pool_ora.close();
-            }
-        }
-    },
-    getAllIcuBeds: async (callBack) => {
-        let pool_ora = await oraConnection();
-        let conn_ora = await pool_ora.getConnection();
-
-        const sql = `
+    const sql = `
                     SELECT  NS AS "NS",
     SUM(TOT) AS "TOT",
     SUM(OCCUP) AS "OCCUP",
@@ -87,27 +79,15 @@ FROM (
              GROUP BY  O.OUC_DESC )
              GROUP BY NS
              ORDER BY NS`;
-        try {
-            const result = await conn_ora.execute(
-                sql,
-                {},
-                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-            )
-            await result.resultSet?.getRows((err, rows) => {
-                callBack(err, rows)
-            })
-        } catch (error) {
-            console.log(error)
-        } finally {
-            if (conn_ora) {
-                await conn_ora.close();
-                await pool_ora.close();
-            }
-        }
-    },
-
-
-
-
-
-}
+    try {
+      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      //   await result.resultSet?.getRows((err, rows) => {
+      // });
+      callBack(err, result.rows);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      await conn_ora.close();
+    }
+  },
+};
