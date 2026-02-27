@@ -1,4 +1,4 @@
-const {getTmcConnection, oracleConnectionClose} = require("../config/oradbconfig");
+const {getTmcConnection, oracleConnectionClose, closeConnection} = require("../config/oradbconfig");
 
 const controllerHelper = (serviceFun, successMessage) => {
   return async (req, res) => {

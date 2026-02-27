@@ -978,10 +978,12 @@ module.exports = {
   // MIS GROUP & CATEGORY
   misGroupMast: async (conn_ora) => {
     const result = await conn_ora.execute(`SELECT * FROM MISINCEXPMAST`, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+    //     console.log(result);
     return result.rows;
   },
   misGroup: async (conn_ora) => {
     const result = await conn_ora.execute(`SELECT * FROM Misincexpgroup`, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+    //     console.log(result);
     return result.rows;
   },
   creditInsuranceBillRefund: async (conn_ora, data) => {

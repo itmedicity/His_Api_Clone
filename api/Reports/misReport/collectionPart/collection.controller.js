@@ -16,7 +16,7 @@ const {
   creditInsuranceBillRefund,
 } = require("./collection.service");
 
-const {controllerHelper} = require("../../../../utls/controller-helperFun");
+const {controllerHelper, controllerGETHelper} = require("../../../../utls/controller-helperFun");
 
 module.exports = {
   getadvanceCollection: controllerHelper(advanceCollection, "advance Collection"),
@@ -31,8 +31,8 @@ module.exports = {
   getipPreviousDayDiscount: controllerHelper(ipPreviousDayDiscount, "ip Previous Day Discount"),
   getipPreviousDayCollection: controllerHelper(ipPreviousDayCollection, "ip Previous Day Collection"),
   getunsettledAmount: controllerHelper(unsettledAmount, "unsettled Amount"),
-  getmisGroup: controllerHelper(misGroup, "mis Group"),
-  getmisGroupMast: controllerHelper(misGroupMast, "mis Group Mast"),
+  misGroup: controllerGETHelper(misGroup, "mis Group"),
+  misGroupMast: controllerGETHelper(misGroupMast, "mis Group Mast"),
   getcreditInsuranceBillRefund: controllerHelper(creditInsuranceBillRefund, "credit Insurance Bill Refund"),
 
   // getadvanceCollection:async (req, res) => {
