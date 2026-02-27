@@ -1,17 +1,13 @@
-const pool = require("../../config/dbconfig");
+const {pools, query, transaction} = require("../../config/mysqldbconfig");
 const {getTmcConnection, oracledb} = require("../../config/oradbconfig");
 
 module.exports = {
-  getPharmacyList: (callBack) => {
-    pool.query(`select * from medi_ellider.outlet`, [], (error, results, fields) => {
-      if (error) {
-        return callBack(error);
-      }
-      return callBack(null, results);
-    });
+  getPharmacyList: async () => {
+    const result = await query(`select * from medi_ellider.outlet`, []);
+    return result;
   },
 
-  searchRequestFromOra: async (data, callBack) => {
+  searchRequestFromOra: async (data) => {
     let conn_ora = await getTmcConnection();
 
     try {
@@ -43,19 +39,18 @@ module.exports = {
         },
         {outFormat: oracledb.OUT_FORMAT_OBJECT},
       );
-      const reqMedFromOra = result.rows;
-      return callBack(null, reqMedFromOra);
+      return result.rows;
     } catch (error) {
-      return callBack(error);
+      throw error;
     } finally {
       if (conn_ora) await conn_ora.close();
     }
   },
 
-  insertToRolSetting: async (data, callBack) => {
+  insertToRolSetting: async (data) => {
     let conn_ora = await getTmcConnection();
-
-    const sql = `INSERT INTO rol_setting (OU_CODE,IT_CODE,ITN_NAME,ITN_MAXQTY,ITN_MINQTY,ITN_MINLVL,ITN_MEDLVL,
+    try {
+      const sql = `INSERT INTO rol_setting (OU_CODE,IT_CODE,ITN_NAME,ITN_MAXQTY,ITN_MINQTY,ITN_MINLVL,ITN_MEDLVL,
         ITN_MAXLVL,STATUS) VALUES 
                         (
                         :OU_CODE,
@@ -68,52 +63,41 @@ module.exports = {
                         :ITN_MAXLVL,
                         :STATUS)`;
 
-    const options = {
-      autoCommit: true,
-      bindDefs: {
-        OU_CODE: {type: oracledb.STRING, maxSize: 4},
-        IT_CODE: {type: oracledb.STRING, maxSize: 4},
-        ITN_NAME: {type: oracledb.STRING, maxSize: 75},
-        ITN_MAXQTY: {type: oracledb.NUMBER, maxSize: 10},
-        ITN_MINQTY: {type: oracledb.NUMBER, maxSize: 10},
-        ITN_MINLVL: {type: oracledb.NUMBER, maxSize: 10},
-        ITN_MEDLVL: {type: oracledb.NUMBER, maxSize: 10},
-        ITN_MAXLVL: {type: oracledb.NUMBER, maxSize: 10},
-        STATUS: {type: oracledb.STRING, maxSize: 1},
-      },
-    };
-    try {
+      const options = {
+        autoCommit: true,
+        bindDefs: {
+          OU_CODE: {type: oracledb.STRING, maxSize: 4},
+          IT_CODE: {type: oracledb.STRING, maxSize: 4},
+          ITN_NAME: {type: oracledb.STRING, maxSize: 75},
+          ITN_MAXQTY: {type: oracledb.NUMBER, maxSize: 10},
+          ITN_MINQTY: {type: oracledb.NUMBER, maxSize: 10},
+          ITN_MINLVL: {type: oracledb.NUMBER, maxSize: 10},
+          ITN_MEDLVL: {type: oracledb.NUMBER, maxSize: 10},
+          ITN_MAXLVL: {type: oracledb.NUMBER, maxSize: 10},
+          STATUS: {type: oracledb.STRING, maxSize: 1},
+        },
+      };
       const result = await conn_ora.executeMany(sql, data, options);
-      return callBack(null, result);
+      return result;
     } catch (error) {
-      return callBack(error);
+      throw error;
     } finally {
       if (conn_ora) await conn_ora.close();
     }
   },
 
-  truncateRolSetting: async (callBack) => {
+  truncateRolSetting: async () => {
     let conn_ora = await getTmcConnection();
-
     try {
-      const result = await conn_ora.execute(` TRUNCATE TABLE rol_setting`, []);
-      return callBack(null, result);
+      return await conn_ora.execute(` TRUNCATE TABLE rol_setting`, []);
     } catch (error) {
-      return callBack(error);
+      throw error;
     } finally {
-      if (conn_ora) {
-        const result = {
-          success: 1,
-        };
-
-        await conn_ora.close();
-
-        return result;
-      }
+      await conn_ora.close();
     }
   },
 
-  updateReqQntyToOracle: async (data, callBack) => {
+  updateReqQntyToOracle: async (data) => {
     oracledb.autoCommit = true;
     let conn_ora = await getTmcConnection();
     try {
@@ -128,9 +112,9 @@ module.exports = {
         },
         {outFormat: oracledb.OUT_FORMAT_OBJECT},
       );
-      return callBack(null, result);
+      return result;
     } catch (error) {
-      return callBack(error);
+      throw error;
     } finally {
       if (conn_ora) {
         await conn_ora.close();

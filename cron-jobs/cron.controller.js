@@ -1,77 +1,54 @@
 const cron = require("node-cron");
-const {oraConnection, oracledb, oraKmcConnection} = require("../config/oradbconfig");
-const pool = require("../config/dbconfig");
-const mysqlpool = require("../config/dbconfigmeliora");
-const {format, subHours, subMonths, parse, isValid, subMinutes} = require("date-fns");
-const bispool = require("../config/dbconfbis");
-const {endLogSuccess, endLogFailure, startLog, getCompanySlno, mysqlExecuteTransaction, getLastTriggerDate} = require("./CronLogger");
+const {format, subHours, subMonths, subSeconds, startOfDay} = require("date-fns");
 
-{
-  /* %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% FEED BACK CRON-JOBS STARTS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% */
-}
+// const pool = require("../config/dbconfig");
+// const mysqlpool = require("../config/dbconfigmeliora");
+// const bispool = require("../config/dbconfbis");
+const {oracledb, getTmcCronConnection, getKmcConnection} = require("../config/oradbconfig");
+const {pools, acquireLock, transaction, releaseLock} = require("../config/mysqldbconfig");
+const {
+  endLogSuccess,
+  endLogFailure,
+  startLog,
+  getCompanySlno,
+  mysqlExecuteTransaction,
+  getLastTriggerDate,
+  getLastProcessedAdmissionDate,
+  getLastProcessedDischargeDate,
+  captureDischargeHistory,
+  withRetry,
+  mysqlExecute,
+} = require("./CronLogger");
 
-// Get Inpaitent Detail
-const getInpatientDetail = async (callBack = () => {}) => {
-  let pool_ora = null;
-  let conn_ora = null;
-  let resultSet = null;
-  let logId = null;
+/* %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% FEED BACK CRON-JOBS STARTS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% */
+
+const getAdmittedPatientInfoToInsert = async () => {
+  const CRON_LOCK = "FB_IPADMISS_IMPORT_LOCK";
+  let ora;
+  let logId;
+  let jobStartTime = new Date();
+  let jobEndTime;
+  /* ---------------- CRON LOCK CONTROL ---------------- */
+  const locked = await acquireLock("meliora", CRON_LOCK);
+  if (!locked) return;
+
   try {
-    // 1. START LOG
-    try {
-      logId = await startLog("FB_IPADMISS_IMPORT");
-      if (!logId) throw new Error("Failed to create log entry");
-    } catch (err) {
-      console.error("Log start failed:", err);
-      return callBack(err);
-    }
-
-    //2. GET COMPANY INFO (MySQL)
-    let mh_Code = "";
-    try {
-      const companySlno = await getCompanySlno();
-      if (isNaN(Number(companySlno))) {
-        await endLogFailure(logId, `Invalid company_slno: ${companySlno}`);
-        return callBack(new Error(`Invalid company_slno: ${companySlno}`));
-      }
-      mh_Code = Number(companySlno) === 1 ? "00" : "KC";
-    } catch (err) {
-      await endLogFailure(logId, "Error fetching company details");
-      return callBack(err);
-    }
-
-    // 3. GET LAST TRIGGER DATE (MySQL)
-    let lastTrigger = null;
-    let fromDate = null;
-    let toDate = null;
-    let jobStartTime = null;
-    let detail = null;
-
-    try {
-      detail = await getLastTriggerDate(1);
-      lastTrigger = detail?.fb_last_trigger_date ? new Date(detail.fb_last_trigger_date) : subHours(new Date(), 1);
-
-      // FIXED job start time (VERY IMPORTANT)
-      jobStartTime = new Date();
-
-      // FROM_DATE = last cycle’s TO_DATE
-      fromDate = format(lastTrigger, "dd/MM/yyyy HH:mm:ss");
-      // TO_DATE is NOW (but will be used as next cycle FROM)
-      toDate = format(jobStartTime, "dd/MM/yyyy HH:mm:ss");
-    } catch (err) {
-      await endLogFailure(logId, "Error fetching last trigger date");
-      return callBack(err);
-    }
-    // 4. FETCH ORACLE DATA
-    let rows = [];
-    let oracleTime = 0;
-
-    try {
-      const oracleStart = Date.now();
-
-      pool_ora = await oraConnection();
-      conn_ora = await pool_ora.getConnection();
-      const oracleSql = `
+    // 1 - starging log
+    logId = await startLog("FB_IPADMISS_IMPORT");
+    // 2 - Get Company Info (MySQL)
+    const companySlno = await getCompanySlno();
+    const mhCode = Number(companySlno) === 1 ? "00" : "KC";
+    // 3 - GET LAST TRIGGER DATE (MySQL)
+    const lastProcessedDate = await getLastProcessedAdmissionDate();
+    // 4 - SELECT MAX(fb_dmd_date) FROM fb_ipadmiss for last processed date
+    // (4a) - IF First run safety → go back 1 hour
+    const fromDate = lastProcessedDate ? lastProcessedDate : subSeconds(new Date(), 3600);
+    // (4b) - To Date - 1 sec
+    const toDate = subSeconds(new Date(), 1);
+    // 5 - FETCH Oracle Data with fromDate and toDate and toDate and mh_code
+    // (5a) - CONNECT TO ORACLE
+    ora = await getTmcCronConnection();
+    const oracleSql = `
           SELECT
               IP.IP_NO,
               IP.IPD_DATE,
@@ -98,187 +75,126 @@ const getInpatientDetail = async (callBack = () => {}) => {
           JOIN DOCTOR DO ON DO.DO_CODE = IP.DO_CODE
           JOIN SPECIALITY SP ON SP.SP_CODE = DO.SP_CODE
           JOIN DEPARTMENT DP ON DP.DP_CODE = SP.DP_CODE
-      WHERE IPD_DATE  >= TO_DATE (:FROM_DATE,'dd/MM/yyyy hh24:mi:ss')
-      AND IPD_DATE  <TO_DATE (:TO_DATE, 'dd/MM/yyyy hh24:mi:ss') AND IPC_PTFLAG='N' AND IP.IPC_MHCODE = :MH_CODE
-      `;
+      WHERE IPD_DATE > :FROM_DATE
+      AND IPD_DATE <= :TO_DATE
+      AND IPC_PTFLAG='N' AND IP.IPC_MHCODE = :MH_CODE
+    `;
+    const {rows = []} = await ora.execute(
+      oracleSql,
+      {
+        FROM_DATE: fromDate,
+        TO_DATE: toDate,
+        MH_CODE: mhCode,
+      },
+      {outFormat: oracledb.OUT_FORMAT_OBJECT},
+    );
 
-      const result = await conn_ora.execute(oracleSql, {FROM_DATE: fromDate, TO_DATE: toDate, MH_CODE: mh_Code}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
-
-      resultSet = result.resultSet;
-      rows = await resultSet.getRows(0);
-
-      await resultSet.close();
-      resultSet = null;
-
-      oracleTime = Date.now() - oracleStart;
-    } catch (err) {
-      await endLogFailure(logId, "Oracle fetch failed");
-      return callBack(err);
-    }
-
-    // 5. IF NO ROWS → SUCCESS + UPDATE LOG DATE + EXIT
-    if (!rows || rows.length === 0) {
+    if (!rows.length) {
       await endLogSuccess(logId, {
         oracleRows: 0,
         mysqlInserted: 0,
         mysqlUpdated: 0,
-        oracleTime,
-        mysqlTime: 0,
+        oracleTime: jobStartTime ? new Date() - jobStartTime : null,
+        mysqlTime: null,
       });
-      return callBack(null, {message: "No rows from Oracle"});
+      return;
     }
-
-    // 6. TRANSFORM ROWS
-    const allValues = rows.map((item) => [
-      item.IP_NO,
-      item.IPD_DATE ? format(new Date(item.IPD_DATE), "yyyy-MM-dd HH:mm:ss") : null,
-      item.PT_NO,
-      item.PTC_PTNAME,
-      item.PTC_SEX,
-      item.PTD_DOB ? format(new Date(item.PTD_DOB), "yyyy-MM-dd HH:mm:ss") : null,
-      buildFullAddress(item),
-      item.BD_CODE,
-      item.DO_CODE,
-      item.DOC_NAME,
-      item.DPC_DESC,
-      item.IPD_DISC ? format(new Date(item.IPD_DISC), "yyyy-MM-dd HH:mm:ss") : null,
-      item.IPC_STATUS,
-      item.DMC_SLNO,
-      item.DMD_DATE ? format(new Date(item.DMD_DATE), "yyyy-MM-dd HH:mm:ss") : null,
-      item.PTC_MOBILE,
-      item.IPC_MHCODE,
-      item.IPC_CURSTATUS,
+    // 6. CONVERT ORACLE DATA TO MYSQL DATA
+    const values = rows.map((r) => [
+      r.IP_NO,
+      r.IPD_DATE ? format(r.IPD_DATE, "yyyy-MM-dd HH:mm:ss") : null,
+      r.PT_NO,
+      r.PTC_PTNAME,
+      r.PTC_SEX,
+      r.PTD_DOB ? format(r.PTD_DOB, "yyyy-MM-dd HH:mm:ss") : null,
+      r.PTC_LOADD1,
+      r.BD_CODE,
+      r.DO_CODE,
+      r.DOC_NAME,
+      r.DPC_DESC,
+      r.IPD_DISC ? format(r.IPD_DISC, "yyyy-MM-dd HH:mm:ss") : null,
+      r.IPC_STATUS,
+      r.DMC_SLNO,
+      r.DMD_DATE ? format(r.DMD_DATE, "yyyy-MM-dd HH:mm:ss") : null,
+      r.PTC_MOBILE,
+      r.IPC_MHCODE,
+      r.IPC_CURSTATUS,
     ]);
-
-    // 7. MYSQL INSERT
-    let mysqlTime = 0;
-    let insertedRows = 0;
-    // Handle fb_last_trigger_date log
-    try {
-      const mysqlStart = Date.now();
-
-      const patientInsertQuery = {
-        sql: `INSERT INTO fb_ipadmiss (
-            fb_ip_no, fb_ipd_date, fb_pt_no, fb_ptc_name, fb_ptc_sex,
-            fb_ptd_dob, fb_ptc_loadd1,fb_bd_code, fb_do_code,fb_doc_name,
-            fb_dep_desc,fb_ipd_disc,fb_ipc_status,fb_dmc_slno,fb_dmd_date,
-            fb_ptc_mobile,fb_ipc_mhcode,fb_ipc_curstatus
-         ) VALUES ?`,
-        values: [allValues],
-      };
-
-      // convert to MySQL format
-      const mysqlToDate = format(jobStartTime, "yyyy-MM-dd HH:mm:ss");
-      // choose query type
-      const logQuery = !detail
-        ? {
-            sql: `INSERT INTO fb_ipadmiss_logdtl (fb_last_trigger_date, fb_process_id) VALUES (?, ?)`,
-            values: [mysqlToDate, 1],
-          }
-        : {
-            sql: `UPDATE fb_ipadmiss_logdtl SET fb_last_trigger_date = ? WHERE fb_process_id = ?`,
-            values: [mysqlToDate, 1],
-          };
-
-      // const mysqlResults = await mysqlExecuteTransaction(queries);
-      const mysqlResults = await mysqlExecuteTransaction([patientInsertQuery, logQuery]);
-
-      insertedRows = mysqlResults[0]?.affectedRows || 0;
-
-      mysqlTime = Date.now() - mysqlStart;
-    } catch (err) {
-      await endLogFailure(logId, `MySQL insert failed:${err}`);
-      return callBack(err);
-    }
+    // 7. MYSQL INSERT (IDEMPOTENT)
+    const insertSql = `
+      INSERT INTO fb_ipadmiss (
+        fb_ip_no, fb_ipd_date, fb_pt_no, fb_ptc_name, fb_ptc_sex,
+        fb_ptd_dob, fb_ptc_loadd1, fb_bd_code, fb_do_code,
+        fb_doc_name, fb_dep_desc, fb_ipd_disc, fb_ipc_status,
+        fb_dmc_slno, fb_dmd_date, fb_ptc_mobile,
+        fb_ipc_mhcode, fb_ipc_curstatus
+      ) VALUES ?
+      ON DUPLICATE KEY UPDATE
+        fb_ipd_date        = VALUES(fb_ipd_date),
+        fb_ipc_curstatus   = VALUES(fb_ipc_curstatus),
+        fb_dmd_date        = VALUES(fb_dmd_date),
+        fb_bd_code         = VALUES(fb_bd_code),
+        fb_do_code         = VALUES(fb_do_code),
+        fb_doc_name        = VALUES(fb_doc_name)
+    `;
+    const [res] = await transaction("meliora", [{sql: insertSql, values: [values]}]);
     // 8. SUCCESS LOG
+    /* note ->
+       affectedRows = inserted + updated*2 bcz on duplicate its updating 
+    */
     await endLogSuccess(logId, {
-      oracleRows: rows.length,
-      mysqlInserted: insertedRows,
+      oracleRows: rows.length ?? 0,
+      mysqlInserted: res.affectedRows ?? 0,
       mysqlUpdated: 0,
-      oracleTime,
-      mysqlTime,
+      oracleTime: null,
+      mysqlTime: jobStartTime ? new Date() - jobStartTime : null,
     });
-
-    return callBack(null, {inserted: insertedRows});
   } catch (err) {
-    // UNEXPECTED FAILURE
-    if (logId) await endLogFailure(logId, `Error in here ${err}`);
-    return callBack(err);
+    if (logId) await endLogFailure(logId, err);
+    throw err;
   } finally {
-    try {
-      if (resultSet) await resultSet.close();
-      if (conn_ora) await conn_ora.close();
-      if (pool_ora) await pool_ora.close();
-    } catch (cleanupErr) {
-      if (logId) {
-        await endLogFailure(logId, `Cleanup error: ${cleanupErr}`);
-      }
-    }
+    if (ora) await ora.close();
+    await releaseLock("meliora", CRON_LOCK);
   }
 };
 
-// UPDATE IPADMISS STATUS DETAILS
-const UpdateIpStatusDetails = async (callBack = () => {}) => {
-  let pool_ora = null;
-  let conn_ora = null;
-  let resultSet = null;
-  let logId = null;
+//UPDATE DISCHAGE AND BED STATUS FROM ORACLE IPADMISS TO MYSQL IPADMISS BASED ON IP_NO AND DMD_DATE
+const UpdateDischargeAndBedStatus = async () => {
+  const CRON_LOCK = "FB_IPSTATUS_IMPORT_LOCK";
+  let ora;
+  let logId;
+  /*****************************************************************************
+   * 1 -> START THE LOG
+   * 2 -> GET COMPANY INFORMATION
+   * 3 -> GET LAST TRIGGER DATE FROM IPADMISS TABLE BASED ON DM_DATE ( FROM DATE)
+   * 4 -> DECLARE TO DATE -> CURRENT DATE - 1 SECONDS
+   * 5 -> START  ORACLE CONNECTION
+   * 6 -> GET DATA FROM ORACLE BASED ON LAST TRIGGER DATE
+   * 7 -> IF NO ROW FOUND THEN END THE LOG AND EXIT
+   * 8 -> IF DATA -> CONVERT DATA FOR MYSQL FORMAT
+   * 9 -> TRIGGER AND INSERT DATA INTO MYSQL
+   * 10 -> COMMIT AND END THE LOG
+   */
+  /*------------------ START THE LOCK --------------------*/
+  const locked = await acquireLock("meliora", CRON_LOCK);
+  if (!locked) return;
 
   try {
-    // 1. START LOG
-    try {
-      logId = await startLog("FB_IPSTATUS_IMPORT");
-      if (!logId) throw new Error("Failed to create log entry");
-    } catch (err) {
-      console.error("Log start failed:", err);
-      return callBack(err);
-    }
-
-    //2. GET COMPANY INFO (MySQL)
-    let mh_Code = "";
-    try {
-      const companySlno = await getCompanySlno();
-      if (isNaN(Number(companySlno))) {
-        await endLogFailure(logId, `Invalid company_slno: ${companySlno}`);
-        return callBack(new Error(`Invalid company_slno: ${companySlno}`));
-      }
-      mh_Code = Number(companySlno) === 1 ? "00" : "KC";
-    } catch (err) {
-      await endLogFailure(logId, "Error fetching company details");
-      return callBack(err);
-    }
-
-    // 3. GET LAST TRIGGER DATE (PROCESS ID = 2)
-    let detail = null;
-    let lastTrigger = null;
-    let fromDate = null;
-    let toDate = null;
-    let jobStartTime = null;
-
-    try {
-      detail = await getLastTriggerDate(2);
-
-      lastTrigger = detail?.fb_last_trigger_date ? new Date(detail.fb_last_trigger_date) : subHours(new Date(), 1);
-
-      if (isNaN(lastTrigger.getTime())) throw new Error("Invalid last trigger date");
-
-      // FIXED job start time (VERY IMPORTANT)
-      jobStartTime = new Date();
-
-      fromDate = format(lastTrigger, "dd/MM/yyyy HH:mm:ss");
-      toDate = format(jobStartTime, "dd/MM/yyyy HH:mm:ss");
-    } catch (err) {
-      await endLogFailure(logId, `Error fetching last trigger date: ${err}`);
-      return callBack(err);
-    }
-
-    // 4. FETCH ORACLE DATA
-    let rows = [];
-    let oracleTime = 0;
-
-    try {
-      const oracleStart = Date.now();
-      const oracleSql = `
+    // 1 -> START THE LOG
+    logId = await startLog("FB_IPSTATUS_IMPORT");
+    // 2 -> GET COMPANY INFORMATION
+    const companySlno = await getCompanySlno();
+    const mhCode = Number(companySlno) === 1 ? "00" : "KC";
+    // 3 -> GET LAST TRIGGER DATE FROM IPADMISS TABLE BASED ON DM_DATE ( FROM DATE)
+    const lastDischargeDate = await getLastProcessedDischargeDate();
+    const fromDate = lastDischargeDate ?? subSeconds(new Date(), 3600);
+    // 4 -> DECLARE TO DATE -> CURRENT DATE - 1 SECONDS
+    const toDate = subSeconds(new Date(), 1);
+    // 5 -> START  ORACLE CONNECTION
+    ora = await getTmcCronConnection();
+    // 6 -> GET DATA FROM ORACLE BASED ON LAST TRIGGER DATE
+    const oracleStart = Date.now();
+    const oracleSql = `
         SELECT 
           IP.ip_no,
           IP.do_code,
@@ -289,27 +205,14 @@ const UpdateIpStatusDetails = async (callBack = () => {}) => {
           IP.dmc_slno,
           DO.DOC_NAME
         FROM IPADMISS IP JOIN DOCTOR DO ON DO.DO_CODE = IP.DO_CODE
-        WHERE IP.DMD_DATE  >= TO_DATE(:FROM_DATE, 'dd/MM/yyyy hh24:mi:ss') AND IP.DMD_DATE < TO_DATE(:TO_DATE, 'dd/MM/yyyy hh24:mi:ss')
+        WHERE IP.DMD_DATE > :FROM_DATE AND IP.DMD_DATE <= :TO_DATE
         AND IP.ipc_ptflag = 'N' AND IP.IPC_MHCODE = :MH_CODE
       `;
+    const {rows = []} = await ora.execute(oracleSql, {FROM_DATE: fromDate, TO_DATE: toDate, MH_CODE: mhCode}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
 
-      pool_ora = await oraConnection();
-      conn_ora = await pool_ora.getConnection();
+    const oracleTime = Date.now() - oracleStart;
 
-      const result = await conn_ora.execute(oracleSql, {FROM_DATE: fromDate, TO_DATE: toDate, MH_CODE: mh_Code}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
-
-      resultSet = result.resultSet;
-      rows = await resultSet.getRows(0);
-      await resultSet.close();
-      resultSet = null;
-
-      oracleTime = Date.now() - oracleStart;
-    } catch (err) {
-      await endLogFailure(logId, `Oracle fetch failed: ${err}`);
-      return callBack(err);
-    }
-    // 5. IF NO ROWS → SUCCESS + EXIT
-    if (!rows || rows.length === 0) {
+    if (!rows.length) {
       await endLogSuccess(logId, {
         oracleRows: 0,
         mysqlInserted: 0,
@@ -317,428 +220,355 @@ const UpdateIpStatusDetails = async (callBack = () => {}) => {
         oracleTime,
         mysqlTime: 0,
       });
-      return callBack(null, {message: "No status updates found"});
+      return;
     }
 
-    // 6. TRANSFORM
-    const updateValues = rows.map((item) => [
-      item.DO_CODE,
-      item.IPC_CURSTATUS,
-      item.IPD_DISC ? format(new Date(item.IPD_DISC), "yyyy-MM-dd HH:mm:ss") : null,
-      item.IPC_STATUS,
-      item.DMD_DATE ? format(new Date(item.DMD_DATE), "yyyy-MM-dd HH:mm:ss") : null,
-      item.DMC_SLNO,
-      item.DOC_NAME,
-      item.IP_NO,
+    /*  PREPARE TEMP DATA */
+    const tempValues = rows.map((r) => [
+      r.IP_NO,
+      r.DO_CODE,
+      r.IPC_CURSTATUS,
+      r.IPD_DISC ? format(r.IPD_DISC, "yyyy-MM-dd HH:mm:ss") : null,
+      r.IPC_STATUS,
+      r.DMD_DATE ? format(r.DMD_DATE, "yyyy-MM-dd HH:mm:ss") : null,
+      r.DMC_SLNO,
+      r.DOC_NAME,
     ]);
 
-    // 7. MYSQL UPDATE TRANSACTION
-    let mysqlTime = 0;
-    let mysqlUpdated = 0;
+    /*  MYSQL TRANSACTION  */
+    const mysqlStart = Date.now();
 
-    try {
-      //start time
-      const mysqlStart = Date.now();
-
-      const updateQueries = updateValues.map((row) => ({
+    const results = await transaction("meliora", [
+      {sql: `DROP TEMPORARY TABLE IF EXISTS tmp_ip_discharge`},
+      {
         sql: `
-          UPDATE fb_ipadmiss
-          SET
-            fb_do_code = ?,
-            fb_ipc_curstatus = ?,
-            fb_ipd_disc = ?,
-            fb_ipc_status = ?,
-            fb_dmd_date = ?,
-            fb_dmc_slno = ?,
-            fb_doc_name = ?
-          WHERE fb_ip_no = ?
-        `,
-        values: row,
-      }));
-      // convert to MySQL format
-      const mysqlToDate = format(jobStartTime, "yyyy-MM-dd HH:mm:ss");
-      // UPDATE / INSERT LOG DATE
-      const logQuery = !detail
-        ? {
-            sql: `INSERT INTO fb_ipadmiss_logdtl (fb_last_trigger_date, fb_process_id) VALUES (?, ?)`,
-            values: [mysqlToDate, 2],
-          }
-        : {
-            sql: `UPDATE fb_ipadmiss_logdtl SET fb_last_trigger_date = ? WHERE fb_process_id = ?`,
-            values: [mysqlToDate, 2],
-          };
+        CREATE TEMPORARY TABLE tmp_ip_discharge (
+          ip_no VARCHAR(20) PRIMARY KEY,
+          do_code VARCHAR(20),
+          ipc_curstatus VARCHAR(10),
+          ipd_disc DATETIME,
+          ipc_status VARCHAR(10),
+          dmd_date DATETIME,
+          dmc_slno INT,
+          doc_name VARCHAR(255)
+        ) ENGINE=MEMORY`,
+      },
+      {
+        sql: `
+        INSERT INTO tmp_ip_discharge VALUES ?
+        ON DUPLICATE KEY UPDATE
+          do_code=VALUES(do_code),
+          ipc_curstatus=VALUES(ipc_curstatus),
+          ipd_disc=VALUES(ipd_disc),
+          ipc_status=VALUES(ipc_status),
+          dmd_date=VALUES(dmd_date),
+          dmc_slno=VALUES(dmc_slno),
+          doc_name=VALUES(doc_name)`,
+        values: [tempValues],
+      },
+      {
+        sql: `
+        UPDATE fb_ipadmiss f
+        JOIN tmp_ip_discharge t ON t.ip_no = f.fb_ip_no
+        SET
+          f.fb_do_code = t.do_code,
+          f.fb_ipc_curstatus = t.ipc_curstatus,
+          f.fb_ipd_disc = t.ipd_disc,
+          f.fb_ipc_status = t.ipc_status,
+          f.fb_dmd_date = t.dmd_date,
+          f.fb_dmc_slno = t.dmc_slno,
+          f.fb_doc_name = t.doc_name
+        WHERE f.fb_dmd_date IS NULL
+           OR f.fb_dmd_date < t.dmd_date`,
+      },
+    ]);
 
-      updateQueries.push(logQuery);
+    const mysqlUpdated = results.find((r) => r.affectedRows !== undefined)?.affectedRows || 0;
+    const mysqlTime = Date.now() - mysqlStart;
 
-      const mysqlResults = await mysqlExecuteTransaction(updateQueries);
-      //Using changedRows to calculate updated rows
-      mysqlUpdated = mysqlResults.filter((r) => r.changedRows !== undefined).reduce((sum, r) => sum + r.changedRows, 0);
-
-      // calculating the end time
-      mysqlTime = Date.now() - mysqlStart;
-    } catch (err) {
-      await endLogFailure(logId, `MySQL update failed: ${err}`);
-      return callBack(err);
-    }
-    // 8. SUCCESS LOG
+    /*  SUCCESS LOG */
     await endLogSuccess(logId, {
       oracleRows: rows.length,
       mysqlInserted: 0,
-      mysqlUpdated: mysqlUpdated,
+      mysqlUpdated,
       oracleTime,
       mysqlTime,
     });
-
-    return callBack(null, {updated: updateValues.length});
-  } catch (err) {
-    // GLOBAL ERROR
-    if (logId) await endLogFailure(logId, `Error in UpdateIpStatusDetails: ${err}`);
-    return callBack(err);
+  } catch (error) {
+    if (logId) await endLogFailure(logId, error);
+    throw error;
   } finally {
-    try {
-      if (resultSet) await resultSet.close();
-    } catch {}
-    try {
-      if (conn_ora) await conn_ora.close();
-    } catch {}
-    try {
-      if (pool_ora) await pool_ora.close();
-    } catch {}
+    if (ora) await ora.close();
+    await releaseLock("meliora", CRON_LOCK);
   }
 };
 
 // UPDATE BED DETAILS STATUS DETAILS
-const UpdateInpatientDetailRmall = async (callBack = () => {}) => {
-  let pool_ora = null;
-  let conn_ora = null;
-  let resultSet = null;
-  let logId = null;
+const UpdateInpatientDetailRmall = async () => {
+  let conn_ora;
+  let logId;
+
+  const CRON_LOCK = "FB_IPRMALL_IMPORT_LOCK";
+  /*--------------------statr lock---------------------------*/
+  const locked = await acquireLock("meliora", CRON_LOCK);
+  if (!locked) return;
 
   try {
     // 1. START LOG
-    try {
-      logId = await startLog("FB_IPRMALL_IMPORT");
-      if (!logId) throw new Error("Failed to create log entry");
-    } catch (err) {
-      console.error("Log start failed:", err);
-      return callBack(err);
-    }
-
-    // 2. GET LAST TRIGGER DATE (PROCESS ID = 3)
-    let detail = null;
-    let lastTrigger = null;
-    let jobStartTime = null;
-    let fromDate = null;
-    let toDate = null;
-
-    try {
-      detail = await getLastTriggerDate(3);
-
-      lastTrigger = detail?.fb_last_trigger_date ? new Date(detail.fb_last_trigger_date) : subHours(new Date(), 1);
-
-      if (isNaN(lastTrigger.getTime())) throw new Error("Invalid last trigger date");
-
-      // FIXED job start time (VERY IMPORTANT)
-      jobStartTime = new Date();
-
-      fromDate = format(lastTrigger, "dd/MM/yyyy HH:mm:ss");
-      toDate = format(jobStartTime, "dd/MM/yyyy HH:mm:ss");
-    } catch (err) {
-      await endLogFailure(logId, `Error fetching last trigger date: ${err}`);
-      return callBack(err);
-    }
+    logId = await startLog("FB_IPRMALL_IMPORT");
+    /* GET LAST TRIGGER DATE */
+    const detail = await getLastTriggerDate(3);
+    const lastTrigger = detail?.fb_last_trigger_date ? new Date(detail.fb_last_trigger_date) : subHours(new Date(), 1);
+    if (isNaN(lastTrigger.getTime())) throw new Error("Invalid last trigger date");
 
     // 3. FETCH ORACLE DATA
-    let rows = [];
-    let oracleTime = 0;
+    const jobStartTime = new Date();
+    const oracleStart = Date.now();
 
-    try {
-      const oracleStart = Date.now();
-      const oracleSql = `
-        SELECT 
-          rmall.bd_code,
-          rmall.ip_no,
-          RMALL.RMC_OCCUPBY
-        FROM rmall
-         JOIN ipadmiss ON rmall.ip_no = ipadmiss.ip_no
-        WHERE ipadmiss.ipc_ptflag = 'N'
-          AND rmall.rmd_relesedate IS NULL
-          AND rmall.rmd_occupdate >= TO_DATE(:FROM_DATE, 'dd/MM/yyyy hh24:mi:ss')
-          AND rmall.rmd_occupdate < TO_DATE(:TO_DATE, 'dd/MM/yyyy hh24:mi:ss')
-      `;
+    conn_ora = await getTmcCronConnection();
+    const oracleSql = `
+      SELECT 
+        rmall.bd_code,
+        rmall.ip_no,
+        RMALL.RMC_OCCUPBY
+      FROM rmall
+       JOIN ipadmiss ON rmall.ip_no = ipadmiss.ip_no
+      WHERE ipadmiss.ipc_ptflag = 'N'
+        AND rmall.rmd_relesedate IS NULL
+        AND rmall.rmd_occupdate >= :FROM_DATE
+        AND rmall.rmd_occupdate < :TO_DATE
+    `;
+    const {rows = []} = await conn_ora.execute(oracleSql, {FROM_DATE: lastTrigger, TO_DATE: jobStartTime}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
 
-      pool_ora = await oraConnection();
-      conn_ora = await pool_ora.getConnection();
-
-      const result = await conn_ora.execute(oracleSql, {FROM_DATE: fromDate, TO_DATE: toDate}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
-
-      resultSet = result.resultSet;
-
-      rows = await resultSet.getRows(0);
-      await resultSet.close();
-      resultSet = null;
-
-      oracleTime = Date.now() - oracleStart;
-    } catch (err) {
-      await endLogFailure(logId, `Oracle fetch failed: ${err}`);
-      return callBack(err);
-    }
-
-    // 4. IF NO ROWS → COMPLETE SUCCESS
-    if (!rows || rows.length === 0) {
+    const oracleTime = Date.now() - oracleStart;
+    if (!rows.length) {
       await endLogSuccess(logId, {
         oracleRows: 0,
-        mysqlInserted: 0,
         mysqlUpdated: 0,
         oracleTime,
-        mysqlTime: 0,
       });
-      return callBack(null, {message: "No updates found"});
+      return;
     }
 
-    // 5. PREPARE MYSQL VALUES
-    const updateValues = rows.map((item) => [item.BD_CODE, item.IP_NO]);
+    /* 4 MYSQL BULK UPDATE */
+    const mysqlStart = Date.now();
+    const bulkValues = rows.map((r) => [r.IP_NO, r.BD_CODE]);
 
-    // 6. MYSQL TRANSACTION
-    let mysqlTime = 0;
-    let mysqlUpdated = 0;
-
-    try {
-      const mysqlStart = Date.now();
-
-      const updateQueries = updateValues.map((row) => ({
+    const results = await mysqlExecuteTransaction([
+      {sql: `DROP TEMPORARY TABLE IF EXISTS tmp_ip_bed`},
+      {
         sql: `
-          UPDATE fb_ipadmiss
-          SET fb_bd_code = ?
-          WHERE fb_ip_no = ?
+          CREATE TEMPORARY TABLE tmp_ip_bed (
+            ip_no   VARCHAR(20) PRIMARY KEY,
+            bd_code VARCHAR(20)
+          ) ENGINE=MEMORY
         `,
-        values: row,
-      }));
-
-      const mysqlToDate = format(jobStartTime, "yyyy-MM-dd HH:mm:ss");
-
-      // INSERT OR UPDATE LOG
-      const logQuery = !detail
+      },
+      {
+        sql: `
+          INSERT INTO tmp_ip_bed (ip_no, bd_code)
+          VALUES ?
+          ON DUPLICATE KEY UPDATE
+            bd_code = VALUES(bd_code)
+        `,
+        values: [bulkValues],
+      },
+      {
+        sql: `
+          UPDATE fb_ipadmiss f
+          JOIN tmp_ip_bed t ON t.ip_no = f.fb_ip_no
+          SET f.fb_bd_code = t.bd_code
+        `,
+      },
+      detail
         ? {
-            sql: `INSERT INTO fb_ipadmiss_logdtl (fb_last_trigger_date, fb_process_id) VALUES (?, ?)`,
-            values: [mysqlToDate, 3],
+            sql: `
+              UPDATE fb_ipadmiss_logdtl
+              SET fb_last_trigger_date = ?
+              WHERE fb_process_id = 3
+            `,
+            values: [format(jobStartTime, "yyyy-MM-dd HH:mm:ss")],
           }
         : {
-            sql: `UPDATE fb_ipadmiss_logdtl SET fb_last_trigger_date = ? WHERE fb_process_id = ?`,
-            values: [mysqlToDate, 3],
-          };
+            sql: `
+              INSERT INTO fb_ipadmiss_logdtl
+              (fb_last_trigger_date, fb_process_id)
+              VALUES (?, 3)
+            `,
+            values: [format(jobStartTime, "yyyy-MM-dd HH:mm:ss")],
+          },
+    ]);
 
-      updateQueries.push(logQuery);
+    const updateResult = results.find((r) => r.affectedRows !== undefined);
+    const mysqlUpdated = updateResult?.affectedRows || 0;
+    const mysqlTime = Date.now() - mysqlStart;
 
-      const mysqlResults = await mysqlExecuteTransaction(updateQueries);
-
-      // Count updated rows ONLY from update queries
-      mysqlUpdated = mysqlResults.filter((r) => r.changedRows !== undefined).reduce((sum, r) => sum + r.changedRows, 0);
-
-      mysqlTime = Date.now() - mysqlStart;
-    } catch (err) {
-      await endLogFailure(logId, `MySQL update failed: ${err}`);
-      return callBack(err);
-    }
-
-    // 7. SUCCESS LOG
+    /* SUCCESS LOG */
     await endLogSuccess(logId, {
       oracleRows: rows.length,
-      mysqlInserted: 0,
       mysqlUpdated,
       oracleTime,
       mysqlTime,
     });
-
-    return callBack(null, {updated: mysqlUpdated});
   } catch (err) {
-    if (logId) await endLogFailure(logId, `Error in UpdateInpatientDetailRmall: ${err}`);
-    return callBack(err);
+    if (logId) await endLogFailure(logId, err);
+    throw err;
   } finally {
-    try {
-      if (resultSet) await resultSet.close();
-    } catch {}
-    try {
-      if (conn_ora) await conn_ora.close();
-    } catch {}
-    try {
-      if (pool_ora) await pool_ora.close();
-    } catch {}
+    if (conn_ora) await conn_ora.close();
+    await releaseLock("meliora", CRON_LOCK);
   }
 };
 
 // UPDATE BED DETAILS  DETAILS ON BED TABLE
-const UpdateFbBedDetailMeliora = async (callBack = () => {}) => {
-  let pool_ora = null;
-  let conn_ora = null;
-  let resultSet = null;
-  let logId = null;
+const UpdateFbBedDetailMeliora = async () => {
+  let conn_ora;
+  let logId;
+
+  const CRON_LOCK = "FB_BED_IMPORT_LOCK";
+
+  /* --------------------statr lock--------------------------- */
+  const locked = await acquireLock("meliora", CRON_LOCK);
+  if (!locked) return;
 
   try {
-    // 1. START LOG
-    try {
-      logId = await startLog("FB_BED_IMPORT");
-      if (!logId) throw new Error("Failed to create log entry");
-    } catch (err) {
-      console.error("Log start failed:", err);
-      return callBack(err);
-    }
+    /*  START LOG */
+    logId = await startLog("FB_BED_IMPORT");
 
-    // 2. GET LAST TRIGGER DATE (PROCESS ID = 4)
-    let detail = null;
-    let lastTrigger = null;
-    let fromDate = null;
-    let toDate = null;
-    let jobStartTime = null;
+    /*  LAST TRIGGER */
+    const detail = await getLastTriggerDate(4);
+    const lastTrigger = detail?.fb_last_trigger_date ? new Date(detail.fb_last_trigger_date) : subHours(new Date(), 1);
 
-    try {
-      detail = await getLastTriggerDate(4);
+    if (isNaN(lastTrigger)) throw new Error("Invalid trigger date");
 
-      lastTrigger = detail?.fb_last_trigger_date ? new Date(detail.fb_last_trigger_date) : subHours(new Date(), 1);
+    const jobStartTime = new Date();
 
-      if (isNaN(lastTrigger.getTime())) throw new Error("Invalid last trigger date");
+    /* ORACLE FETCH */
+    const oracleStart = Date.now();
+    conn_ora = await getTmcCronConnection();
 
-      // FIXED job start time (VERY IMPORTANT)
-      jobStartTime = new Date();
+    const oracleSql = `
+      SELECT 
+        BD.BDC_OCCUP,
+        BD.BDN_OCCNO,
+        BD.BD_CODE
+      FROM BED BD
+      WHERE BD.BDC_STATUS = 'Y'
+        AND BD.BDD_EDDATE >= TO_DATE(:FROM_DATE,'dd/MM/yyyy HH24:mi:ss')
+        AND BD.BDD_EDDATE < TO_DATE(:TO_DATE,'dd/MM/yyyy HH24:mi:ss')
+    `;
 
-      fromDate = format(lastTrigger, "dd/MM/yyyy HH:mm:ss");
-      toDate = format(jobStartTime, "dd/MM/yyyy HH:mm:ss");
-    } catch (err) {
-      await endLogFailure(logId, `Error fetching last trigger date: ${err}`);
-      return callBack(err);
-    }
+    const {rows = []} = await conn_ora.execute(
+      oracleSql,
+      {
+        FROM_DATE: lastTrigger,
+        TO_DATE: jobStartTime,
+      },
+      {outFormat: oracledb.OUT_FORMAT_OBJECT},
+    );
 
-    // 3. FETCH ORACLE DATA
-    let rows = [];
-    let oracleTime = 0;
+    const oracleTime = Date.now() - oracleStart;
 
-    try {
-      const oracleStart = Date.now();
-
-      const oracleSql = `
-        SELECT 
-          BD.BDC_OCCUP,
-          BD.BD_CODE,
-          BD.BDN_OCCNO
-        FROM BED BD
-        WHERE BD.BDC_STATUS = 'Y'
-          AND BD.BDD_EDDATE >= TO_DATE(:FROM_DATE, 'dd/MM/yyyy HH24:mi:ss')
-          AND BD.BDD_EDDATE < TO_DATE(:TO_DATE, 'dd/MM/yyyy HH24:mi:ss')
-
-      `;
-
-      pool_ora = await oraConnection();
-      conn_ora = await pool_ora.getConnection();
-
-      const result = await conn_ora.execute(oracleSql, {FROM_DATE: fromDate, TO_DATE: toDate}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
-
-      resultSet = result.resultSet;
-      rows = await resultSet.getRows(0);
-      await resultSet.close();
-      resultSet = null;
-
-      oracleTime = Date.now() - oracleStart;
-    } catch (err) {
-      await endLogFailure(logId, `Oracle fetch failed: ${err}`);
-      return callBack(err);
-    }
-
-    // 4. IF NO ROWS → SUCCESS + EXIT
-    if (!rows || rows.length === 0) {
+    if (!rows.length) {
       await endLogSuccess(logId, {
         oracleRows: 0,
-        mysqlInserted: 0,
         mysqlUpdated: 0,
         oracleTime,
-        mysqlTime: 0,
       });
-      return callBack(null, {message: "No bed updates found"});
+      return;
     }
 
-    // 5. PREPARE MYSQL VALUES
-    const updateValues = rows.map((item) => [item.BDC_OCCUP, item.BDN_OCCNO, item.BD_CODE]);
+    /* MYSQL BULK UPDATE */
+    const mysqlStart = Date.now();
 
-    // 6. MYSQL TRANSACTION
-    let mysqlTime = 0;
-    let mysqlUpdated = 0;
-
-    try {
-      const mysqlStart = Date.now();
-
-      const updateQueries = updateValues.map((row) => ({
+    const bulkValues = rows.map((r) => [r.BD_CODE, r.BDC_OCCUP, r.BDN_OCCNO]);
+    const results = await transaction("meliora", [
+      {sql: `DROP TEMPORARY TABLE IF EXISTS tmp_bed_update`},
+      {
         sql: `
-          UPDATE fb_bed
-          SET 
-            fb_bdc_occup = ?,
-            fb_bdn_cccno = ?
-          WHERE fb_bd_code = ?
+          CREATE TEMPORARY TABLE tmp_bed_update (
+            bd_code VARCHAR(20) PRIMARY KEY,
+            occup   VARCHAR(5),
+            occ_no  VARCHAR(20)
+          ) ENGINE=MEMORY
         `,
-        values: row,
-      }));
-
-      const mysqlToDate = format(jobStartTime, "yyyy-MM-dd HH:mm:ss");
-
-      // INSERT OR UPDATE LOG
-      const logQuery = !detail
+      },
+      {
+        sql: `
+          INSERT INTO tmp_bed_update (bd_code, occup, occ_no)
+          VALUES ?
+          ON DUPLICATE KEY UPDATE
+            occup = VALUES(occup),
+            occ_no = VALUES(occ_no)
+        `,
+        values: [bulkValues],
+      },
+      {
+        sql: `
+          UPDATE fb_bed b
+          JOIN tmp_bed_update t ON t.bd_code = b.fb_bd_code
+          SET
+            b.fb_bdc_occup = t.occup,
+            b.fb_bdn_cccno = t.occ_no
+        `,
+      },
+      detail
         ? {
-            sql: `INSERT INTO fb_ipadmiss_logdtl (fb_last_trigger_date, fb_process_id) VALUES (?, ?)`,
-            values: [mysqlToDate, 4],
+            sql: `
+              UPDATE fb_ipadmiss_logdtl
+              SET fb_last_trigger_date = ?
+              WHERE fb_process_id = 4
+            `,
+            values: [format(jobStartTime, "yyyy-MM-dd HH:mm:ss")],
           }
         : {
-            sql: `UPDATE fb_ipadmiss_logdtl SET fb_last_trigger_date = ? WHERE fb_process_id = ?`,
-            values: [mysqlToDate, 4],
-          };
+            sql: `
+              INSERT INTO fb_ipadmiss_logdtl
+              (fb_last_trigger_date, fb_process_id)
+              VALUES (?, 4)
+            `,
+            values: [format(jobStartTime, "yyyy-MM-dd HH:mm:ss")],
+          },
+    ]);
 
-      updateQueries.push(logQuery);
+    const updateResult = results.find((r) => r.affectedRows !== undefined);
+    const mysqlUpdated = updateResult?.affectedRows || 0;
+    const mysqlTime = Date.now() - mysqlStart;
 
-      const mysqlResults = await mysqlExecuteTransaction(updateQueries);
-
-      // Count updated rows ONLY from update queries
-      mysqlUpdated = mysqlResults.filter((r) => r.changedRows !== undefined).reduce((sum, r) => sum + r.changedRows, 0);
-
-      mysqlTime = Date.now() - mysqlStart;
-    } catch (err) {
-      await endLogFailure(logId, `MySQL update failed: ${err}`);
-      return callBack(err);
-    }
-
-    // 7. SUCCESS LOG
+    /* SUCCESS LOG */
     await endLogSuccess(logId, {
       oracleRows: rows.length,
-      mysqlInserted: 0,
       mysqlUpdated,
       oracleTime,
       mysqlTime,
     });
-
-    return callBack(null, {updated: mysqlUpdated});
   } catch (err) {
-    if (logId) await endLogFailure(logId, `Error in UpdateFbBedDetailMeliora: ${err}`);
-    return callBack(err);
+    if (logId) await endLogFailure(logId, err);
+    throw err;
   } finally {
-    try {
-      if (resultSet) await resultSet.close();
-    } catch {}
-    try {
-      if (conn_ora) await conn_ora.close();
-    } catch {}
-    try {
-      if (pool_ora) await pool_ora.close();
-    } catch {}
+    if (conn_ora) await conn_ora.close();
+    await releaseLock("meliora", CRON_LOCK);
   }
 };
 
 // GET CHILD DETAIL FROM ELLIDER
-const InsertChilderDetailMeliora = async (callBack = () => {}) => {
-  let pool_ora = null;
-  let conn_ora = null;
-  let resultSet = null;
+const InsertChilderDetailMeliora = async () => {
+  let conn_ora;
+  let logId;
+  let jobStartTime = new Date();
+
+  const CRON_LOCK = "FB_BIRTH_IMPORT_LOCK";
+  /*-----------------------starting the locking --------------------------------*/
+  const locked = await acquireLock("meliora", CRON_LOCK);
+  if (!locked) return;
 
   try {
-    // 1. Format today's date for Oracle query (DD-MON-YYYY)
-    const formattedDate = format(new Date(), "dd-MMM-yyyy").toUpperCase();
+    /* START LOG */
+    logId = await startLog("FB_BIRTH_IMPORT");
+    /* ORACLE DATE (START OF TODAY) */
+    const fromDate = startOfDay(new Date());
+    /* ORACLE FETCH */
+    conn_ora = await getTmcCronConnection();
 
-    // 2. Oracle SQL
     const oracleSql = `
       SELECT
         B.BR_SLNO,
@@ -754,1698 +584,365 @@ const InsertChilderDetailMeliora = async (callBack = () => {}) => {
         B.BD_CODE,
         B.IP_NO,
         B.BRC_MHCODE,
-        L.BRC_SEX AS CHILD_GENDER,
-        L.BRD_DATE AS BIRTH_DATE,
-        L.IP_NO AS MOTHER_IPNO,
-        L.PT_NO AS CHILD_PT_NO,
-        L.CHILD_IPNO AS CHILD_IPNO,
-        L.BRN_WEIGHT AS CHILD_WEIGHT
+        L.BRC_SEX       AS CHILD_GENDER,
+        L.BRD_DATE     AS BIRTH_DATE,
+        L.IP_NO        AS MOTHER_IPNO,
+        L.PT_NO        AS CHILD_PT_NO,
+        L.CHILD_IPNO   AS CHILD_IPNO,
+        L.BRN_WEIGHT   AS CHILD_WEIGHT
       FROM BIRTHREGMAST B
       LEFT JOIN BRITHREGDETL L ON B.BR_SLNO = L.BR_SLNO
-      WHERE B.BRD_DATE >= :GET_DATE
+      WHERE B.BRD_DATE >= :FROM_DATE
     `;
+    const {rows = []} = await conn_ora.execute(oracleSql, {FROM_DATE: fromDate}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
 
-    // 3. Execute Oracle
-    pool_ora = await oraConnection();
-    conn_ora = await pool_ora.getConnection();
-
-    const result = await conn_ora.execute(oracleSql, {GET_DATE: formattedDate}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
-
-    resultSet = result.resultSet;
-    const rows = await resultSet.getRows(0); // fetch all rows
-
-    await resultSet.close();
-    resultSet = null;
-
-    if (!rows || rows.length === 0) {
-      return callBack(null, {message: "No Birth Registered Today"});
+    if (!rows.length) {
+      await endLogSuccess(logId, {
+        oracleRows: 0,
+        mysqlInserted: 0,
+        oracleTime: jobStartTime ? new Date() - jobStartTime : null,
+      });
+      return;
     }
 
-    // 4. Convert rows to MySQL array values
-    const insertValues = rows.map((item) => [
-      item.BR_SLNO,
-      item.BRD_DATE ? format(new Date(item.BRD_DATE), "yyyy-MM-dd HH:mm:ss") : null,
-      item.PT_NO,
-      item.PTC_PTNAME,
-      item.PTC_LOADD1,
-      item.PTC_LOADD2,
-      item.BRC_HUSBAND,
-      item.BRN_AGE,
-      item.BRN_TOTAL,
-      item.BRN_LIVE,
-      item.BD_CODE,
-      item.IP_NO,
-      item.BRC_MHCODE,
-      item.CHILD_GENDER,
-      item.BIRTH_DATE ? format(new Date(item.BIRTH_DATE), "yyyy-MM-dd HH:mm:ss") : null,
-      item.MOTHER_IPNO,
-      item.CHILD_PT_NO,
-      item.CHILD_IPNO,
-      item.CHILD_WEIGHT,
+    /*  MAP TO MYSQL */
+    const values = rows.map((r) => [
+      r.BR_SLNO,
+      r.BRD_DATE ? format(r.BRD_DATE, "yyyy-MM-dd HH:mm:ss") : null,
+      r.PT_NO,
+      r.PTC_PTNAME,
+      r.PTC_LOADD1,
+      r.PTC_LOADD2,
+      r.BRC_HUSBAND,
+      r.BRN_AGE,
+      r.BRN_TOTAL,
+      r.BRN_LIVE,
+      r.BD_CODE,
+      r.IP_NO,
+      r.BRC_MHCODE,
+      r.CHILD_GENDER,
+      r.BIRTH_DATE ? format(r.BIRTH_DATE, "yyyy-MM-dd HH:mm:ss") : null,
+      r.MOTHER_IPNO,
+      r.CHILD_PT_NO,
+      r.CHILD_IPNO,
+      r.CHILD_WEIGHT,
     ]);
 
-    // 5. Prepare MySQL transaction query
-    const insertQuery = {
-      sql: `
-        INSERT INTO fb_birth_reg_mast (
-          fb_br_slno,
-          fb_brd_date,
-          fb_pt_no,
-          fb_ptc_name,
-          fb_ptc_loadd1,
-          fb_ptc_loadd2,
-          fb_brc_husband,
-          fb_brn_age,
-          fb_brn_total,
-          fb_brn_live,
-          fb_bd_code,
-          fb_ip_no,
-          fb_brc_mhcode,
-          fb_child_gender,
-          fb_birth_date,
-          fb_mother_ip_no,
-          fb_child_pt_no,
-          fb_child_ip_no,
-          fb_child_weight
-        ) VALUES ?
-      `,
-      values: [insertValues],
-    };
+    /*  MYSQL UPSERT */
+    const insertSql = `
+      INSERT INTO fb_birth_reg_mast (
+        fb_br_slno,
+        fb_brd_date,
+        fb_pt_no,
+        fb_ptc_name,
+        fb_ptc_loadd1,
+        fb_ptc_loadd2,
+        fb_brc_husband,
+        fb_brn_age,
+        fb_brn_total,
+        fb_brn_live,
+        fb_bd_code,
+        fb_ip_no,
+        fb_brc_mhcode,
+        fb_child_gender,
+        fb_birth_date,
+        fb_mother_ip_no,
+        fb_child_pt_no,
+        fb_child_ip_no,
+        fb_child_weight
+      ) VALUES ?
+      ON DUPLICATE KEY UPDATE
+        fb_child_weight = VALUES(fb_child_weight),
+        fb_birth_date   = VALUES(fb_birth_date),
+        fb_child_gender = VALUES(fb_child_gender)
+    `;
+    const [res] = await transaction("meliora", [{sql: insertSql, values: [values]}]);
 
-    // 6. Run MySQL Transaction
-    await mysqlExecuteTransaction([insertQuery]);
-
-    // 7. Success callback
-    return callBack(null, {inserted: insertValues.length});
+    /*  SUCCESS LOG */
+    await endLogSuccess(logId, {
+      oracleRows: rows.length,
+      mysqlInserted: res.affectedRows,
+      oracleTime: jobStartTime ? new Date() - jobStartTime : null,
+      mysqlTime: jobStartTime ? new Date() - jobStartTime : null,
+    });
   } catch (err) {
-    return callBack(err);
+    if (logId) await endLogFailure(logId, err);
+    throw err;
   } finally {
-    if (resultSet) {
-      try {
-        await resultSet.close();
-      } catch {}
-    }
-    if (conn_ora) {
-      try {
-        await conn_ora.close();
-      } catch {}
-    }
-    if (pool_ora) {
-      try {
-        await pool_ora.close();
-      } catch {}
-    }
+    if (conn_ora) await conn_ora.close();
+    await releaseLock("meliora", CRON_LOCK);
   }
 };
 
-{
-  /* %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% FEED BACK CRON-JOBS ENDS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% */
-}
+/* %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% FEED BACK CRON-JOBS ENDS %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% */
 
-// const getAmsPatientDetails = async (callBack) => {
-//   let pool_ora = await oraConnection();
-//   let conn_ora = await pool_ora.getConnection();
+// const getAmsPatientDetails = async () => {
+//   let conn_ora;
+//   let logId;
+
+//   const LOCK = "AMS_PATIENT_IMPORT_LOCK";
+
+//   /* -----------------------start lock----------------------------*/
+//   const locked = await acquireLock("meliora", LOCK);
+//   if (!locked) return;
 
 //   try {
+//     /*  START LOG */
+//     logId = await startLog("AMS_PATIENT_IMPORT");
+
+//     /*  LAST UPDATED DATE */
 //     const detail = await getAmsLastUpdatedDate(1);
 //     if (!detail?.ams_last_updated_date) {
-//       return; // Exit early — don’t fetch or insert anything
+//       await endLogSuccess(logId, {oracleRows: 0, mysqlInserted: 0});
+//       return;
 //     }
 
-//     const lastInsertDate = new Date(detail.ams_last_updated_date);
-//     const fromDate = format(lastInsertDate, 'dd/MM/yyyy HH:mm:ss');
-//     const toDate = format(new Date(), 'dd/MM/yyyy HH:mm:ss');
-//     const mysqlsupportToDate = format(new Date(), 'yyyy-MM-dd HH:mm:ss');
+//     const fromDate = new Date(detail.ams_last_updated_date);
+//     const toDate = new Date();
+//     const mysqlDate = format(toDate, "yyyy-MM-dd HH:mm:ss");
 
-//     const itemCodes = await new Promise((resolve, reject) => {
-//       mysqlpool.query(
-//         `SELECT item_code FROM ams_antibiotic_master WHERE status = 1`,
-//         [],
-//         (err, results) => {
-//           if (err) return reject(err);
-//           resolve(results.map(row => row.item_code));
-//         }
-//       );
-//     });
+//     /*  ACTIVE ITEM CODES */
+//     const itemCodes = await execute("meliora", `SELECT item_code FROM ams_antibiotic_master WHERE status = 1`);
 
-//     if (itemCodes.length === 0) return;
+//     if (!itemCodes.length) return;
 
-//     const itemCodeBinds = itemCodes.map((_, i) => `:item_code_${i}`).join(',');
-//     const itemCodeParams = {};
-//     itemCodes.forEach((code, i) => {
-//       itemCodeParams[`item_code_${i}`] = code;
+//     /*  ORACLE FETCH */
+//     conn_ora = await getTmcCronConnection();
+
+//     const binds = itemCodes.map((_, i) => `:it${i}`).join(",");
+//     const params = {FROM_DATE: fromDate, TO_DATE: toDate};
+
+//     itemCodes.forEach((r, i) => {
+//       params[`it${i}`] = r.item_code;
 //     });
 
 //     const oracleSql = `
-//       SELECT P.BMD_DATE,
-//              P.BM_NO,
-//              B.BD_CODE,
-//              P.PT_NO,
-//              PT.PTC_PTNAME,
-//              DECODE(PT.PTC_SEX, 'M', 'Male', 'F', 'Female') AS GENEDER,
-//              PT.PTN_YEARAGE,
-//              P.IP_NO,
-//              N.NSC_DESC,
-//              D.DOC_NAME,
-//              DP.DPC_DESC,
-//              M.ITC_DESC,
-//              G.CMC_DESC,
-//              PL.IT_CODE
+//       SELECT
+//         P.BMD_DATE,
+//         P.BM_NO,
+//         B.BD_CODE,
+//         P.PT_NO,
+//         PT.PTC_PTNAME,
+//         DECODE(PT.PTC_SEX,'M','Male','F','Female') GENEDER,
+//         PT.PTN_YEARAGE,
+//         P.IP_NO,
+//         N.NSC_DESC,
+//         D.DOC_NAME,
+//         DP.DPC_DESC,
+//         PL.IT_CODE
 //       FROM PBILLMAST P
-//         LEFT JOIN PBILLDETL PL ON P.BMC_SLNO = PL.BMC_SLNO
-//         LEFT JOIN PATIENT PT ON P.PT_NO = PT.PT_NO
-//         LEFT JOIN IPADMISS I ON P.IP_NO = I.IP_NO
-//         LEFT JOIN BED B ON I.BD_CODE = B.BD_CODE
-//         LEFT JOIN NURSTATION N ON B.NS_CODE = N.NS_CODE
-//         LEFT JOIN DOCTOR D ON P.DO_CODE = D.DO_CODE
-//         LEFT JOIN SPECIALITY S ON D.SP_CODE = S.SP_CODE
-//         LEFT JOIN DEPARTMENT DP ON S.DP_CODE = DP.DP_CODE
-//         LEFT JOIN MEDDESC M ON PL.IT_CODE = M.IT_CODE
-//         LEFT JOIN MEDGENCOMB G ON M.CM_CODE = G.CM_CODE
-//       WHERE PL.IT_CODE IN (${itemCodeBinds})
-//         AND P.BMD_DATE >= TO_DATE(:FROM_DATE, 'dd/MM/yyyy hh24:mi:ss')
-//         AND P.BMD_DATE <= TO_DATE(:TO_DATE, 'dd/MM/yyyy hh24:mi:ss')
-//       GROUP BY P.BMD_DATE, P.BM_NO, P.PT_NO, PT.PTC_PTNAME, PT.PTC_SEX, PT.PTN_YEARAGE,
-//                P.IP_NO, N.NSC_DESC,D.DOC_NAME, DP.DPC_DESC, G.CMC_DESC, M.ITC_DESC,PL.IT_CODE, B.BD_CODE`;
+//       JOIN PBILLDETL PL ON P.BMC_SLNO = PL.BMC_SLNO
+//       JOIN PATIENT PT ON P.PT_NO = PT.PT_NO
+//       LEFT JOIN IPADMISS I ON P.IP_NO = I.IP_NO
+//       LEFT JOIN BED B ON I.BD_CODE = B.BD_CODE
+//       LEFT JOIN NURSTATION N ON B.NS_CODE = N.NS_CODE
+//       LEFT JOIN DOCTOR D ON P.DO_CODE = D.DO_CODE
+//       LEFT JOIN SPECIALITY S ON D.SP_CODE = S.SP_CODE
+//       LEFT JOIN DEPARTMENT DP ON S.DP_CODE = DP.DP_CODE
+//       WHERE PL.IT_CODE IN (${binds})
+//         AND P.BMD_DATE BETWEEN :FROM_DATE AND :TO_DATE
+//     `;
 
-//     const bindParams = {
-//       FROM_DATE: fromDate,
-//       TO_DATE: toDate,
-//       ...itemCodeParams
-//     };
+//     const {rows = []} = await conn_ora.execute(oracleSql, params, {outFormat: oracledb.OUT_FORMAT_OBJECT});
 
-//     const result = await conn_ora.execute(oracleSql, bindParams, {
-//       resultSet: true,
-//       outFormat: oracledb.OUT_FORMAT_OBJECT,
-//     });
+//     if (!rows.length) {
+//       await endLogSuccess(logId, {oracleRows: 0, mysqlInserted: 0});
+//       return;
+//     }
 
-//     await result.resultSet?.getRows((err, rows) => {
-//       if (rows.length === 0) return;
+//     /*  GROUP BY IP */
+//     const grouped = new Map();
 
-//       const formatDateTime = (dateStr) => {
-//         const date = new Date(dateStr);
-//         return date.toISOString().slice(0, 19).replace('T', ' ');
-//       };
+//     for (const r of rows) {
+//       if (!r.IP_NO || !r.PT_NO) continue;
 
-//       const filteredRows = rows.filter(
-//         (item) => item.PT_NO != null && item.IP_NO != null
-//       );
+//       const billDate = format(r.BMD_DATE, "yyyy-MM-dd HH:mm:ss");
 
-//       if (filteredRows.length === 0) return;
+//       if (!grouped.has(r.IP_NO)) {
+//         grouped.set(r.IP_NO, {
+//           patient: [r.PT_NO, r.IP_NO, r.PTC_PTNAME, r.PTN_YEARAGE, r.GENEDER, r.NSC_DESC, r.BD_CODE, r.DPC_DESC, billDate, r.DOC_NAME],
+//           antibiotics: [],
+//         });
+//       }
 
-//       // Group by IP_NO
-//       const groupedMap = new Map();
+//       grouped.get(r.IP_NO).antibiotics.push([r.IP_NO, r.IT_CODE, r.BM_NO, billDate, 1]);
+//     }
 
-//       filteredRows.forEach(item => {
-//         const key = item.IP_NO;
-//         const formattedDate = formatDateTime(item.BMD_DATE);
+//     /*  EXISTING PATIENTS */
+//     const ipNos = [...grouped.keys()];
+//     const placeholders = ipNos.map(() => "?").join(",");
 
-//         if (!groupedMap.has(key)) {
-//           groupedMap.set(key, {
-//             patient: {
-//               PT_NO: item.PT_NO,
-//               IP_NO: item.IP_NO,
-//               PTC_PTNAME: item.PTC_PTNAME,
-//               PTN_YEARAGE: item.PTN_YEARAGE,
-//               GENEDER: item.GENEDER,
-//               NSC_DESC: item.NSC_DESC,
-//               BD_CODE: item.BD_CODE,
-//               DPC_DESC: item.DPC_DESC,
-//               DOC_NAME: item.DOC_NAME,
-//               BMD_DATE: formattedDate
+//     const existing = await execute(
+//       "meliora",
+//       `SELECT ams_patient_detail_slno, patient_ip_no
+//        FROM ams_antibiotic_patient_details
+//        WHERE patient_ip_no IN (${placeholders})
+//          AND report_updated = 0`,
+//       ipNos,
+//     );
+
+//     const existingMap = new Map(existing.map((r) => [r.patient_ip_no, r.ams_patient_detail_slno]));
+
+//     const newPatients = [];
+//     const antibiotics = [];
+
+//     for (const [ip, data] of grouped) {
+//       if (existingMap.has(ip)) {
+//         const id = existingMap.get(ip);
+//         data.antibiotics.forEach((a) => antibiotics.push([id, ...a]));
+//       } else {
+//         newPatients.push(data.patient);
+//       }
+//     }
+
+//     /*  TRANSACTION */
+//     await transaction("meliora", [
+//       ...(newPatients.length
+//         ? [
+//             {
+//               sql: `
+//               INSERT INTO ams_antibiotic_patient_details (
+//                 mrd_no, patient_ip_no, patient_name,
+//                 patient_age, patient_gender, patient_location,
+//                 bed_code, consultant_department, bill_date, doc_name
+//               ) VALUES ?
+//             `,
+//               values: [newPatients],
 //             },
-//             antibiotics: []
-//           });
-//         }
+//           ]
+//         : []),
 
-//         const group = groupedMap.get(key);
+//       ...(antibiotics.length
+//         ? [
+//             {
+//               sql: `
+//               INSERT INTO ams_patient_antibiotics (
+//                 ams_patient_detail_slno, patient_ip_no,
+//                 item_code, bill_no, bill_date, item_status
+//               ) VALUES ?
+//             `,
+//               values: [antibiotics],
+//             },
+//           ]
+//         : []),
 
-//         // Update earliest BMD_DATE
-//         if (new Date(formattedDate) < new Date(group.patient.BMD_DATE)) {
-//           group.patient.BMD_DATE = formattedDate;
-//         }
-
-//         group.antibiotics.push({
-//           item_code: item.IT_CODE,
-//           bill_no: item.BM_NO,
-//           bill_date: formattedDate,
-//           item_status: 1
-//         });
-//       });
-
-//       const VALUES = [];
-//       for (const [_, data] of groupedMap.entries()) {
-//         const p = data.patient;
-//         VALUES.push([
-//           p.PT_NO,
-//           p.IP_NO,
-//           p.PTC_PTNAME,
-//           p.PTN_YEARAGE,
-//           p.GENEDER,
-//           p.NSC_DESC,
-//           p.BD_CODE,
-//           p.DPC_DESC,
-//           p.BMD_DATE,
-//           p.DOC_NAME
-//         ]);
-//       }
-
-//       mysqlpool.getConnection((err, connection) => {
-//         if (err) return;
-
-//         connection.beginTransaction(err => {
-//           if (err) return connection.release();
-
-//           connection.query(
-//             `INSERT INTO ams_antibiotic_patient_details (
-//               mrd_no,
-//               patient_ip_no,
-//               patient_name,
-//               patient_age,
-//               patient_gender,
-//               patient_location,
-//               bed_code,
-//               consultant_department,
-//               bill_date,
-//               doc_name
-//             ) VALUES ?`,
-//             [VALUES],
-//             (err, result) => {
-//               if (err) {
-//                 connection.query(
-//                   `DELETE FROM ams_antibiotic_patient_details
-//                    WHERE DATE(create_date) = CURDATE()
-//                      AND TIME(create_date) >= TIME(DATE_SUB(NOW(), INTERVAL 2 MINUTE))`,
-//                   [],
-//                   () => connection.rollback(() => connection.release())
-//                 );
-//               } else {
-//                 const insertedIds = Array.from({ length: result.affectedRows }, (_, i) => result.insertId + i);
-//                 const antibioticsFinal = [];
-
-//                 let index = 0;
-//                 for (const [_, data] of groupedMap.entries()) {
-//                   const pid = insertedIds[index++];
-//                   data.antibiotics.forEach(row => {
-//                     antibioticsFinal.push([
-//                       pid,
-//                       data.patient.IP_NO,
-//                       row.item_code,
-//                       row.bill_no,
-//                       row.bill_date,
-//                       row.item_status
-//                     ]);
-//                   });
-//                 }
-
-//                 connection.query(
-//                   `INSERT INTO ams_patient_antibiotics (
-//                     ams_patient_detail_slno,
-//                     patient_ip_no,
-//                     item_code,
-//                     bill_no,
-//                     bill_date,
-//                     item_status
-//                   ) VALUES ?`,
-//                   [antibioticsFinal],
-//                   (err2, result2) => {
-//                     if (err2) {
-//                       connection.query(
-//                         `DELETE FROM ams_antibiotic_patient_details
-//                          WHERE DATE(create_date) = CURDATE()
-//                            AND TIME(create_date) >= TIME(DATE_SUB(NOW(), INTERVAL 2 MINUTE))`,
-//                         [],
-//                         () => connection.rollback(() => connection.release())
-//                       );
-//                     } else {
-//                       connection.query(
-//                         `UPDATE ams_patient_details_last_updated_date
-//                          SET ams_last_updated_date = ?
-//                          WHERE ams_lastupdate_slno = 1`,
-//                         [mysqlsupportToDate],
-//                         (err, result) => {
-//                           if (err) {
-//                             connection.query(
-//                               `DELETE FROM ams_antibiotic_patient_details
-//                                WHERE DATE(create_date) = CURDATE()
-//                                  AND TIME(create_date) >= TIME(DATE_SUB(NOW(), INTERVAL 2 MINUTE))`,
-//                               [],
-//                               () => connection.rollback(() => connection.release())
-//                             );
-//                           } else {
-//                             connection.commit(err => {
-//                               if (err) {
-//                                 connection.query(
-//                                   `DELETE FROM ams_antibiotic_patient_details
-//                                    WHERE DATE(create_date) = CURDATE()
-//                                      AND TIME(create_date) >= TIME(DATE_SUB(NOW(), INTERVAL 2 MINUTE))`,
-//                                   [],
-//                                   () => connection.rollback(() => connection.release())
-//                                 );
-//                               } else {
-//                                 connection.release();
-//                               }
-//                             });
-//                           }
-//                         }
-//                       );
-//                     }
-//                   }
-//                 );
-//               }
-//             }
-//           );
-//         });
-//       });
-//     });
-//   } catch (error) {
-//     return callBack(error);
-//   }
-// }
-
-// trigger to get the childer data for the correspoding date
-const getAmsPatientDetails = async (callBack) => {
-  let pool_ora = await oraConnection();
-  let conn_ora = await pool_ora.getConnection();
-
-  try {
-    const detail = await getAmsLastUpdatedDate(1);
-
-    if (!detail?.ams_last_updated_date) {
-      return; // Exit early — don’t fetch or insert anything
-    }
-
-    const lastInsertDate = new Date(detail.ams_last_updated_date);
-    const fromDate = format(lastInsertDate, "dd/MM/yyyy HH:mm:ss");
-    const toDate = format(new Date(), "dd/MM/yyyy HH:mm:ss");
-    const mysqlsupportToDate = format(new Date(), "yyyy-MM-dd HH:mm:ss");
-
-    const itemCodes = await new Promise((resolve, reject) => {
-      mysqlpool.query(`SELECT item_code FROM ams_antibiotic_master WHERE status = 1`, [], (err, results) => {
-        if (err) return reject(err);
-        resolve(results.map((row) => row.item_code));
-      });
-    });
-
-    if (itemCodes.length === 0) return;
-
-    const itemCodeBinds = itemCodes.map((_, i) => `:item_code_${i}`).join(",");
-    const itemCodeParams = {};
-    itemCodes.forEach((code, i) => {
-      itemCodeParams[`item_code_${i}`] = code;
-    });
-
-    const oracleSql = `
-      SELECT P.BMD_DATE,
-             P.BM_NO,
-             B.BD_CODE,
-             P.PT_NO,
-             PT.PTC_PTNAME,
-             DECODE(PT.PTC_SEX, 'M', 'Male', 'F', 'Female') AS GENEDER,
-             PT.PTN_YEARAGE,
-             P.IP_NO,
-             N.NSC_DESC,   
-             D.DOC_NAME,
-             DP.DPC_DESC,
-             M.ITC_DESC,
-             G.CMC_DESC,
-             PL.IT_CODE
-      FROM PBILLMAST P
-        LEFT JOIN PBILLDETL PL ON P.BMC_SLNO = PL.BMC_SLNO
-        LEFT JOIN PATIENT PT ON P.PT_NO = PT.PT_NO
-        LEFT JOIN IPADMISS I ON P.IP_NO = I.IP_NO
-        LEFT JOIN BED B ON I.BD_CODE = B.BD_CODE
-        LEFT JOIN NURSTATION N ON B.NS_CODE = N.NS_CODE
-        LEFT JOIN DOCTOR D ON P.DO_CODE = D.DO_CODE
-        LEFT JOIN SPECIALITY S ON D.SP_CODE = S.SP_CODE
-        LEFT JOIN DEPARTMENT DP ON S.DP_CODE = DP.DP_CODE
-        LEFT JOIN MEDDESC M ON PL.IT_CODE = M.IT_CODE
-        LEFT JOIN MEDGENCOMB G ON M.CM_CODE = G.CM_CODE
-      WHERE PL.IT_CODE IN (${itemCodeBinds})
-        AND P.BMD_DATE >= TO_DATE(:FROM_DATE, 'dd/MM/yyyy hh24:mi:ss')
-        AND P.BMD_DATE <= TO_DATE(:TO_DATE, 'dd/MM/yyyy hh24:mi:ss')
-      GROUP BY P.BMD_DATE, P.BM_NO, P.PT_NO, PT.PTC_PTNAME, PT.PTC_SEX, PT.PTN_YEARAGE,
-               P.IP_NO, N.NSC_DESC,D.DOC_NAME, DP.DPC_DESC, G.CMC_DESC, M.ITC_DESC,PL.IT_CODE, B.BD_CODE`;
-
-    const bindParams = {
-      FROM_DATE: fromDate,
-      TO_DATE: toDate,
-      ...itemCodeParams,
-    };
-
-    const result = await conn_ora.execute(oracleSql, bindParams, {
-      resultSet: true,
-      outFormat: oracledb.OUT_FORMAT_OBJECT,
-    });
-
-    await result.resultSet?.getRows(async (err, rows) => {
-      if (rows.length === 0) return;
-
-      const formatDateTime = (dateStr) => {
-        const date = new Date(dateStr);
-        return date.toISOString().slice(0, 19).replace("T", " ");
-      };
-
-      const filteredRows = rows.filter((item) => item.PT_NO != null && item.IP_NO != null);
-      if (filteredRows.length === 0) return;
-
-      const groupedMap = new Map();
-
-      filteredRows.forEach((item) => {
-        const key = item.IP_NO;
-        const formattedDate = formatDateTime(item.BMD_DATE);
-
-        if (!groupedMap.has(key)) {
-          groupedMap.set(key, {
-            patient: {
-              PT_NO: item.PT_NO,
-              IP_NO: item.IP_NO,
-              PTC_PTNAME: item.PTC_PTNAME,
-              PTN_YEARAGE: item.PTN_YEARAGE,
-              GENEDER: item.GENEDER,
-              NSC_DESC: item.NSC_DESC,
-              BD_CODE: item.BD_CODE,
-              DPC_DESC: item.DPC_DESC,
-              DOC_NAME: item.DOC_NAME,
-              BMD_DATE: formattedDate,
-            },
-            antibiotics: [],
-          });
-        }
-
-        const group = groupedMap.get(key);
-        if (new Date(formattedDate) < new Date(group.patient.BMD_DATE)) {
-          group.patient.BMD_DATE = formattedDate;
-        }
-
-        group.antibiotics.push({
-          item_code: item.IT_CODE,
-          bill_no: item.BM_NO,
-          bill_date: formattedDate,
-          item_status: 1,
-        });
-      });
-
-      const ipNos = Array.from(groupedMap.keys());
-      const placeholders = ipNos.map(() => "?").join(",");
-
-      mysqlpool.getConnection((err, connection) => {
-        if (err) return;
-
-        connection.query(
-          `SELECT ams_patient_detail_slno, patient_ip_no 
-           FROM ams_antibiotic_patient_details 
-           WHERE patient_ip_no IN (${placeholders}) AND report_updated = 0`,
-          ipNos,
-          (err, existingRows) => {
-            if (err) return connection.release();
-
-            const existingMap = new Map();
-            existingRows.forEach((row) => {
-              existingMap.set(row.patient_ip_no, row.ams_patient_detail_slno);
-            });
-
-            const newPatients = [];
-            const antibioticsFinal = [];
-
-            for (const [ip_no, data] of groupedMap.entries()) {
-              const p = data.patient;
-              if (existingMap.has(ip_no)) {
-                const existingId = existingMap.get(ip_no);
-                data.antibiotics.forEach((row) => {
-                  antibioticsFinal.push([existingId, ip_no, row.item_code, row.bill_no, row.bill_date, row.item_status]);
-                });
-              } else {
-                newPatients.push([p.PT_NO, p.IP_NO, p.PTC_PTNAME, p.PTN_YEARAGE, p.GENEDER, p.NSC_DESC, p.BD_CODE, p.DPC_DESC, p.BMD_DATE, p.DOC_NAME]);
-              }
-            }
-
-            connection.beginTransaction((err) => {
-              if (err) return connection.release();
-
-              const insertNewPatients =
-                newPatients.length > 0
-                  ? new Promise((resolve, reject) => {
-                      connection.query(
-                        `INSERT INTO ams_antibiotic_patient_details (
-                        mrd_no,
-                        patient_ip_no,
-                        patient_name,
-                        patient_age,
-                        patient_gender,
-                        patient_location,
-                        bed_code,
-                        consultant_department,
-                        bill_date,
-                        doc_name
-                      ) VALUES ?`,
-                        [newPatients],
-                        (err, result) => {
-                          if (err) return reject(err);
-
-                          const insertedIds = Array.from({length: result.affectedRows}, (_, i) => result.insertId + i);
-                          let index = 0;
-
-                          for (const [ip_no, data] of groupedMap.entries()) {
-                            if (!existingMap.has(ip_no)) {
-                              const newId = insertedIds[index++];
-                              existingMap.set(ip_no, newId);
-                              data.antibiotics.forEach((row) => {
-                                antibioticsFinal.push([newId, ip_no, row.item_code, row.bill_no, row.bill_date, row.item_status]);
-                              });
-                            }
-                          }
-
-                          resolve();
-                        },
-                      );
-                    })
-                  : Promise.resolve();
-
-              insertNewPatients
-                .then(() => {
-                  connection.query(
-                    `INSERT INTO ams_patient_antibiotics (
-                      ams_patient_detail_slno,
-                      patient_ip_no,
-                      item_code,
-                      bill_no,
-                      bill_date,
-                      item_status
-                    ) VALUES ?`,
-                    [antibioticsFinal],
-                    (err2) => {
-                      if (err2) return connection.rollback(() => connection.release());
-
-                      connection.query(
-                        `UPDATE ams_patient_details_last_updated_date 
-                         SET ams_last_updated_date = ? 
-                         WHERE ams_lastupdate_slno = 1`,
-                        [mysqlsupportToDate],
-                        (err3) => {
-                          if (err3) return connection.rollback(() => connection.release());
-                          connection.commit((err4) => {
-                            if (err4) return connection.rollback(() => connection.release());
-                            connection.release();
-                          });
-                        },
-                      );
-                    },
-                  );
-                })
-                .catch((err) => connection.rollback(() => connection.release()));
-            });
-          },
-        );
-      });
-    });
-  } catch (error) {
-    return callBack(error);
-  } finally {
-    if (conn_ora) {
-      await conn_ora.close();
-      await pool_ora.close();
-    }
-  }
-};
-
-//bis module- jomol
-// Utility function
-// const getItCodesInChunks = (mysqlConn, fromDate, toDate, chunkSize = 1000) => {
-//   return new Promise((resolve, reject) => {
-//     const selectQuery = `
-//       SELECT it_code
-//       FROM bis_kmc_med_desc_mast
-//       WHERE create_date BETWEEN ? AND ?`;
-
-//     mysqlConn.query(selectQuery, [fromDate, toDate], (err, results) => {
-//       if (err) return reject(err);
-
-//       const numericItcodes = results?.map(val => val.it_code);
-//       if (!numericItcodes || numericItcodes.length === 0) {
-//         console.log("No it_codes found.");
-//         return resolve([]);
-//       }
-
-//       // Chunk the array
-//       const chunkArray = (array, size) => {
-//         const result = [];
-//         for (let i = 0; i < array.length; i += size) {
-//           result.push(array.slice(i, i + size));
-//         }
-//         return result;
-//       };
-
-//       const chunks = chunkArray(numericItcodes, chunkSize);
-//       resolve(chunks);
-//     });
-//   });
-// };
-
-// const InsertKmcMedDesc = async (callBack) => {
-//   let pool_ora, conn_ora, mysqlConn;
-
-//   try {
-//     pool_ora = await oraKmcConnection();
-//     conn_ora = await pool_ora.getConnection();
-//     mysqlConn = await getConnection(bispool);
-
-//     const detail = await getBisKmcLastTriggerDate();
-//     const lastUpdateDate = detail?.last_insert_date ? new Date(detail.last_insert_date) : subMonths(new Date(), 1);
-//     const fromDate = format(lastUpdateDate, 'yyyy-MM-dd HH:mm:ss');
-//     const toDate = format(new Date(), 'yyyy-MM-dd HH:mm:ss');
-
-//     // Fetch fresh records for insert
-//     const oracleSql = `
-//       SELECT meddesc.it_code, meddesc.itc_desc, meddesc.itc_alias, meddesc.itn_strip,
-//              medcategory.mc_code, medcategory.mcc_desc, medgroup.mg_code, medgroup.mgc_desc,
-//              medgencomb.cmc_desc, medtype.mtc_desc,
-//              DECODE(meddesc.itc_medicine,'N','No','Y','MEDICINE') AS MEDICINE,
-//              DECODE(meddesc.itc_consumable,'N','No','Y','CONSUM') AS CONSUMABLE,
-//              DECODE(meddesc.itc_highvalue,'N',' ','Y','VALUE') AS HIGH_VALUE,
-//              DECODE(meddesc.itc_highrisk,'N',' ','Y','HIGH_RISK') AS HIGH_RISK,
-//              DECODE(meddesc.itc_hazardous,'N',' ','Y','HAZARDOUS') AS HAZARDOUS,
-//              DECODE(meddesc.itc_ved,'N','None','V','Vital','E','Essential','D','Desirable') AS VED,
-//              DECODE(meddesc.itc_breakable,'N','No','Y','Yes') AS BREAKABLE,
-//              meddesc.itn_breakqty, meddesc.itn_lprate, meddesc.itn_mrp,
-//              meddesc.itn_originalmrp, meddesc.itn_gendisper, meddesc.itn_genipdisper,
-//              meddesc.itd_date, meddesc.itd_eddate
-//       FROM MEDDESC
-//       RIGHT JOIN (SELECT DISTINCT(IT_CODE) FROM MEDSTORE) B ON MEDDESC.IT_CODE = B.IT_CODE
-//       LEFT JOIN medcategory ON meddesc.mc_code = medcategory.mc_code
-//       LEFT JOIN medgroup ON meddesc.mg_code = medgroup.mg_code
-//       LEFT JOIN medtype ON meddesc.mt_code = medtype.mt_code
-//       LEFT JOIN medstore ON meddesc.it_code = medstore.it_code
-//       LEFT JOIN pstparam ON medstore.st_code = pstparam.st_code
-//       LEFT JOIN medgencomb ON meddesc.cm_code = medgencomb.cm_code
-//       WHERE MEDDESC.ITC_STATUS = 'Y' AND meddesc.itd_date
-//         BETWEEN TO_DATE(:FROM_DATE, 'yyyy-mm-dd hh24:mi:ss') AND TO_DATE(:TO_DATE, 'yyyy-mm-dd hh24:mi:ss')
-//       GROUP BY meddesc.it_code, meddesc.itc_desc, meddesc.itc_alias, medcategory.mc_code, medcategory.mcc_desc,
-//                medgroup.mg_code, medgroup.mgc_desc, medtype.mt_code, medtype.mtc_desc, meddesc.itc_assestitem,
-//                meddesc.itc_medicine, meddesc.itc_consumable, meddesc.itc_highvalue, meddesc.itc_highrisk,
-//                meddesc.itc_hazardous, medgencomb.cmc_desc, meddesc.itc_ved, meddesc.itn_strip,
-//                meddesc.itc_breakable, meddesc.itn_breakqty, meddesc.itn_lprate, meddesc.itn_mrp,
-//                meddesc.itn_originalmrp, meddesc.itn_gendisper, meddesc.itn_genipdisper, meddesc.itd_date,
-//                meddesc.itd_eddate`;
-
-//     const insertResult = await conn_ora.execute(
-//       oracleSql,
-//       { FROM_DATE: fromDate, TO_DATE: toDate },
-//       { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
-//     );
-//     const insertRows = await insertResult.resultSet.getRows();
-//     await insertResult.resultSet.close();
-
-//     if (!insertRows.length) {
-//       if (callBack) callBack(null, "No data to insert.");
-//       return;
-//     }
-
-//     const Values = insertRows.map(row => [
-//       row.IT_CODE, row.ITC_DESC, row.ITC_ALIAS, row.ITN_STRIP,
-//       row.MC_CODE, row.MCC_DESC, row.MG_CODE, row.MGC_DESC,
-//       row.CMC_DESC, row.MTC_DESC, row.MEDICINE, row.CONSUMABLE,
-//       row.HIGH_VALUE, row.HIGH_RISK, row.HAZARDOUS, row.VED,
-//       row.BREAKABLE, row.ITN_BREAKQTY, row.ITN_LPRATE, row.ITN_MRP,
-//       row.ITN_ORIGINALMRP, row.ITN_GENDISPER, row.ITN_GENIPDISPER,
-//       row.ITD_DATE, row.ITD_EDDATE
+//       {
+//         sql: `
+//           UPDATE ams_patient_details_last_updated_date
+//           SET ams_last_updated_date = ?
+//           WHERE ams_lastupdate_slno = 1
+//         `,
+//         values: [mysqlDate],
+//       },
 //     ]);
-//     const insertQuery = `
-//       INSERT INTO bis_kmc_med_desc_mast (
-//         it_code, itc_desc, itc_alias, itn_strip, mc_code, mcc_desc,
-//         mg_code, mgc_desc, cmc_desc, mtc_desc, itc_medicine, itc_consumable,
-//         itc_highvalue, itc_highrisk, itc_hazardous, itc_ved, itc_breakable,
-//         itn_breakqty, itn_lprate, itn_mrp, itn_originalmrp, itn_gendisper,
-//         itn_genipdisper, create_date, edit_date
-//       ) VALUES ?`;
 
-//     await beginTransaction(mysqlConn);
-//     await queryPromise(mysqlConn, insertQuery, [Values]);
-
-//     // Step 2: MEDSTORE insert
-//     const insertedChunks = await getItCodesInChunks(mysqlConn, fromDate, toDate, 1000);
-//     let medstoreData = [];
-
-//     for (const chunk of insertedChunks) {
-//       const bindParams = {};
-//       const keys = chunk.map((code, i) => {
-//         const key = `val${i}`;
-//         bindParams[key] = code;
-//         return `:${key}`;
-//       });
-
-//       const medstoreQuery = `
-//         SELECT IT_CODE, ST_CODE FROM MEDSTORE
-//         WHERE IT_CODE IN (${keys.join(',')})`;
-//       const medstoreResult = await conn_ora.execute(medstoreQuery, bindParams, { outFormat: oracledb.OUT_FORMAT_OBJECT });
-
-//       if (medstoreResult.rows.length) {
-//         medstoreData.push(...medstoreResult.rows);
-//       }
-//     }
-
-//     if (medstoreData.length) {
-//       const medstoreValues = medstoreData.map(row => [row.IT_CODE, row.ST_CODE]);
-//       await queryPromise(mysqlConn, `INSERT INTO bis_kmc_med_store (it_code, st_code) VALUES ?`, [medstoreValues]);
-//     }
-
-//     // Step 3: Update trigger
-//     const currentDate = format(new Date(), 'yyyy-MM-dd HH:mm:ss');
-//     await queryPromise(mysqlConn,
-//       `UPDATE bis_kmc_trigger_details SET last_insert_date = ?, last_update_date = ? WHERE trgr_slno = 1`,
-//       [currentDate, currentDate]
-//     );
-
-//     // Step 4: Update Logic
-//     const oracleSqlquery = `
-//       SELECT meddesc.it_code, meddesc.itc_desc, meddesc.itc_alias, meddesc.itn_strip,
-//              medcategory.mc_code, medcategory.mcc_desc, medgroup.mg_code, medgroup.mgc_desc,
-//              medgencomb.cmc_desc, medtype.mtc_desc,
-//              DECODE(meddesc.itc_medicine,'N','No','Y','MEDICINE') AS MEDICINE,
-//              DECODE(meddesc.itc_consumable,'N','No','Y','CONSUM') AS CONSUMABLE,
-//              DECODE(meddesc.itc_highvalue,'N',' ','Y','VALUE') AS HIGH_VALUE,
-//              DECODE(meddesc.itc_highrisk,'N',' ','Y','HIGH_RISK') AS HIGH_RISK,
-//              DECODE(meddesc.itc_hazardous,'N',' ','Y','HAZARDOUS') AS HAZARDOUS,
-//              DECODE(meddesc.itc_ved,'N','None','V','Vital','E','Essential','D','Desirable') AS VED,
-//              DECODE(meddesc.itc_breakable,'N','No','Y','Yes') AS BREAKABLE,
-//              meddesc.itn_breakqty, meddesc.itn_lprate, meddesc.itn_mrp,
-//              meddesc.itn_originalmrp, meddesc.itn_gendisper, meddesc.itn_genipdisper,
-//              meddesc.itd_date, meddesc.itd_eddate
-//       FROM MEDDESC
-//       RIGHT JOIN (SELECT DISTINCT(IT_CODE) FROM MEDSTORE) B ON MEDDESC.IT_CODE = B.IT_CODE
-//       LEFT JOIN medcategory ON meddesc.mc_code = medcategory.mc_code
-//       LEFT JOIN medgroup ON meddesc.mg_code = medgroup.mg_code
-//       LEFT JOIN medtype ON meddesc.mt_code = medtype.mt_code
-//       LEFT JOIN medstore ON meddesc.it_code = medstore.it_code
-//       LEFT JOIN pstparam ON medstore.st_code = pstparam.st_code
-//       LEFT JOIN medgencomb ON meddesc.cm_code = medgencomb.cm_code
-//       WHERE MEDDESC.ITC_STATUS = 'Y' AND meddesc.itd_date
-//         BETWEEN TO_DATE(:FROM_DATE, 'yyyy-mm-dd hh24:mi:ss') AND TO_DATE(:TO_DATE, 'yyyy-mm-dd hh24:mi:ss')
-//       GROUP BY meddesc.it_code, meddesc.itc_desc, meddesc.itc_alias, medcategory.mc_code, medcategory.mcc_desc,
-//                medgroup.mg_code, medgroup.mgc_desc, medtype.mt_code, medtype.mtc_desc, meddesc.itc_assestitem,
-//                meddesc.itc_medicine, meddesc.itc_consumable, meddesc.itc_highvalue, meddesc.itc_highrisk,
-//                meddesc.itc_hazardous, medgencomb.cmc_desc, meddesc.itc_ved, meddesc.itn_strip,
-//                meddesc.itc_breakable, meddesc.itn_breakqty, meddesc.itn_lprate, meddesc.itn_mrp,
-//                meddesc.itn_originalmrp, meddesc.itn_gendisper, meddesc.itn_genipdisper, meddesc.itd_date,
-//                meddesc.itd_eddate`;
-
-//     const updateResult = await conn_ora.execute(
-//       oracleSqlquery,
-//       { FROM_DATE: fromDate, TO_DATE: toDate },
-//       { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
-//     );
-//     const updateRows = await updateResult.resultSet.getRows();
-//     await updateResult.resultSet.close();
-
-//     const updateItCodes = await getItCodesInChunks(mysqlConn, fromDate, toDate, 1000);
-//     const updateSet = new Set(updateItCodes.flat());
-
-//     const filteredUpdates = updateRows.filter(row => updateSet.has(row.IT_CODE));
-//     // const filteredUpdates = updateRows.filter(row => updateSet.includes(row.IT_CODE));
-
-//     if (!filteredUpdates.length) {
-//       if (callBack) callBack(null, "No data to update.");
-//       return;
-//     }
-
-//     const updateQuery = `
-//                        UPDATE bis_kmc_med_desc_mast
-//                        SET
-//                          itc_desc = ?,
-//                          itc_alias = ?,
-//                          itn_strip = ?,
-//                          mc_code = ?,
-//                          mcc_desc = ?,
-//                          mg_code = ?,
-//                          mgc_desc = ?,
-//                          cmc_desc = ?,
-//                          mtc_desc = ?,
-//                          itc_medicine = ?,
-//                          itc_consumable = ?,
-//                          itc_highvalue = ?,
-//                          itc_highrisk = ?,
-//                          itc_hazardous = ?,
-//                          itc_ved = ?,
-//                          itc_breakable = ?,
-//                          itn_breakqty = ?,
-//                          itn_lprate = ?,
-//                          itn_mrp = ?,
-//                          itn_originalmrp = ?,
-//                          itn_gendisper = ?,
-//                          itn_genipdisper = ?,
-//                          create_date = ?,
-//                          edit_date = ?
-//                        WHERE it_code = ?
-//                       `;
-//     for (const row of filteredUpdates) {
-//       const updateValues = [
-//         row.ITC_DESC, row.ITC_ALIAS, row.ITN_STRIP,
-//         row.MC_CODE, row.MCC_DESC, row.MG_CODE, row.MGC_DESC,
-//         row.CMC_DESC, row.MTC_DESC, row.MEDICINE, row.CONSUMABLE,
-//         row.HIGH_VALUE, row.HIGH_RISK, row.HAZARDOUS, row.VED,
-//         row.BREAKABLE, row.ITN_BREAKQTY, row.ITN_LPRATE, row.ITN_MRP,
-//         row.ITN_ORIGINALMRP, row.ITN_GENDISPER, row.ITN_GENIPDISPER,
-//         row.ITD_DATE, row.ITD_EDDATE,
-//         row.IT_CODE
-//       ];
-//       await queryPromise(mysqlConn, updateQuery, updateValues);
-//     }
-
-//     await commit(mysqlConn);
-//     if (callBack) callBack(null, `${filteredUpdates.length} records updated successfully.`);
-
-//     // update triger table
-//     const last_update_date = format(new Date(), 'yyyy-MM-dd HH:mm:ss');
-//     await queryPromise(mysqlConn,
-//       `UPDATE bis_kmc_trigger_details SET last_update_date = ? WHERE trgr_slno = 1`,
-//       [last_update_date]
-//     );
-
+//     /*  SUCCESS */
+//     await endLogSuccess(logId, {
+//       oracleRows: rows.length,
+//       mysqlInserted: newPatients.length,
+//     });
 //   } catch (err) {
-//     if (mysqlConn) await rollback(mysqlConn);
-//     console.error("InsertKmcMedDesc error:", err);
-//     if (callBack) callBack(err);
+//     if (logId) await endLogFailure(logId, err);
+//     throw err;
 //   } finally {
 //     if (conn_ora) await conn_ora.close();
-//     if (mysqlConn) mysqlConn.release();
+//     await releaseLock("meliora", LOCK);
 //   }
 // };
 
-// Run cron every minute
-// cron.schedule("* * * * *", () => {
-//   InsertKmcMedDesc();
-// });
+/**
+ *
+ * CRONE OVER LAP PREVENTION
+ *
+ */
+// START FUN
+const runningJobs = new Set();
 
-// TMC PROCESS
+async function safeRun(name, fn) {
+  if (runningJobs.has(name)) {
+    console.warn(`[CRON SKIPPED] ${name} already running`);
+    return;
+  }
 
-const getConnection = (pool) => {
-  return new Promise((resolve, reject) => {
-    pool.getConnection((err, connection) => {
-      if (err) return reject(err);
-      resolve(connection);
-    });
-  });
-};
-
-// const queryPromise = (conn, sql, values) => {
-//   return new Promise((resolve, reject) => {
-//     conn.query(sql, values, (err, results) => {
-//       if (err) return reject(err);
-//       resolve(results);
-//     });
-//   });
-// };
-
-const queryPromise = (conn, sql, params) =>
-  new Promise((resolve, reject) => {
-    conn.query(sql, params, (err, results) => {
-      if (err) return reject(err);
-      resolve(results);
-    });
-  });
-
-const beginTransaction = (conn) => {
-  return new Promise((resolve, reject) => {
-    conn.beginTransaction((err) => {
-      if (err) return reject(err);
-      resolve();
-    });
-  });
-};
-
-const commit = (conn) => {
-  return new Promise((resolve, reject) => {
-    conn.commit((err) => {
-      if (err) return reject(err);
-      resolve();
-    });
-  });
-};
-
-const rollback = (conn) => {
-  return new Promise((resolve) => {
-    conn.rollback(() => resolve());
-  });
-};
-
-const buildFullAddress = (item) => {
-  return [item.PTC_LOADD1, item.PTC_LOADD2, item.PTC_LOADD3, item.PTC_LOADD4]
-    .filter((v) => v && v?.trim() !== "") // remove null/empty
-    .join(", "); // separator
-};
-
-//TMCH
-const getBisTmcLastTriggerDate = async () => {
-  return new Promise((resolve, reject) => {
-    bispool.getConnection((err, connection) => {
-      if (err) {
-        console.error("MySQL DB not connected. Check connection.");
-        return reject(err);
-      }
-      const query = `SELECT last_insert_date, last_update_date FROM bis_tmc_trigger_details WHERE trgr_slno = 1`;
-      connection.query(query, [], (err, results) => {
-        connection.release();
-        if (err) {
-          return reject(err);
-        }
-        resolve(results.length > 0 ? results[0] : null);
-      });
-    });
-  });
-};
-
-const getTMCItCodesInChunks = (mysqlConn, fromDate, toDate, chunkSize = 1000) => {
-  return new Promise((resolve, reject) => {
-    const selectQuery = `
-      SELECT it_code
-      FROM bis_tmc_med_desc_mast
-      WHERE create_date BETWEEN ? AND ?`;
-
-    mysqlConn.query(selectQuery, [fromDate, toDate], (err, results) => {
-      if (err) return reject(err);
-      const numericItcodes = results?.map((val) => val.it_code);
-      if (!numericItcodes || numericItcodes.length === 0) {
-        return resolve([]);
-      }
-
-      // Chunk the array
-      const chunkArray = (array, size) => {
-        const result = [];
-        for (let i = 0; i < array.length; i += size) {
-          result.push(array.slice(i, i + size));
-        }
-        return result;
-      };
-
-      const chunks = chunkArray(numericItcodes, chunkSize);
-      resolve(chunks);
-    });
-  });
-};
-
-// jomol code
-const InsertTmcMedDesc = async (callBack) => {
-  let pool_ora, conn_ora, mysqlConn;
+  runningJobs.add(name);
+  const start = Date.now();
 
   try {
-    pool_ora = await oraConnection();
-    conn_ora = await pool_ora.getConnection();
-    mysqlConn = await getConnection(bispool);
-
-    const detail = await getBisTmcLastTriggerDate();
-    const lastUpdateDate = detail?.last_insert_date ? new Date(detail.last_insert_date) : subMonths(new Date(), 1);
-    const fromDate = format(lastUpdateDate, "yyyy-MM-dd HH:mm:ss");
-    const toDate = format(new Date(), "yyyy-MM-dd HH:mm:ss");
-
-    // Step 1: Fetch insert data from Oracle
-    const oracleSql = `
-      SELECT meddesc.it_code, meddesc.itc_desc, meddesc.itc_alias, meddesc.itn_strip,
-             medcategory.mc_code, medcategory.mcc_desc, medgroup.mg_code, medgroup.mgc_desc,
-             medgencomb.cmc_desc, medtype.mtc_desc,
-             DECODE(meddesc.itc_medicine,'N','No','Y','MEDICINE') AS MEDICINE,
-             DECODE(meddesc.itc_consumable,'N','No','Y','CONSUM') AS CONSUMABLE,
-             DECODE(meddesc.itc_highvalue,'N',' ','Y','VALUE') AS HIGH_VALUE,
-             DECODE(meddesc.itc_highrisk,'N',' ','Y','HIGH_RISK') AS HIGH_RISK,
-             DECODE(meddesc.itc_hazardous,'N',' ','Y','HAZARDOUS') AS HAZARDOUS,
-             DECODE(meddesc.itc_ved,'N','None','V','Vital','E','Essential','D','Desirable') AS VED,
-             DECODE(meddesc.itc_breakable,'N','No','Y','Yes') AS BREAKABLE,
-             meddesc.itn_breakqty, meddesc.itn_lprate, meddesc.itn_mrp,
-             meddesc.itn_originalmrp, meddesc.itn_gendisper, meddesc.itn_genipdisper,
-             meddesc.itd_date, meddesc.itd_eddate
-      FROM MEDDESC
-      RIGHT JOIN (SELECT DISTINCT(IT_CODE) FROM MEDSTORE) B ON MEDDESC.IT_CODE = B.IT_CODE
-      LEFT JOIN medcategory ON meddesc.mc_code = medcategory.mc_code
-      LEFT JOIN medgroup ON meddesc.mg_code = medgroup.mg_code
-      LEFT JOIN medtype ON meddesc.mt_code = medtype.mt_code
-      LEFT JOIN medstore ON meddesc.it_code = medstore.it_code
-      LEFT JOIN pstparam ON medstore.st_code = pstparam.st_code
-      LEFT JOIN medgencomb ON meddesc.cm_code = medgencomb.cm_code
-      WHERE MEDDESC.ITC_STATUS = 'Y' AND meddesc.itd_date
-        BETWEEN TO_DATE(:FROM_DATE, 'yyyy-mm-dd hh24:mi:ss') AND TO_DATE(:TO_DATE, 'yyyy-mm-dd hh24:mi:ss')
-      GROUP BY meddesc.it_code, meddesc.itc_desc, meddesc.itc_alias, medcategory.mc_code, medcategory.mcc_desc,
-               medgroup.mg_code, medgroup.mgc_desc, medtype.mt_code, medtype.mtc_desc, meddesc.itc_assestitem,
-               meddesc.itc_medicine, meddesc.itc_consumable, meddesc.itc_highvalue, meddesc.itc_highrisk,
-               meddesc.itc_hazardous, medgencomb.cmc_desc, meddesc.itc_ved, meddesc.itn_strip,
-               meddesc.itc_breakable, meddesc.itn_breakqty, meddesc.itn_lprate, meddesc.itn_mrp,
-               meddesc.itn_originalmrp, meddesc.itn_gendisper, meddesc.itn_genipdisper, meddesc.itd_date,
-               meddesc.itd_eddate`; // keep your existing oracleSql query here
-    const insertResult = await conn_ora.execute(oracleSql, {FROM_DATE: fromDate, TO_DATE: toDate}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
-    const insertRows = await insertResult.resultSet.getRows();
-    await insertResult.resultSet.close();
-
-    if (!insertRows.length) {
-      if (callBack) callBack(null, "No data to insert.");
-      return;
-    }
-
-    const Values = insertRows.map((row) => [
-      row.IT_CODE,
-      row.ITC_DESC,
-      row.ITC_ALIAS,
-      row.ITN_STRIP,
-      row.MC_CODE,
-      row.MCC_DESC,
-      row.MG_CODE,
-      row.MGC_DESC,
-      row.CMC_DESC,
-      row.MTC_DESC,
-      row.MEDICINE,
-      row.CONSUMABLE,
-      row.HIGH_VALUE,
-      row.HIGH_RISK,
-      row.HAZARDOUS,
-      row.VED,
-      row.BREAKABLE,
-      row.ITN_BREAKQTY,
-      row.ITN_LPRATE,
-      row.ITN_MRP,
-      row.ITN_ORIGINALMRP,
-      row.ITN_GENDISPER,
-      row.ITN_GENIPDISPER,
-      row.ITD_DATE,
-      row.ITD_EDDATE,
-    ]);
-
-    // Step 2: Begin transaction
-    await mysqlConn.beginTransaction();
-
-    // Step 3: Insert into bis_kmc_med_desc_mast
-    await queryPromise(
-      mysqlConn,
-      `
-      INSERT INTO bis_tmc_med_desc_mast (
-        it_code, itc_desc, itc_alias, itn_strip, mc_code, mcc_desc,
-        mg_code, mgc_desc, cmc_desc, mtc_desc, itc_medicine, itc_consumable,
-        itc_highvalue, itc_highrisk, itc_hazardous, itc_ved, itc_breakable,
-        itn_breakqty, itn_lprate, itn_mrp, itn_originalmrp, itn_gendisper,
-        itn_genipdisper, create_date, edit_date
-      ) VALUES ?`,
-      [Values],
-    );
-
-    // Step 4: Fetch chunks for medstore insert
-    const insertedChunks = await getTMCItCodesInChunks(mysqlConn, fromDate, toDate, 1000);
-    let medstoreData = [];
-
-    for (const chunk of insertedChunks) {
-      const bindParams = {};
-      const keys = chunk.map((code, i) => {
-        const key = `val${i}`;
-        bindParams[key] = code;
-        return `:${key}`;
-      });
-
-      const medstoreQuery = `
-        SELECT IT_CODE, ST_CODE FROM MEDSTORE 
-        WHERE IT_CODE IN (${keys.join(",")})`;
-
-      const medstoreResult = await conn_ora.execute(medstoreQuery, bindParams, {outFormat: oracledb.OUT_FORMAT_OBJECT});
-
-      if (medstoreResult.rows.length) {
-        medstoreData.push(...medstoreResult.rows);
-      }
-    }
-
-    if (medstoreData.length) {
-      const medstoreValues = medstoreData.map((row) => [row.IT_CODE, row.ST_CODE]);
-      await queryPromise(
-        mysqlConn,
-        `
-        INSERT INTO bis_tmc_med_store (it_code, st_code) VALUES ?`,
-        [medstoreValues],
-      );
-    }
-
-    // Step 5: Update trigger table
-    const currentDate = format(new Date(), "yyyy-MM-dd HH:mm:ss");
-    await queryPromise(
-      mysqlConn,
-      `
-      UPDATE bis_tmc_trigger_details 
-      SET last_insert_date = ?, last_update_date = ? 
-      WHERE trgr_slno = 1`,
-      [currentDate, currentDate],
-    );
-
-    // Step 6: Fetch update records
-    const oracleSqlquery = ` 
-      SELECT meddesc.it_code, meddesc.itc_desc, meddesc.itc_alias, meddesc.itn_strip,
-             medcategory.mc_code, medcategory.mcc_desc, medgroup.mg_code, medgroup.mgc_desc,
-             medgencomb.cmc_desc, medtype.mtc_desc,
-             DECODE(meddesc.itc_medicine,'N','No','Y','MEDICINE') AS MEDICINE,
-             DECODE(meddesc.itc_consumable,'N','No','Y','CONSUM') AS CONSUMABLE,
-             DECODE(meddesc.itc_highvalue,'N',' ','Y','VALUE') AS HIGH_VALUE,
-             DECODE(meddesc.itc_highrisk,'N',' ','Y','HIGH_RISK') AS HIGH_RISK,
-             DECODE(meddesc.itc_hazardous,'N',' ','Y','HAZARDOUS') AS HAZARDOUS,
-             DECODE(meddesc.itc_ved,'N','None','V','Vital','E','Essential','D','Desirable') AS VED,
-             DECODE(meddesc.itc_breakable,'N','No','Y','Yes') AS BREAKABLE,
-             meddesc.itn_breakqty, meddesc.itn_lprate, meddesc.itn_mrp,
-             meddesc.itn_originalmrp, meddesc.itn_gendisper, meddesc.itn_genipdisper,
-             meddesc.itd_date, meddesc.itd_eddate
-      FROM MEDDESC
-      RIGHT JOIN (SELECT DISTINCT(IT_CODE) FROM MEDSTORE) B ON MEDDESC.IT_CODE = B.IT_CODE
-      LEFT JOIN medcategory ON meddesc.mc_code = medcategory.mc_code
-      LEFT JOIN medgroup ON meddesc.mg_code = medgroup.mg_code
-      LEFT JOIN medtype ON meddesc.mt_code = medtype.mt_code
-      LEFT JOIN medstore ON meddesc.it_code = medstore.it_code
-      LEFT JOIN pstparam ON medstore.st_code = pstparam.st_code
-      LEFT JOIN medgencomb ON meddesc.cm_code = medgencomb.cm_code
-      WHERE MEDDESC.ITC_STATUS = 'Y' AND meddesc.itd_eddate
-        BETWEEN TO_DATE(:FROM_DATE, 'yyyy-mm-dd hh24:mi:ss') AND TO_DATE(:TO_DATE, 'yyyy-mm-dd hh24:mi:ss')
-      GROUP BY meddesc.it_code, meddesc.itc_desc, meddesc.itc_alias, medcategory.mc_code, medcategory.mcc_desc,
-               medgroup.mg_code, medgroup.mgc_desc, medtype.mt_code, medtype.mtc_desc, meddesc.itc_assestitem,
-               meddesc.itc_medicine, meddesc.itc_consumable, meddesc.itc_highvalue, meddesc.itc_highrisk,
-               meddesc.itc_hazardous, medgencomb.cmc_desc, meddesc.itc_ved, meddesc.itn_strip,
-               meddesc.itc_breakable, meddesc.itn_breakqty, meddesc.itn_lprate, meddesc.itn_mrp,
-               meddesc.itn_originalmrp, meddesc.itn_gendisper, meddesc.itn_genipdisper, meddesc.itd_date,
-               meddesc.itd_eddate`; // keep your existing update Oracle SQL query here
-    const updateResult = await conn_ora.execute(oracleSqlquery, {FROM_DATE: fromDate, TO_DATE: toDate}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
-    const updateRows = await updateResult.resultSet.getRows();
-    await updateResult.resultSet.close();
-
-    const updateItCodes = await getTMCItCodesInChunks(mysqlConn, fromDate, toDate, 1000);
-    const updateSet = new Set(updateItCodes.flat());
-
-    const filteredUpdates = updateRows.filter((row) => updateSet.has(row.IT_CODE));
-
-    // Step 7: Perform updates
-    if (filteredUpdates.length) {
-      const updateQuery = `
-        UPDATE bis_tmc_med_desc_mast
-        SET
-          itc_desc = ?, itc_alias = ?, itn_strip = ?, mc_code = ?, mcc_desc = ?,
-          mg_code = ?, mgc_desc = ?, cmc_desc = ?, mtc_desc = ?, itc_medicine = ?,
-          itc_consumable = ?, itc_highvalue = ?, itc_highrisk = ?, itc_hazardous = ?,
-          itc_ved = ?, itc_breakable = ?, itn_breakqty = ?, itn_lprate = ?, itn_mrp = ?,
-          itn_originalmrp = ?, itn_gendisper = ?, itn_genipdisper = ?, create_date = ?, edit_date = ?
-        WHERE it_code = ?`;
-
-      for (const row of filteredUpdates) {
-        const updateValues = [
-          row.ITC_DESC,
-          row.ITC_ALIAS,
-          row.ITN_STRIP,
-          row.MC_CODE,
-          row.MCC_DESC,
-          row.MG_CODE,
-          row.MGC_DESC,
-          row.CMC_DESC,
-          row.MTC_DESC,
-          row.MEDICINE,
-          row.CONSUMABLE,
-          row.HIGH_VALUE,
-          row.HIGH_RISK,
-          row.HAZARDOUS,
-          row.VED,
-          row.BREAKABLE,
-          row.ITN_BREAKQTY,
-          row.ITN_LPRATE,
-          row.ITN_MRP,
-          row.ITN_ORIGINALMRP,
-          row.ITN_GENDISPER,
-          row.ITN_GENIPDISPER,
-          row.ITD_DATE,
-          row.ITD_EDDATE,
-          row.IT_CODE,
-        ];
-        await queryPromise(mysqlConn, updateQuery, updateValues);
-      }
-
-      // Step 8: Update trigger (again, just in case)
-      await queryPromise(
-        mysqlConn,
-        `
-        UPDATE bis_tmc_trigger_details SET last_update_date = ? 
-        WHERE trgr_slno = 1`,
-        [currentDate],
-      );
-    }
-
-    //  Step 9: Commit transaction
-    await mysqlConn.commit();
-
-    if (callBack) callBack(null, `Inserted: ${Values.length}, Updated: ${filteredUpdates.length}`);
-  } catch (err) {
-    if (mysqlConn) await mysqlConn.rollback();
-    console.error("InsertTmcMedDesc error:", err);
-    if (callBack) callBack(err);
+    await fn();
+    console.log(`[CRON SUCCESS] ${name} (${Date.now() - start} ms)`);
+  } catch (e) {
+    console.error(`[CRON FAILED] ${name}`, e);
   } finally {
-    if (conn_ora) await conn_ora.close();
-    if (mysqlConn) mysqlConn.release();
+    runningJobs.delete(name);
   }
-};
+}
 
-///////////////////////////////////KMC*******************************
+// END FUN
 
-//TMCH
-const getBisKmcLastTriggerDate = async () => {
-  return new Promise((resolve, reject) => {
-    bispool.getConnection((err, connection) => {
-      if (err) {
-        console.error("MySQL DB not connected. Check connection.");
-        return reject(err);
-      }
-      const query = `SELECT last_insert_date, last_update_date FROM bis_kmc_trigger_details WHERE trgr_slno = 1`;
-      connection.query(query, [], (err, results) => {
-        connection.release();
-        if (err) {
-          return reject(err);
-        }
-        resolve(results.length > 0 ? results[0] : null);
-      });
-    });
-  });
-};
-
-const getKMCItCodesInChunks = (mysqlConn, fromDate, toDate, chunkSize = 1000) => {
-  return new Promise((resolve, reject) => {
-    const selectQuery = `
-      SELECT it_code
-      FROM bis_kmc_med_desc_mast
-      WHERE create_date BETWEEN ? AND ?`;
-
-    mysqlConn.query(selectQuery, [fromDate, toDate], (err, results) => {
-      if (err) return reject(err);
-      const numericItcodes = results?.map((val) => val.it_code);
-      if (!numericItcodes || numericItcodes.length === 0) {
-        return resolve([]);
-      }
-
-      // Chunk the array
-      const chunkArray = (array, size) => {
-        const result = [];
-        for (let i = 0; i < array.length; i += size) {
-          result.push(array.slice(i, i + size));
-        }
-        return result;
-      };
-
-      const chunks = chunkArray(numericItcodes, chunkSize);
-      resolve(chunks);
-    });
-  });
-};
-
-// jomol code
-const InsertKmcMedDesc = async (callBack) => {
-  let pool_ora, conn_ora, mysqlConn;
-
-  try {
-    pool_ora = await oraKmcConnection();
-    conn_ora = await pool_ora.getConnection();
-    mysqlConn = await getConnection(bispool);
-
-    const detail = await getBisKmcLastTriggerDate();
-    const lastUpdateDate = detail?.last_insert_date ? new Date(detail.last_insert_date) : subMonths(new Date(), 1);
-    const fromDate = format(lastUpdateDate, "yyyy-MM-dd HH:mm:ss");
-    const toDate = format(new Date(), "yyyy-MM-dd HH:mm:ss");
-
-    // Step 1: Fetch insert data from Oracle
-    const oracleSql = `
-      SELECT meddesc.it_code, meddesc.itc_desc, meddesc.itc_alias, meddesc.itn_strip,
-             medcategory.mc_code, medcategory.mcc_desc, medgroup.mg_code, medgroup.mgc_desc,
-             medgencomb.cmc_desc, medtype.mtc_desc,
-             DECODE(meddesc.itc_medicine,'N','No','Y','MEDICINE') AS MEDICINE,
-             DECODE(meddesc.itc_consumable,'N','No','Y','CONSUM') AS CONSUMABLE,
-             DECODE(meddesc.itc_highvalue,'N',' ','Y','VALUE') AS HIGH_VALUE,
-             DECODE(meddesc.itc_highrisk,'N',' ','Y','HIGH_RISK') AS HIGH_RISK,
-             DECODE(meddesc.itc_hazardous,'N',' ','Y','HAZARDOUS') AS HAZARDOUS,
-             DECODE(meddesc.itc_ved,'N','None','V','Vital','E','Essential','D','Desirable') AS VED,
-             DECODE(meddesc.itc_breakable,'N','No','Y','Yes') AS BREAKABLE,
-             meddesc.itn_breakqty, meddesc.itn_lprate, meddesc.itn_mrp,
-             meddesc.itn_originalmrp, meddesc.itn_gendisper, meddesc.itn_genipdisper,
-             meddesc.itd_date, meddesc.itd_eddate
-      FROM MEDDESC
-      RIGHT JOIN (SELECT DISTINCT(IT_CODE) FROM MEDSTORE) B ON MEDDESC.IT_CODE = B.IT_CODE
-      LEFT JOIN medcategory ON meddesc.mc_code = medcategory.mc_code
-      LEFT JOIN medgroup ON meddesc.mg_code = medgroup.mg_code
-      LEFT JOIN medtype ON meddesc.mt_code = medtype.mt_code
-      LEFT JOIN medstore ON meddesc.it_code = medstore.it_code
-      LEFT JOIN pstparam ON medstore.st_code = pstparam.st_code
-      LEFT JOIN medgencomb ON meddesc.cm_code = medgencomb.cm_code
-      WHERE MEDDESC.ITC_STATUS = 'Y' AND meddesc.itd_date
-        BETWEEN TO_DATE(:FROM_DATE, 'yyyy-mm-dd hh24:mi:ss') AND TO_DATE(:TO_DATE, 'yyyy-mm-dd hh24:mi:ss')
-      GROUP BY meddesc.it_code, meddesc.itc_desc, meddesc.itc_alias, medcategory.mc_code, medcategory.mcc_desc,
-               medgroup.mg_code, medgroup.mgc_desc, medtype.mt_code, medtype.mtc_desc, meddesc.itc_assestitem,
-               meddesc.itc_medicine, meddesc.itc_consumable, meddesc.itc_highvalue, meddesc.itc_highrisk,
-               meddesc.itc_hazardous, medgencomb.cmc_desc, meddesc.itc_ved, meddesc.itn_strip,
-               meddesc.itc_breakable, meddesc.itn_breakqty, meddesc.itn_lprate, meddesc.itn_mrp,
-               meddesc.itn_originalmrp, meddesc.itn_gendisper, meddesc.itn_genipdisper, meddesc.itd_date,
-               meddesc.itd_eddate`; // keep your existing oracleSql query here
-    const insertResult = await conn_ora.execute(oracleSql, {FROM_DATE: fromDate, TO_DATE: toDate}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
-    const insertRows = await insertResult.resultSet.getRows();
-    await insertResult.resultSet.close();
-
-    if (!insertRows.length) {
-      if (callBack) callBack(null, "No data to insert.");
-      return;
-    }
-
-    const Values = insertRows.map((row) => [
-      row.IT_CODE,
-      row.ITC_DESC,
-      row.ITC_ALIAS,
-      row.ITN_STRIP,
-      row.MC_CODE,
-      row.MCC_DESC,
-      row.MG_CODE,
-      row.MGC_DESC,
-      row.CMC_DESC,
-      row.MTC_DESC,
-      row.MEDICINE,
-      row.CONSUMABLE,
-      row.HIGH_VALUE,
-      row.HIGH_RISK,
-      row.HAZARDOUS,
-      row.VED,
-      row.BREAKABLE,
-      row.ITN_BREAKQTY,
-      row.ITN_LPRATE,
-      row.ITN_MRP,
-      row.ITN_ORIGINALMRP,
-      row.ITN_GENDISPER,
-      row.ITN_GENIPDISPER,
-      row.ITD_DATE,
-      row.ITD_EDDATE,
-    ]);
-
-    // Step 2: Begin transaction
-    await mysqlConn.beginTransaction();
-
-    // Step 3: Insert into bis_kmc_med_desc_mast
-    await queryPromise(
-      mysqlConn,
-      `
-      INSERT INTO bis_kmc_med_desc_mast (
-        it_code, itc_desc, itc_alias, itn_strip, mc_code, mcc_desc,
-        mg_code, mgc_desc, cmc_desc, mtc_desc, itc_medicine, itc_consumable,
-        itc_highvalue, itc_highrisk, itc_hazardous, itc_ved, itc_breakable,
-        itn_breakqty, itn_lprate, itn_mrp, itn_originalmrp, itn_gendisper,
-        itn_genipdisper, create_date, edit_date
-      ) VALUES ?`,
-      [Values],
-    );
-
-    // Step 4: Fetch chunks for medstore insert
-    const insertedChunks = await getKMCItCodesInChunks(mysqlConn, fromDate, toDate, 1000);
-    let medstoreData = [];
-
-    for (const chunk of insertedChunks) {
-      const bindParams = {};
-      const keys = chunk.map((code, i) => {
-        const key = `val${i}`;
-        bindParams[key] = code;
-        return `:${key}`;
-      });
-
-      const medstoreQuery = `
-        SELECT IT_CODE, ST_CODE FROM MEDSTORE 
-        WHERE IT_CODE IN (${keys.join(",")})`;
-
-      const medstoreResult = await conn_ora.execute(medstoreQuery, bindParams, {outFormat: oracledb.OUT_FORMAT_OBJECT});
-
-      if (medstoreResult.rows.length) {
-        medstoreData.push(...medstoreResult.rows);
-      }
-    }
-
-    if (medstoreData.length) {
-      const medstoreValues = medstoreData.map((row) => [row.IT_CODE, row.ST_CODE]);
-      await queryPromise(
-        mysqlConn,
-        `
-        INSERT INTO bis_kmc_med_store (it_code, st_code) VALUES ?`,
-        [medstoreValues],
-      );
-    }
-
-    // Step 5: Update trigger table
-    const currentDate = format(new Date(), "yyyy-MM-dd HH:mm:ss");
-    await queryPromise(
-      mysqlConn,
-      `
-      UPDATE bis_kmc_trigger_details 
-      SET last_insert_date = ?, last_update_date = ? 
-      WHERE trgr_slno = 1`,
-      [currentDate, currentDate],
-    );
-
-    // Step 6: Fetch update records
-    const oracleSqlquery = ` 
-      SELECT meddesc.it_code, meddesc.itc_desc, meddesc.itc_alias, meddesc.itn_strip,
-             medcategory.mc_code, medcategory.mcc_desc, medgroup.mg_code, medgroup.mgc_desc,
-             medgencomb.cmc_desc, medtype.mtc_desc,
-             DECODE(meddesc.itc_medicine,'N','No','Y','MEDICINE') AS MEDICINE,
-             DECODE(meddesc.itc_consumable,'N','No','Y','CONSUM') AS CONSUMABLE,
-             DECODE(meddesc.itc_highvalue,'N',' ','Y','VALUE') AS HIGH_VALUE,
-             DECODE(meddesc.itc_highrisk,'N',' ','Y','HIGH_RISK') AS HIGH_RISK,
-             DECODE(meddesc.itc_hazardous,'N',' ','Y','HAZARDOUS') AS HAZARDOUS,
-             DECODE(meddesc.itc_ved,'N','None','V','Vital','E','Essential','D','Desirable') AS VED,
-             DECODE(meddesc.itc_breakable,'N','No','Y','Yes') AS BREAKABLE,
-             meddesc.itn_breakqty, meddesc.itn_lprate, meddesc.itn_mrp,
-             meddesc.itn_originalmrp, meddesc.itn_gendisper, meddesc.itn_genipdisper,
-             meddesc.itd_date, meddesc.itd_eddate
-      FROM MEDDESC
-      RIGHT JOIN (SELECT DISTINCT(IT_CODE) FROM MEDSTORE) B ON MEDDESC.IT_CODE = B.IT_CODE
-      LEFT JOIN medcategory ON meddesc.mc_code = medcategory.mc_code
-      LEFT JOIN medgroup ON meddesc.mg_code = medgroup.mg_code
-      LEFT JOIN medtype ON meddesc.mt_code = medtype.mt_code
-      LEFT JOIN medstore ON meddesc.it_code = medstore.it_code
-      LEFT JOIN pstparam ON medstore.st_code = pstparam.st_code
-      LEFT JOIN medgencomb ON meddesc.cm_code = medgencomb.cm_code
-      WHERE MEDDESC.ITC_STATUS = 'Y' AND meddesc.itd_eddate
-        BETWEEN TO_DATE(:FROM_DATE, 'yyyy-mm-dd hh24:mi:ss') AND TO_DATE(:TO_DATE, 'yyyy-mm-dd hh24:mi:ss')
-      GROUP BY meddesc.it_code, meddesc.itc_desc, meddesc.itc_alias, medcategory.mc_code, medcategory.mcc_desc,
-               medgroup.mg_code, medgroup.mgc_desc, medtype.mt_code, medtype.mtc_desc, meddesc.itc_assestitem,
-               meddesc.itc_medicine, meddesc.itc_consumable, meddesc.itc_highvalue, meddesc.itc_highrisk,
-               meddesc.itc_hazardous, medgencomb.cmc_desc, meddesc.itc_ved, meddesc.itn_strip,
-               meddesc.itc_breakable, meddesc.itn_breakqty, meddesc.itn_lprate, meddesc.itn_mrp,
-               meddesc.itn_originalmrp, meddesc.itn_gendisper, meddesc.itn_genipdisper, meddesc.itd_date,
-               meddesc.itd_eddate`; // keep your existing update Oracle SQL query here
-    const updateResult = await conn_ora.execute(oracleSqlquery, {FROM_DATE: fromDate, TO_DATE: toDate}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
-    const updateRows = await updateResult.resultSet.getRows();
-    await updateResult.resultSet.close();
-
-    const updateItCodes = await getKMCItCodesInChunks(mysqlConn, fromDate, toDate, 1000);
-    const updateSet = new Set(updateItCodes.flat());
-
-    const filteredUpdates = updateRows.filter((row) => updateSet.has(row.IT_CODE));
-
-    // Step 7: Perform updates
-    if (filteredUpdates.length) {
-      const updateQuery = `
-        UPDATE bis_kmc_med_desc_mast
-        SET
-          itc_desc = ?, itc_alias = ?, itn_strip = ?, mc_code = ?, mcc_desc = ?,
-          mg_code = ?, mgc_desc = ?, cmc_desc = ?, mtc_desc = ?, itc_medicine = ?,
-          itc_consumable = ?, itc_highvalue = ?, itc_highrisk = ?, itc_hazardous = ?,
-          itc_ved = ?, itc_breakable = ?, itn_breakqty = ?, itn_lprate = ?, itn_mrp = ?,
-          itn_originalmrp = ?, itn_gendisper = ?, itn_genipdisper = ?, create_date = ?, edit_date = ?
-        WHERE it_code = ?`;
-
-      for (const row of filteredUpdates) {
-        const updateValues = [
-          row.ITC_DESC,
-          row.ITC_ALIAS,
-          row.ITN_STRIP,
-          row.MC_CODE,
-          row.MCC_DESC,
-          row.MG_CODE,
-          row.MGC_DESC,
-          row.CMC_DESC,
-          row.MTC_DESC,
-          row.MEDICINE,
-          row.CONSUMABLE,
-          row.HIGH_VALUE,
-          row.HIGH_RISK,
-          row.HAZARDOUS,
-          row.VED,
-          row.BREAKABLE,
-          row.ITN_BREAKQTY,
-          row.ITN_LPRATE,
-          row.ITN_MRP,
-          row.ITN_ORIGINALMRP,
-          row.ITN_GENDISPER,
-          row.ITN_GENIPDISPER,
-          row.ITD_DATE,
-          row.ITD_EDDATE,
-          row.IT_CODE,
-        ];
-        await queryPromise(mysqlConn, updateQuery, updateValues);
-      }
-
-      // Step 8: Update trigger (again, just in case)
-      await queryPromise(
-        mysqlConn,
-        `
-        UPDATE bis_kmc_trigger_details SET last_update_date = ? 
-        WHERE trgr_slno = 1`,
-        [currentDate],
-      );
-    }
-
-    //  Step 9: Commit transaction
-    await mysqlConn.commit();
-
-    if (callBack) callBack(null, `Inserted: ${Values.length}, Updated: ${filteredUpdates.length}`);
-  } catch (err) {
-    if (mysqlConn) await mysqlConn.rollback();
-    console.error("InsertKmcMedDesc error:", err);
-    if (callBack) callBack(err);
-  } finally {
-    if (conn_ora) await conn_ora.close();
-    if (mysqlConn) mysqlConn.release();
-  }
-};
-
-// cron.schedule("0 0 * * *", () => {
-//   InsertKmcMedDesc();
-// });
-
-// // for 5 mints
-// cron.schedule('*/5 * * * *', () => {
-//   InsertKmcMedDesc();
-// });
-
-const updateAmsPatientDetails = () => {
-  mysqlpool.getConnection((err, connection) => {
-    if (err) {
-      return;
-    }
-    const selectQuery = `
-         SELECT 
-          a.patient_ip_no,
-          a.ams_patient_detail_slno,
-          f.fb_bd_code,
-          n.fb_ns_name
-      FROM 
-          ams_antibiotic_patient_details a,
-          fb_ipadmiss f,
-          fb_bed b,
-          fb_nurse_station_master n
-      WHERE 
-          a.patient_ip_no = f.fb_ip_no
-          AND f.fb_bd_code = b.fb_bd_code
-          AND b.fb_ns_code = n.fb_ns_code
-          AND a.report_updated = 0
-          AND (
-              a.bed_code IS NULL OR
-              a.patient_location IS NULL OR
-              a.bed_code <> f.fb_bd_code OR
-              a.patient_location <> n.fb_ns_name
-          )
-        GROUP BY 
-         a.ams_patient_detail_slno,
-         a.patient_ip_no`;
-
-    connection.query(selectQuery, (Err, results) => {
-      if (Err) {
-        connection.release();
-        return;
-      }
-      if (results.length === 0) {
-        connection.release();
-        return;
-      }
-      const updateQuery = `
-        UPDATE ams_antibiotic_patient_details 
-        SET bed_code = ?, patient_location = ?
-        WHERE ams_patient_detail_slno = ? AND patient_ip_no = ?
-      `;
-
-      const updatePromises = results.map((row) => {
-        const {fb_bd_code, fb_ns_name, ams_patient_detail_slno, patient_ip_no} = row;
-        return new Promise((resolve, reject) => {
-          connection.query(updateQuery, [fb_bd_code, fb_ns_name, ams_patient_detail_slno, patient_ip_no], (updateErr) => {
-            if (updateErr) {
-              reject(updateErr);
-            } else {
-              resolve();
-            }
-          });
-        });
-      });
-
-      // all settle works even if any of the query fails and doest throw error
-      Promise.allSettled(updatePromises)
-        .then(() => {
-          connection.release();
-        })
-        .catch(() => {
-          connection.release();
-        });
-    });
-  });
-};
-
-const getAmsLastUpdatedDate = async (processId) => {
-  return new Promise((resolve, reject) => {
-    mysqlpool.getConnection((err, connection) => {
-      if (err) {
-        console.error("MySQL DB not connected. Check connection.");
-        return reject(err);
-      }
-      const query = `
-        SELECT ams_last_updated_date 
-        FROM ams_patient_details_last_updated_date ;
-      `;
-      connection.query(query, [processId], (err, results) => {
-        connection.release();
-        if (err) {
-          return reject(err);
-        }
-        resolve(results.length > 0 ? results[0] : null);
-      });
-    });
-  });
-};
-
-/****************************/
-
-// auto sync at an interval of 10 min/2
-cron.schedule("*/10 * * * *", () => {
-  getInpatientDetail();
+// 1 Admit patients
+cron.schedule("0,15,30,45 * * * *", async () => {
+  await safeRun("getAdmittedPatientInfoToInsert", getAdmittedPatientInfoToInsert);
 });
 
-// //  auto sync at an interval of 13 min
-cron.schedule("*/13 * * * *", () => {
-  UpdateIpStatusDetails();
+// 2 Bed / Rmall update
+cron.schedule("3,18,33,48 * * * *", async () => {
+  await safeRun("UpdateInpatientDetailRmall", UpdateInpatientDetailRmall);
 });
 
-// //  auto sync at an interval of 15 min
-cron.schedule("*/15 * * * *", () => {
-  UpdateInpatientDetailRmall();
+// 3 Discharge & status
+cron.schedule("6,21,36,51 * * * *", async () => {
+  await safeRun("UpdateDischargeAndBedStatus", UpdateDischargeAndBedStatus);
 });
 
-// //  test triggering
-cron.schedule("*/17 * * * *", () => {
-  UpdateFbBedDetailMeliora();
+// 4 Final bed sync
+cron.schedule("9,24,39,54 * * * *", async () => {
+  await safeRun("UpdateFbBedDetailMeliora", UpdateFbBedDetailMeliora);
 });
 
-cron.schedule("*/49 * * * *", () => {
-  getAmsPatientDetails();
+cron.schedule("0 23 * * *", async () => {
+  await safeRun("InsertChilderDetailMeliora", InsertChilderDetailMeliora);
 });
 
-// //runs at every 3 hours
-cron.schedule("0 */3 * * *", () => {
-  updateAmsPatientDetails();
-});
-
-// // // Running InsertChilderDetailMeliora at midnight... 11.00 pm
-// cron.schedule("0 23 * * *", () => {
-//   InsertChilderDetailMeliora();
+// cron.schedule("*/49 * * * *", async () => {
+//   await safeRun("getAmsPatientDetails", getAmsPatientDetails);
 // });
 
-// Run via cron- Jomol for BIS
-// cron.schedule("*/2 * * * *", () => {
-//   InsertKmcMedDesc();
+// cron.schedule("0 */3 * * *", async () => {
+//   await safeRun("updateAmsPatientDetails", updateAmsPatientDetails);
 // });
 
-// ********************* BIS ************************
-// cron.schedule("0 0 * * *", () => {
-//   InsertKmcMedDesc();
+/***************************************FOR TEST************************************************/
+
+// 1 Admit patients
+// cron.schedule("*/10 * * * *", async () => {
+//   await safeRun("getAdmittedPatientInfoToInsert", getAdmittedPatientInfoToInsert);
+//   console.log("getAdmittedPatientInfoToInsert - Test Cron executed" + new Date().toLocaleTimeString());
 // });
 
-// cron.schedule("0 22 * * *", () => {
-//   InsertTmcMedDesc();
+// // // 2 Bed / Rmall update
+// cron.schedule("*/13 * * * *", async () => {
+//   await safeRun("UpdateInpatientDetailRmall", UpdateInpatientDetailRmall);
+//   console.log("UpdateInpatientDetailRmall - Test Cron executed" + new Date().toLocaleTimeString());
 // });
+
+// // // 3 Discharge & status
+// cron.schedule("*/1 * * * *", async () => {
+//   await safeRun("UpdateDischargeAndBedStatus", UpdateDischargeAndBedStatus);
+//   console.log("UpdateDischargeAndBedStatus - Test Cron executed" + new Date().toLocaleTimeString());
+// });
+
+// // 4 Final bed sync
+// cron.schedule("*/1 * * * *", async () => {
+//   await safeRun("UpdateFbBedDetailMeliora", UpdateFbBedDetailMeliora);
+//   console.log("UpdateFbBedDetailMeliora - Test Cron executed" + new Date().toLocaleTimeString());
+// });
+
+// cron.schedule("*/1 * * * *", async () => {
+//   await safeRun("InsertChilderDetailMeliora", InsertChilderDetailMeliora);
+//   console.log("InsertChilderDetailMeliora - Test Cron executed" + new Date().toLocaleTimeString());
+// });
+
+// cron.schedule("*/49 * * * *", async () => {
+//   await safeRun("getAmsPatientDetails", getAmsPatientDetails);
+// });
+/**************************************FOR TEST TIMI*************************************************/

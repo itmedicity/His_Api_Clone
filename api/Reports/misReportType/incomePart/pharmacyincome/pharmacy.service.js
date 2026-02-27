@@ -2,7 +2,7 @@
 const {oracledb, getTmcConnection} = require("../../../../../config/oradbconfig");
 
 module.exports = {
-  pharmacySalePart1: async (data, callBack) => {
+  pharmacySalePart1: async (data) => {
     let conn_ora = await getTmcConnection();
     try {
       const result = await conn_ora.execute(
@@ -58,14 +58,16 @@ module.exports = {
         },
         {outFormat: oracledb.OUT_FORMAT_OBJECT},
       );
-      callBack(null, result.rows);
+      // callBack(null, );
+      return result.rows;
     } catch (error) {
       console.log(error);
+      throw error;
     } finally {
       if (conn_ora) await conn_ora.close();
     }
   },
-  phamracyReturnPart1: async (data, callBack) => {
+  phamracyReturnPart1: async (data) => {
     let conn_ora = await getTmcConnection();
     try {
       const result = await conn_ora.execute(
@@ -92,14 +94,16 @@ module.exports = {
         },
         {outFormat: oracledb.OUT_FORMAT_OBJECT},
       );
-      callBack(null, result.rows);
+      // callBack(null, result.rows);
+      return result.rows;
     } catch (error) {
       console.log(error);
+      throw error;
     } finally {
       if (conn_ora) await conn_ora.close();
     }
   },
-  phamracySalePart2: async (data, callBack) => {
+  phamracySalePart2: async (data) => {
     let conn_ora = await getTmcConnection();
     try {
       const result = await conn_ora.execute(
@@ -154,14 +158,16 @@ module.exports = {
         },
         {outFormat: oracledb.OUT_FORMAT_OBJECT},
       );
-      callBack(null, result.rows);
+      // callBack(null, );
+      return result.rows;
     } catch (error) {
       console.log(error);
+      throw error;
     } finally {
       if (conn_ora) await conn_ora.close();
     }
   },
-  phamracyReturnPart2: async (data, callBack) => {
+  phamracyReturnPart2: async (data) => {
     let conn_ora = await getTmcConnection();
     try {
       const result = await conn_ora.execute(
@@ -188,14 +194,16 @@ module.exports = {
         },
         {outFormat: oracledb.OUT_FORMAT_OBJECT},
       );
-      callBack(null, result.rows);
+      // callBack(null, );
+      return result.rows;
     } catch (error) {
       console.log(error);
+      throw error;
     } finally {
       if (conn_ora) await conn_ora.close();
     }
   },
-  phamracySalePart3: async (data, callBack) => {
+  phamracySalePart3: async (data) => {
     let conn_ora = await getTmcConnection();
     try {
       const result = await conn_ora.execute(
@@ -223,14 +231,16 @@ module.exports = {
         },
         {outFormat: oracledb.OUT_FORMAT_OBJECT},
       );
-      callBack(null, result.rows);
+      // callBack(null, );
+      return result.rows;
     } catch (error) {
       console.log(error);
+      throw error;
     } finally {
       if (conn_ora) await conn_ora.close();
     }
   },
-  phamracyReturnPart3: async (data, callBack) => {
+  phamracyReturnPart3: async (data) => {
     let conn_ora = await getTmcConnection();
     try {
       const result = await conn_ora.execute(
@@ -256,9 +266,11 @@ module.exports = {
         },
         {outFormat: oracledb.OUT_FORMAT_OBJECT},
       );
-      callBack(null, result.rows);
+      // callBack(null, );
+      return result.rows;
     } catch (error) {
       console.log(error);
+      throw error;
     } finally {
       if (conn_ora) await conn_ora.close();
     }

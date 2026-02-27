@@ -1,3 +1,4 @@
+const {controllerHelper} = require("../../../../../utls/controller-helperFun");
 const {
   pharmacyTsshSalePart1,
   phamracyTsshReturnPart1,
@@ -16,160 +17,168 @@ const {
 } = require("./pharmacyTssh.service");
 
 module.exports = {
-  getpharmacyTsshSalePart1: (req, res) => {
-    const body = req.body;
-    pharmacyTsshSalePart1(body, (err, results) => {
-      if (err) {
-        return res.status(200).json({
-          success: 0,
-          message: err.message,
-        });
-      }
-      if (Object.keys(results).length === 0) {
-        return res.status(200).json({
-          success: 2,
-          message: "No Result",
-        });
-      }
-      return res.status(200).json({
-        success: 1,
-        message: "Pharmacy Sale",
-        data: results,
-      });
-    });
-  },
-  getphamracyTsshReturnPart1: (req, res) => {
-    const body = req.body;
-    phamracyTsshReturnPart1(body, (err, results) => {
-      if (err) {
-        return res.status(200).json({
-          success: 0,
-          message: err.message,
-        });
-      }
-      if (Object.keys(results).length === 0) {
-        return res.status(200).json({
-          success: 2,
-          message: "No Result",
-        });
-      }
-      return res.status(200).json({
-        success: 1,
-        message: "Pharmacy Sale",
-        data: results,
-      });
-    });
-  },
-  getphamracyTsshSalePart2: (req, res) => {
-    const body = req.body;
-    phamracyTsshSalePart2(body, (err, results) => {
-      if (err) {
-        return res.status(200).json({
-          success: 0,
-          message: err.message,
-        });
-      }
-      if (Object.keys(results).length === 0) {
-        return res.status(200).json({
-          success: 2,
-          message: "No Result",
-        });
-      }
-      return res.status(200).json({
-        success: 1,
-        message: "Pharmacy Sale",
-        data: results,
-      });
-    });
-  },
-  getphamracyTsshReturnPart2: (req, res) => {
-    const body = req.body;
-    phamracyTsshReturnPart2(body, (err, results) => {
-      if (err) {
-        return res.status(200).json({
-          success: 0,
-          message: err.message,
-        });
-      }
-      if (Object.keys(results).length === 0) {
-        return res.status(200).json({
-          success: 2,
-          message: "No Result",
-        });
-      }
-      return res.status(200).json({
-        success: 1,
-        message: "Pharmacy Sale",
-        data: results,
-      });
-    });
-  },
-  getphamracyTsshSalePart3: (req, res) => {
-    const body = req.body;
-    phamracyTsshSalePart3(body, (err, results) => {
-      if (err) {
-        return res.status(200).json({
-          success: 0,
-          message: err.message,
-        });
-      }
-      if (Object.keys(results).length === 0) {
-        return res.status(200).json({
-          success: 2,
-          message: "No Result",
-        });
-      }
-      return res.status(200).json({
-        success: 1,
-        message: "Pharmacy Sale",
-        data: results,
-      });
-    });
-  },
-  getphamracyTsshReturnPart3: (req, res) => {
-    const body = req.body;
-    phamracyTsshReturnPart3(body, (err, results) => {
-      if (err) {
-        return res.status(200).json({
-          success: 0,
-          message: err.message,
-        });
-      }
-      if (Object.keys(results).length === 0) {
-        return res.status(200).json({
-          success: 2,
-          message: "No Result",
-        });
-      }
-      return res.status(200).json({
-        success: 1,
-        message: "Pharmacy Sale",
-        data: results,
-      });
-    });
-  },
-  pharmacyRoundOffAmntTssh: (req, res) => {
-    const body = req.body;
-    pharmacyRoundOffAmntTssh(body, (err, results) => {
-      if (err) {
-        return res.status(200).json({
-          success: 0,
-          message: err.message,
-        });
-      }
-      if (Object.keys(results).length === 0) {
-        return res.status(200).json({
-          success: 2,
-          message: "No Result",
-        });
-      }
-      return res.status(200).json({
-        success: 1,
-        message: "Round Off",
-        data: results,
-      });
-    });
-  },
+  getpharmacyTsshSalePart1: controllerHelper(pharmacyTsshSalePart1, "Pharmacy Sale"),
+  // getpharmacyTsshSalePart1: (req, res) => {
+  //   const body = req.body;
+  //   pharmacyTsshSalePart1(body, (err, results) => {
+  //     if (err) {
+  //       return res.status(200).json({
+  //         success: 0,
+  //         message: err.message,
+  //       });
+  //     }
+  //     if (Object.keys(results).length === 0) {
+  //       return res.status(200).json({
+  //         success: 2,
+  //         message: "No Result",
+  //       });
+  //     }
+  //     return res.status(200).json({
+  //       success: 1,
+  //       message: "Pharmacy Sale",
+  //       data: results,
+  //     });
+  //   });
+  // },
+  getphamracyTsshReturnPart1: controllerHelper(phamracyTsshReturnPart1, "Pharmacy Sale"),
+  // getphamracyTsshReturnPart1: (req, res) => {
+  //   const body = req.body;
+  //   phamracyTsshReturnPart1(body, (err, results) => {
+  //     if (err) {
+  //       return res.status(200).json({
+  //         success: 0,
+  //         message: err.message,
+  //       });
+  //     }
+  //     if (Object.keys(results).length === 0) {
+  //       return res.status(200).json({
+  //         success: 2,
+  //         message: "No Result",
+  //       });
+  //     }
+  //     return res.status(200).json({
+  //       success: 1,
+  //       message: "Pharmacy Sale",
+  //       data: results,
+  //     });
+  //   });
+  // },
+  getphamracyTsshSalePart2: controllerHelper(phamracyTsshSalePart2, "Pharmacy Sale"),
+  // getphamracyTsshSalePart2: (req, res) => {
+  //   const body = req.body;
+  //   phamracyTsshSalePart2(body, (err, results) => {
+  //     if (err) {
+  //       return res.status(200).json({
+  //         success: 0,
+  //         message: err.message,
+  //       });
+  //     }
+  //     if (Object.keys(results).length === 0) {
+  //       return res.status(200).json({
+  //         success: 2,
+  //         message: "No Result",
+  //       });
+  //     }
+  //     return res.status(200).json({
+  //       success: 1,
+  //       message: "Pharmacy Sale",
+  //       data: results,
+  //     });
+  //   });
+  // },
+  getphamracyTsshReturnPart2: controllerHelper(phamracyTsshReturnPart2, "Pharmacy Sale"),
+  // getphamracyTsshReturnPart2: (req, res) => {
+  //   const body = req.body;
+  //   phamracyTsshReturnPart2(body, (err, results) => {
+  //     if (err) {
+  //       return res.status(200).json({
+  //         success: 0,
+  //         message: err.message,
+  //       });
+  //     }
+  //     if (Object.keys(results).length === 0) {
+  //       return res.status(200).json({
+  //         success: 2,
+  //         message: "No Result",
+  //       });
+  //     }
+  //     return res.status(200).json({
+  //       success: 1,
+  //       message: "Pharmacy Sale",
+  //       data: results,
+  //     });
+  //   });
+  // },
+  getphamracyTsshSalePart3: controllerHelper(phamracyTsshSalePart3, "Pharmacy Sale"),
+  // getphamracyTsshSalePart3: (req, res) => {
+  //   const body = req.body;
+  //   phamracyTsshSalePart3(body, (err, results) => {
+  //     if (err) {
+  //       return res.status(200).json({
+  //         success: 0,
+  //         message: err.message,
+  //       });
+  //     }
+  //     if (Object.keys(results).length === 0) {
+  //       return res.status(200).json({
+  //         success: 2,
+  //         message: "No Result",
+  //       });
+  //     }
+  //     return res.status(200).json({
+  //       success: 1,
+  //       message: "Pharmacy Sale",
+  //       data: results,
+  //     });
+  //   });
+  // },
+  getphamracyTsshReturnPart3: controllerHelper(phamracyTsshReturnPart3, "Pharmacy Sale"),
+  // getphamracyTsshReturnPart3: (req, res) => {
+  //   const body = req.body;
+  //   phamracyTsshReturnPart3(body, (err, results) => {
+  //     if (err) {
+  //       return res.status(200).json({
+  //         success: 0,
+  //         message: err.message,
+  //       });
+  //     }
+  //     if (Object.keys(results).length === 0) {
+  //       return res.status(200).json({
+  //         success: 2,
+  //         message: "No Result",
+  //       });
+  //     }
+  //     return res.status(200).json({
+  //       success: 1,
+  //       message: "Pharmacy Sale",
+  //       data: results,
+  //     });
+  //   });
+  // },
+
+  pharmacyRoundOffAmntTssh: controllerHelper(pharmacyRoundOffAmntTssh, "Round Off"),
+  // pharmacyRoundOffAmntTssh: (req, res) => {
+  //   const body = req.body;
+  //   pharmacyRoundOffAmntTssh(body, (err, results) => {
+  //     if (err) {
+  //       return res.status(200).json({
+  //         success: 0,
+  //         message: err.message,
+  //       });
+  //     }
+  //     if (Object.keys(results).length === 0) {
+  //       return res.status(200).json({
+  //         success: 2,
+  //         message: "No Result",
+  //       });
+  //     }
+  //     return res.status(200).json({
+  //       success: 1,
+  //       message: "Round Off",
+  //       data: results,
+  //     });
+  //   });
+  // },
   /*
    *
    * TMCH GROUPED REPORTS

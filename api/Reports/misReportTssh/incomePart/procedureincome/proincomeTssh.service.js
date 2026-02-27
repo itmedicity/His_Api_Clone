@@ -2,8 +2,8 @@
 const {oracledb, getTmcConnection} = require("../../../../../config/oradbconfig");
 
 module.exports = {
-  proIncomePart1Tssh: async (data, callBack) => {
-    let conn_ora = await pool_ora.getConnection();
+  proIncomePart1Tssh: async (data) => {
+    let conn_ora = await getTmcConnection();
 
     const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(",")) || null;
     const fromDate = data.from;
@@ -427,15 +427,17 @@ module.exports = {
                         ORDER BY Dg_desc`;
     try {
       const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
-      callBack(err, result.rows);
+      //       callBack(null, );
+      return result.rows;
     } catch (error) {
       console.log(error);
+      throw error;
     } finally {
-      if (conn_ora) await pool_ora.close();
+      if (conn_ora) await conn_ora.close();
     }
   },
-  proIncomePart2Tssh: async (data, callBack) => {
-    let conn_ora = await pool_ora.getConnection();
+  proIncomePart2Tssh: async (data) => {
+    let conn_ora = await getTmcConnection();
 
     const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(",")) || null;
     const fromDate = data.from;
@@ -539,15 +541,17 @@ module.exports = {
     // GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc`;
     try {
       const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
-      callBack(err, result.rows);
+      //       callBack(null, );
+      return result.rows;
     } catch (error) {
       console.log(error);
+      throw error;
     } finally {
-      if (conn_ora) await pool_ora.close();
+      if (conn_ora) await conn_ora.close();
     }
   },
-  proIncomePart3Tssh: async (data, callBack) => {
-    let conn_ora = await pool_ora.getConnection();
+  proIncomePart3Tssh: async (data) => {
+    let conn_ora = await getTmcConnection();
 
     const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(",")) || null;
     const fromDate = data.from;
@@ -612,15 +616,17 @@ module.exports = {
                     GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc`;
     try {
       const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
-      callBack(err, result.rows);
+      //       callBack(null, );
+      return result.rows;
     } catch (error) {
       console.log(error);
+      throw error;
     } finally {
-      if (conn_ora) await pool_ora.close();
+      if (conn_ora) await conn_ora.close();
     }
   },
-  proIncomePart4Tssh: async (data, callBack) => {
-    let conn_ora = await pool_ora.getConnection();
+  proIncomePart4Tssh: async (data) => {
+    let conn_ora = await getTmcConnection();
 
     const fromDate = data.from;
     const toDate = data.to;
@@ -637,15 +643,17 @@ module.exports = {
                     WHERE DG_TYPE = 'E'`;
     try {
       const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
-      callBack(err, result.rows);
+      //       callBack(null, );
+      return result.rows;
     } catch (error) {
       console.log(error);
+      throw error;
     } finally {
-      if (conn_ora) await pool_ora.close();
+      if (conn_ora) await conn_ora.close();
     }
   },
-  theaterIncomeTssh: async (data, callBack) => {
-    let conn_ora = await pool_ora.getConnection();
+  theaterIncomeTssh: async (data) => {
+    let conn_ora = await getTmcConnection();
 
     const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(",")) || null;
     const fromDate = data.from;
@@ -975,11 +983,13 @@ module.exports = {
                         ORDER BY Dg_desc`;
     try {
       const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
-      callBack(err, result.rows);
+      //       callBack(null, );
+      return result.rows;
     } catch (error) {
       console.log(error);
+      throw error;
     } finally {
-      if (conn_ora) await pool_ora.close();
+      if (conn_ora) await conn_ora.close();
     }
   },
 };

@@ -1,6 +1,6 @@
 const {oracledb, getTmcConnection} = require("../../config/oradbconfig");
 module.exports = {
-  GetProcedureList: async (data, callBack) => {
+  GetProcedureList: async (data) => {
     let conn_ora = await getTmcConnection();
     const sql = `SELECT 
                             PRODESCRIPTION.PD_CODE,PRODESCRIPTION.PDC_DESC
@@ -16,11 +16,14 @@ module.exports = {
         },
         {outFormat: oracledb.OUT_FORMAT_OBJECT},
       );
+      return result.rows;
       // await result.resultSet?.getRows((err, rows) => {
       // })
-      callBack(err, result.rows);
+      // callBack(null, result.rows);
     } catch (error) {
-      return callBack(error);
+      console.log(error);
+      throw error;
+      // return callBack(error);
     } finally {
       if (conn_ora) {
         await conn_ora.close();

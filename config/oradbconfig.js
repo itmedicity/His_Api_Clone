@@ -3,6 +3,7 @@ oracledb.outFormat = oracledb.OUT_FORMAT_OBJECT;
 
 let poolKMC;
 let poolTMC;
+let poolTMCCRON;
 let initPromise;
 
 /**
@@ -23,11 +24,25 @@ async function initializePools() {
         connectString: process.env.ORA_CONN_STRING,
         poolAlias: "TMC_POOL",
         poolMin: 2,
-        poolMax: 10,
-        poolIncrement: 2,
-        poolTimeout: 60,
+        poolMax: 6,
+        poolIncrement: 1,
+        queueTimeout: 60000,
       });
       console.log("TMC Oracle pool initialized");
+    }
+
+    if (!poolTMCCRON) {
+      poolTMCCRON = await oracledb.createPool({
+        user: process.env.ORA_USER,
+        password: process.env.ORAC_PASS,
+        connectString: process.env.ORA_CONN_STRING,
+        poolAlias: "TMC_CRONE_POOL",
+        poolMin: 1,
+        poolMax: 3,
+        poolIncrement: 1,
+        queueTimeout: 60000,
+      });
+      console.log("TMC Oracle_CRONE pool initialized");
     }
 
     if (!poolKMC) {
@@ -37,9 +52,9 @@ async function initializePools() {
         connectString: process.env.KMC_ORA_CONN_STRING,
         poolAlias: "KMC_POOL",
         poolMin: 2,
-        poolMax: 10,
-        poolIncrement: 2,
-        poolTimeout: 60,
+        poolMax: 6,
+        poolIncrement: 1,
+        queueTimeout: 60000,
       });
       console.log("KMC Oracle pool initialized");
     }
@@ -48,21 +63,16 @@ async function initializePools() {
   return initPromise;
 }
 
-/**
- * Retrieves a connection from the TMC Oracle connection pool.
- * If the pool has not been initialized yet, it will be initialized before retrieving the connection.
- * @returns {Promise<import('oracledb').PoolConnection>} A promise that resolves to an Oracle connection object.
- */
 async function getTmcConnection() {
   if (!poolTMC) await initializePools();
   return poolTMC.getConnection();
 }
 
-/**
- * Retrieves a connection from the KMC Oracle connection pool.
- * If the pool has not been initialized yet, it will be initialized before retrieving the connection.
- * @returns {Promise<import('oracledb').PoolConnection>} A promise that resolves to an Oracle connection object.
- */
+async function getTmcCronConnection() {
+  if (!poolTMCCRON) await initializePools();
+  return poolTMCCRON.getConnection();
+}
+
 async function getKmcConnection() {
   if (!poolKMC) await initializePools();
   return poolKMC.getConnection();
@@ -72,18 +82,40 @@ async function closeConnection() {
   try {
     if (poolTMC) await poolTMC.close(10);
     if (poolKMC) await poolKMC.close(10);
+    if (poolTMCCRON) await poolTMCCRON.close(10);
     console.log(" Oracle pools closed");
   } catch (err) {
     console.error("Error closing Oracle pools:", err);
   }
 }
 
+const oracleConnectionClose = async (conn_ora) => {
+  try {
+    if (conn_ora) {
+      await conn_ora.close();
+    }
+  } catch (error) {
+    console.log("Error Closing Oracle Connection", error);
+  }
+};
+
+setInterval(() => {
+  console.log("Oracle Pool Stats", {
+    open: poolTMC?.connectionsOpen,
+    inUse: poolTMC?.connectionsInUse,
+    open_cron: poolTMCCRON?.connectionsOpen,
+    inUse_cron: poolTMCCRON?.connectionsInUse,
+  });
+}, 30000);
+
 module.exports = {
   oracledb,
   initializePools,
   getTmcConnection,
   getKmcConnection,
+  getTmcCronConnection,
   closeConnection,
+  oracleConnectionClose,
 };
 
 // // Create a pool for KMC Oracle connection

@@ -77,7 +77,7 @@ module.exports = {
         },
         {outFormat: oracledb.OUT_FORMAT_OBJECT},
       );
-      callBack(err, result.rows);
+      callBack(null, result.rows);
     } catch (error) {
       console.log(error);
     } finally {
@@ -128,7 +128,7 @@ module.exports = {
         },
         {outFormat: oracledb.OUT_FORMAT_OBJECT},
       );
-      callBack(err, result.rows);
+      callBack(null, result.rows);
     } catch (error) {
       console.log(error);
     } finally {
@@ -210,7 +210,7 @@ module.exports = {
         },
         {outFormat: oracledb.OUT_FORMAT_OBJECT},
       );
-      callBack(err, result.rows);
+      callBack(null, result.rows);
     } catch (error) {
       console.log(error);
     } finally {
@@ -261,7 +261,7 @@ module.exports = {
         },
         {outFormat: oracledb.OUT_FORMAT_OBJECT},
       );
-      callBack(err, result.rows);
+      callBack(null, result.rows);
     } catch (error) {
       console.log(error);
     } finally {
@@ -306,7 +306,7 @@ module.exports = {
         },
         {outFormat: oracledb.OUT_FORMAT_OBJECT},
       );
-      callBack(err, result.rows);
+      callBack(null, result.rows);
     } catch (error) {
       console.log(error);
     } finally {

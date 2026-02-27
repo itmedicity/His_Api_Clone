@@ -1,4 +1,4 @@
-const pool = require("../../config/dbconfig");
+const {pools} = require("../../config/mysqldbconfig");
 const {getTmcConnection, oracledb} = require("../../config/oradbconfig");
 module.exports = {
   getOpCountDayWise: async (callBack) => {
@@ -36,7 +36,6 @@ module.exports = {
     } finally {
       if (conn_ora) {
         await conn_ora.close();
-        await pool_ora.close();
       }
     }
   },

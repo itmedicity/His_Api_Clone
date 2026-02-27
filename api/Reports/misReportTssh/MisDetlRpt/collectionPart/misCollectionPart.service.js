@@ -2,7 +2,7 @@
 const {oracledb, getTmcConnection} = require("../../../../../config/oradbconfig");
 
 module.exports = {
-  creditInsuranceBillDetlPart1: async (data, callBack) => {
+  creditInsuranceBillDetlPart1: async (data) => {
     let conn_ora = await getTmcConnection();
 
     // const ipNumberList = (data?.ptno?.length > 0 && data?.ptno?.join(',')) || null;
@@ -19,14 +19,16 @@ module.exports = {
                     FROM dual`;
     try {
       const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
-      callBack(err, result.rows);
+      // callBack(null, result);
+      return result.rows;
     } catch (error) {
       console.log(error);
+      throw error;
     } finally {
       if (conn_ora) await conn_ora.close();
     }
   },
-  creditInsuranceBillDetlPart2: async (data, callBack) => {
+  creditInsuranceBillDetlPart2: async (data) => {
     let conn_ora = await getTmcConnection();
 
     // const ipNumberList = data.ptno.join(',');
@@ -44,14 +46,16 @@ module.exports = {
                     FROM dual`;
     try {
       const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
-      callBack(err, result.rows);
+      // callBack(null, );
+      return result.rows;
     } catch (error) {
       console.log(error);
+      throw error;
     } finally {
       if (conn_ora) await conn_ora.close();
     }
   },
-  creditInsuranceBillDetlPart3: async (data, callBack) => {
+  creditInsuranceBillDetlPart3: async (data) => {
     let conn_ora = await getTmcConnection();
 
     // const ipNumberList = data.ptno.join(',');
@@ -96,14 +100,16 @@ module.exports = {
                         HAVING SUM (NVL (Dmn_credit, 0)) <> 0`;
     try {
       const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
-      callBack(err, result.rows);
+      // callBack(null, );
+      return result.rows;
     } catch (error) {
       console.log(error);
+      throw error;
     } finally {
       if (conn_ora) await conn_ora.close();
     }
   },
-  creditInsuranceBillDetlPart4: async (data, callBack) => {
+  creditInsuranceBillDetlPart4: async (data) => {
     let conn_ora = await getTmcConnection();
 
     // const ipNumberList = data.ptno.join(',');
@@ -154,14 +160,16 @@ module.exports = {
                         ORDER BY Pbillmast.Pt_no`;
     try {
       const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
-      callBack(err, result.rows);
+      // callBack(null, );
+      return result.rows;
     } catch (error) {
       console.log(error);
+      throw error;
     } finally {
       if (conn_ora) await conn_ora.close();
     }
   },
-  creditInsuranceBillDetlPart5: async (data, callBack) => {
+  creditInsuranceBillDetlPart5: async (data) => {
     let conn_ora = await getTmcConnection();
 
     // const ipNumberList = data.ptno.join(',');
@@ -204,14 +212,16 @@ module.exports = {
                         ORDER BY Pbillmast.Pt_no`;
     try {
       const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
-      callBack(err, result.rows);
+      // callBack(null, );
+      return result.rows;
     } catch (error) {
       console.log(error);
+      throw error;
     } finally {
       if (conn_ora) await conn_ora.close();
     }
   },
-  creditInsuranceBillDetlPart6: async (data, callBack) => {
+  creditInsuranceBillDetlPart6: async (data) => {
     let conn_ora = await getTmcConnection();
 
     // const ipNumberList = data.ptno.join(',');
@@ -229,14 +239,16 @@ module.exports = {
                     FROM dual`;
     try {
       const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
-      callBack(err, result.rows);
+      // callBack(null, );
+      return result.rows;
     } catch (error) {
       console.log(error);
+      throw error;
     } finally {
       if (conn_ora) await conn_ora.close();
     }
   },
-  unSettledAmountDetl: async (data, callBack) => {
+  unSettledAmountDetl: async (data) => {
     let conn_ora = await getTmcConnection();
 
     // const ipNumberList = data.ptno.join(',');
@@ -257,14 +269,16 @@ module.exports = {
                     FROM DUAL`;
     try {
       const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
-      callBack(err, result.rows);
+      // callBack(null, );
+      return result.rows;
     } catch (error) {
       console.log(error);
+      throw error;
     } finally {
       if (conn_ora) await conn_ora.close();
     }
   },
-  advanceCollection: async (data, callBack) => {
+  advanceCollection: async (data) => {
     let conn_ora = await getTmcConnection();
 
     // const ipNumberList = data.ptno.join(',');
@@ -317,14 +331,16 @@ module.exports = {
                                 Usc_name`;
     try {
       const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
-      callBack(err, result.rows);
+      // callBack(null, );
+      return result.rows;
     } catch (error) {
       console.log(error);
+      throw error;
     } finally {
       if (conn_ora) await conn_ora.close();
     }
   },
-  creditInsuranceBillCollection1: async (data, callBack) => {
+  creditInsuranceBillCollection1: async (data) => {
     let conn_ora = await getTmcConnection();
 
     // const ipNumberList = data.ptno.join(',');
@@ -353,14 +369,16 @@ module.exports = {
                             GROUP BY X.Rc_no,Rcn_cash,Rcn_chk,Rcn_dd,Rcn_Card,RCN_NEFT,Rcc_Bank,Cuc_name,Usc_name`;
     try {
       const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
-      callBack(err, result.rows);
+      // callBack(null, );
+      return result.rows;
     } catch (error) {
       console.log(error);
+      throw error;
     } finally {
       if (conn_ora) await conn_ora.close();
     }
   },
-  creditInsuranceBillCollection2: async (data, callBack) => {
+  creditInsuranceBillCollection2: async (data) => {
     let conn_ora = await getTmcConnection();
 
     // const ipNumberList = data.ptno.join(',');
@@ -388,9 +406,11 @@ module.exports = {
                             AND X.MH_CODE IN (SELECT MH_CODE FROM multihospital)`;
     try {
       const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
-      callBack(err, result.rows);
+      // callBack(null, );
+      return result.rows;
     } catch (error) {
       console.log(error);
+      throw error;
     } finally {
       if (conn_ora) await conn_ora.close();
     }

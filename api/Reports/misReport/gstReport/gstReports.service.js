@@ -1,6 +1,13 @@
-// @ts-ignore
 const {oracledb, getTmcConnection} = require("../../../../config/oradbconfig");
-
+const oracleConnectionClose = async (conn_ora) => {
+  try {
+    if (conn_ora) {
+      await conn_ora.close();
+    }
+  } catch (error) {
+    console.log("Error Closing Oracle Connection", error);
+  }
+};
 module.exports = {
   gstreportsPartOne: async (data, callBack) => {
     let conn_ora = await getTmcConnection();
@@ -77,15 +84,12 @@ module.exports = {
         },
         {outFormat: oracledb.OUT_FORMAT_OBJECT},
       );
-      //   await result.resultSet?.getRows((err, rows) => {
-      // });
-      callBack(err, result.rows);
+      callBack(null, result.rows);
     } catch (error) {
       console.log(error);
+      throw error;
     } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-      }
+      await oracleConnectionClose(conn_ora);
     }
   },
   gstreportsPartTwo: async (data, callBack) => {
@@ -132,19 +136,15 @@ module.exports = {
         },
         {outFormat: oracledb.OUT_FORMAT_OBJECT},
       );
-      //   await result.resultSet?.getRows((err, rows) => {
-      // });
-      callBack(err, result.rows);
+      callBack(null, result.rows);
     } catch (error) {
       console.log(error);
+      throw error;
     } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-        // await pool_ora.close();
-      }
+      await oracleConnectionClose(conn_ora);
     }
   },
-  gstreportsPartThree: async (data, callBack) => {();
+  gstreportsPartThree: async (data, callBack) => {
     let conn_ora = await getTmcConnection();
     try {
       const result = await conn_ora.execute(
@@ -219,16 +219,12 @@ module.exports = {
         },
         {outFormat: oracledb.OUT_FORMAT_OBJECT},
       );
-    //   await result.resultSet?.getRows((err, rows) => {
-    // });
-    callBack(err, result.rows);
+      callBack(null, result.rows);
     } catch (error) {
       console.log(error);
+      throw error;
     } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-        // await pool_ora.close();
-      }
+      await oracleConnectionClose(conn_ora);
     }
   },
   gstreportsPartFour: async (data, callBack) => {
@@ -275,16 +271,12 @@ module.exports = {
         },
         {outFormat: oracledb.OUT_FORMAT_OBJECT},
       );
-    //   await result.resultSet?.getRows((err, rows) => {
-    // });
-    callBack(err, result.rows);
+      callBack(null, result.rows);
     } catch (error) {
       console.log(error);
+      throw error;
     } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-        // await pool_ora.close();
-      }
+      await oracleConnectionClose(conn_ora);
     }
   },
   gstreportsPartFive: async (data, callBack) => {
@@ -325,15 +317,12 @@ module.exports = {
         },
         {outFormat: oracledb.OUT_FORMAT_OBJECT},
       );
-    //   await result.resultSet?.getRows((err, rows) => {
-    // });
-    callBack(err, result.rows);
+      callBack(null, result.rows);
     } catch (error) {
       console.log(error);
+      throw error;
     } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-      }
+      await oracleConnectionClose(conn_ora);
     }
   },
 };

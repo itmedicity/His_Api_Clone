@@ -1,4 +1,4 @@
-const pool = require("../../../../config/dbconfig");
+const {pools} = require("../../../../config/mysqldbconfig");
 const {getTmcConnection, oracledb} = require("../../../../config/oradbconfig");
 
 module.exports = {

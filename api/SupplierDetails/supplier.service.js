@@ -1,7 +1,7 @@
-const pool = require("../../config/dbconfig");
+const {pools} = require("../../config/mysqldbconfig");
 const {getTmcConnection, oracledb} = require("../../config/oradbconfig");
 module.exports = {
-  getSupplierList: async (data, callBack) => {
+  getSupplierList: async (data) => {
     let conn_ora = await getTmcConnection();
     const sql = `SELECT
                            SU_CODE,SUC_NAME,SUC_ALIAS,SUC_STATUS,SUC_PERSON,SUC_ADD1,SUC_ADD2,SUC_ADD3,SUC_ADD4,SUC_PHONE,
@@ -23,16 +23,19 @@ module.exports = {
         },
         {outFormat: oracledb.OUT_FORMAT_OBJECT},
       );
-      callBack(null, result.rows);
+      return result.rows;
+      // callBack(null, result.rows);
     } catch (error) {
-      return callBack(error);
+      console.log(error);
+      throw error;
+      // return callBack(error);
     } finally {
       if (conn_ora) {
         await conn_ora.close();
       }
     }
   },
-  getActiveSupplierList: async (callBack) => {
+  getActiveSupplierList: async () => {
     let conn_ora = await getTmcConnection();
     const sql = `SELECT
                            SUPPLIER.SU_CODE,SUC_NAME,SUC_ALIAS,SUC_STATUS
@@ -48,9 +51,12 @@ module.exports = {
                      ORDER BY SUC_NAME`;
     try {
       const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
-      callBack(null, result.rows);
+      // callBack(null, result.rows);
+      return result.rows;
     } catch (error) {
-      return callBack(error);
+      console.log(error);
+      throw error;
+      // return callBack(error);
     } finally {
       if (conn_ora) await conn_ora.close();
     }

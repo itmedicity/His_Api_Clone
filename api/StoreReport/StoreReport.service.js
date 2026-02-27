@@ -2,7 +2,7 @@ const {format, parseISO} = require("date-fns");
 const {getTmcConnection, oracledb} = require("../../config/oradbconfig");
 
 module.exports = {
-  getPurchaseMastDatas: async (data, callBack) => {
+  getPurchaseMastDatas: async (data) => {
     const {fromDate, toDate} = data;
     const from = fromDate ? parseISO(fromDate) : null;
     const to = toDate ? parseISO(toDate) : null;
@@ -189,16 +189,19 @@ LEFT JOIN MEDDESC ON MEDDESC.IT_CODE = PUR.PU_ITEM
         },
         {outFormat: oracledb.OUT_FORMAT_OBJECT},
       );
-      callBack(null, result.rows);
+      return result.rows;
+      // callBack(null, result.rows);
     } catch (error) {
-      return callBack(error);
+      console.log(error);
+      throw error;
+      // return callBack(error);
     } finally {
       if (conn_ora) await conn_ora.close();
     }
   },
 
   //Grm Details
-  getGrmDetails: async (data, callBack) => {
+  getGrmDetails: async (data) => {
     const {fromDate, toDate} = data;
     const from = fromDate ? parseISO(fromDate) : null;
     const to = toDate ? parseISO(toDate) : null;
@@ -222,7 +225,7 @@ LEFT JOIN MEDDESC ON MEDDESC.IT_CODE = PUR.PU_ITEM
     PO_FREEQTY AS "PO FREE QTY",
     PO_RATE AS "RATE",
     PO_DISPER AS "DIS %",
-     ROUND(((PO_MRP - PO_RATE ) / PO_RATE ) * 100,2) AS "PO MARGIN %",
+    ROUND(((PO_MRP - PO_RATE ) / PO_RATE ) * 100,2) AS "PO MARGIN %",
     ROUND((PU_RATE - PO_RATE),3) AS "RATE VARIATION",
     NVL(ROUND(((ROUND(QU_MRP / (1 + (TAX.TXN_PURPER / 100)), 2) - QU_RATE) / QU_RATE) * 100,2),0) AS "QUO MARGIN %",
     ROUND(((PO_MRP - PO_RATE ) / PO_RATE ) * 100,2) AS "ORDER MARGIN %",
@@ -231,7 +234,8 @@ LEFT JOIN MEDDESC ON MEDDESC.IT_CODE = PUR.PU_ITEM
     (PO_FREEQTY - PU_FREE) AS "GRN VARIATION FREE",
     (PU_DATE - PO_DATE) AS DATE_DIFF,
     (PO_DISPER - PU_DISPER) AS "DISCOUNT VARIATION",
-    SU.SUC_NAME
+    SU.SUC_NAME,
+    PO_MRP AS "PO_MRP"
 FROM (
         SELECT DISTINCT
             PM.PU_NO,
@@ -374,15 +378,18 @@ JOIN SUPPLIER SU ON SU.SU_CODE = PUR.SU_CODE
         },
         {outFormat: oracledb.OUT_FORMAT_OBJECT},
       );
-      callBack(null, result.rows);
+      // callBack(null, result.rows);
+      return result.rows;
     } catch (error) {
-      return callBack(error);
+      // return callBack(error);
+      console.log(error);
+      throw error;
     } finally {
       if (conn_ora) await conn_ora.close();
     }
   },
 
-  getpendingApprovalQtn: async (callBack) => {
+  getpendingApprovalQtn: async () => {
     let conn_ora = await getTmcConnection();
     const sql = `
              SELECT 
@@ -404,14 +411,17 @@ JOIN SUPPLIER SU ON SU.SU_CODE = PUR.SU_CODE
             `;
     try {
       const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
-      callBack(null, result.rows);
+      // callBack(null, result.rows);
+      return result.rows;
     } catch (error) {
-      return callBack(error);
+      // return callBack(error);
+      console.log(error);
+      throw error;
     } finally {
       if (conn_ora) await conn_ora.close();
     }
   },
-  getPurchaseDetails: async (data, callBack) => {
+  getPurchaseDetails: async (data) => {
     let conn_ora = await getTmcConnection();
     try {
       const result = await conn_ora.execute(
@@ -445,13 +455,16 @@ JOIN SUPPLIER SU ON SU.SU_CODE = PUR.SU_CODE
         },
         {outFormat: oracledb.OUT_FORMAT_OBJECT},
       );
-      callBack(null, result.rows);
+      return result.rows;
+      // callBack(null, result.rows);
     } catch (error) {
+      console.log(error);
+      throw error;
     } finally {
       if (conn_ora) await conn_ora.close();
     }
   },
-  getItemDetails: async (data, callBack) => {
+  getItemDetails: async (data) => {
     let conn_ora = await getTmcConnection();
     try {
       const result = await conn_ora.execute(
@@ -498,8 +511,11 @@ JOIN SUPPLIER SU ON SU.SU_CODE = PUR.SU_CODE
         },
         {outFormat: oracledb.OUT_FORMAT_OBJECT},
       );
-      callBack(null, result.rows);
+      return result.rows;
+      // callBack(null, result.rows);
     } catch (error) {
+      console.log(error);
+      throw error;
     } finally {
       if (conn_ora) await conn_ora.close();
     }

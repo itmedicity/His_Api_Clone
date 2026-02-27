@@ -1,13 +1,10 @@
-// @ts-ignore
-const {oracledb, getTmcConnection} = require("../../../../config/oradbconfig");
+const {oracledb} = require("../../../../config/oradbconfig");
 
 module.exports = {
   //Advance Collection (C)
-  advanceCollection: async (data, callBack) => {
-    let conn_ora = await getTmcConnection();
-    try {
-      const result = await conn_ora.execute(
-        `SELECT SUM (NVL (ARN_AMOUNT, 0)) Amt, 0 tax
+  advanceCollection: async (conn_ora, data) => {
+    const result = await conn_ora.execute(
+      `SELECT SUM (NVL (ARN_AMOUNT, 0)) Amt, 0 tax
                         FROM OPADVANCE
                     WHERE NVL (ARC_CANCEL, 'N') = 'N'
                             AND ARD_DATE >=
@@ -42,36 +39,24 @@ module.exports = {
                             AND ARD_DATE <=
                                     TO_DATE (:date7, 'dd/MM/yyyy hh24:mi:ss')
                             AND ADVANCEENTRY.ARC_MHCODE IN (SELECT MH_CODE FROM multihospital)`,
-        {
-          date0: data.from,
-          date1: data.to,
-          date2: data.from,
-          date3: data.to,
-          date4: data.from,
-          date5: data.to,
-          date6: data.from,
-          date7: data.to,
-        },
-        {outFormat: oracledb.OUT_FORMAT_OBJECT},
-      );
-      // await result.resultSet?.getRows((err, rows) => {
-      // })
-      callBack(err, result.rows);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-        // await pool_ora.close();
-      }
-    }
+      {
+        date0: data.from,
+        date1: data.to,
+        date2: data.from,
+        date3: data.to,
+        date4: data.from,
+        date5: data.to,
+        date6: data.from,
+        date7: data.to,
+      },
+      {outFormat: oracledb.OUT_FORMAT_OBJECT},
+    );
+    return result.rows;
   },
   // Advance Refund (B)
-  advanceRefund: async (data, callBack) => {
-    let conn_ora = await getTmcConnection();
-    try {
-      const result = await conn_ora.execute(
-        `SELECT SUM (NVL (REFUNDOPADVANCE.RFN_AMT, 0)) Amt, 0 tax
+  advanceRefund: async (conn_ora, data) => {
+    const result = await conn_ora.execute(
+      `SELECT SUM (NVL (REFUNDOPADVANCE.RFN_AMT, 0)) Amt, 0 tax
                 FROM REFUNDOPADVANCE
                WHERE REFUNDOPADVANCE.Rfc_Cancel = 'N'
                      AND REFUNDOPADVANCE.Rfd_Date >=
@@ -118,36 +103,24 @@ module.exports = {
                      AND ADVANCERETURN.RAD_DATE <=
                             TO_DATE (:date7, 'dd/MM/yyyy hh24:mi:ss')
               HAVING SUM (NVL (ADVANCERETURN.RAN_AMT, 0)) > 0`,
-        {
-          date0: data.from,
-          date1: data.to,
-          date2: data.from,
-          date3: data.to,
-          date4: data.from,
-          date5: data.to,
-          date6: data.from,
-          date7: data.to,
-        },
-        {outFormat: oracledb.OUT_FORMAT_OBJECT},
-      );
-      //   await result.resultSet?.getRows((err, rows) => {
-      // });
-      callBack(err, result.rows);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-        // await pool_ora.close();
-      }
-    }
+      {
+        date0: data.from,
+        date1: data.to,
+        date2: data.from,
+        date3: data.to,
+        date4: data.from,
+        date5: data.to,
+        date6: data.from,
+        date7: data.to,
+      },
+      {outFormat: oracledb.OUT_FORMAT_OBJECT},
+    );
+    return result.rows;
   },
   //Advance Settled
-  advanceSettled: async (data, callBack) => {
-    let conn_ora = await getTmcConnection();
-    try {
-      const result = await conn_ora.execute(
-        `SELECT SUM (NVL (Opn_advance, 0)) Amt, 0 tax
+  advanceSettled: async (conn_ora, data) => {
+    const result = await conn_ora.execute(
+      `SELECT SUM (NVL (Opn_advance, 0)) Amt, 0 tax
                     FROM Opbillmast
                 WHERE NVL (OPN_CANCEL, 'N') = 'N'
                         AND OPD_DATE >=
@@ -204,40 +177,28 @@ module.exports = {
                         AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         AND BMD_COLLDATE <=
                                 TO_DATE (:date11, 'dd/MM/yyyy hh24:mi:ss')`,
-        {
-          date0: data.from,
-          date1: data.to,
-          date2: data.from,
-          date3: data.to,
-          date4: data.from,
-          date5: data.to,
-          date6: data.from,
-          date7: data.to,
-          date8: data.from,
-          date9: data.to,
-          date10: data.from,
-          date11: data.to,
-        },
-        {outFormat: oracledb.OUT_FORMAT_OBJECT},
-      );
-      //   await result.resultSet?.getRows((err, rows) => {
-      // });
-      callBack(err, result.rows);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-        // await pool_ora.close();
-      }
-    }
+      {
+        date0: data.from,
+        date1: data.to,
+        date2: data.from,
+        date3: data.to,
+        date4: data.from,
+        date5: data.to,
+        date6: data.from,
+        date7: data.to,
+        date8: data.from,
+        date9: data.to,
+        date10: data.from,
+        date11: data.to,
+      },
+      {outFormat: oracledb.OUT_FORMAT_OBJECT},
+    );
+    return result.rows;
   },
   //Collection Against Sales (A) Total Value
-  collectionAgainstSalePart1: async (data, callBack) => {
-    let conn_ora = await getTmcConnection();
-    try {
-      const result = await conn_ora.execute(
-        `SELECT SUM (
+  collectionAgainstSalePart1: async (conn_ora, data) => {
+    const result = await conn_ora.execute(
+      `SELECT SUM (
                                     NVL (receiptmast.RPN_CASH, 0)
                                 + NVL (receiptmast.RPN_CARD, 0)
                                 + NVL (receiptmast.RPN_CHEQUE, 0))
@@ -363,46 +324,34 @@ module.exports = {
                             AND Pbillmast.BMD_COLLDATE <=
                                     TO_DATE (:date18, 'dd/MM/yyyy hh24:mi:ss')
                             AND pbillmast.MH_CODE IN (SELECT MH_CODE FROM multihospital)`,
-        {
-          date1: data.from,
-          date2: data.to,
-          date3: data.from,
-          date4: data.to,
-          date5: data.from,
-          date6: data.to,
-          date7: data.from,
-          date8: data.to,
-          date9: data.from,
-          date10: data.to,
-          date11: data.from,
-          date12: data.to,
-          date13: data.from,
-          date14: data.to,
-          date15: data.from,
-          date16: data.to,
-          date17: data.from,
-          date18: data.to,
-        },
-        {outFormat: oracledb.OUT_FORMAT_OBJECT},
-      );
-      //   await result.resultSet?.getRows((err, rows) => {
-      // });
-      callBack(err, result.rows);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-        // await pool_ora.close();
-      }
-    }
+      {
+        date1: data.from,
+        date2: data.to,
+        date3: data.from,
+        date4: data.to,
+        date5: data.from,
+        date6: data.to,
+        date7: data.from,
+        date8: data.to,
+        date9: data.from,
+        date10: data.to,
+        date11: data.from,
+        date12: data.to,
+        date13: data.from,
+        date14: data.to,
+        date15: data.from,
+        date16: data.to,
+        date17: data.from,
+        date18: data.to,
+      },
+      {outFormat: oracledb.OUT_FORMAT_OBJECT},
+    );
+    return result.rows;
   },
   //Collection Against Sales (A) negative value
-  collectionAgainstSalePart2: async (data, callBack) => {
-    let conn_ora = await getTmcConnection();
-    try {
-      const result = await conn_ora.execute(
-        `SELECT SUM (
+  collectionAgainstSalePart2: async (conn_ora, data) => {
+    const result = await conn_ora.execute(
+      `SELECT SUM (
                                 NVL (Refundreceiptmast.RFN_CASH, 0)
                             + NVL (Refundreceiptmast.RFN_CARD, 0)
                             + NVL (Refundreceiptmast.RFN_CHEQUE, 0))
@@ -582,46 +531,34 @@ module.exports = {
                         AND Mretmast.MRD_RETDATE <=
                                 TO_DATE (:date18, 'dd/MM/yyyy hh24:mi:ss')
                         AND MRETMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)`,
-        {
-          date1: data.from,
-          date2: data.to,
-          date3: data.from,
-          date4: data.to,
-          date5: data.from,
-          date6: data.to,
-          date7: data.from,
-          date8: data.to,
-          date9: data.from,
-          date10: data.to,
-          date11: data.from,
-          date12: data.to,
-          date13: data.from,
-          date14: data.to,
-          date15: data.from,
-          date16: data.to,
-          date17: data.from,
-          date18: data.to,
-        },
-        {outFormat: oracledb.OUT_FORMAT_OBJECT},
-      );
-      //   await result.resultSet?.getRows((err, rows) => {
-      // });
-      callBack(err, result.rows);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-        // await pool_ora.close();
-      }
-    }
+      {
+        date1: data.from,
+        date2: data.to,
+        date3: data.from,
+        date4: data.to,
+        date5: data.from,
+        date6: data.to,
+        date7: data.from,
+        date8: data.to,
+        date9: data.from,
+        date10: data.to,
+        date11: data.from,
+        date12: data.to,
+        date13: data.from,
+        date14: data.to,
+        date15: data.from,
+        date16: data.to,
+        date17: data.from,
+        date18: data.to,
+      },
+      {outFormat: oracledb.OUT_FORMAT_OBJECT},
+    );
+    return result.rows;
   },
   // Complimentary
-  complimentory: async (data, callBack) => {
-    let conn_ora = await getTmcConnection();
-    try {
-      const result = await conn_ora.execute(
-        `SELECT SUM (
+  complimentory: async (conn_ora, data) => {
+    const result = await conn_ora.execute(
+      `SELECT SUM (
                                 NVL (Opbillmast.OPN_NETAMT, 0)
                             + NVL (OPBILLMAST.OPN_SALETAXCH, 0)
                             + NVL (OPBILLMAST.OPN_SALETAXCR, 0))
@@ -656,33 +593,20 @@ module.exports = {
                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         AND DMD_DATE <=
                                 TO_DATE (:date4, 'dd/MM/yyyy hh24:mi:ss')`,
-        {
-          date1: data.from,
-          date2: data.to,
-          date3: data.from,
-          date4: data.to,
-        },
-        {outFormat: oracledb.OUT_FORMAT_OBJECT},
-      );
-
-      //   await result.resultSet?.getRows((err, rows) => {
-      // });
-      callBack(err, result.rows);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-        // await pool_ora.close();
-      }
-    }
+      {
+        date1: data.from,
+        date2: data.to,
+        date3: data.from,
+        date4: data.to,
+      },
+      {outFormat: oracledb.OUT_FORMAT_OBJECT},
+    );
+    return result.rows;
   },
   // CreditInsurance Bill Collection(D)
-  creditInsuranceBillCollection: async (data, callBack) => {
-    let conn_ora = await getTmcConnection();
-    try {
-      const result = await conn_ora.execute(
-        `SELECT SUM (
+  creditInsuranceBillCollection: async (conn_ora, data) => {
+    const result = await conn_ora.execute(
+      `SELECT SUM (
                             NVL (RECPCOLLECTIONMAST.RCN_CASH, 0)
                         + NVL (RECPCOLLECTIONMAST.RCN_CHK, 0)
                         + NVL (RECPCOLLECTIONMAST.RCN_DD, 0)
@@ -718,31 +642,20 @@ module.exports = {
                     AND Recpcollectionmast.Rfd_Date <=
                             TO_DATE (:date4, 'dd/MM/yyyy hh24:mi:ss')
                     AND NVL (Rcc_Cancel, 'N') = 'N'`,
-        {
-          date1: data.from,
-          date2: data.to,
-          date3: data.from,
-          date4: data.to,
-        },
-        {outFormat: oracledb.OUT_FORMAT_OBJECT},
-      );
-      //   await result.resultSet?.getRows((err, rows) => {
-      // });
-      callBack(err, result.rows);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-      }
-    }
+      {
+        date1: data.from,
+        date2: data.to,
+        date3: data.from,
+        date4: data.to,
+      },
+      {outFormat: oracledb.OUT_FORMAT_OBJECT},
+    );
+    return result.rows;
   },
   //	Credit/Insurance Bill
-  creditInsuranceBill: async (data, callBack) => {
-    let conn_ora = await getTmcConnection();
-    try {
-      const result = await conn_ora.execute(
-        `SELECT SUM (NVL (RPN_CREDIT, 0)) AS Amt,
+  creditInsuranceBill: async (conn_ora, data) => {
+    const result = await conn_ora.execute(
+      `SELECT SUM (NVL (RPN_CREDIT, 0)) AS Amt,
                             SUM (NVL (receiptmast.RPN_TOTTAX, 0)) Tax
                     FROM receiptmast
                     WHERE     receiptmast.RPC_CACR IN ('R')
@@ -868,44 +781,32 @@ module.exports = {
                             AND receiptmast.RPD_COLLDATE <=
                                 TO_DATE (:date16, 'dd/MM/yyyy hh24:mi:ss')
                             AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)`,
-        {
-          date1: data.from,
-          date2: data.to,
-          date3: data.from,
-          date4: data.to,
-          date5: data.from,
-          date6: data.to,
-          date7: data.from,
-          date8: data.to,
-          date9: data.from,
-          date10: data.to,
-          date11: data.from,
-          date12: data.to,
-          date13: data.from,
-          date14: data.to,
-          date15: data.from,
-          date16: data.to,
-        },
-        {outFormat: oracledb.OUT_FORMAT_OBJECT},
-      );
-      //   await result.resultSet?.getRows((err, rows) => {
-      // });
-      callBack(err, result.rows);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-        // await pool_ora.close();
-      }
-    }
+      {
+        date1: data.from,
+        date2: data.to,
+        date3: data.from,
+        date4: data.to,
+        date5: data.from,
+        date6: data.to,
+        date7: data.from,
+        date8: data.to,
+        date9: data.from,
+        date10: data.to,
+        date11: data.from,
+        date12: data.to,
+        date13: data.from,
+        date14: data.to,
+        date15: data.from,
+        date16: data.to,
+      },
+      {outFormat: oracledb.OUT_FORMAT_OBJECT},
+    );
+    return result.rows;
   },
   //Ip Consolidate Discount
-  ipConsolidatedDiscount: async (data, callBack) => {
-    let conn_ora = await getTmcConnection();
-    try {
-      const result = await conn_ora.execute(
-        `SELECT SUM (NVL (irn_discount, 0)) Discount
+  ipConsolidatedDiscount: async (conn_ora, data) => {
+    const result = await conn_ora.execute(
+      `SELECT SUM (NVL (irn_discount, 0)) Discount
                         FROM Ipreceipt, Disbillmast
                     WHERE     Ipreceipt.Dmc_Slno = Disbillmast.Dmc_Slno
                             AND NVL (irc_cancel, 'N') = 'N'
@@ -922,32 +823,20 @@ module.exports = {
                                     TO_DATE (:date4, 'dd/MM/yyyy hh24:mi:ss')
                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             AND NVL (irn_discount, 0) > 0`,
-        {
-          date1: data.from,
-          date2: data.to,
-          date3: data.from,
-          date4: data.to,
-        },
-        {outFormat: oracledb.OUT_FORMAT_OBJECT},
-      );
-      //   await result.resultSet?.getRows((err, rows) => {
-      // });
-      callBack(err, result.rows);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-        // await pool_ora.close();
-      }
-    }
+      {
+        date1: data.from,
+        date2: data.to,
+        date3: data.from,
+        date4: data.to,
+      },
+      {outFormat: oracledb.OUT_FORMAT_OBJECT},
+    );
+    return result.rows;
   },
   // IP Previous Day's  Discount
-  ipPreviousDayDiscount: async (data, callBack) => {
-    let conn_ora = await getTmcConnection();
-    try {
-      const result = await conn_ora.execute(
-        `SELECT SUM (NVL (Irn_Discount, 0)) Discount
+  ipPreviousDayDiscount: async (conn_ora, data) => {
+    const result = await conn_ora.execute(
+      `SELECT SUM (NVL (Irn_Discount, 0)) Discount
                     FROM ipreceipt, Disbillmast
                 WHERE Ipreceipt.Dmc_slno = Disbillmast.Dmc_slno
                         AND Disbillmast.Dmd_date <
@@ -959,31 +848,19 @@ module.exports = {
                         AND IRD_DATE <=
                                 TO_DATE (:date3, 'dd/MM/yyyy hh24:mi:ss')
                         AND NVL (Irc_cancel, 'N') = 'N'`,
-        {
-          date1: data.from,
-          date2: data.from,
-          date3: data.to,
-        },
-        {outFormat: oracledb.OUT_FORMAT_OBJECT},
-      );
-      //   await result.resultSet?.getRows((err, rows) => {
-      // });
-      callBack(err, result.rows);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-        // await pool_ora.close();
-      }
-    }
+      {
+        date1: data.from,
+        date2: data.from,
+        date3: data.to,
+      },
+      {outFormat: oracledb.OUT_FORMAT_OBJECT},
+    );
+    return result.rows;
   },
   // IP Previous Day's Collectoion(E)
-  ipPreviousDayCollection: async (data, callBack) => {
-    let conn_ora = await getTmcConnection();
-    try {
-      const result = await conn_ora.execute(
-        `SELECT SUM (
+  ipPreviousDayCollection: async (conn_ora, data) => {
+    const result = await conn_ora.execute(
+      `SELECT SUM (
                             (  NVL (Ipreceipt.irn_amount, 0)
                             + NVL (Ipreceipt.irn_cheque, 0)
                             + NVL (Ipreceipt.irn_card, 0)
@@ -1004,32 +881,19 @@ module.exports = {
                         AND ird_date <=
                                 TO_DATE (:date3, 'dd/MM/yyyy hh24:mi:ss')
                         AND Irc_cancel IS NULL`,
-        {
-          date1: data.from,
-          date2: data.from,
-          date3: data.to,
-        },
-        {outFormat: oracledb.OUT_FORMAT_OBJECT},
-      );
-
-      //   await result.resultSet?.getRows((err, rows) => {
-      // });
-      callBack(err, result.rows);
-    } catch (err) {
-      console.log(err);
-    } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-        // await pool_ora.close();
-      }
-    }
+      {
+        date1: data.from,
+        date2: data.from,
+        date3: data.to,
+      },
+      {outFormat: oracledb.OUT_FORMAT_OBJECT},
+    );
+    return result.rows;
   },
   // UnSettled Amount
-  unsettledAmount: async (data, callBack) => {
-    let conn_ora = await getTmcConnection();
-    try {
-      const result = await conn_ora.execute(
-        `SELECT SUM (NVL (Payable, 0)) Amt, SUM (tax) tax
+  unsettledAmount: async (conn_ora, data) => {
+    const result = await conn_ora.execute(
+      `SELECT SUM (NVL (Payable, 0)) Amt, SUM (tax) tax
                     FROM (SELECT SUM (NVL (DMN_FINALPTPAYABLE, 0)) Payable,
                                 SUM (
                                     DECODE (
@@ -1099,68 +963,32 @@ module.exports = {
                                         + NVL (Ipreceipt.IRN_REFCHEQ, 0)
                                         + NVL (Ipreceipt.irn_refcard, 0))
                                     + NVL (ipreceipt.irn_discount, 0)) <> 0) A`,
-        {
-          date1: data.from,
-          date2: data.to,
-          date3: data.from,
-          date4: data.to,
-          date5: data.from,
-          date6: data.to,
-        },
-        {outFormat: oracledb.OUT_FORMAT_OBJECT},
-      );
-      //   await result.resultSet?.getRows((err, rows) => {
-      // });
-      callBack(err, result.rows);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-        // await pool_ora.close();
-      }
-    }
+      {
+        date1: data.from,
+        date2: data.to,
+        date3: data.from,
+        date4: data.to,
+        date5: data.from,
+        date6: data.to,
+      },
+      {outFormat: oracledb.OUT_FORMAT_OBJECT},
+    );
+    return result.rows;
   },
   // MIS GROUP & CATEGORY
-  misGroupMast: async (callBack) => {
-    let conn_ora = await getTmcConnection();
-    try {
-      const result = await conn_ora.execute(`SELECT * FROM MISINCEXPMAST`, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
-
-      //   await result.resultSet?.getRows((err, rows) => {
-      // });
-      callBack(err, result.rows);
-    } catch (err) {
-      console.log(err);
-    } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-      }
-    }
+  misGroupMast: async (conn_ora) => {
+    const result = await conn_ora.execute(`SELECT * FROM MISINCEXPMAST`, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+    return result.rows;
   },
-  misGroup: async (callBack) => {
-    let conn_ora = await pool_ora.getConnection();
-    try {
-      const result = await conn_ora.execute(`SELECT * FROM Misincexpgroup`, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
-      callBack(err, result.rows);
-    } catch (err) {
-      console.log(err);
-    } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-        // await pool_ora.close();
-      }
-    }
+  misGroup: async (conn_ora) => {
+    const result = await conn_ora.execute(`SELECT * FROM Misincexpgroup`, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+    return result.rows;
   },
-  creditInsuranceBillRefund: async (data, callBack) => {
-    let conn_ora = await getTmcConnection();
-
+  creditInsuranceBillRefund: async (conn_ora, data) => {
     const fromDate = data.from;
     const toDate = data.to;
-
-    try {
-      const result = await conn_ora.execute(
-        `SELECT SUM (NVL (Refundreceiptmast.RPN_RTCREDIT, 0)) * -1 AS Amt,
+    const result = await conn_ora.execute(
+      `SELECT SUM (NVL (Refundreceiptmast.RPN_RTCREDIT, 0)) * -1 AS Amt,
                         SUM (NVL (Refundreceiptmast.RFN_TOTTAX, 0)) * -1 tax
                 FROM Refundreceiptmast
                 WHERE     Refundreceiptmast.Rfc_Cacr IN ('R')
@@ -1275,19 +1103,9 @@ module.exports = {
                         AND Mretmast.MRD_RETDATE <=
                             TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
                         AND MRETMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)`,
-        {},
-        {outFormat: oracledb.OUT_FORMAT_OBJECT},
-      );
-      //   await result.resultSet?.getRows((err, rows) => {
-      // });
-      callBack(err, result.rows);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-        // await pool_ora.close();
-      }
-    }
+      {},
+      {outFormat: oracledb.OUT_FORMAT_OBJECT},
+    );
+    return result.rows;
   },
 };

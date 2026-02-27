@@ -3,7 +3,7 @@ const {oracledb, getTmcConnection} = require("../../../../config/oradbconfig");
 
 module.exports = {
   //Advance Collection (C)
-  advanceCollection: async (data, callBack) => {
+  advanceCollection: async (data) => {
     let conn_ora = await getTmcConnection();
     try {
       const result = await conn_ora.execute(
@@ -48,15 +48,17 @@ module.exports = {
         },
         {outFormat: oracledb.OUT_FORMAT_OBJECT},
       );
-      callBack(err, result.rows);
+      // callBack(null, );
+      return result.rows;
     } catch (error) {
       console.log(error);
+      throw error;
     } finally {
       if (conn_ora) await conn_ora.close();
     }
   },
   // Advance Refund (B)
-  advanceRefund: async (data, callBack) => {
+  advanceRefund: async (data) => {
     let conn_ora = await getTmcConnection();
     try {
       const result = await conn_ora.execute(
@@ -116,15 +118,17 @@ module.exports = {
         },
         {outFormat: oracledb.OUT_FORMAT_OBJECT},
       );
-      callBack(err, result.rows);
+      // callBack(null, );
+      return result.rows;
     } catch (error) {
       console.log(error);
+      throw error;
     } finally {
       if (conn_ora) await conn_ora.close();
     }
   },
   //Advance Settled
-  advanceSettled: async (data, callBack) => {
+  advanceSettled: async (data) => {
     let conn_ora = await getTmcConnection();
     try {
       const result = await conn_ora.execute(
@@ -190,15 +194,17 @@ module.exports = {
         },
         {outFormat: oracledb.OUT_FORMAT_OBJECT},
       );
-      callBack(err, result.rows);
+      // callBack(null, );
+      return result.rows;
     } catch (error) {
       console.log(error);
+      throw error;
     } finally {
       if (conn_ora) await conn_ora.close();
     }
   },
   //Collection Against Sales (A) Total Value
-  collectionAgainstSalePart1: async (data, callBack) => {
+  collectionAgainstSalePart1: async (data) => {
     let conn_ora = await getTmcConnection();
     try {
       const result = await conn_ora.execute(
@@ -352,15 +358,17 @@ SELECT SUM (
         },
         {outFormat: oracledb.OUT_FORMAT_OBJECT},
       );
-      callBack(err, result.rows);
+      // callBack(null, );
+      return result.rows;
     } catch (error) {
       console.log(error);
+      throw error;
     } finally {
       if (conn_ora) await conn_ora.close();
     }
   },
   //Collection Against Sales (A) negative value
-  collectionAgainstSalePart2: async (data, callBack) => {
+  collectionAgainstSalePart2: async (data) => {
     let conn_ora = await getTmcConnection();
     try {
       const result = await conn_ora.execute(
@@ -502,15 +510,17 @@ SELECT SUM (
         },
         {outFormat: oracledb.OUT_FORMAT_OBJECT},
       );
-      callBack(err, result.rows);
+      // callBack(null, );
+      return result.rows;
     } catch (error) {
       console.log(error);
+      throw error;
     } finally {
       if (conn_ora) await conn_ora.close();
     }
   },
   // Complimentary
-  complimentory: async (data, callBack) => {
+  complimentory: async (data) => {
     let conn_ora = await getTmcConnection();
     try {
       const result = await conn_ora.execute(
@@ -543,15 +553,17 @@ SELECT SUM (
         {outFormat: oracledb.OUT_FORMAT_OBJECT},
       );
 
-      callBack(err, result.rows);
+      // callBack(null, );
+      return result.rows;
     } catch (error) {
       console.log(error);
+      throw error;
     } finally {
       if (conn_ora) await conn_ora.close();
     }
   },
   // CreditInsurance Bill Collection(D)
-  creditInsuranceBillCollection: async (data, callBack) => {
+  creditInsuranceBillCollection: async (data) => {
     let conn_ora = await getTmcConnection();
     try {
       const result = await conn_ora.execute(
@@ -584,15 +596,17 @@ SELECT SUM (
         },
         {outFormat: oracledb.OUT_FORMAT_OBJECT},
       );
-      callBack(err, result.rows);
+      // callBack(null, );
+      return result.rows;
     } catch (error) {
       console.log(error);
+      throw error;
     } finally {
       if (conn_ora) await conn_ora.close();
     }
   },
   //	Credit/Insurance Bill
-  creditInsuranceBill: async (data, callBack) => {
+  creditInsuranceBill: async (data) => {
     let conn_ora = await getTmcConnection();
     try {
       const result = await conn_ora.execute(
@@ -704,15 +718,17 @@ SELECT SUM (
         },
         {outFormat: oracledb.OUT_FORMAT_OBJECT},
       );
-      callBack(err, result.rows);
+      // callBack(null, );
+      return result.rows;
     } catch (error) {
       console.log(error);
+      throw error;
     } finally {
       if (conn_ora) await conn_ora.close();
     }
   },
   //Ip Consolidate Discount
-  ipConsolidatedDiscount: async (data, callBack) => {
+  ipConsolidatedDiscount: async (data) => {
     let conn_ora = await getTmcConnection();
     try {
       const result = await conn_ora.execute(
@@ -736,15 +752,17 @@ SELECT SUM (
         },
         {outFormat: oracledb.OUT_FORMAT_OBJECT},
       );
-      callBack(err, result.rows);
+      // callBack(null, );
+      return result.rows;
     } catch (error) {
       console.log(error);
+      throw error;
     } finally {
       if (conn_ora) await conn_ora.close();
     }
   },
   // IP Previous Day's  Discount
-  ipPreviousDayDiscount: async (data, callBack) => {
+  ipPreviousDayDiscount: async (data) => {
     let conn_ora = await getTmcConnection();
     try {
       const result = await conn_ora.execute(
@@ -764,15 +782,17 @@ SELECT SUM (
         },
         {outFormat: oracledb.OUT_FORMAT_OBJECT},
       );
-      callBack(err, result.rows);
+      // callBack(null, );
+      return result.rows;
     } catch (error) {
       console.log(error);
+      throw error;
     } finally {
       if (conn_ora) await conn_ora.close();
     }
   },
   // IP Previous Day's Collectoion(E)
-  ipPreviousDayCollection: async (data, callBack) => {
+  ipPreviousDayCollection: async (data) => {
     let conn_ora = await getTmcConnection();
     try {
       const result = await conn_ora.execute(
@@ -794,15 +814,17 @@ SELECT SUM (
         {outFormat: oracledb.OUT_FORMAT_OBJECT},
       );
 
-      callBack(err, result.rows);
+      callBack(null);
+      return result.rows;
     } catch (err) {
       console.log(err);
+      throw err;
     } finally {
       if (conn_ora) await conn_ora.close();
     }
   },
   // UnSettled Amount
-  unsettledAmount: async (data, callBack) => {
+  unsettledAmount: async (data) => {
     let conn_ora = await getTmcConnection();
     try {
       const result = await conn_ora.execute(
@@ -842,39 +864,45 @@ SELECT SUM (
         },
         {outFormat: oracledb.OUT_FORMAT_OBJECT},
       );
-      callBack(err, result.rows);
+      // callBack(null, );
+      return result.rows;
     } catch (error) {
       console.log(error);
+      throw error;
     } finally {
       if (conn_ora) await conn_ora.close();
     }
   },
   // MIS GROUP & CATEGORY
-  misGroupMast: async (callBack) => {
+  misGroupMast: async () => {
     let conn_ora = await getTmcConnection();
     try {
       const result = await conn_ora.execute(`SELECT * FROM MISINCEXPMAST`, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
 
-      callBack(err, result.rows);
+      // callBack(null, );
+      return result.rows;
     } catch (err) {
       console.log(err);
+      throw err;
     } finally {
       if (conn_ora) await conn_ora.close();
     }
   },
-  misGroup: async (callBack) => {
+  misGroup: async () => {
     let conn_ora = await getTmcConnection();
     try {
       const result = await conn_ora.execute(`SELECT * FROM Misincexpgroup`, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
 
-      callBack(err, result.rows);
+      // callBack(null, );
+      return result.rows;
     } catch (err) {
       console.log(err);
+      throw err;
     } finally {
       if (conn_ora) await conn_ora.close();
     }
   },
-  creditInsuranceBillRefund: async (data, callBack) => {
+  creditInsuranceBillRefund: async (data) => {
     let conn_ora = await getTmcConnection();
 
     try {
@@ -986,9 +1014,11 @@ SELECT SUM (
         },
         {outFormat: oracledb.OUT_FORMAT_OBJECT},
       );
-      callBack(err, result.rows);
+      // callBack(null, );
+      return result.rows;
     } catch (error) {
       console.log(error);
+      throw error;
     } finally {
       if (conn_ora) await conn_ora.close();
     }

@@ -1,7 +1,7 @@
-const pool = require("../../config/dbconfig");
+const {pools} = require("../../config/mysqldbconfig");
 const {getTmcConnection, oracledb} = require("../../config/oradbconfig");
 module.exports = {
-  GetElliderCensusCount: async (data, callBack) => {
+  GetElliderCensusCount: async (data) => {
     let conn_ora = await getTmcConnection();
     try {
       const result = await conn_ora.execute(
@@ -84,10 +84,10 @@ module.exports = {
         },
         {outFormat: oracledb.OUT_FORMAT_OBJECT},
       );
-      const hisData = await result.rows;
-      return callBack(null, hisData);
+      return await result.rows;
     } catch (error) {
-      return callBack(error);
+      console.log(error);
+      throw error;
     } finally {
       await conn_ora.close();
     }

@@ -1,485 +1,486 @@
 const {
-    bedIncome,
-    nsIncome,
-    roomRentIncome,
-    otherIncome,
-    consultingIncome,
-    anesthetiaIncome,
-    surgeonIncome,
-    theaterIncome,
-    cardiologyIncome,
-    disPosibleItemIncome,
-    icuIncome,
-    icuprocedureIncome,
-    radiologyIncome,
-    laboratoryIncome,
-    mriIncome,
-    dietIncome,
-    pharmacyIncomePart1,
-    pharmacyIncomePart2,
-    pharmacyIncomePart3,
-    pharmacyIncomePart4
-} = require('../incomePart/income.service')
+  bedIncome,
+  nsIncome,
+  roomRentIncome,
+  otherIncome,
+  consultingIncome,
+  anesthetiaIncome,
+  surgeonIncome,
+  theaterIncome,
+  cardiologyIncome,
+  disPosibleItemIncome,
+  icuIncome,
+  icuprocedureIncome,
+  radiologyIncome,
+  laboratoryIncome,
+  mriIncome,
+  dietIncome,
+  pharmacyIncomePart1,
+  pharmacyIncomePart2,
+  pharmacyIncomePart3,
+  pharmacyIncomePart4,
+} = require("../incomePart/income.service");
 
 module.exports = {
-    bedIncome: (req, res) => {
-        const body = req.body;
-        bedIncome(body, (err, results) => {
-            if (err) {
-                return res.status(200).json({
-                    success: 0,
-                    message: err.message
-                });
-            }
-            if (Object.keys(results).length === 0) {
-                return res.status(200).json({
-                    success: 2,
-                    message: "No Result",
-                    data: []
-                });
-            }
-            return res.status(200).json({
-                success: 1,
-                message: "bedIncome",
-                data: results
-            });
-        })
-    },
-    nsIncome: (req, res) => {
-        const body = req.body;
-        nsIncome(body, (err, results) => {
-            if (err) {
-                return res.status(200).json({
-                    success: 0,
-                    message: err.message
-                });
-            }
-            if (Object.keys(results).length === 0) {
-                return res.status(200).json({
-                    success: 2,
-                    message: "No Result",
-                    data: []
-                });
-            }
-            return res.status(200).json({
-                success: 1,
-                message: "nsIncome",
-                data: results
-            });
-        })
-    },
-    roomRentIncome: (req, res) => {
-        const body = req.body;
-        roomRentIncome(body, (err, results) => {
-            if (err) {
-                return res.status(200).json({
-                    success: 0,
-                    message: err.message
-                });
-            }
-            if (Object.keys(results).length === 0) {
-                return res.status(200).json({
-                    success: 2,
-                    message: "No Result",
-                    data: []
-                });
-            }
-            return res.status(200).json({
-                success: 1,
-                message: "roomRentIncome",
-                data: results
-            });
-        })
-    },
-    otherIncome: (req, res) => {
-        const body = req.body;
-        otherIncome(body, (err, results) => {
-            if (err) {
-                return res.status(200).json({
-                    success: 0,
-                    message: err.message
-                });
-            }
-            if (Object.keys(results).length === 0) {
-                return res.status(200).json({
-                    success: 2,
-                    message: "No Result",
-                    data: []
-                });
-            }
-            return res.status(200).json({
-                success: 1,
-                message: "otherIncome",
-                data: results
-            });
-        })
-    },
-    consultingIncome: (req, res) => {
-        const body = req.body;
-        consultingIncome(body, (err, results) => {
-            if (err) {
-                return res.status(200).json({
-                    success: 0,
-                    message: err.message
-                });
-            }
-            if (Object.keys(results).length === 0) {
-                return res.status(200).json({
-                    success: 2,
-                    message: "No Result",
-                    data: []
-                });
-            }
-            return res.status(200).json({
-                success: 1,
-                message: "consultingIncome",
-                data: results
-            });
-        })
-    },
-    anesthetiaIncome: (req, res) => {
-        const body = req.body;
-        anesthetiaIncome(body, (err, results) => {
-            if (err) {
-                return res.status(200).json({
-                    success: 0,
-                    message: err.message
-                });
-            }
-            if (Object.keys(results).length === 0) {
-                return res.status(200).json({
-                    success: 2,
-                    message: "No Result",
-                    data: []
-                });
-            }
-            return res.status(200).json({
-                success: 1,
-                message: "anesthetiaIncome",
-                data: results
-            });
-        })
-    },
-    surgeonIncome: (req, res) => {
-        const body = req.body;
-        surgeonIncome(body, (err, results) => {
-            if (err) {
-                return res.status(200).json({
-                    success: 0,
-                    message: err.message
-                });
-            }
-            if (Object.keys(results).length === 0) {
-                return res.status(200).json({
-                    success: 2,
-                    message: "No Result",
-                    data: []
-                });
-            }
-            return res.status(200).json({
-                success: 1,
-                message: "surgeonIncome",
-                data: results
-            });
-        })
-    },
-    theaterIncome: (req, res) => {
-        const body = req.body;
-        theaterIncome(body, (err, results) => {
-            if (err) {
-                return res.status(200).json({
-                    success: 0,
-                    message: err.message
-                });
-            }
-            if (Object.keys(results).length === 0) {
-                return res.status(200).json({
-                    success: 2,
-                    message: "No Result",
-                    data: []
-                });
-            }
-            return res.status(200).json({
-                success: 1,
-                message: "theaterIncome",
-                data: results
-            });
-        })
-    },
-    cardiologyIncome: (req, res) => {
-        const body = req.body;
-        cardiologyIncome(body, (err, results) => {
-            if (err) {
-                return res.status(200).json({
-                    success: 0,
-                    message: err.message
-                });
-            }
-            if (Object.keys(results).length === 0) {
-                return res.status(200).json({
-                    success: 2,
-                    message: "No Result",
-                    data: []
-                });
-            }
-            return res.status(200).json({
-                success: 1,
-                message: "cardiologyIncome",
-                data: results
-            });
-        })
-    },
-    disPosibleItemIncome: (req, res) => {
-        const body = req.body;
-        disPosibleItemIncome(body, (err, results) => {
-            if (err) {
-                return res.status(200).json({
-                    success: 0,
-                    message: err.message
-                });
-            }
-            if (Object.keys(results).length === 0) {
-                return res.status(200).json({
-                    success: 2,
-                    message: "No Result",
-                    data: []
-                });
-            }
-            return res.status(200).json({
-                success: 1,
-                message: "disPosibleItemIncome",
-                data: results
-            });
-        })
-    },
-    icuIncome: (req, res) => {
-        const body = req.body;
-        icuIncome(body, (err, results) => {
-            if (err) {
-                return res.status(200).json({
-                    success: 0,
-                    message: err.message
-                });
-            }
-            if (Object.keys(results).length === 0) {
-                return res.status(200).json({
-                    success: 2,
-                    message: "No Result",
-                    data: []
-                });
-            }
-            return res.status(200).json({
-                success: 1,
-                message: "icuIncome",
-                data: results
-            });
-        })
-    },
-    icuprocedureIncome: (req, res) => {
-        const body = req.body;
-        icuprocedureIncome(body, (err, results) => {
-            if (err) {
-                return res.status(200).json({
-                    success: 0,
-                    message: err.message
-                });
-            }
-            if (Object.keys(results).length === 0) {
-                return res.status(200).json({
-                    success: 2,
-                    message: "No Result",
-                    data: []
-                });
-            }
-            return res.status(200).json({
-                success: 1,
-                message: "icuprocedureIncome",
-                data: results
-            });
-        })
-    },
-    radiologyIncome: (req, res) => {
-        const body = req.body;
-        radiologyIncome(body, (err, results) => {
-            if (err) {
-                return res.status(200).json({
-                    success: 0,
-                    message: err.message
-                });
-            }
-            if (Object.keys(results).length === 0) {
-                return res.status(200).json({
-                    success: 2,
-                    message: "No Result",
-                    data: []
-                });
-            }
-            return res.status(200).json({
-                success: 1,
-                message: "radiologyIncome",
-                data: results
-            });
-        })
-    },
-    laboratoryIncome: (req, res) => {
-        const body = req.body;
-        laboratoryIncome(body, (err, results) => {
-            if (err) {
-                return res.status(200).json({
-                    success: 0,
-                    message: err.message
-                });
-            }
-            if (Object.keys(results).length === 0) {
-                return res.status(200).json({
-                    success: 2,
-                    message: "No Result",
-                    data: []
-                });
-            }
-            return res.status(200).json({
-                success: 1,
-                message: "laboratoryIncome",
-                data: results
-            });
-        })
-    },
-    mriIncome: (req, res) => {
-        const body = req.body;
-        mriIncome(body, (err, results) => {
-            if (err) {
-                return res.status(200).json({
-                    success: 0,
-                    message: err.message
-                });
-            }
-            if (Object.keys(results).length === 0) {
-                return res.status(200).json({
-                    success: 2,
-                    message: "No Result",
-                    data: []
-                });
-            }
-            return res.status(200).json({
-                success: 1,
-                message: "mriIncome",
-                data: results
-            });
-        })
-    },
-    dietIncome: (req, res) => {
-        const body = req.body;
-        dietIncome(body, (err, results) => {
-            if (err) {
-                return res.status(200).json({
-                    success: 0,
-                    message: err.message
-                });
-            }
-            if (Object.keys(results).length === 0) {
-                return res.status(200).json({
-                    success: 2,
-                    message: "No Result",
-                    data: []
-                });
-            }
-            return res.status(200).json({
-                success: 1,
-                message: "dietIncome",
-                data: results
-            });
-        })
-    },
-    pharmacyIncomePart1: (req, res) => {
-        const body = req.body;
-        pharmacyIncomePart1(body, (err, results) => {
-            if (err) {
-                return res.status(200).json({
-                    success: 0,
-                    message: err.message
-                });
-            }
-            if (Object.keys(results).length === 0) {
-                return res.status(200).json({
-                    success: 2,
-                    message: "No Result",
-                    data: []
-                });
-            }
-            return res.status(200).json({
-                success: 1,
-                message: "pharmacyIncomePart1",
-                data: results
-            });
-        })
-    },
-    pharmacyIncomePart2: (req, res) => {
-        const body = req.body;
-        pharmacyIncomePart2(body, (err, results) => {
-            if (err) {
-                return res.status(200).json({
-                    success: 0,
-                    message: err.message
-                });
-            }
-            if (Object.keys(results).length === 0) {
-                return res.status(200).json({
-                    success: 2,
-                    message: "No Result",
-                    data: []
-                });
-            }
-            return res.status(200).json({
-                success: 1,
-                message: "pharmacyIncomePart2",
-                data: results
-            });
-        })
-    },
-    pharmacyIncomePart3: (req, res) => {
-        const body = req.body;
-        pharmacyIncomePart3(body, (err, results) => {
-            if (err) {
-                return res.status(200).json({
-                    success: 0,
-                    message: err.message
-                });
-            }
-            if (Object.keys(results).length === 0) {
-                return res.status(200).json({
-                    success: 2,
-                    message: "No Result",
-                    data: []
-                });
-            }
-            return res.status(200).json({
-                success: 1,
-                message: "pharmacyIncomePart3",
-                data: results
-            });
-        })
-    },
-    pharmacyIncomePart4: (req, res) => {
-        const body = req.body;
-        pharmacyIncomePart4(body, (err, results) => {
-            if (err) {
-                return res.status(200).json({
-                    success: 0,
-                    message: err.message
-                });
-            }
-            if (Object.keys(results).length === 0) {
-                return res.status(200).json({
-                    success: 2,
-                    message: "No Result",
-                    data: []
-                });
-            }
-            return res.status(200).json({
-                success: 1,
-                message: "pharmacyIncomePart4",
-                data: results
-            });
-        })
-    },
-}
+  bedIncome: async (req, res) => {
+    try {
+      const body = req.body;
+      const data = await bedIncome(body);
+      if (Array.isArray(data) && data.length > 0) {
+        return res.status(200).json({
+          success: 2,
+          message: "No Result",
+          data: [],
+        });
+      }
+      return res.status(200).json({
+        success: 1,
+        message: "bedIncome",
+        data: data,
+      });
+    } catch (error) {
+      return res.status(200).json({
+        success: 0,
+        message: error.message,
+      });
+    }
+  },
+  nsIncome: async (req, res) => {
+    try {
+      const body = req.body;
+      const data = await nsIncome(body);
+      if (Array.isArray(data) && data.length === 0) {
+        return res.status(200).json({
+          success: 2,
+          message: "No Result",
+          data: [],
+        });
+      }
+      return res.status(200).json({
+        success: 1,
+        message: "nsIncome",
+        data: data,
+      });
+    } catch (error) {
+      return res.status(200).json({
+        success: 0,
+        message: error.message,
+      });
+    }
+  },
+  roomRentIncome: async (req, res) => {
+    try {
+      const body = req.body;
+      const data = await roomRentIncome(body);
+      if (Array.isArray(data) && data.length === 0) {
+        return res.status(200).json({
+          success: 2,
+          message: "No Result",
+          data: [],
+        });
+      }
+      return res.status(200).json({
+        success: 1,
+        message: "roomRentIncome",
+        data: data,
+      });
+    } catch (error) {
+      return res.status(200).json({
+        success: 0,
+        message: error.message,
+      });
+    }
+  },
+  otherIncome: async (req, res) => {
+    try {
+      const body = req.body;
+      const data = await otherIncome(body);
+      if (Array.isArray(data) && data.length === 0) {
+        return res.status(200).json({
+          success: 2,
+          message: "No Result",
+          data: [],
+        });
+      }
+      return res.status(200).json({
+        success: 1,
+        message: "otherIncome",
+        data: data,
+      });
+    } catch (error) {
+      return res.status(200).json({
+        success: 0,
+        message: error.message,
+      });
+    }
+  },
+  consultingIncome: async (req, res) => {
+    try {
+      const body = req.body;
+      const data = await consultingIncome(body);
+      if (Array.isArray(data) && data.length === 0) {
+        return res.status(200).json({
+          success: 2,
+          message: "No Result",
+          data: [],
+        });
+      }
+      return res.status(200).json({
+        success: 1,
+        message: "consultingIncome",
+        data: data,
+      });
+    } catch (error) {
+      return res.status(200).json({
+        success: 0,
+        message: error.message,
+      });
+    }
+  },
+  anesthetiaIncome: async (req, res) => {
+    try {
+      const body = req.body;
+      const data = await anesthetiaIncome(body);
+      if (Array.isArray(data) && data.length === 0) {
+        return res.status(200).json({
+          success: 2,
+          message: "No Result",
+          data: [],
+        });
+      }
+      return res.status(200).json({
+        success: 1,
+        message: "anesthetiaIncome",
+        data: data,
+      });
+    } catch (error) {
+      return res.status(200).json({
+        success: 0,
+        message: error.message,
+      });
+    }
+  },
+  surgeonIncome: async (req, res) => {
+    try {
+      const body = req.body;
+      const data = await surgeonIncome(body);
+      if (Array.isArray(data) && data.length === 0) {
+        return res.status(200).json({
+          success: 2,
+          message: "No Result",
+          data: [],
+        });
+      }
+
+      return res.status(200).json({
+        success: 1,
+        message: "surgeonIncome",
+        data: data,
+      });
+    } catch (error) {
+      return res.status(200).json({
+        success: 0,
+        message: error.message,
+      });
+    }
+  },
+  theaterIncome: async (req, res) => {
+    try {
+      const body = req.body;
+      const data = await theaterIncome(body);
+      if (Array.isArray(data) && data.length === 0) {
+        return res.status(200).json({
+          success: 2,
+          message: "No Result",
+          data: [],
+        });
+      }
+      return res.status(200).json({
+        success: 1,
+        message: "theaterIncome",
+        data: data,
+      });
+    } catch (error) {
+      return res.status(200).json({
+        success: 0,
+        message: error.message,
+      });
+    }
+  },
+  cardiologyIncome: async (req, res) => {
+    try {
+      const body = req.body;
+      const data = await cardiologyIncome(body);
+      if (Array.isArray(data) && data.length === 0) {
+        return res.status(200).json({
+          success: 2,
+          message: "No Result",
+          data: [],
+        });
+      }
+      return res.status(200).json({
+        success: 1,
+        message: "cardiologyIncome",
+        data: data,
+      });
+    } catch (error) {
+      return res.status(200).json({
+        success: 0,
+        message: error.message,
+      });
+    }
+  },
+  disPosibleItemIncome: async (req, res) => {
+    try {
+      const body = req.body;
+      const data = await disPosibleItemIncome(body);
+      if (Array.isArray(data) && data.length === 0) {
+        return res.status(200).json({
+          success: 2,
+          message: "No Result",
+          data: [],
+        });
+      }
+      return res.status(200).json({
+        success: 1,
+        message: "disPosibleItemIncome",
+        data: data,
+      });
+    } catch (error) {
+      return res.status(200).json({
+        success: 0,
+        message: error.message,
+      });
+    }
+  },
+  icuIncome: async (req, res) => {
+    try {
+      const body = req.body;
+      const data = await icuIncome(body);
+      if (Array.isArray(data) && data.length === 0) {
+        return res.status(200).json({
+          success: 2,
+          message: "No Result",
+          data: [],
+        });
+      }
+      return res.status(200).json({
+        success: 1,
+        message: "icuIncome",
+        data: data,
+      });
+    } catch (error) {
+      return res.status(200).json({
+        success: 0,
+        message: error.message,
+      });
+    }
+  },
+  icuprocedureIncome: async (req, res) => {
+    try {
+      const body = req.body;
+      const data = await icuprocedureIncome(body);
+      if (Array.isArray(data) && data.length === 0) {
+        return res.status(200).json({
+          success: 2,
+          message: "No Result",
+          data: [],
+        });
+      }
+      return res.status(200).json({
+        success: 1,
+        message: "icuprocedureIncome",
+        data: data,
+      });
+    } catch (error) {
+      return res.status(200).json({
+        success: 0,
+        message: error.message,
+      });
+    }
+  },
+  radiologyIncome: async (req, res) => {
+    try {
+      const body = req.body;
+      const data = await radiologyIncome(body);
+      if (Array.isArray(data) && data.length === 0) {
+        return res.status(200).json({
+          success: 2,
+          message: "No Result",
+          data: [],
+        });
+      }
+      return res.status(200).json({
+        success: 1,
+        message: "radiologyIncome",
+        data: data,
+      });
+    } catch (error) {
+      return res.status(200).json({
+        success: 0,
+        message: error.message,
+      });
+    }
+  },
+  laboratoryIncome: async (req, res) => {
+    try {
+      const body = req.body;
+      const data = await laboratoryIncome(body);
+      if (Array.isArray(data) && data.length === 0) {
+        return res.status(200).json({
+          success: 2,
+          message: "No Result",
+          data: [],
+        });
+      }
+      return res.status(200).json({
+        success: 1,
+        message: "laboratoryIncome",
+        data: data,
+      });
+    } catch (error) {
+      return res.status(200).json({
+        success: 0,
+        message: error.message,
+      });
+    }
+  },
+  mriIncome: async (req, res) => {
+    try {
+      const body = req.body;
+      const data = await mriIncome(body);
+      if (Array.isArray(data) && data.length === 0) {
+        return res.status(200).json({
+          success: 2,
+          message: "No Result",
+          data: [],
+        });
+      }
+      return res.status(200).json({
+        success: 1,
+        message: "mriIncome",
+        data: data,
+      });
+    } catch (error) {
+      return res.status(200).json({
+        success: 0,
+        message: error.message,
+      });
+    }
+  },
+  dietIncome: async (req, res) => {
+    try {
+      const body = req.body;
+      const data = await dietIncome(body);
+      if (Array.isArray(data) && data.length === 0) {
+        return res.status(200).json({
+          success: 2,
+          message: "No Result",
+          data: [],
+        });
+      }
+      return res.status(200).json({
+        success: 1,
+        message: "dietIncome",
+        data: data,
+      });
+    } catch (error) {
+      return res.status(200).json({
+        success: 0,
+        message: error.message,
+      });
+    }
+  },
+  pharmacyIncomePart1: async (req, res) => {
+    try {
+      const body = req.body;
+      const data = await pharmacyIncomePart1(body);
+      if (Array.isArray(data) && data.length === 0) {
+        return res.status(200).json({
+          success: 2,
+          message: "No Result",
+          data: [],
+        });
+      }
+      return res.status(200).json({
+        success: 1,
+        message: "pharmacyIncomePart1",
+        data: data,
+      });
+    } catch (error) {
+      return res.status(200).json({
+        success: 0,
+        message: error.message,
+      });
+    }
+  },
+  pharmacyIncomePart2: async (req, res) => {
+    try {
+      const body = req.body;
+      const data = await pharmacyIncomePart2(body);
+      if (Array.isArray(data) && data.length === 0) {
+        return res.status(200).json({
+          success: 2,
+          message: "No Result",
+          data: [],
+        });
+      }
+      return res.status(200).json({
+        success: 1,
+        message: "pharmacyIncomePart2",
+        data: data,
+      });
+    } catch (error) {
+      return res.status(200).json({
+        success: 0,
+        message: error.message,
+      });
+    }
+  },
+  pharmacyIncomePart3: async (req, res) => {
+    try {
+      const body = req.body;
+      const data = await pharmacyIncomePart3(body);
+      if (Array.isArray(data) && data.length === 0) {
+        return res.status(200).json({
+          success: 2,
+          message: "No Result",
+          data: [],
+        });
+      }
+      return res.status(200).json({
+        success: 1,
+        message: "pharmacyIncomePart3",
+        data: data,
+      });
+    } catch (error) {
+      return res.status(200).json({
+        success: 0,
+        message: error.message,
+      });
+    }
+  },
+  pharmacyIncomePart4: async (req, res) => {
+    try {
+      const body = req.body;
+      const data = await pharmacyIncomePart4(body);
+      if (Array.isArray(data) && data.length === 0) {
+        return res.status(200).json({
+          success: 2,
+          message: "No Result",
+          data: [],
+        });
+      }
+      return res.status(200).json({
+        success: 1,
+        message: "pharmacyIncomePart4",
+        data: data,
+      });
+    } catch (error) {
+      return res.status(200).json({
+        success: 0,
+        message: error.message,
+      });
+    }
+  },
+};

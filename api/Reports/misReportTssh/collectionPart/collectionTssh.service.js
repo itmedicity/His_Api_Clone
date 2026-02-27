@@ -1,10 +1,10 @@
 // @ts-ignore
-const pool = require("../../../../config/dbconfig");
+const {pools, query} = require("../../../../config/mysqldbconfig");
 const {oracledb, getTmcConnection} = require("../../../../config/oradbconfig");
 
 module.exports = {
   //Advance Collection (C)
-  advanceCollectionTssh: async (data, callBack) => {
+  advanceCollectionTssh: async (data) => {
     let conn_ora = await getTmcConnection();
 
     const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(",")) || null;
@@ -36,14 +36,16 @@ module.exports = {
 
     try {
       const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
-      callBack(err, result.rows);
+      // callBack(null, );
+      return result.rows;
     } catch (error) {
       console.log(error);
+      throw error;
     } finally {
       if (conn_ora) await conn_ora.close();
     }
   },
-  advanceRefundTssh: async (data, callBack) => {
+  advanceRefundTssh: async (data) => {
     let conn_ora = await getTmcConnection();
 
     const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(",")) || null;
@@ -91,15 +93,17 @@ module.exports = {
 
     try {
       const result = await conn_ora.execute(advanceRefndSql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
-      callBack(err, result.rows);
+      // callBack(null, );
+      return result.rows;
     } catch (error) {
       console.log(error);
+      throw error;
     } finally {
       if (conn_ora) await conn_ora.close();
     }
   },
   //Advance Settled
-  advanceSettledTssh: async (data, callBack) => {
+  advanceSettledTssh: async (data) => {
     let conn_ora = await getTmcConnection();
 
     const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(",")) || null;
@@ -156,15 +160,17 @@ module.exports = {
 
     try {
       const result = await conn_ora.execute(advanceSettledSql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
-      callBack(err, result.rows);
+      // callBack(null, );
+      return result.rows;
     } catch (error) {
       console.log(error);
+      throw error;
     } finally {
       if (conn_ora) await conn_ora.close();
     }
   },
   //Collection Against Sales (A) Total Value
-  collectionAgainstSalePart1Tssh: async (data, callBack) => {
+  collectionAgainstSalePart1Tssh: async (data) => {
     let conn_ora = await getTmcConnection();
 
     const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(",")) || null;
@@ -186,15 +192,17 @@ module.exports = {
 
     try {
       const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
-      callBack(err, result.rows);
+      // callBack(null, );
+      return result.rows;
     } catch (error) {
       console.log(error);
+      throw error;
     } finally {
       if (conn_ora) await conn_ora.close();
     }
   },
   //Collection Against Sales (A) negative value
-  collectionAgainstSalePart2Tssh: async (data, callBack) => {
+  collectionAgainstSalePart2Tssh: async (data) => {
     let conn_ora = await getTmcConnection();
 
     const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(",")) || null;
@@ -213,15 +221,17 @@ module.exports = {
                         AND IPRECEIPTREFUND.IP_NO IN (${ipNumberList})`;
     try {
       const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
-      callBack(err, result.rows);
+      // callBack(null, );
+      return result.rows;
     } catch (error) {
       console.log(error);
+      throw error;
     } finally {
       if (conn_ora) await conn_ora.close();
     }
   },
   // Complimentary
-  complimentoryTssh: async (data, callBack) => {
+  complimentoryTssh: async (data) => {
     let conn_ora = await getTmcConnection();
 
     const fromDate = data.from;
@@ -251,15 +261,17 @@ module.exports = {
     try {
       const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
 
-      callBack(err, result.rows);
+      // callBack(null, );
+      return result.rows;
     } catch (error) {
       console.log(error);
+      throw error;
     } finally {
       if (conn_ora) await conn_ora.close();
     }
   },
   // CreditInsurance Bill Collection(D)
-  creditInsuranceBillCollectionTssh: async (data, callBack) => {
+  creditInsuranceBillCollectionTssh: async (data) => {
     let conn_ora = await getTmcConnection();
     // console.log(data);
     const ipNumberList = (data?.ipNoColl?.length > 0 && data.ipNoColl.join(",")) || null;
@@ -302,15 +314,17 @@ module.exports = {
                                 AND RECPCOLLECTIONDETL.IP_NO  IN  (${ipNumberList}))`;
     try {
       const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
-      callBack(err, result.rows);
+      // callBack(null, );
+      return result.rows;
     } catch (error) {
       console.log(error);
+      throw error;
     } finally {
       if (conn_ora) await conn_ora.close();
     }
   },
   //	Credit/Insurance Bill
-  creditInsuranceBillTssh: async (data, callBack) => {
+  creditInsuranceBillTssh: async (data) => {
     let conn_ora = await getTmcConnection();
 
     const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(",")) || null;
@@ -329,15 +343,17 @@ module.exports = {
 
     try {
       const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
-      callBack(err, result.rows);
+      // callBack(null, );
+      return result.rows;
     } catch (error) {
       console.log(error);
+      throw error;
     } finally {
       if (conn_ora) await conn_ora.close();
     }
   },
   //Ip Consolidate Discount
-  ipConsolidatedDiscountTssh: async (data, callBack) => {
+  ipConsolidatedDiscountTssh: async (data) => {
     let conn_ora = await getTmcConnection();
 
     const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(",")) || null;
@@ -361,15 +377,17 @@ module.exports = {
 
     try {
       const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
-      callBack(err, result.rows);
+      // callBack(null, );
+      return result.rows;
     } catch (error) {
       console.log(error);
+      throw error;
     } finally {
       if (conn_ora) await conn_ora.close();
     }
   },
   // IP Previous Day's  Discount
-  ipPreviousDayDiscountTssh: async (data, callBack) => {
+  ipPreviousDayDiscountTssh: async (data) => {
     let conn_ora = await getTmcConnection();
 
     const ipNumberList = (data?.ipNoColl?.length > 0 && data.ipNoColl.join(",")) || null;
@@ -389,15 +407,17 @@ module.exports = {
 
     try {
       const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
-      callBack(err, result.rows);
+      // callBack(null, );
+      return result.rows;
     } catch (error) {
       console.log(error);
+      throw error;
     } finally {
       if (conn_ora) await conn_ora.close();
     }
   },
   // IP Previous Day's Collectoion(E)
-  ipPreviousDayCollectionTssh: async (data, callBack) => {
+  ipPreviousDayCollectionTssh: async (data) => {
     let conn_ora = await getTmcConnection();
 
     const ipNumberList = (data?.ipNoColl?.length > 0 && data.ipNoColl.join(",")) || null;
@@ -424,16 +444,16 @@ module.exports = {
                             AND Irc_cancel IS NULL group by  DISBILLMAST.IP_NO`;
     try {
       const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
-
-      callBack(err, result.rows);
+      return result.rows;
     } catch (err) {
       console.log(err);
+      throw err;
     } finally {
       if (conn_ora) await conn_ora.close();
     }
   },
   // UnSettled Amount
-  unsettledAmount: async (data, callBack) => {
+  unsettledAmount: async (data) => {
     let conn_ora = await getTmcConnection();
 
     const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(",")) || null;
@@ -489,39 +509,45 @@ module.exports = {
                                     + NVL (ipreceipt.irn_discount, 0)) <> 0) A`;
     try {
       const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
-      callBack(err, result.rows);
+      // callBack(null, );
+      return result.rows;
     } catch (error) {
       console.log(error);
+      throw error;
     } finally {
       if (conn_ora) await conn_ora.close();
     }
   },
   // MIS GROUP & CATEGORY
-  misGroupMast: async (callBack) => {
+  misGroupMast: async () => {
     let conn_ora = await getTmcConnection();
     try {
       const result = await conn_ora.execute(`SELECT * FROM MISINCEXPMAST`, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
 
-      callBack(err, result.rows);
+      // callBack(null, );
+      return result.rows;
     } catch (err) {
       console.log(err);
+      throw err;
     } finally {
       if (conn_ora) await conn_ora.close();
     }
   },
-  misGroup: async (callBack) => {
+  misGroup: async () => {
     let conn_ora = await getTmcConnection();
     try {
       const result = await conn_ora.execute(`SELECT * FROM Misincexpgroup`, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
 
-      callBack(err, result.rows);
+      // callBack(null, );
+      return result.rows;
     } catch (err) {
       console.log(err);
+      throw err;
     } finally {
       if (conn_ora) await conn_ora.close();
     }
   },
-  creditInsuranceBillRefund: async (data, callBack) => {
+  creditInsuranceBillRefund: async (data) => {
     let conn_ora = await getTmcConnection();
 
     const fromDate = data.from;
@@ -529,22 +555,19 @@ module.exports = {
 
     try {
       const result = await conn_ora.execute(`SELECT 0 AMT,0 TAX FROM DUAL`, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
-      callBack(err, result.rows);
+      // callBack(null, );
+      return result.rows;
     } catch (error) {
       console.log(error);
+      throw error;
     } finally {
       if (conn_ora) await conn_ora.close();
     }
   },
-  getIpNumberFromPreviousDayCollection: (data, callBack) => {
+  getIpNumberFromPreviousDayCollection: async (data) => {
     const sql = `SELECT ip_no,dis_status,tmch_status
         FROM tssh_ipadmiss 
         WHERE ip_no IN (${data.ipno}) AND tmch_status = ${data.group}`;
-    pool.query(sql, [], (error, results, feilds) => {
-      if (error) {
-        return error;
-      }
-      return callBack(null, results);
-    });
+    return await query("ellider", sql, []);
   },
 };

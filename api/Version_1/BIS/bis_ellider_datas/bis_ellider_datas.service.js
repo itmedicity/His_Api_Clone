@@ -1,4 +1,3 @@
-// const pool = require('../../config/dbconfig');
 const {getTmcConnection, oracledb} = require("../../../../config/oradbconfig");
 module.exports = {
   getOpdatas: async (data, callBack) => {

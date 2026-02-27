@@ -1,5 +1,5 @@
 // @ts-ignore
-const {oracledb, getTmcConnection} = require("../../../../config/oradbconfig");
+const {oracledb, connectionClose, oraConnection, getTmcConnection, oracleConnectionClose} = require("../../../../config/oradbconfig");
 
 module.exports = {
   patientTypeDiscount: async (data, callBack) => {
@@ -2481,16 +2481,12 @@ module.exports = {
         },
         {outFormat: oracledb.OUT_FORMAT_OBJECT},
       );
-      //       await result.resultSet?.getRows((err, rows) => {
-      // });
-      callBack(err, result.rows);
+      callBack(null, result.rows);
     } catch (error) {
       console.log(error);
+      callBack(error, null);
     } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-        //  await pool_ora.close();
-      }
+      await oracleConnectionClose(conn_ora);
     }
   },
 };

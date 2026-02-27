@@ -1,8 +1,8 @@
-const pool = require("../../../config/dbconfig");
+const {pools, query} = require("../../../config/mysqldbconfig");
 const {getTmcConnection, oracledb} = require("../../../config/oradbconfig");
 
 module.exports = {
-  getGstReportOfPharmacy: async (data, callBack) => {
+  getGstReportOfPharmacy: async (data) => {
     let conn_ora = await getTmcConnection();
     const fromDate = data.from;
     const toDate = data.to;
@@ -220,16 +220,18 @@ module.exports = {
         {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT},
       );
       const gstReportFromOra = await result.resultSet?.getRows();
-      return callBack(null, gstReportFromOra);
+      return gstReportFromOra;
+      // return callBack(null, gstReportFromOra);
     } catch (error) {
-      return callBack(error);
+      // return callBack(error);
+      throw error;
     } finally {
       if (result) await result.resultSet.close();
       if (conn_ora) await conn_ora.close();
     }
   },
 
-  getGstReportPharmacyWise: async (data, callBack) => {
+  getGstReportPharmacyWise: async (data) => {
     let conn_ora = await getTmcConnection();
     const fromDate = data.from;
     const toDate = data.to;
@@ -302,16 +304,18 @@ module.exports = {
     try {
       result = await conn_ora.execute(sql, {fromDate: fromDate, toDate: toDate}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
       const gstReportFromOra = await result.resultSet?.getRows();
-      return callBack(null, gstReportFromOra);
+      return gstReportFromOra;
+      // return callBack(null, gstReportFromOra);
     } catch (error) {
-      return callBack(error);
+      // return callBack(error);
+      throw error;
     } finally {
       if (result && result.resultSet) await result.resultSet.close();
       if (conn_ora) await conn_ora.close();
     }
   },
 
-  getInPatientMedReturn: async (data, callBack) => {
+  getInPatientMedReturn: async (data) => {
     let conn_ora = await getTmcConnection();
     const fromDate = data.from;
     const toDate = data.to;
@@ -353,15 +357,17 @@ module.exports = {
     try {
       const result = await conn_ora.execute(sql, {fromDate: fromDate, toDate: toDate}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       const gstReportFromOra = result.rows;
-      return callBack(null, gstReportFromOra);
+      // return callBack(null, gstReportFromOra);
+      return gstReportFromOra;
     } catch (error) {
-      return callBack(error);
+      // return callBack(error);
+      throw error;
     } finally {
       if (conn_ora) await conn_ora.close();
     }
   },
 
-  getInPatientMedSale: async (data, callBack) => {
+  getInPatientMedSale: async (data) => {
     let conn_ora = await getTmcConnection();
     const fromDate = data.from;
     const toDate = data.to;
@@ -403,15 +409,17 @@ module.exports = {
     try {
       const result = await conn_ora.execute(sql, {fromDate: fromDate, toDate: toDate}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       const gstReportFromOra = result.rows;
-      return callBack(null, gstReportFromOra);
+      return gstReportFromOra;
+      // return callBack(null, gstReportFromOra);
     } catch (error) {
-      return callBack(error);
+      // return callBack(error);
+      throw error;
     } finally {
       if (conn_ora) await conn_ora.close();
     }
   },
 
-  getSumOfAmountTaxDisc: async (data, callBack) => {
+  getSumOfAmountTaxDisc: async (data) => {
     let conn_ora = await getTmcConnection();
     const fromDate = data.from;
     const toDate = data.to;
@@ -483,15 +491,17 @@ module.exports = {
     try {
       const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       const gstReportFromOra = result.rows;
-      return callBack(null, gstReportFromOra);
+      // return callBack(null, gstReportFromOra);
+      return gstReportFromOra;
     } catch (error) {
-      return callBack(error);
+      // return callBack(error);
+      throw error;
     } finally {
       if (conn_ora) await conn_ora.close();
     }
   },
 
-  getInPatientMedReturnSum: async (data, callBack) => {
+  getInPatientMedReturnSum: async (data) => {
     let conn_ora = await getTmcConnection();
     const fromDate = data.from;
     const toDate = data.to;
@@ -532,15 +542,17 @@ WHERE     Pbillmast.Bmc_Slno = Mretdetl.Bmc_Slno
     try {
       const result = await conn_ora.execute(sql, {fromDate: fromDate, toDate: toDate}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       const gstReportFromOra = result.rows;
-      return callBack(null, gstReportFromOra);
+      // return callBack(null, gstReportFromOra);
+      return gstReportFromOra;
     } catch (error) {
-      return callBack(error);
+      // return callBack(error);
+      throw error;
     } finally {
       if (conn_ora) await conn_ora.close();
     }
   },
 
-  getOpCreditPharmSale: async (data, callBack) => {
+  getOpCreditPharmSale: async (data) => {
     let conn_ora = await getTmcConnection();
     const fromDate = data.from;
     const toDate = data.to;
@@ -576,15 +588,17 @@ TO_DATE(:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
     try {
       const result = await conn_ora.execute(sql, {fromDate: fromDate, toDate: toDate}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       const gstReportFromOra = result.rows;
-      return callBack(null, gstReportFromOra);
+      // return callBack(null, gstReportFromOra);
+      return gstReportFromOra;
     } catch (error) {
-      return callBack(error);
+      // return callBack(error);
+      throw error;
     } finally {
       if (conn_ora) await conn_ora.close();
     }
   },
 
-  getGstReportPharmCollection: async (data, callBack) => {
+  getGstReportPharmCollection: async (data) => {
     let conn_ora = await getTmcConnection();
     const fromDate = data.from;
     const toDate = data.to;
@@ -658,14 +672,16 @@ TO_DATE(:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
     try {
       const result = await conn_ora.execute(sql, {fromDate: fromDate, toDate: toDate}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       const gstReportFromOra = result.rows;
-      return callBack(null, gstReportFromOra);
+      // return callBack(null, gstReportFromOra);
+      return gstReportFromOra;
     } catch (error) {
-      return callBack(error);
+      // return callBack(error);
+      throw error;
     } finally {
       if (conn_ora) await conn_ora.close();
     }
   }, // TSSH PHARMACY GST REPORTS
-  tsshPharmacyGstRptOne: async (data, callBack) => {
+  tsshPharmacyGstRptOne: async (data) => {
     let conn_ora = await getTmcConnection();
 
     const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(",")) || null;
@@ -702,14 +718,16 @@ TO_DATE(:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
 
     try {
       const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
-      callBack(err, result.rows);
+      // callBack(null, result.rows);
+      return result.rows;
     } catch (error) {
       console.log(error);
+      throw error;
     } finally {
       if (conn_ora) await conn_ora.close();
     }
   },
-  tsshPharmacyGstRptTwo: async (data, callBack) => {
+  tsshPharmacyGstRptTwo: async (data) => {
     let conn_ora = await getTmcConnection();
 
     const group = data?.group;
@@ -748,14 +766,16 @@ TO_DATE(:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
 
     try {
       const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
-      callBack(err, result.rows);
+      return result.rows;
+      // callBack(null, result.rows);
     } catch (error) {
       console.log(error);
+      throw error;
     } finally {
       if (conn_ora) await conn_ora.close();
     }
   },
-  tsshPharmacyGstRptthree: async (data, callBack) => {
+  tsshPharmacyGstRptthree: async (data) => {
     let conn_ora = await getTmcConnection();
 
     const group = data?.group;
@@ -793,14 +813,16 @@ TO_DATE(:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
 
     try {
       const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
-      callBack(err, result.rows);
+      // callBack(null, result.rows);
+      return result.rows;
     } catch (error) {
       console.log(error);
+      throw error;
     } finally {
       if (conn_ora) await conn_ora.close();
     }
   },
-  tsshPharmacyGstRptFour: async (data, callBack) => {
+  tsshPharmacyGstRptFour: async (data) => {
     let conn_ora = await getTmcConnection();
 
     const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(",")) || null;
@@ -887,33 +909,30 @@ TO_DATE(:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
 
     try {
       const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
-      callBack(err, result.rows);
+      // callBack(null, result.rows);
+      return result.rows;
     } catch (error) {
       callBack(error, null);
+      throw error;
     } finally {
       if (conn_ora) await conn_ora.close();
     }
   },
 
   //COLLLECTION REPORTS
-  collectionTmch: (data, callBack) => {
-    pool.query(
+  collectionTmch: async (data) => {
+    const result = await query(
       `SELECT 
                 code,name,SUM(amount) amount
             FROM collection 
             WHERE date BETWEEN ? AND ?
             GROUP BY code,name`,
       [data.from, data.to],
-      (error, results, feilds) => {
-        if (error) {
-          return callBack(error);
-        }
-        return callBack(null, results);
-      },
     );
+    return result;
   },
-  pharmacySaleGst: (data, callBack) => {
-    pool.query(
+  pharmacySaleGst: async (data) => {
+    const result = await query(
       `SELECT 
                 sum(ip) ip,
                 sum(op_0) op0,
@@ -928,13 +947,8 @@ TO_DATE(:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
             FROM pharmacysalegst
             WHERE date BETWEEN ? AND ?`,
       [data.from, data.to],
-      (error, results, feilds) => {
-        if (error) {
-          return callBack(error);
-        }
-        return callBack(null, results);
-      },
     );
+    return result;
   },
   tmchGstReport: async (data) => {
     //GST FIRST REPORTS
@@ -1478,7 +1492,6 @@ TO_DATE(:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
       } finally {
         if (conn_ora) {
           await conn_ora.close();
-          await pool_ora.close();
         }
       }
     });

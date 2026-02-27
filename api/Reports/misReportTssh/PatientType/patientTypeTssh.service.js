@@ -2,7 +2,7 @@
 const {oracledb, getTmcConnection} = require("../../../../config/oradbconfig");
 
 module.exports = {
-  patientTypeDiscountTssh: async (data, callBack) => {
+  patientTypeDiscountTssh: async (data) => {
     let conn_ora = await getTmcConnection();
 
     const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(",")) || null;
@@ -2156,9 +2156,11 @@ FROM (
       const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       // await result.resultSet?.getRows((err, rows) => {
       // });
-      callBack(err, result.rows);
+      // callBack(null, );
+      return result.rows;
     } catch (error) {
       console.log(error);
+      throw error;
     } finally {
       if (conn_ora) await conn_ora.close();
     }

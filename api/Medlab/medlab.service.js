@@ -2,7 +2,7 @@ const {format, subHours, setSeconds, setMinutes, setHours, startOfDay} = require
 const {oracledb, getTmcConnection} = require("../../config/oradbconfig");
 
 module.exports = {
-  getAllPatientLabResults: async (callBack) => {
+  getAllPatientLabResults: async () => {
     let conn_ora = await getTmcConnection();
 
     const sql = `
@@ -45,16 +45,18 @@ module.exports = {
         },
         {outFormat: oracledb.OUT_FORMAT_OBJECT},
       );
+      return result.rows;
       // await result.resultSet?.getRows((err, rows) => {
       // })
-      callBack(err, result.rows);
+      // callBack(null, result.rows);
     } catch (error) {
       console.log(error);
+      throw error;
     } finally {
       await conn_ora.close();
     }
   },
-  getAllIcuBeds: async (callBack) => {
+  getAllIcuBeds: async () => {
     let conn_ora = await getTmcConnection();
 
     const sql = `
@@ -83,9 +85,11 @@ FROM (
       const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       //   await result.resultSet?.getRows((err, rows) => {
       // });
-      callBack(err, result.rows);
+      return result.rows;
+      // callBack(null, result.rows);
     } catch (error) {
       console.log(error);
+      throw error;
     } finally {
       await conn_ora.close();
     }

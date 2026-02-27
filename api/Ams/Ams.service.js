@@ -1,6 +1,7 @@
+const {query} = require("../../config/mysqldbconfig");
 const {getTmcConnection, oracledb} = require("../../config/oradbconfig");
 module.exports = {
-  getAntibiotic: async (data, callBack) => {
+  getAntibiotic: async (data) => {
     let conn_ora = await getTmcConnection();
     const sql = `select meddesc.it_code,
          meddesc.itc_desc,
@@ -35,26 +36,21 @@ module.exports = {
         },
         {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT},
       );
-      await result.resultSet?.getRows((err, rows) => {
-        callBack(err, rows);
-      });
+      return await result.resultSet?.getRows((err, rows) => rows);
     } catch (error) {
-      return callBack(error);
+      console.log(error);
+      throw error;
+      // return callBack(error);
     } finally {
       await conn_ora.close();
     }
   },
 
-  getAntibioticItemCode: (callback) => {
-    pool.query(`SELECT item_code FROM ams_antibiotic_master where status = 1 `, [], (error, results, feilds) => {
-      if (error) {
-        return callback(error);
-      }
-      return callback(null, results);
-    });
+  getAntibioticItemCode: async () => {
+    return await query("meliora", `SELECT item_code FROM ams_antibiotic_master where status = 1`);
   },
 
-  getMicrobiologyTest: async (id, callBack) => {
+  getMicrobiologyTest: async (id) => {
     let conn_ora = await getTmcConnection();
     try {
       const result = await conn_ora.execute(
@@ -97,9 +93,12 @@ module.exports = {
       );
 
       const hisData = await result.resultSet?.getRows();
-      return callBack(null, hisData);
+      // return callBack(null, hisData);
+      return hisData;
     } catch (error) {
-      return callBack(error);
+      console.log(error);
+      throw error;
+      // return callBack(error);
     } finally {
       await conn_ora.close();
     }

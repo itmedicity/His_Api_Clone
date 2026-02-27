@@ -1,136 +1,122 @@
-const { getModuleList, getMenuList, menuGroupInsert, menugroupAlreadyExist, getGroupMapDetails, menuGroupUpdate, getMenuNameDetails } = require('./menugroup.service')
+const {getModuleList, getMenuList, menuGroupInsert, menugroupAlreadyExist, getGroupMapDetails, menuGroupUpdate, getMenuNameDetails} = require("./menugroup.service");
 
 module.exports = {
-    getModuleList: (req, res) => {
-        getModuleList((err, results) => {
-            if (err) {
-                return res.status(200).json({
-                    success: 0,
-                    message: err
-                });
-            }
-            return res.status(200).json({
-                success: 2,
-                data: results
-            });
+  getModuleList: async (req, res) => {
+    try {
+      const data = await getModuleList();
+      console.log(data);
+      return res.status(200).json({
+        success: 2,
+        data: data,
+      });
+    } catch (error) {
+      return res.status(200).json({
+        success: 0,
+        message: error,
+      });
+    }
+  },
+
+  getMenuList: async (req, res) => {
+    try {
+      const body = req.body;
+      const data = await getMenuList(body);
+      if (data.length === 0) {
+        return res.status(200).json({
+          success: 1,
         });
-    },
+      }
+      return res.status(200).json({
+        success: 2,
+        data: data,
+      });
+    } catch (error) {
+      return res.status(200).json({
+        success: 0,
+        message: error,
+      });
+    }
+  },
 
-    getMenuList: (req, res) => {
-        const body = req.body;
-        getMenuList(body, (err, results) => {
-            if (err) {
-                return res.status(200).json({
-                    success: 0,
-                    message: err
-                });
-            }
-            if (results.length === 0) {
-                return res.status(200).json({
-                    success: 1,
-                });
-            }
-            return res.status(200).json({
-                success: 2,
-                data: results
-            });
+  menuGroupInsert: async (req, res) => {
+    try {
+      const body = req.body;
+      const excits = await menugroupAlreadyExist(body);
+      if (excits.length > 0) {
+        return res.status(200).json({
+          success: 7,
+          message: "MenuGroup Already Exist",
         });
-    },
+      }
 
+      await menuGroupInsert(body);
+      return res.status(200).json({
+        success: 1,
+        message: "MenuGroup Created Successfully",
+      });
+    } catch (error) {
+      return res.status(200).json({
+        success: 0,
+        message: error.message,
+      });
+    }
+  },
 
-    menuGroupInsert: (req, res) => {
-        const body = req.body;
-        menugroupAlreadyExist(body, (err, results) => {
-            const value = JSON.parse(JSON.stringify(results))
-            if (Object.keys(value).length === 0) {
-                menuGroupInsert(body, (err, results) => {
-                    if (err) {
-                        return res.status(200).json({
-                            success: 0,
-                            message: err.message
-                        });
-                    }
-                    return res.status(200).json({
-                        success: 1,
-                        message: "MenuGroup Created Successfully"
-                    })
-                })
-
-            }
-            else {
-                return res.status(200).json({
-                    success: 7,
-                    message: "MenuGroup Already Exist"
-                })
-            }
-        })
-    },
-
-
-    getGroupMapDetails: (req, res) => {
-        getGroupMapDetails((err, results) => {
-            if (err) {
-                return res.status(200).json({
-                    success: 0,
-                    message: err
-                });
-            }
-            if (results.length === 0) {
-                return res.status(200).json({
-                    success: 1,
-                    message: "No Results Found"
-                });
-            }
-            return res.status(200).json({
-                success: 2,
-                data: results
-            });
+  getGroupMapDetails: async (req, res) => {
+    try {
+      const data = await getGroupMapDetails();
+      console.log(data);
+      if (data.length === 0) {
+        return res.status(200).json({
+          success: 1,
+          message: "No Results Found",
         });
-    },
+      }
+      return res.status(200).json({
+        success: 2,
+        data: data,
+      });
+    } catch (error) {
+      return res.status(200).json({
+        success: 0,
+        message: error,
+      });
+    }
+  },
 
-    menuGroupUpdate: (req, res) => {
-        const body = req.body;
-        menuGroupUpdate(body, (err, results) => {
-            if (err) {
-                return res.status(200).json({
-                    success: 0,
-                    message: err
-                });
-            }
-            if (!results) {
-                return res.json({
-                    success: 1,
-                    message: "Failed to Update"
-                });
-            }
-            return res.status(200).json({
-                success: 2,
-                message: "Data Updated Successfully"
-            });
+  menuGroupUpdate: async (req, res) => {
+    try {
+      const body = req.body;
+      await menuGroupUpdate(body);
+      return res.status(200).json({
+        success: 2,
+        message: "Data Updated Successfully",
+      });
+    } catch (error) {
+      return res.status(200).json({
+        success: 0,
+        message: error,
+      });
+    }
+  },
+  getMenuNameDetails: async (req, res) => {
+    try {
+      const body = req.body;
+      const data = await getMenuNameDetails(body);
+      if (data.length === 0) {
+        return res.status(200).json({
+          success: 1,
         });
-    },
-
-    getMenuNameDetails: (req, res) => {
-        const body = req.body;
-        getMenuNameDetails(body, (err, results) => {
-            if (err) {
-                return res.status(200).json({
-                    success: 0,
-                    message: err
-                })
-            }
-            if (results.length === 0) {
-                return res.status(200).json({
-                    success: 1,
-                });
-            }
-            return res.status(200).json({
-                success: 2,
-                data: results
-            })
-        })
-
-    },
-
-
-}
+      }
+      return res.status(200).json({
+        success: 2,
+        data: data,
+      });
+    } catch (error) {
+      return res.status(200).json({
+        success: 0,
+        message: error,
+      });
+    }
+  },
+};

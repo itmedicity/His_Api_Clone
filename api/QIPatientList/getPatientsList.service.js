@@ -1,6 +1,6 @@
 const {getTmcConnection, oracledb} = require("../../config/oradbconfig");
 module.exports = {
-  GetElliderPatientList: async (data, callBack) => {
+  GetElliderPatientList: async (data) => {
     let conn_ora = await getTmcConnection();
     try {
       const result = await conn_ora.execute(
@@ -27,10 +27,11 @@ module.exports = {
         },
         {outFormat: oracledb.OUT_FORMAT_OBJECT},
       );
-      const hisData = result.rows;
-      return callBack(null, hisData);
+      return result.rows;
     } catch (error) {
-      return callBack(error);
+      console.log(error);
+      throw error;
+      // return callBack(error);
     } finally {
       if (conn_ora) {
         await conn_ora.close();
@@ -39,7 +40,7 @@ module.exports = {
     }
   },
 
-  GetEndoscopyIPInfo: async (id, callBack) => {
+  GetEndoscopyIPInfo: async (id) => {
     let conn_ora = await getTmcConnection();
     try {
       const result = await conn_ora.execute(
@@ -59,10 +60,11 @@ module.exports = {
         },
         {outFormat: oracledb.OUT_FORMAT_OBJECT},
       );
-      const hisData = result.rows;
-      return callBack(null, hisData);
+      return result.rows;
     } catch (error) {
-      return callBack(error);
+      console.log(error);
+      throw error;
+      // return callBack(error);
     } finally {
       if (conn_ora) {
         await conn_ora.close();
@@ -70,7 +72,7 @@ module.exports = {
     }
   },
 
-  GetInitialAssessmentDetails: async (data, callBack) => {
+  GetInitialAssessmentDetails: async (data) => {
     let conn_ora = await getTmcConnection();
     try {
       const result = await conn_ora.execute(
@@ -114,10 +116,12 @@ module.exports = {
         },
         {outFormat: oracledb.OUT_FORMAT_OBJECT},
       );
-      const hisData = result.rows;
-      return callBack(null, hisData);
+      return result.rows;
+      // return callBack(null, hisData);
     } catch (error) {
-      return callBack(error);
+      console.log(error);
+      throw error;
+      // return callBack(error);
     } finally {
       if (conn_ora) {
         await conn_ora.close();
@@ -125,7 +129,7 @@ module.exports = {
     }
   },
 
-  GetEndoscopyPatientsQI: async (data, callBack) => {
+  GetEndoscopyPatientsQI: async (data) => {
     let conn_ora = await getTmcConnection();
     try {
       const result = await conn_ora.execute(
@@ -156,10 +160,11 @@ module.exports = {
         },
         {outFormat: oracledb.OUT_FORMAT_OBJECT},
       );
-      const hisData = await result.rows;
-      return callBack(null, hisData);
+      return await result.rows;
     } catch (error) {
-      return callBack(error);
+      console.log(error);
+      throw error;
+      // return callBack(error);
     } finally {
       if (conn_ora) {
         await conn_ora.close();
@@ -167,7 +172,7 @@ module.exports = {
     }
   },
 
-  GetIPPatientList: async (data, callBack) => {
+  GetIPPatientList: async (data) => {
     let conn_ora = await getTmcConnection();
     try {
       const result = await conn_ora.execute(
@@ -190,10 +195,12 @@ module.exports = {
         },
         {outFormat: oracledb.OUT_FORMAT_OBJECT},
       );
-      const hisData = result.rows;
-      return callBack(null, hisData);
+      return result.rows;
+      // return callBack(null, hisData);
     } catch (error) {
-      return callBack(error);
+      console.log(error);
+      throw error;
+      // return callBack(error);
     } finally {
       if (conn_ora) {
         await conn_ora.close();

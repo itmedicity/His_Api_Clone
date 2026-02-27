@@ -1,6 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const app = express();
+const {mysqlExecute} = require("./cron-jobs/CronLogger");
 const {initializePools, closeConnection} = require("./config/oradbconfig");
 
 (async () => {
@@ -12,8 +13,28 @@ const {initializePools, closeConnection} = require("./config/oradbconfig");
   }
 })();
 
-process.on("SIGINT", closeConnection);
-process.on("SIGTERM", closeConnection);
+(async () => {
+  const rows = await mysqlExecute("SELECT 1 AS ok");
+  console.log("MySQL Promise OK:", rows[0].ok);
+})();
+
+process.on("SIGINT", async () => {
+  console.log("Shutting down...");
+  await closeConnection();
+  process.exit(0);
+});
+process.on("SIGTERM", async () => {
+  console.log("Shutting down...");
+  await closeConnection();
+  process.exit(0);
+});
+process.on("unhandledRejection", (reason, promise) => {
+  console.error("🔥 Unhandled Rejection:", reason);
+});
+
+process.on("uncaughtException", (err) => {
+  console.error("🔥 Uncaught Exception:", err);
+});
 
 //IMPORT MODULES
 const emplyeeRoutes = require("./api/employee/emp.router");
@@ -96,6 +117,13 @@ const cronjob = require("./cron-jobs/cron.router");
 //store report
 const storeReport = require("./api/StoreReport/StoreReport.router");
 
+/**
+ *  LATEST VERSION  V-5.0.1
+ */
+
+//GET MIS REPORTS QMT
+const getMisReportsQMT = require("./api/Reports/misReport/misReportQMT/misReportQmt.route");
+
 app.use(express.json());
 
 app.use((req, res, next) => {
@@ -160,9 +188,9 @@ app.use("/api/rolprocess", rolprocess);
 app.use("/api/pharmacytax", gstTaxPharmacy);
 
 // count
-app.use("/api/opcount", opcount);
-app.use("/api/ipcount", ipcount);
-app.use("/api/dashboard", dashboard);
+app.use("/api/opcount", opcount); // not corrected
+app.use("/api/ipcount", ipcount); // not corrected
+app.use("/api/dashboard", dashboard); // not corrected
 
 // MELIORA
 app.use("/api/melioraEllider", elliderData);
@@ -173,8 +201,8 @@ app.use("/api/procedureList", procedure);
 app.use("/api/crfpurchase", crfpo);
 
 //BIS_ELLIDER_API
-app.use("/api/bisElliderData", bisElliderData);
-app.use("/api/bisQuotationData", bisQuotationData);
+app.use("/api/bisElliderData", bisElliderData); // jomol - not corrected
+app.use("/api/bisQuotationData", bisQuotationData); // jomol - not corrected
 
 //Ams _Antibiotic Data Collection
 app.use("/api/amsAntibiotic", amsAntibioticData);
@@ -188,6 +216,14 @@ app.use("/api/cronjob", cronjob);
 //COLLECTION REPORTS TMCH
 app.use("/api/collectionOnlyQmt", collectionTmc);
 app.use("/api/storeReport", storeReport);
+
+/**
+ *  LATEST VERSION  V-5.0.1
+ */
+
+//GET MIS REPORTS QMT
+
+app.use("/api/getMisReportsQmt", getMisReportsQMT);
 
 app.listen(process.env.APP_PORT, (val) => {
   console.log(`Server Up and Running ${process.env.APP_PORT}`);

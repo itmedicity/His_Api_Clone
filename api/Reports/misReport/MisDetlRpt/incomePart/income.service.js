@@ -3,7 +3,7 @@ const {oracledb, getTmcConnection} = require("../../../../../config/oradbconfig"
 
 module.exports = {
   // BED INCOME
-  bedIncome: async (data, callBack) => {
+  bedIncome: async (data) => {
     let conn_ora = await getTmcConnection();
     const ipNumberList = data?.ptno?.join(",");
     const fromDate = data.from;
@@ -1359,21 +1359,23 @@ module.exports = {
                         ORDER BY Pcc_Desc`;
     let result;
     try {
-      result = await conn_ora.execute(sql, {}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
-      await result.resultSet?.getRows((err, rows) => {
-        callBack(err, rows);
-      });
+      result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      //       await result.resultSet?.getRows((err, rows) => {
+      //         callBack(err, rows);
+      //       });
+      return result.rows;
     } catch (error) {
       console.log(error);
+      throw error;
     } finally {
-      result.resultSet?.close();
+      //       result.resultSet?.close();
       if (conn_ora) {
         await conn_ora.close();
         // await pool_ora.close();
       }
     }
   },
-  nsIncome: async (data, callBack) => {
+  nsIncome: async (data) => {
     let conn_ora = await getTmcConnection();
 
     // const ipNumberList = data.ptno.join(',');
@@ -2730,21 +2732,23 @@ module.exports = {
                 ORDER BY Pcc_Desc`;
     let result;
     try {
-      result = await conn_ora.execute(sql, {}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
-      await result.resultSet?.getRows((err, rows) => {
-        callBack(err, rows);
-      });
+      result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      //       await result.resultSet?.getRows((err, rows) => {
+      //         callBack(err, rows);
+      //       });
+      return result.rows;
     } catch (error) {
       console.log(error);
+      throw error;
     } finally {
-      result.resultSet?.close();
+      //       result.resultSet?.close();
       if (conn_ora) {
         await conn_ora.close();
         // await pool_ora.close();
       }
     }
   },
-  roomRentIncome: async (data, callBack) => {
+  roomRentIncome: async (data) => {
     let conn_ora = await getTmcConnection();
     // const ipNumberList = data.ptno.join(',');
     const fromDate = data.from;
@@ -4103,9 +4107,11 @@ module.exports = {
       const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       //       await result.resultSet?.getRows((err, rows) => {
       // });
-      callBack(err, result.rows);
+      //       callBack(null, result.rows);
+      return result.rows;
     } catch (error) {
       console.log(error);
+      throw error;
     } finally {
       if (conn_ora) {
         await conn_ora.close();
@@ -4113,7 +4119,7 @@ module.exports = {
       }
     }
   },
-  otherIncome: async (data, callBack) => {
+  otherIncome: async (data) => {
     let conn_ora = await getTmcConnection();
     // const ipNumberList = data.ptno.join(',');
     const fromDate = data.from;
@@ -5472,9 +5478,11 @@ ORDER BY Pcc_Desc`;
       const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       //       await result.resultSet?.getRows((err, rows) => {
       // });
-      callBack(err, result.rows);
+      //       callBack(null, result.rows);
+      return result.rows;
     } catch (error) {
       console.log(error);
+      throw error;
     } finally {
       if (conn_ora) {
         await conn_ora.close();
@@ -5482,7 +5490,7 @@ ORDER BY Pcc_Desc`;
       }
     }
   },
-  consultingIncome: async (data, callBack) => {
+  consultingIncome: async (data) => {
     let conn_ora = await getTmcConnection();
     // const ipNumberList = data.ptno.join(',');
     const fromDate = data.from;
@@ -6840,9 +6848,11 @@ ORDER BY Pcc_Desc`;
       const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       //       await result.resultSet?.getRows((err, rows) => {
       // });
-      callBack(err, result.rows);
+      //       callBack(null, result.rows);
+      return result.rows;
     } catch (error) {
       console.log(error);
+      throw error;
     } finally {
       if (conn_ora) {
         await conn_ora.close();
@@ -6850,7 +6860,7 @@ ORDER BY Pcc_Desc`;
       }
     }
   },
-  anesthetiaIncome: async (data, callBack) => {
+  anesthetiaIncome: async (data) => {
     let conn_ora = await getTmcConnection();
     // const ipNumberList = data.ptno.join(',');
     const fromDate = data.from;
@@ -8209,9 +8219,11 @@ ORDER BY Pcc_Desc`;
       const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       //       await result.resultSet?.getRows((err, rows) => {
       // });
-      callBack(err, result.rows);
+      //       callBack(null, result.rows);
+      return result.rows;
     } catch (error) {
       console.log(error);
+      throw error;
     } finally {
       if (conn_ora) {
         await conn_ora.close();
@@ -8219,7 +8231,7 @@ ORDER BY Pcc_Desc`;
       }
     }
   },
-  surgeonIncome: async (data, callBack) => {
+  surgeonIncome: async (data) => {
     let conn_ora = await getTmcConnection();
     // const ipNumberList = data.ptno.join(',');
     const fromDate = data.from;
@@ -9577,9 +9589,11 @@ ORDER BY Pcc_Desc`;
       const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       //       await result.resultSet?.getRows((err, rows) => {
       // });
-      callBack(err, result.rows);
+      //       callBack(null, result.rows);
+      return result.rows;
     } catch (error) {
       console.log(error);
+      throw error;
     } finally {
       if (conn_ora) {
         await conn_ora.close();
@@ -9587,7 +9601,7 @@ ORDER BY Pcc_Desc`;
       }
     }
   },
-  theaterIncome: async (data, callBack) => {
+  theaterIncome: async (data) => {
     let conn_ora = await getTmcConnection();
     // const ipNumberList = data.ptno.join(',');
     const fromDate = data.from;
@@ -10946,9 +10960,11 @@ ORDER BY Pcc_Desc`;
       const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       //       await result.resultSet?.getRows((err, rows) => {
       // });
-      callBack(err, result.rows);
+      //       callBack(null, result.rows);
+      return result.rows;
     } catch (error) {
       console.log(error);
+      throw error;
     } finally {
       if (conn_ora) {
         await conn_ora.close();
@@ -10956,7 +10972,7 @@ ORDER BY Pcc_Desc`;
       }
     }
   },
-  cardiologyIncome: async (data, callBack) => {
+  cardiologyIncome: async (data) => {
     let conn_ora = await getTmcConnection();
     // const ipNumberList = data.ptno.join(',');
     const fromDate = data.from;
@@ -12314,9 +12330,11 @@ ORDER BY Pcc_Desc`;
       const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       //       await result.resultSet?.getRows((err, rows) => {
       // });
-      callBack(err, result.rows);
+      //       callBack(null, result.rows);
+      return result.rows;
     } catch (error) {
       console.log(error);
+      throw error;
     } finally {
       if (conn_ora) {
         await conn_ora.close();
@@ -12324,7 +12342,7 @@ ORDER BY Pcc_Desc`;
       }
     }
   },
-  disPosibleItemIncome: async (data, callBack) => {
+  disPosibleItemIncome: async (data) => {
     let conn_ora = await getTmcConnection();
     // const ipNumberList = data.ptno.join(',');
     const fromDate = data.from;
@@ -13683,9 +13701,11 @@ ORDER BY Pcc_Desc`;
       const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       //       await result.resultSet?.getRows((err, rows) => {
       // });
-      callBack(err, result.rows);
+      //       callBack(null, result.rows);
+      return result.rows;
     } catch (error) {
       console.log(error);
+      throw error;
     } finally {
       if (conn_ora) {
         await conn_ora.close();
@@ -13693,7 +13713,7 @@ ORDER BY Pcc_Desc`;
       }
     }
   },
-  icuIncome: async (data, callBack) => {
+  icuIncome: async (data) => {
     let conn_ora = await getTmcConnection();
     // const ipNumberList = data.ptno.join(',');
     const fromDate = data.from;
@@ -15051,9 +15071,11 @@ ORDER BY Pcc_Desc`;
       const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       //       await result.resultSet?.getRows((err, rows) => {
       // });
-      callBack(err, result.rows);
+      //       callBack(null, result.rows);
+      return result.rows;
     } catch (error) {
       console.log(error);
+      throw error;
     } finally {
       if (conn_ora) {
         await conn_ora.close();
@@ -15061,7 +15083,7 @@ ORDER BY Pcc_Desc`;
       }
     }
   },
-  icuprocedureIncome: async (data, callBack) => {
+  icuprocedureIncome: async (data) => {
     let conn_ora = await getTmcConnection();
     // const ipNumberList = data.ptno.join(',');
     const fromDate = data.from;
@@ -16419,9 +16441,11 @@ ORDER BY Pcc_Desc`;
       const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       //       await result.resultSet?.getRows((err, rows) => {
       // });
-      callBack(err, result.rows);
+      //       callBack(null, result.rows);
+      return result.rows;
     } catch (error) {
       console.log(error);
+      throw error;
     } finally {
       if (conn_ora) {
         await conn_ora.close();
@@ -16429,7 +16453,7 @@ ORDER BY Pcc_Desc`;
       }
     }
   },
-  radiologyIncome: async (data, callBack) => {
+  radiologyIncome: async (data) => {
     let conn_ora = await getTmcConnection();
     // const ipNumberList = data.ptno.join(',');
     const fromDate = data.from;
@@ -17787,9 +17811,11 @@ ORDER BY Pcc_Desc`;
       const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       //       await result.resultSet?.getRows((err, rows) => {
       // });
-      callBack(err, result.rows);
+      //       callBack(null, result.rows);
+      return result.rows;
     } catch (error) {
       console.log(error);
+      throw error;
     } finally {
       if (conn_ora) {
         await conn_ora.close();
@@ -17797,7 +17823,7 @@ ORDER BY Pcc_Desc`;
       }
     }
   },
-  laboratoryIncome: async (data, callBack) => {
+  laboratoryIncome: async (data) => {
     let conn_ora = await getTmcConnection();
 
     // const ipNumberList = data.ptno.join(',');
@@ -19156,9 +19182,11 @@ ORDER BY Pcc_Desc`;
       const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       //       await result.resultSet?.getRows((err, rows) => {
       // });
-      callBack(err, result.rows);
+      //       callBack(null, result.rows);
+      return result.rows;
     } catch (error) {
       console.log(error);
+      throw error;
     } finally {
       if (conn_ora) {
         await conn_ora.close();
@@ -19166,7 +19194,7 @@ ORDER BY Pcc_Desc`;
       }
     }
   },
-  mriIncome: async (data, callBack) => {
+  mriIncome: async (data) => {
     let conn_ora = await getTmcConnection();
     // const ipNumberList = data.ptno.join(',');
     const fromDate = data.from;
@@ -20524,16 +20552,18 @@ ORDER BY Pcc_Desc`;
       const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       //       await result.resultSet?.getRows((err, rows) => {
       // });
-      callBack(err, result.rows);
+      //       callBack(null, result.rows);
+      return result.rows;
     } catch (error) {
       console.log(error);
+      throw error;
     } finally {
       if (conn_ora) {
         await conn_ora.close();
       }
     }
   },
-  dietIncome: async (data, callBack) => {
+  dietIncome: async (data) => {
     let conn_ora = await getTmcConnection();
     // const ipNumberList = data.ptno.join(',');
     const fromDate = data.from;
@@ -21891,9 +21921,11 @@ ORDER BY Pcc_Desc`;
       const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       //       await result.resultSet?.getRows((err, rows) => {
       // });
-      callBack(err, result.rows);
+      //       callBack(null, result.rows);
+      return result.rows;
     } catch (error) {
       console.log(error);
+      throw error;
     } finally {
       if (conn_ora) {
         await conn_ora.close();
@@ -21901,7 +21933,7 @@ ORDER BY Pcc_Desc`;
       }
     }
   },
-  pharmacyIncomePart1: async (data, callBack) => {
+  pharmacyIncomePart1: async (data) => {
     let conn_ora = await getTmcConnection();
 
     // const ipNumberList = data.ptno.join(',');
@@ -22065,9 +22097,11 @@ ORDER BY Pcc_Desc`;
       const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       //       await result.resultSet?.getRows((err, rows) => {
       // });
-      callBack(err, result.rows);
+      //       callBack(null, result.rows);
+      return result.rows;
     } catch (error) {
       console.log(error);
+      throw error;
     } finally {
       if (conn_ora) {
         await conn_ora.close();
@@ -22075,7 +22109,7 @@ ORDER BY Pcc_Desc`;
       }
     }
   },
-  pharmacyIncomePart2: async (data, callBack) => {
+  pharmacyIncomePart2: async (data) => {
     let conn_ora = await getTmcConnection();
 
     // const ipNumberList = data.ptno.join(',');
@@ -22177,9 +22211,11 @@ ORDER BY Pcc_Desc`;
       const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       //       await result.resultSet?.getRows((err, rows) => {
       // });
-      callBack(err, result.rows);
+      //       callBack(null, result.rows);
+      return result.rows;
     } catch (error) {
       console.log(error);
+      throw error;
     } finally {
       if (conn_ora) {
         await conn_ora.close();
@@ -22187,7 +22223,7 @@ ORDER BY Pcc_Desc`;
       }
     }
   },
-  pharmacyIncomePart3: async (data, callBack) => {
+  pharmacyIncomePart3: async (data) => {
     let conn_ora = await getTmcConnection();
 
     // const ipNumberList = data.ptno.join(',');
@@ -22222,9 +22258,11 @@ ORDER BY Pcc_Desc`;
       const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       //       await result.resultSet?.getRows((err, rows) => {
       // });
-      callBack(err, result.rows);
+      //       callBack(null, result.rows);
+      return result.rows;
     } catch (error) {
       console.log(error);
+      throw error;
     } finally {
       if (conn_ora) {
         await conn_ora.close();
@@ -22232,7 +22270,7 @@ ORDER BY Pcc_Desc`;
       }
     }
   },
-  pharmacyIncomePart4: async (data, callBack) => {
+  pharmacyIncomePart4: async (data) => {
     let conn_ora = await getTmcConnection();
 
     // const ipNumberList = data.ptno.join(',');
@@ -22331,9 +22369,11 @@ ORDER BY Pcc_Desc`;
       const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       //       await result.resultSet?.getRows((err, rows) => {
       // });
-      callBack(err, result.rows);
+      //       callBack(null, result.rows);
+      return result.rows;
     } catch (error) {
       console.log(error);
+      throw error;
     } finally {
       if (conn_ora) {
         await conn_ora.close();

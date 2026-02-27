@@ -1,62 +1,78 @@
-const { userRightsInsert, getUserRights, userRightsUpdate } = require('./userRights.service')
+const {userRightsInsert, getUserRights, userRightsUpdate} = require("./userRights.service");
 
 module.exports = {
-    userRightsInsert: (req, res) => {
-        const body = req.body;
-        const data = body.map((val) => {
-            return [val.user_group_id, val.module_id, val.menugroup_id,
-            val.menuname_id, val.view_menu, val.pdf_view, val.excel_view]
-        })
-        userRightsInsert(data, (err, results) => {
+  userRightsInsert: async (req, res) => {
+    try {
+      const body = req.body;
+      if (!Array.isArray(body) || body.length === 0) {
+        return res.status(200).json({
+          success: 0,
+          message: "Invalid payload",
+        });
+      }
 
-            if (err) {
-                return res.status(200).json({
-                    success: 0,
-                    message: err.message
-                });
-            }
-            return res.status(200).json({
-                success: 1,
-                message: "User Rights Updated"
-            })
-        })
-    },
+      const rows = body.map((val) => {
+        return [val.user_group_id ?? null, val.module_id ?? null, val.menugroup_id ?? null, val.menuname_id ?? null, val.view_menu ?? 0, val.pdf_view ?? 0, val.excel_view ?? 0];
+      });
 
-    getUserRights: (req, res) => {
-        const body = req.body;
-        getUserRights(body, (err, results) => {
-            if (err) {
-                return res.status(200).json({
-                    success: 0,
-                    message: err
-                })
-            }
-            if (results.length === 0) {
-                return res.status(200).json({
-                    success: 1,
-                });
-            }
-            return res.status(200).json({
-                success: 2,
-                data: results
-            })
-        })
+      await userRightsInsert(rows);
 
-    },
+      return res.status(200).json({
+        success: 1,
+        message: "User Rights Updated",
+      });
+    } catch (error) {
+      return res.status(200).json({
+        success: 0,
+        message: error.message,
+      });
+    }
+  },
 
-    userRightsUpdate: async (req, res) => {
-        const body = req.body;
-        userRightsUpdate(body).then(results => {
-            return res.status(200).json({
-                success: 1,
-                message: "User Rights Updated"
-            });
-        }).catch(err => {
-            return res.status(200).json({
-                success: 0,
-                message: "Error Occured"
-            });
-        })
-    },
+  getUserRights: async (req, res) => {
+    try {
+      const body = req.body;
+      const data = await getUserRights(body);
 
-}
+      if (data.length === 0) {
+        return res.status(200).json({
+          success: 1,
+        });
+      }
+      return res.status(200).json({
+        success: 2,
+        data: data,
+      });
+    } catch (error) {
+      return res.status(200).json({
+        success: 0,
+        message: error,
+      });
+    }
+  },
+
+  userRightsUpdate: async (req, res) => {
+    try {
+      const body = req.body;
+
+      if (!Array.isArray(body) || body.length === 0) {
+        return res.status(200).json({
+          success: 0,
+          message: "Invalid payload",
+        });
+      }
+
+      await userRightsUpdate(body);
+
+      return res.status(200).json({
+        success: 1,
+        message: "User Rights Updated",
+      });
+    } catch (error) {
+      return res.status(200).json({
+        success: 0,
+        message: "Error Occured",
+      });
+    }
+  },
+};

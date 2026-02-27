@@ -1,8 +1,8 @@
-const pool = require("../../config/dbconfig");
+const {pools} = require("../../config/mysqldbconfig");
 const {getTmcConnection, oracledb} = require("../../config/oradbconfig");
 
 module.exports = {
-  getPODetails: async (data, callBack) => {
+  getPODetails: async (data) => {
     let conn_ora = await getTmcConnection();
     try {
       const result = await conn_ora.execute(
@@ -33,9 +33,12 @@ module.exports = {
         {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT},
       );
       const hisData = await result.resultSet?.getRows();
-      return callBack(null, hisData);
+      // return callBack(null, hisData);
+      return hisData;
     } catch (error) {
-      return callBack(error);
+      // return callBack(error);
+      console.log(error);
+      throw error;
     } finally {
       await conn_ora.close();
     }
@@ -74,7 +77,7 @@ module.exports = {
   },
   // AND POC_CLOSE IS NULL
 
-  getItemGrnDetails: async (data, callBack) => {
+  getItemGrnDetails: async (data) => {
     const ponoArray = data?.map((d) => `'${d.pono}'`).join(",");
     const stcodeArray = data?.map((d) => `'${d.stcode}'`).join(",");
 
@@ -93,16 +96,18 @@ module.exports = {
                         AND PORDMAST.ST_CODE IN (${stcodeArray})
                         AND PORDMAST.POD_DATE >= ADD_MONTHS(SYSDATE, -50)`;
       const result = await conn_ora.execute(query, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
-      const hisData = result.rows;
-      return callBack(null, hisData);
+      return result.rows;
+      // return callBack(null, hisData);
     } catch (error) {
-      return callBack(error);
+      console.log(error);
+      throw error;
+      // return callBack(error);
     } finally {
       await conn_ora.close();
     }
   },
 
-  getPODetailsBySupplier: async (id, callBack) => {
+  getPODetailsBySupplier: async (id) => {
     let conn_ora = await getTmcConnection();
     try {
       const result = await conn_ora.execute(
@@ -129,15 +134,18 @@ module.exports = {
         {outFormat: oracledb.OUT_FORMAT_OBJECT},
       );
       const hisData = result.rows;
-      return callBack(null, hisData);
+      return hisData;
+      // return callBack(null, hisData);
     } catch (error) {
-      return callBack(error);
+      console.log(error);
+      throw error;
+      // return callBack(error);
     } finally {
       await conn_ora.close();
     }
   },
 
-  getItemDetails: async (data, callBack) => {
+  getItemDetails: async (data) => {
     const ponoArray = data?.map((d) => `'${d.pono}'`).join(",");
     const stcodeArray = data?.map((d) => `'${d.stcode}'`).join(",");
 
@@ -155,9 +163,12 @@ module.exports = {
                        AND PORDMAST.POD_DATE >= ADD_MONTHS(SYSDATE, -12)`;
       const result = await conn_ora.execute(query, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       const hisData = result.rows;
-      return callBack(null, hisData);
+      return hisData;
+      // return callBack(null, hisData);
     } catch (error) {
-      return callBack(error);
+      console.log(error);
+      throw error;
+      // return callBack(error);
     } finally {
       await conn_ora.close();
     }
