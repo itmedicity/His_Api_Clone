@@ -453,8 +453,8 @@ const UpdateFbBedDetailMeliora = async () => {
         BD.BD_CODE
       FROM BED BD
       WHERE BD.BDC_STATUS = 'Y'
-        AND BD.BDD_EDDATE >= TO_DATE(:FROM_DATE,'dd/MM/yyyy HH24:mi:ss')
-        AND BD.BDD_EDDATE < TO_DATE(:TO_DATE,'dd/MM/yyyy HH24:mi:ss')
+        AND BD.BDD_EDDATE >= :FROM_DATE
+        AND BD.BDD_EDDATE <  :TO_DATE
     `;
 
     const {rows = []} = await conn_ora.execute(
@@ -877,6 +877,7 @@ async function safeRun(name, fn) {
   }
 }
 
+/***************************************LIVE TIMING START************************************************/
 // END FUN
 
 // 1 Admit patients
@@ -902,6 +903,8 @@ cron.schedule("9,24,39,54 * * * *", async () => {
 cron.schedule("0 23 * * *", async () => {
   await safeRun("InsertChilderDetailMeliora", InsertChilderDetailMeliora);
 });
+
+/***************************************LIVE TIMING END************************************************/
 
 // cron.schedule("*/49 * * * *", async () => {
 //   await safeRun("getAmsPatientDetails", getAmsPatientDetails);

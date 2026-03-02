@@ -17,7 +17,7 @@ const getCollectionAndIncomeMisReportQMT = async (req, res) => {
     };
 
     console.log(bind);
-    console.time("MIS_TOTAL_TIME");
+    // console.time("MIS_TOTAL_TIME");
 
     const advanceCollection = await collectionQmtService.advanceCollection(conn, bind);
     const advanceRefund = await collectionQmtService.advanceRefund(conn, bind);
@@ -46,7 +46,7 @@ const getCollectionAndIncomeMisReportQMT = async (req, res) => {
     const procedurePart4 = await procedureQmtService.proIncomePart4(conn, bind);
     const theaterIncome = await procedureQmtService.theaterIncome(conn, bind);
     const patientTypeDiscount = await patientTypeDiscountQmtService.patientTypeDiscount(conn, bind);
-    console.timeEnd("misReportQmt");
+    // console.timeEnd("misReportQmt");
     const result = {
       mis: {
         misGroupMast,
@@ -56,8 +56,8 @@ const getCollectionAndIncomeMisReportQMT = async (req, res) => {
         advanceCollection,
         advanceRefund,
         advanceSettled,
-        collectionAgainstSalePart1,
-        collectionAgainstSalePart2,
+        collectionAgainstSalesTotal: collectionAgainstSalePart1,
+        collectionAgainstSalesDeduction: collectionAgainstSalePart2,
         complimentory,
         creditInsuranceBillCollection,
         creditInsuranceBill,

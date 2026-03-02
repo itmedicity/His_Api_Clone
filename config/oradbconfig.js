@@ -24,12 +24,13 @@ async function initializePools() {
         connectString: process.env.ORA_CONN_STRING,
         poolAlias: "TMC_POOL",
         poolMin: 2,
-        poolMax: 15,
+        poolMax: 5,
         poolIncrement: 1,
         poolTimeout: 60,
         queueTimeout: 60000,
         stmtCacheSize: 30,
         poolPingInterval: 60,
+        callTimeout: 120000,
       });
       console.log("TMC Oracle pool initialized");
     }

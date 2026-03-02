@@ -36,6 +36,10 @@ process.on("uncaughtException", (err) => {
   console.error("🔥 Uncaught Exception:", err);
 });
 
+// setInterval(() => {
+//   console.log("Event Loop Lag Check", process.memoryUsage().rss);
+// }, 5000);
+
 //IMPORT MODULES
 const emplyeeRoutes = require("./api/employee/emp.router");
 const usgroup = require("./api/newUsergroup/newgroup.router");
@@ -211,7 +215,7 @@ app.use("/api/amsAntibiotic", amsAntibioticData);
 app.use("/api/medlab", medlab);
 
 // CRON JOB FUNCTION
-app.use("/api/cronjob", cronjob);
+// app.use("/api/cronjob", cronjob);
 
 //COLLECTION REPORTS TMCH
 app.use("/api/collectionOnlyQmt", collectionTmc);
