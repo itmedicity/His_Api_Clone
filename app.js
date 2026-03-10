@@ -127,6 +127,7 @@ const storeReport = require("./api/StoreReport/StoreReport.router");
 
 //GET MIS REPORTS QMT
 const getMisReportsQMT = require("./api/Reports/misReport/misReportQMT/misReportQmt.route");
+const getMisReportsTMCH = require("./api/Reports/misReportTmch/misReportTMCH/misReportTMCH.route");
 
 app.use(express.json());
 
@@ -228,6 +229,7 @@ app.use("/api/storeReport", storeReport);
 //GET MIS REPORTS QMT
 
 app.use("/api/getMisReportsQmt", getMisReportsQMT);
+app.use("/api/getMisReportsTmch", getMisReportsTMCH);
 
 app.listen(process.env.APP_PORT, (val) => {
   console.log(`Server Up and Running ${process.env.APP_PORT}`);

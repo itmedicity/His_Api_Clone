@@ -1,4 +1,4 @@
-const {oracledb, getTmcConnection} = require("../../../../config/oradbconfig");
+const {getTmcConnection} = require("../../../../config/oradbconfig");
 const collectionQmtService = require("../collectionPart/collection.service");
 const pharmacyCollectionQmtService = require("../incomePart/pharmacyincome/pharmacy.service");
 const procedureQmtService = require("../incomePart/procedureIncome/proincome.service");
@@ -15,9 +15,6 @@ const getCollectionAndIncomeMisReportQMT = async (req, res) => {
       from: from,
       to: to,
     };
-
-    console.log(bind);
-    // console.time("MIS_TOTAL_TIME");
 
     const advanceCollection = await collectionQmtService.advanceCollection(conn, bind);
     const advanceRefund = await collectionQmtService.advanceRefund(conn, bind);
@@ -87,15 +84,6 @@ const getCollectionAndIncomeMisReportQMT = async (req, res) => {
       },
     };
 
-    // if (Array.isArray(data) && data.length === 0) {
-    //   return res.status(200).json({
-    //     success: 2,
-    //     message: "No Result",
-    //   });
-    // }
-
-    console.log(result);
-
     return res.status(200).json({
       success: 1,
       message: "successfully get mis-qmt-reports",
@@ -119,67 +107,3 @@ const getCollectionAndIncomeMisReportQMT = async (req, res) => {
 };
 
 module.exports = getCollectionAndIncomeMisReportQMT;
-
-/***
- * 
- * 
- * 
- *     // const [
-    //   advanceCollection,
-    //   advanceRefund,
-    //   advanceSettled,
-    //   collectionAgainstSalePart1,
-    //   collectionAgainstSalePart2,
-    //   complimentory,
-    //   creditInsuranceBillCollection,
-    //   creditInsuranceBill,
-    //   ipConsolidatedDiscount,
-    //   ipPreviousDayDiscount,
-    //   ipPreviousDayCollection,
-    //   unsettledAmount,
-    //   misGroupMast,
-    //   misGroup,
-    //   creditInsuranceBillRefund,
-    //   pharmacyReturnPart1,
-    //   pharmacyReturnPart2,
-    //   pharmacyReturnPart3,
-    //   pharmacySalePart1,
-    //   pharmacySalePart2,
-    //   pharmacySalePart3,
-    //   procedurePart1,
-    //   procedurePart2,
-    //   procedurePart3,
-    //   procedurePart4,
-    //   theaterIncome,
-    //   patientTypeDiscount,
-    // ] = await Promise.all([
-    //   collectionQmtService.advanceCollection(conn, bind),
-    //   collectionQmtService.advanceRefund(conn, bind),
-    //   collectionQmtService.advanceSettled(conn, bind),
-    //   collectionQmtService.collectionAgainstSalePart1(conn, bind),
-    //   collectionQmtService.collectionAgainstSalePart2(conn, bind),
-    //   collectionQmtService.complimentory(conn, bind),
-    //   collectionQmtService.creditInsuranceBillCollection(conn, bind),
-    //   collectionQmtService.creditInsuranceBill(conn, bind),
-    //   collectionQmtService.ipConsolidatedDiscount(conn, bind),
-    //   collectionQmtService.ipPreviousDayDiscount(conn, bind),
-    //   collectionQmtService.ipPreviousDayCollection(conn, bind),
-    //   collectionQmtService.unsettledAmount(conn, bind),
-    //   collectionQmtService.misGroupMast(conn),
-    //   collectionQmtService.misGroup(conn),
-    //   collectionQmtService.creditInsuranceBillRefund(conn, bind),
-    //   pharmacyCollectionQmtService.phamracyReturnPart1(conn, bind),
-    //   pharmacyCollectionQmtService.phamracyReturnPart2(conn, bind),
-    //   pharmacyCollectionQmtService.phamracyReturnPart3(conn, bind),
-    //   pharmacyCollectionQmtService.pharmacySalePart1(conn, bind),
-    //   pharmacyCollectionQmtService.phamracySalePart2(conn, bind),
-    //   pharmacyCollectionQmtService.phamracySalePart3(conn, bind),
-    //   procedureQmtService.proIncomePart1(conn, bind),
-    //   procedureQmtService.proIncomePart2(conn, bind),
-    //   procedureQmtService.proIncomePart3(conn, bind),
-    //   procedureQmtService.proIncomePart4(conn, bind),
-    //   procedureQmtService.theaterIncome(conn, bind),
-    //   patientTypeDiscountQmtService.patientTypeDiscount(conn, bind),
-    // ]);
-
- */

@@ -196,12 +196,12 @@ module.exports = {
       if (conn_ora) await conn_ora.close();
     }
   },
-  pharmacyRoundOffAmntTssh: async (data) => {
-    let conn_ora = await getTmcConnection();
+  pharmacyRoundOffAmntTssh: async (conn_ora, data) => {
+    // let conn_ora = await getTmcConnection();
 
-    const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(",")) || null;
-    const fromDate = data.from;
-    const toDate = data.to;
+    // const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(",")) || null;
+    // const fromDate = data.from;
+    // const toDate = data.to;
 
     const sql = `SELECT 
                             SUM (NVL (Mretdetl.MRN_AMOUNT, 0) - NVL (MRN_DISAMT, 0)) * -1 Amt,
@@ -216,10 +216,10 @@ module.exports = {
                             AND NVL (Mretdetl.Mrc_cancel, 'N') = 'N'
                             AND NVL (Dmc_Cancel, 'N') = 'N'
                             AND Disbillmast.Dmc_Cacr <> 'M'
-                            AND Disbillmast.Dmd_date >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                            AND Disbillmast.Dmd_date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-                            AND Disbillmast.Dmd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
-                            AND DISBILLMAST.IP_NO IN (${ipNumberList})
+                            AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                            AND EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Disbillmast.IP_NO)
                             UNION
                             SELECT SUM (NVL (Pbilldetl.Bdn_amount, 0)) Amt,
                                     SUM (NVL (Pbilldetl.Bdn_amount, 0) + NVL (Pbilldetl.Bmn_disamt, 0))
@@ -234,10 +234,10 @@ module.exports = {
                                     AND Pbillmast.Bmc_Cacr = 'I'
                                     AND NVL (Dmc_Cancel, 'N') = 'N'
                                     AND Disbillmast.Dmc_Cacr <> 'M'
-                                    AND Disbillmast.Dmd_date >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                    AND Disbillmast.Dmd_date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                                     AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-                                    AND Disbillmast.Dmd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                    AND Disbillmast.IP_NO IN (${ipNumberList})
+                                    AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                                    AND EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Disbillmast.IP_NO)
                             UNION 
                             SELECT SUM (NVL (Pbilldetl.Bdn_amount, 0)) Amt,
                                 SUM (NVL (Pbilldetl.Bdn_amount, 0) + NVL (Pbilldetl.Bmn_disamt, 0))
@@ -252,10 +252,10 @@ module.exports = {
                                 AND Pbillmast.Bmc_Cacr = 'O'
                                 AND Opbillmast.Opc_Cacr <> 'M'
                                 AND NVL (Opbillmast.Opn_cancel, 'N') = 'N'
-                                AND Opbillmast.Opd_date >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                AND Opbillmast.Opd_date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                                 AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-                                AND Opbillmast.Opd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND PBILLMAST.IP_NO IN (${ipNumberList})
+                                AND Opbillmast.Opd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                                AND EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = PBILLMAST.IP_NO)
                         UNION
                         SELECT SUM (NVL (Iprefunditemdetl.Rin_Netamt, 0)) * -1 Amt,
                                 SUM ( NVL (Iprefunditemdetl.Rin_Netamt, 0)  + NVL (Iprefunditemdetl.Rin_Disamt, 0)) * -1 GrossAmt,
@@ -267,21 +267,28 @@ module.exports = {
                                 AND Iprefunditemdetl.Ric_Type = 'PHY'
                                 AND Iprefundmast.Ric_Cacr IN ('C', 'R')
                                 AND NVL (Iprefundmast.Ric_Cancel, 'N') = 'N'
-                                AND Iprefundmast.Rid_Date >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                AND Iprefundmast.Rid_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                                 AND IPREFUNDMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-                                AND Iprefundmast.Rid_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')`;
+                                AND Iprefundmast.Rid_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
+    const result = await conn_ora.execute(
+      sql,
+      {
+        fromDate: data.from,
+        toDate: data.to,
+      },
+      {outFormat: oracledb.OUT_FORMAT_OBJECT},
+    );
+    return result.rows;
 
-    try {
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+    // try {
 
-      // callBack(null, );
-      return result.rows;
-    } catch (error) {
-      console.log(error);
-      throw error;
-    } finally {
-      if (conn_ora) await conn_ora.close();
-    }
+    //   // callBack(null, );
+    // } catch (error) {
+    //   console.log(error);
+    //   throw error;
+    // } finally {
+    //   if (conn_ora) await conn_ora.close();
+    // }
   },
 
   /*
@@ -291,44 +298,39 @@ module.exports = {
    *
    */
 
-  TmchGroupedSalePart1: async () => {
-    let conn_ora = await getTmcConnection();
+  // SERVICE FOR TMCH GROUPED
 
-    const sql = `SELECT 
-                            0 Amt,
-                            0 GrossAmt,
-                            0 Discount,
-                            0 Comp,   
-                            0 TAX
-                    FROM HOSPITAL`;
-    try {
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
-      // await result.resultSet?.getRows((err, rows) => {
-      //     // callBack(err, rows)
-      //     return {
-      //         success : 1,
-      //         err : err,
-      //         data : rows
-      //     }
-      // })
+  // TmchGroupedSalePart1: async () => {
+  //   let conn_ora = await getTmcConnection();
 
-      const resultData = result.rows;
-      return {success: 1, data: resultData};
-    } catch (error) {
-      console.log(error);
-      throw error;
-    } finally {
-      if (conn_ora) await conn_ora.close();
-    }
-  },
-  TmchGroupedReturnPart1: async (data) => {
-    let conn_ora = await getTmcConnection();
+  //   const sql = `SELECT
+  //                           0 Amt,
+  //                           0 GrossAmt,
+  //                           0 Discount,
+  //                           0 Comp,
+  //                           0 TAX
+  //                   FROM HOSPITAL`;
+  //   try {
+  //     const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+  //     // await result.resultSet?.getRows((err, rows) => {
+  //     //     // callBack(err, rows)
+  //     //     return {
+  //     //         success : 1,
+  //     //         err : err,
+  //     //         data : rows
+  //     //     }
+  //     // })
 
-    const group = data?.group;
-    const ipNumberList = (data?.grouped?.length > 0 && data.grouped.join(",")) || null;
-    const fromDate = data.from;
-    const toDate = data.to;
-
+  //     const resultData = result.rows;
+  //     return {success: 1, data: resultData};
+  //   } catch (error) {
+  //     console.log(error);
+  //     throw error;
+  //   } finally {
+  //     if (conn_ora) await conn_ora.close();
+  //   }
+  // },
+  TmchGroupedReturnPart1: async (conn_ora, data) => {
     const sql = `SELECT 
                         SUM (NVL (Mretdetl.MRN_AMOUNT, 0) - NVL (MRN_DISAMT, 0)) * -1 Amt,
                         SUM (NVL (Mretdetl.MRN_AMOUNT, 0)) * -1 GrossAmt,
@@ -342,71 +344,51 @@ module.exports = {
                         AND NVL (Mretdetl.Mrc_cancel, 'N') = 'N'
                         AND NVL (Dmc_Cancel, 'N') = 'N'
                         AND Disbillmast.Dmc_Cacr <> 'M'
-                        AND Disbillmast.Dmd_date >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                        AND Disbillmast.Dmd_date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-                        AND Disbillmast.Dmd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
-                        AND DISBILLMAST.IP_NO IN (${ipNumberList})`;
-
-    try {
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
-
-      //    const resultData = result.resultSet?.getRows((err, rows) => {
-      //     console.log(rows)
-      //         return {
-      //             success : 1,
-      //             err : err,
-      //             data : rows
-      //         }
-      //     })
-
-      const resultData = result.rows;
-      return {success: 1, data: resultData};
-    } catch (error) {
-      console.log(error);
-      throw error;
-    } finally {
-      if (conn_ora) await conn_ora.close();
-    }
+                        AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                        AND EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Disbillmast.IP_NO)`;
+    const result = await conn_ora.execute(
+      sql,
+      {
+        fromDate: data.from,
+        toDate: data.to,
+      },
+      {outFormat: oracledb.OUT_FORMAT_OBJECT},
+    );
+    result.rows;
   },
-  TmchGroupedSalePart2: async (data) => {
-    let conn_ora = await getTmcConnection();
+  // TmchGroupedSalePart2: async (data) => {
+  //   let conn_ora = await getTmcConnection();
 
-    const fromDate = data.from;
-    const toDate = data.to;
+  //   const fromDate = data.from;
+  //   const toDate = data.to;
 
-    const sql = `SELECT 0 Amt,
-                        0 GrossAmt,
-                        0 Discount,
-                        0 Comp,
-                        0 TAX
-                    FROM HOSPITAL`;
-    try {
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
-      // await result.resultSet?.getRows((err, rows) => {
-      //     return {
-      //         success : 1,
-      //         err : err,
-      //         data : rows
-      //     }
-      // })
+  //   const sql = `SELECT 0 Amt,
+  //                       0 GrossAmt,
+  //                       0 Discount,
+  //                       0 Comp,
+  //                       0 TAX
+  //                   FROM HOSPITAL`;
+  //   try {
+  //     const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+  //     // await result.resultSet?.getRows((err, rows) => {
+  //     //     return {
+  //     //         success : 1,
+  //     //         err : err,
+  //     //         data : rows
+  //     //     }
+  //     // })
 
-      const resultData = result.rows;
-      return {success: 1, data: resultData};
-    } catch (error) {
-      console.log(error);
-    } finally {
-      if (conn_ora) await conn_ora.close();
-    }
-  },
-  TmchGroupedReturnPart2: async (data) => {
-    let conn_ora = await getTmcConnection();
-
-    const group = data?.group;
-    const ipNumberList = (data?.grouped?.length > 0 && data.grouped.join(",")) || null;
-    // const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(',')) || null;
-    const fromDate = data.from;
-    const toDate = data.to;
-
+  //     const resultData = result.rows;
+  //     return {success: 1, data: resultData};
+  //   } catch (error) {
+  //     console.log(error);
+  //   } finally {
+  //     if (conn_ora) await conn_ora.close();
+  //   }
+  // },
+  TmchGroupedReturnPart2: async (conn_ora, data) => {
     const sql = `SELECT SUM (NVL (Pbilldetl.Bdn_amount, 0)) Amt,
                                 SUM (NVL (Pbilldetl.Bdn_amount, 0) + NVL (Pbilldetl.Bmn_disamt, 0))
                                 GrossAmt,
@@ -420,38 +402,22 @@ module.exports = {
                                 AND Pbillmast.Bmc_Cacr = 'I'
                                 AND NVL (Dmc_Cancel, 'N') = 'N'
                                 AND Disbillmast.Dmc_Cacr <> 'M'
-                                AND Disbillmast.Dmd_date >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                AND Disbillmast.Dmd_date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-                                AND Disbillmast.Dmd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND Disbillmast.IP_NO IN (${ipNumberList})`;
+                                AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                                AND EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Disbillmast.IP_NO)`;
 
-    try {
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
-      // await result.resultSet?.getRows((err, rows) => {
-      //     return {
-      //         success : 1,
-      //         err : err,
-      //         data : rows
-      //     }
-      // })
-
-      const resultData = result.rows;
-      return {success: 1, data: resultData};
-    } catch (error) {
-      console.log(error);
-    } finally {
-      if (conn_ora) await conn_ora.close();
-    }
+    const result = await conn_ora.execute(
+      sql,
+      {
+        fromDate: data.from,
+        toDate: data.to,
+      },
+      {outFormat: oracledb.OUT_FORMAT_OBJECT},
+    );
+    return result.rows;
   },
-  TmchGroupedTsshSalePart3: async (data) => {
-    let conn_ora = await getTmcConnection();
-
-    const group = data?.group;
-    const ipNumberList = (data?.grouped?.length > 0 && data.grouped.join(",")) || null;
-    // const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(',')) || null;
-    const fromDate = data.from;
-    const toDate = data.to;
-
+  TmchGroupedTsshSalePart3: async (conn_ora, data) => {
     const sql = `SELECT SUM (NVL (Pbilldetl.Bdn_amount, 0)) Amt,
                             SUM (NVL (Pbilldetl.Bdn_amount, 0) + NVL (Pbilldetl.Bmn_disamt, 0))
                             GrossAmt,
@@ -465,36 +431,22 @@ module.exports = {
                             AND Pbillmast.Bmc_Cacr = 'O'
                             AND Opbillmast.Opc_Cacr <> 'M'
                             AND NVL (Opbillmast.Opn_cancel, 'N') = 'N'
-                            AND Opbillmast.Opd_date >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                            AND Opbillmast.Opd_date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                             AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-                            AND Opbillmast.Opd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
-                            AND PBILLMAST.IP_NO IN (${ipNumberList})`;
+                            AND Opbillmast.Opd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                            AND EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = PBILLMAST.IP_NO)`;
 
-    try {
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
-      // await result.resultSet?.getRows((err, rows) => {
-      //     return {
-      //         success : 1,
-      //         err : err,
-      //         data : rows
-      //     }
-      // })
-
-      const resultData = result.rows;
-      return {success: 1, data: resultData};
-    } catch (error) {
-      console.log(error);
-      throw error;
-    } finally {
-      if (conn_ora) await conn_ora.close();
-    }
+    const result = await conn_ora.execute(
+      sql,
+      {
+        fromDate: data.from,
+        toDate: data.to,
+      },
+      {outFormat: oracledb.OUT_FORMAT_OBJECT},
+    );
+    return result.rows;
   },
-  TmchGroupedTsshReturnPart3: async (data) => {
-    let conn_ora = await getTmcConnection();
-
-    const fromDate = data.from;
-    const toDate = data.to;
-
+  TmchGroupedTsshReturnPart3: async (conn_ora, data) => {
     const sql = `SELECT SUM (NVL (Iprefunditemdetl.Rin_Netamt, 0)) * -1 Amt,
                                 SUM ( NVL (Iprefunditemdetl.Rin_Netamt, 0)  + NVL (Iprefunditemdetl.Rin_Disamt, 0)) * -1 GrossAmt,
                                 SUM (NVL (Iprefunditemdetl.Rin_Disamt, 0)) * -1 Discount,
@@ -505,36 +457,39 @@ module.exports = {
                                 AND Iprefunditemdetl.Ric_Type = 'PHY'
                                 AND Iprefundmast.Ric_Cacr IN ('C', 'R')
                                 AND NVL (Iprefundmast.Ric_Cancel, 'N') = 'N'
-                                AND Iprefundmast.Rid_Date >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                AND Iprefundmast.Rid_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                                 AND IPREFUNDMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-                                AND Iprefundmast.Rid_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')`;
+                                AND Iprefundmast.Rid_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
 
-    try {
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
-      // await result.resultSet?.getRows((err, rows) => {
-      //     return {
-      //         success : 1,
-      //         err : err,
-      //         data : rows
-      //     }
-      // })
+    const result = await conn_ora.execute(
+      sql,
+      {
+        fromDate: data.from,
+        toDate: data.to,
+      },
+      {outFormat: oracledb.OUT_FORMAT_OBJECT},
+    );
 
-      const resultData = result.rows;
-      return {success: 1, data: resultData};
-    } catch (error) {
-      console.log(error);
-      throw error;
-    } finally {
-      if (conn_ora) await conn_ora.close();
-    }
+    return result.rows;
+    // try {
+    //   // await result.resultSet?.getRows((err, rows) => {
+    //   //     return {
+    //   //         success : 1,
+    //   //         err : err,
+    //   //         data : rows
+    //   //     }
+    //   // })
+
+    //   const resultData = result.rows;
+    //   return {success: 1, data: resultData};
+    // } catch (error) {
+    //   console.log(error);
+    //   throw error;
+    // } finally {
+    //   if (conn_ora) await conn_ora.close();
+    // }
   },
-  TmchGroupedRoundOffAmntTssh: async (data) => {
-    let conn_ora = await getTmcConnection();
-
-    const ipNumberList = (data?.grouped?.length > 0 && data.grouped.join(",")) || null;
-    const fromDate = data.from;
-    const toDate = data.to;
-
+  TmchGroupedRoundOffAmntTssh: async (conn_ora, data) => {
     const sql = `SELECT 
                             SUM (NVL (Mretdetl.MRN_AMOUNT, 0) - NVL (MRN_DISAMT, 0)) * -1 Amt,
                             SUM (NVL (Mretdetl.MRN_AMOUNT, 0)) * -1 GrossAmt,
@@ -548,10 +503,10 @@ module.exports = {
                             AND NVL (Mretdetl.Mrc_cancel, 'N') = 'N'
                             AND NVL (Dmc_Cancel, 'N') = 'N'
                             AND Disbillmast.Dmc_Cacr <> 'M'
-                            AND Disbillmast.Dmd_date >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                            AND Disbillmast.Dmd_date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-                            AND Disbillmast.Dmd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
-                            AND DISBILLMAST.IP_NO IN (${ipNumberList})
+                            AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                            AND EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Disbillmast.IP_NO)
                             UNION
                             SELECT SUM (NVL (Pbilldetl.Bdn_amount, 0)) Amt,
                                     SUM (NVL (Pbilldetl.Bdn_amount, 0) + NVL (Pbilldetl.Bmn_disamt, 0))
@@ -566,10 +521,10 @@ module.exports = {
                                     AND Pbillmast.Bmc_Cacr = 'I'
                                     AND NVL (Dmc_Cancel, 'N') = 'N'
                                     AND Disbillmast.Dmc_Cacr <> 'M'
-                                    AND Disbillmast.Dmd_date >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                    AND Disbillmast.Dmd_date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                                     AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-                                    AND Disbillmast.Dmd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                    AND Disbillmast.IP_NO IN (${ipNumberList})
+                                    AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                                    AND EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Disbillmast.IP_NO)
                             UNION 
                             SELECT SUM (NVL (Pbilldetl.Bdn_amount, 0)) Amt,
                                 SUM (NVL (Pbilldetl.Bdn_amount, 0) + NVL (Pbilldetl.Bmn_disamt, 0))
@@ -584,10 +539,10 @@ module.exports = {
                                 AND Pbillmast.Bmc_Cacr = 'O'
                                 AND Opbillmast.Opc_Cacr <> 'M'
                                 AND NVL (Opbillmast.Opn_cancel, 'N') = 'N'
-                                AND Opbillmast.Opd_date >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                AND Opbillmast.Opd_date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                                 AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-                                AND Opbillmast.Opd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND PBILLMAST.IP_NO IN (${ipNumberList})
+                                AND Opbillmast.Opd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                                AND EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = PBILLMAST.IP_NO)
                         UNION
                         SELECT SUM (NVL (Iprefunditemdetl.Rin_Netamt, 0)) * -1 Amt,
                                 SUM ( NVL (Iprefunditemdetl.Rin_Netamt, 0)  + NVL (Iprefunditemdetl.Rin_Disamt, 0)) * -1 GrossAmt,
@@ -599,27 +554,26 @@ module.exports = {
                                 AND Iprefunditemdetl.Ric_Type = 'PHY'
                                 AND Iprefundmast.Ric_Cacr IN ('C', 'R')
                                 AND NVL (Iprefundmast.Ric_Cancel, 'N') = 'N'
-                                AND Iprefundmast.Rid_Date >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                AND Iprefundmast.Rid_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                                 AND IPREFUNDMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-                                AND Iprefundmast.Rid_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')`;
+                                AND Iprefundmast.Rid_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
 
-    try {
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
-      // await result.resultSet?.getRows((err, rows) => {
-      //     return {
-      //         success : 1,
-      //         err : err,
-      //         data : rows
-      //     }
-      // })
+    const result = await conn_ora.execute(
+      sql,
+      {
+        fromDate: data.from,
+        toDate: data.to,
+      },
+      {outFormat: oracledb.OUT_FORMAT_OBJECT},
+    );
+    return result.rows;
+  },
+  getTempTableList: async (conn_ora, text) => {
+    console.log(text);
+    const sql = `select * from GTT_EXCLUDE_IP`;
 
-      const resultData = result.rows;
-      return {success: 1, data: resultData};
-    } catch (error) {
-      console.log(error);
-      throw error;
-    } finally {
-      if (conn_ora) await conn_ora.close();
-    }
+    const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+    console.log(result.rows);
+    // return result.rows;
   },
 };

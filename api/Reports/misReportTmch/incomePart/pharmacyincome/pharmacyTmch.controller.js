@@ -1,5 +1,12 @@
 const {controllerHelper} = require("../../../../../utls/controller-helperFun");
-const {pharmacyTmchSalePart1, phamracyTmchReturnPart1, phamracyTmchSalePart2, phamracyTmchReturnPart2, phamracyTmchSalePart3, phamracyTmchReturnPart3} = require("./pharmacyTmch.service");
+const {
+  pharmacyTmchSalePart1,
+  phamracyTmchReturnPart1,
+  phamracyTmchSalePart2,
+  phamracyTmchReturnPart2,
+  phamracyTmchSalePart3,
+  phamracyTmchReturnPart3,
+} = require("../../misReportTMCH/pharmacyTmch.service");
 
 module.exports = {
   getpharmacyTmchSalePart1: controllerHelper(pharmacyTmchSalePart1, "Pharmacy Sale"),

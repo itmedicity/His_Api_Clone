@@ -66,4 +66,12 @@ const controllerGETHelper = (serviceFun, successMessage) => {
   };
 };
 
-module.exports = {controllerHelper, controllerGETHelper};
+const insertIntoGTT = async (conn, ptnoList = []) => {
+  if (!ptnoList.length) return;
+
+  const rows = ptnoList.map((ip) => [ip]);
+
+  await conn.executeMany(`INSERT INTO GTT_EXCLUDE_IP (IP_NO) VALUES (:1)`, rows, {autoCommit: false});
+};
+
+module.exports = {controllerHelper, controllerGETHelper, insertIntoGTT};

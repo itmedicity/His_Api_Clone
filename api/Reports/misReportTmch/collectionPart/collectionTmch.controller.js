@@ -19,7 +19,7 @@ const {
   getDischargedIpInfoMysql,
   creditInsuranceBillRefund,
   getIpNumberFromPreviousDayCollection,
-} = require("./collectionTmch.service");
+} = require("../misReportTMCH/collectionTmch.service");
 const {controllerHelper} = require("../../../../utls/controller-helperFun");
 
 module.exports = {
@@ -284,7 +284,6 @@ module.exports = {
             });
           }
         }
-        // getIpNumberFromPreviousDayCollection(ipNumber, (err, getResult) => {});
       }
     } catch (error) {
       return res.status(200).json({

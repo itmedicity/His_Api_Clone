@@ -197,9 +197,9 @@ module.exports = {
       // const pharmaGroup7 = await
 
       const [pharmaGroup1, pharmaGroup2, pharmaGroup3, pharmaGroup4, pharmaGroup5, pharmaGroup6, pharmaGroup7] = await Promise.all([
-        TmchGroupedSalePart1(body),
+        // TmchGroupedSalePart1(body),
+        // TmchGroupedSalePart2(body),
         TmchGroupedReturnPart1(body),
-        TmchGroupedSalePart2(body),
         TmchGroupedReturnPart2(body),
         TmchGroupedTsshSalePart3(body),
         TmchGroupedTsshReturnPart3(body),
