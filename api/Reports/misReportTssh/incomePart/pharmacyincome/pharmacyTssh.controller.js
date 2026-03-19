@@ -14,7 +14,7 @@ const {
   TmchGroupedTsshSalePart3,
   TmchGroupedTsshReturnPart3,
   TmchGroupedRoundOffAmntTssh,
-} = require("./pharmacyTssh.service");
+} = require("../../misReportTssh/pharmacyTssh.service");
 
 module.exports = {
   getpharmacyTsshSalePart1: controllerHelper(pharmacyTsshSalePart1, "Pharmacy Sale"),

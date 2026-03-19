@@ -559,7 +559,7 @@ module.exports = {
                             (SUM (NVL (Recpcollectionmast.Rfn_Cash, 0)) + SUM (NVL (Recpcollectionmast.Rfn_Chk, 0)) + SUM (NVL (Recpcollectionmast.Rfn_Dd, 0)) + SUM (NVL (Recpcollectionmast.Rfn_Card, 0))) * -1 Amt,
                             0 tax
                         FROM Recpcollectionmast
-                        WHERE Recpcollectionmast.Rfd_Date >= TO_DATE (:fromDate,' dd/MM/yyyy hh24:mi:ss')
+                        WHERE Recpcollectionmast.Rfd_Date >= TO_DATE (:fromDate,'dd/MM/yyyy hh24:mi:ss')
                             AND RECPCOLLECTIONMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             AND Recpcollectionmast.Rfd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                             AND NVL (Rcc_Cancel, 'N') = 'N'
@@ -567,7 +567,7 @@ module.exports = {
                         SELECT 
                             RCC_SLNO 
                         FROM RECPCOLLECTIONDETL 
-                        WHERE RECPCOLLECTIONDETL.RCD_DATE >= TO_DATE (:fromDate,' dd/MM/yyyy hh24:mi:ss')
+                        WHERE RECPCOLLECTIONDETL.RCD_DATE >= TO_DATE (:fromDate,'dd/MM/yyyy hh24:mi:ss')
                         AND RECPCOLLECTIONDETL.RCD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss') 
                         AND NOT EXISTS (
                         SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = RECPCOLLECTIONDETL.IP_NO 

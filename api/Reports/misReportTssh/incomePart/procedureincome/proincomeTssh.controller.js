@@ -1,5 +1,5 @@
 const {controllerHelper} = require("../../../../../utls/controller-helperFun");
-const {proIncomePart1Tssh, proIncomePart2Tssh, proIncomePart3Tssh, proIncomePart4Tssh, theaterIncomeTssh} = require("./proincomeTssh.service");
+const {proIncomePart1Tssh, proIncomePart2Tssh, proIncomePart3Tssh, proIncomePart4Tssh, theaterIncomeTssh} = require("../../../misReportTssh/misReportTssh/proincomeTssh.service");
 
 module.exports = {
   getproIncomePart1Tssh: controllerHelper(proIncomePart1Tssh, "Procedure Income"),

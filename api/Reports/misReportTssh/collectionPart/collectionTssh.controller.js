@@ -16,7 +16,7 @@ const {
   misGroup,
   creditInsuranceBillRefund,
   getIpNumberFromPreviousDayCollection,
-} = require("./collectionTssh.service");
+} = require("../../misReportTssh/misReportTssh/collectionTssh.service");
 
 module.exports = {
   getadvanceCollectionTssh: controllerHelper(advanceCollectionTssh, "advance Collection"),

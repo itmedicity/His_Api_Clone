@@ -2,12 +2,11 @@
 const {oracledb, getTmcConnection} = require("../../../../config/oradbconfig");
 
 module.exports = {
-  patientTypeDiscountTssh: async (data) => {
-    let conn_ora = await getTmcConnection();
-
-    const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(",")) || null;
-    const fromDate = data.from;
-    const toDate = data.to;
+  patientTypeDiscountTssh: async (conn_ora, data) => {
+    //  let conn_ora = await getTmcConnection();
+    //  const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(",")) || null;
+    //  const fromDate = data.from;
+    //  const toDate = data.to;
 
     const sql = `SELECT 
         Ptc_Desc, 
@@ -37,8 +36,8 @@ FROM (
               AND Patient.Pt_Code = Pattype.Pt_Code(+)
               AND NVL (Receiptmast.Rpc_Cancel, 'N') = 'N'
               AND Receiptmast.Rpc_Cacr IN ('C', 'R')
-              AND Receiptmast.Rpd_Date >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')--1
-              AND Receiptmast.Rpd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss') --2
+              AND Receiptmast.Rpd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')--1
+              AND Receiptmast.Rpd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss') --2
               AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
      GROUP BY Receiptmast.Rpc_Slno,
               Receiptmast.Rp_No,
@@ -72,8 +71,8 @@ FROM (
               AND Patient.Pt_Code = Pattype.Pt_Code
               AND NVL (Receiptmast.Rpc_Cancel, 'N') = 'N'
               AND Receiptmast.Rpc_Cacr IN ('C', 'R')
-              AND Receiptmast.RPD_COLLDATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')--3
-              AND Receiptmast.RPD_COLLDATE <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')--4
+              AND Receiptmast.RPD_COLLDATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')--3
+              AND Receiptmast.RPD_COLLDATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')--4
               AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
      GROUP BY Receiptmast.Rpc_Slno,
               Receiptmast.Rp_No,
@@ -114,8 +113,8 @@ FROM (
               AND NVL (Refundreceiptmast.Rfc_Cancel, 'N') = 'N'
               AND Refundreceiptmast.Rfc_Cacr IN ('C', 'R')
               AND Receiptmast.Rpc_Cacr IN ('C', 'R')
-              AND Refundreceiptmast.Rfd_Date >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
-              AND Refundreceiptmast.Rfd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+              AND Refundreceiptmast.Rfd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+              AND Refundreceiptmast.Rfd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
               AND REFUNDRECEIPTMAST.MH_CODE IN  (SELECT MH_CODE FROM multihospital)
      GROUP BY Refundreceiptmast.Rfc_Slno,
               Refundreceiptmast.Rf_No,
@@ -156,8 +155,8 @@ FROM (
               AND NVL (Refundreceiptmast.Rfc_Cancel, 'N') = 'N'
               AND Refundreceiptmast.Rfc_Cacr IN ('C', 'R')
               AND Receiptmast.Rpc_Cacr IN ('C', 'R')
-              AND Refundreceiptmast.RFD_RETDATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')--7
-              AND Refundreceiptmast.RFD_RETDATE <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')--8
+              AND Refundreceiptmast.RFD_RETDATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')--7
+              AND Refundreceiptmast.RFD_RETDATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')--8
               AND REFUNDRECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
      GROUP BY Refundreceiptmast.Rfc_Slno,
               Refundreceiptmast.Rf_No,
@@ -191,9 +190,9 @@ FROM (
      AND Patsurgery.Da_Code = Discountauthority.Da_Code(+)
      AND Patient.Pt_Code = Pattype.Pt_Code
      AND Opbillmast.Pt_No = Patient.Pt_No
-     AND Opbillmast.Opd_Date >= TO_DATE ( '${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
-     AND Opbillmast.Opd_Date <= TO_DATE ( '${toDate}', 'dd/MM/yyyy hh24:mi:ss')
-      AND Patsurgery.IP_NO IN (${ipNumberList})
+     AND Opbillmast.Opd_Date >= TO_DATE ( :fromDate, 'dd/MM/yyyy hh24:mi:ss')
+     AND Opbillmast.Opd_Date <= TO_DATE ( :toDate, 'dd/MM/yyyy hh24:mi:ss')
+      AND EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Patsurgery.IP_NO) 
      AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
      GROUP BY Opbillmast.Opc_Slno,Opbillmast.Op_No, Opbillmast.Opd_Date,Opbillmast.Pt_No,INITCAP (Patient.Ptc_Ptname),INITCAP (Dac_Desc),Discountauthority.Da_Code,INITCAP (Pattype.Ptc_Desc)
      UNION ALL
@@ -219,9 +218,9 @@ FROM (
               AND Patsurdetl.Da_Code = Discountauthority.Da_Code(+)
               AND Patient.Pt_Code = Pattype.Pt_Code
               AND Opbillmast.Pt_No = Patient.Pt_No
-              AND Opbillmast.Opd_Date >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
-              AND Opbillmast.Opd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
-              AND Patsurgery.IP_NO IN (${ipNumberList})
+              AND Opbillmast.Opd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+              AND Opbillmast.Opd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+              AND EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Patsurgery.IP_NO)
               AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
      GROUP BY Opbillmast.Opc_Slno,
               Opbillmast.Op_No,
@@ -254,9 +253,9 @@ FROM (
               AND Patsurother.Da_Code = Discountauthority.Da_Code(+)
               AND Patient.Pt_Code = Pattype.Pt_Code
               AND Opbillmast.Pt_No = Patient.Pt_No
-              AND Opbillmast.Opd_Date >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
-              AND Opbillmast.Opd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
-              AND Patsurgery.IP_NO IN (${ipNumberList})
+              AND Opbillmast.Opd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+              AND Opbillmast.Opd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+              AND EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Patsurgery.IP_NO)
               AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
      GROUP BY Opbillmast.Opc_Slno,
               Opbillmast.Op_No,
@@ -292,8 +291,8 @@ FROM (
               AND Receiptmast.Rpc_Cacr IN ('O')
               AND NVL (Receiptmast.Rpc_Cancel, 'N') = 'N'
               AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
-              AND Opbillmast.Opd_Date >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss') --15
-              AND Opbillmast.Opd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss') --16
+              AND Opbillmast.Opd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss') --15
+              AND Opbillmast.Opd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss') --16
               AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
      GROUP BY Opbillmast.Opc_Slno,
               Opbillmast.Op_No,
@@ -336,8 +335,8 @@ FROM (
               AND NVL (Refundreceiptmast.Rfc_Cancel, 'N') = 'N'
               AND NVL (Receiptmast.Rpc_Cancel, 'N') = 'N'
               AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
-              AND Opbillmast.Opd_Date >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss') -- 17
-              AND Opbillmast.Opd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss') -- 18
+              AND Opbillmast.Opd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss') -- 17
+              AND Opbillmast.Opd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss') -- 18
               AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
      GROUP BY Opbillmast.Opc_Slno,
               Opbillmast.Op_No,
@@ -373,8 +372,8 @@ FROM (
               AND Billmast.Bmc_Cacr IN ('O')
               AND NVL (Billmast.Bmc_Cancel, 'N') = 'N'
               AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
-              AND Opbillmast.Opd_Date >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
-              AND Opbillmast.Opd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss') --20
+              AND Opbillmast.Opd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+              AND Opbillmast.Opd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss') --20
               AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
      GROUP BY Opbillmast.Opc_Slno,
               Opbillmast.Op_No,
@@ -417,8 +416,8 @@ FROM (
               AND NVL (Refundbillmast.Rfc_Cancel, 'N') = 'N'
               AND NVL (Billmast.Bmc_Cancel, 'N') = 'N'
               AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
-              AND Opbillmast.Opd_Date >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss') 
-              AND Opbillmast.Opd_Date <= TO_DATE ('${toDate}',  'dd/MM/yyyy hh24:mi:ss')
+              AND Opbillmast.Opd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss') 
+              AND Opbillmast.Opd_Date <= TO_DATE (:toDate,  'dd/MM/yyyy hh24:mi:ss')
               AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
      GROUP BY Opbillmast.Opc_Slno,
               Opbillmast.Op_No,
@@ -462,8 +461,8 @@ FROM (
             AND Patient.Pt_Code = Pattype.Pt_Code
             AND Billmast.Bmc_Cacr IN ('O') AND NVL ( Refundbillmast.Rfc_Cancel, 'N') =   'N' AND NVL ( Billmast.Bmc_Cancel, 'N') = 'N'
             AND NVL ( Opbillmast.Opn_Cancel, 'N') = 'N' 
-            AND Opbillmast.Opc_Cacr <> 'M' AND Opbillmast.Opd_Date >= TO_DATE ( '${fromDate}',  'dd/MM/yyyy hh24:mi:ss') 
-            AND Opbillmast.Opd_Date <= TO_DATE (  '${toDate}', 'dd/MM/yyyy hh24:mi:ss') 
+            AND Opbillmast.Opc_Cacr <> 'M' AND Opbillmast.Opd_Date >= TO_DATE ( :fromDate,  'dd/MM/yyyy hh24:mi:ss') 
+            AND Opbillmast.Opd_Date <= TO_DATE (  :toDate, 'dd/MM/yyyy hh24:mi:ss') 
             AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital) 
             GROUP BY Opbillmast.Opc_Slno, Opbillmast.Op_No,Opbillmast.Opd_Date, Opbillmast.Pt_No, 
             INITCAP ( Patient.Ptc_Ptname), INITCAP ( Dac_Desc), Discountauthority.Da_Code,INITCAP ( Pattype.Ptc_Desc)
@@ -493,8 +492,8 @@ FROM (
               AND Pbillmast.Bmc_Cacr IN ('O')
               AND NVL (Pbillmast.Bmc_Cancel, 'N') = 'N'
               AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
-              AND Opbillmast.Opd_Date >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss') 
-              AND Opbillmast.Opd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss') 
+              AND Opbillmast.Opd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss') 
+              AND Opbillmast.Opd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss') 
               AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
      GROUP BY Opbillmast.Opc_Slno,
               Opbillmast.Op_No,
@@ -551,8 +550,8 @@ FROM (
                       AND Mretmast.Mrc_Cacr IN ('O')
                       AND NVL (Mretmast.Mrc_Cancel, 'N') = 'N'
                       AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
-                      AND Opbillmast.Opd_Date >= TO_DATE ('${fromDate}',  'dd/MM/yyyy hh24:mi:ss') 
-                      AND Opbillmast.Opd_Date <= TO_DATE ('${toDate}',  'dd/MM/yyyy hh24:mi:ss') 
+                      AND Opbillmast.Opd_Date >= TO_DATE (:fromDate,  'dd/MM/yyyy hh24:mi:ss') 
+                      AND Opbillmast.Opd_Date <= TO_DATE (:toDate,  'dd/MM/yyyy hh24:mi:ss') 
                       AND OPBILLMAST.MH_CODE IN  (SELECT MH_CODE FROM multihospital)) A
                      GROUP BY A.Slno,
                               A.Op_No,
@@ -591,8 +590,8 @@ FROM (
        AND Receiptdetl.Da_Code = Discountauthority.Da_Code(+) 
        AND Patient.Pt_Code = Pattype.Pt_Code 
        AND NVL (Receiptmast.Rpc_Cancel, 'N') = 'N' AND NVL ( Refundreceiptmast.Rfc_Cancel, 'N') = 'N' 
-       AND Opbillrefundmast.Rod_Date >= TO_DATE ( '${fromDate}','dd/MM/yyyy hh24:mi:ss') 
-       AND Opbillrefundmast.Rod_Date <= TO_DATE (  '${toDate}', 'dd/MM/yyyy hh24:mi:ss') 
+       AND Opbillrefundmast.Rod_Date >= TO_DATE ( :fromDate,'dd/MM/yyyy hh24:mi:ss') 
+       AND Opbillrefundmast.Rod_Date <= TO_DATE (  :toDate, 'dd/MM/yyyy hh24:mi:ss') 
        AND OPBILLREFUNDMAST.MH_CODE IN  (SELECT MH_CODE FROM multihospital) 
        GROUP BY Opbillrefundmast.Roc_Slno,
                     Opbillrefundmast.Ro_No,
@@ -633,9 +632,9 @@ FROM (
               AND NVL (Refundbillmast.Rfc_Cancel, 'N') = 'N'
               AND NVL (Billdetl.Bmc_Cancel, 'N') = 'N'
               AND NVL (Opbillrefundmast.Roc_Cancel, 'N') = 'N'
-              AND Opbillrefundmast.Rod_Date >=  TO_DATE ('${fromDate}',  'dd/MM/yyyy hh24:mi:ss') 
-              AND Opbillrefundmast.Rod_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
-              AND Billmast.IP_NO IN (${ipNumberList})
+              AND Opbillrefundmast.Rod_Date >=  TO_DATE (:fromDate,  'dd/MM/yyyy hh24:mi:ss') 
+              AND Opbillrefundmast.Rod_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+              AND EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Billmast.IP_NO) 
               AND OPBILLREFUNDMAST.MH_CODE IN  (SELECT MH_CODE FROM multihospital)
      GROUP BY Opbillrefundmast.Roc_Slno,
               Opbillrefundmast.Ro_No,
@@ -667,9 +666,9 @@ FROM (
       AND Patservice.Da_Code = Discountauthority.Da_Code(+)
       AND Patient.Pt_Code = Pattype.Pt_Code 
       AND NVL (Disbillmast.Dmc_Cancel, 'N') =  'N' 
-      AND NVL (Patservice.Svc_Cancel, 'N') =  'N' AND Disbillmast.Dmd_Date >= TO_DATE (  '${fromDate}',  'dd/MM/yyyy hh24:mi:ss') 
-      AND Disbillmast.Dmd_Date <= TO_DATE (  '${toDate}',  'dd/MM/yyyy hh24:mi:ss') 
-       AND Disbillmast.IP_NO IN (${ipNumberList})
+      AND NVL (Patservice.Svc_Cancel, 'N') =  'N' AND Disbillmast.Dmd_Date >= TO_DATE (  :fromDate,  'dd/MM/yyyy hh24:mi:ss') 
+      AND Disbillmast.Dmd_Date <= TO_DATE (  :toDate,  'dd/MM/yyyy hh24:mi:ss') 
+       AND EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Disbillmast.IP_NO) 
       AND DISBILLMAST.MH_CODE IN(SELECT MH_CODE FROM multihospital)
                           GROUP BY Disbillmast.Dmc_Slno,
                           Disbillmast.Dm_No,
@@ -699,9 +698,9 @@ FROM (
               AND Disbillmast.Pt_No = Patient.Pt_No
               AND Patient.Pt_Code = Pattype.Pt_Code
               AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
-              AND Disbillmast.Dmd_Date >= TO_DATE ('${fromDate}',  'dd/MM/yyyy hh24:mi:ss') --35
-              AND Disbillmast.Dmd_Date <= TO_DATE ('${toDate}',  'dd/MM/yyyy hh24:mi:ss') --36
-              AND Disbillmast.IP_NO IN (${ipNumberList})
+              AND Disbillmast.Dmd_Date >= TO_DATE (:fromDate,  'dd/MM/yyyy hh24:mi:ss') --35
+              AND Disbillmast.Dmd_Date <= TO_DATE (:toDate,  'dd/MM/yyyy hh24:mi:ss') --36
+              AND EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Disbillmast.IP_NO)
               AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
      GROUP BY Disbillmast.Dmc_Slno,
               Disbillmast.Dm_No,
@@ -734,9 +733,9 @@ FROM (
               AND Patient.Pt_Code = Pattype.Pt_Code
               AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
               AND NVL (PATVISIT.VSC_CANCEL, 'N') = 'N'
-              AND Disbillmast.Dmd_Date >= TO_DATE ('${fromDate}',  'dd/MM/yyyy hh24:mi:ss') --37
-              AND Disbillmast.Dmd_Date <= TO_DATE ('${toDate}',  'dd/MM/yyyy hh24:mi:ss') --38
-              AND Disbillmast.IP_NO IN (${ipNumberList})
+              AND Disbillmast.Dmd_Date >= TO_DATE (:fromDate,  'dd/MM/yyyy hh24:mi:ss') --37
+              AND Disbillmast.Dmd_Date <= TO_DATE (:toDate,  'dd/MM/yyyy hh24:mi:ss') --38
+              AND EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Disbillmast.IP_NO)
               AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
      GROUP BY Disbillmast.Dmc_Slno,
               Disbillmast.Dm_No,
@@ -779,13 +778,13 @@ FROM (
               AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
               AND NVL (Patsurgery.Src_Cancel, 'N') = 'N'
               AND Disbillmast.Dmd_Date >=
-                     TO_DATE ('${fromDate}',
+                     TO_DATE (:fromDate,
                               'dd/MM/yyyy hh24:mi:ss') --39
               AND Disbillmast.Dmd_Date <=
-                     TO_DATE ('${toDate}',
+                     TO_DATE (:toDate,
                               'dd/MM/yyyy hh24:mi:ss') --40
               AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-              AND Disbillmast.IP_NO IN (${ipNumberList})
+              AND EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Disbillmast.IP_NO)
      GROUP BY Disbillmast.Dmc_Slno,
               Disbillmast.Dm_No,
               Disbillmast.Dmd_Date,
@@ -829,13 +828,13 @@ FROM (
               AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
               AND NVL (Patsurgery.Src_Cancel, 'N') = 'N'
               AND Disbillmast.Dmd_Date >=
-                     TO_DATE ('${fromDate}',
+                     TO_DATE (:fromDate,
                               'dd/MM/yyyy hh24:mi:ss') --41
               AND Disbillmast.Dmd_Date <=
-                     TO_DATE ('${toDate}',
+                     TO_DATE (:toDate,
                               'dd/MM/yyyy hh24:mi:ss')  --42
               AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-              AND Disbillmast.IP_NO IN (${ipNumberList})
+              AND EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Disbillmast.IP_NO)
      GROUP BY Disbillmast.Dmc_Slno,
               Disbillmast.Dm_No,
               Disbillmast.Dmd_Date,
@@ -879,13 +878,13 @@ FROM (
               AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
               AND NVL (Patsurgery.Src_Cancel, 'N') = 'N'
               AND Disbillmast.Dmd_Date >=
-                     TO_DATE ('${fromDate}',
+                     TO_DATE (:fromDate,
                               'dd/MM/yyyy hh24:mi:ss') --43
               AND Disbillmast.Dmd_Date <=
-                     TO_DATE ('${toDate}',
+                     TO_DATE (:toDate,
                               'dd/MM/yyyy hh24:mi:ss') --44
               AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-              AND Disbillmast.IP_NO IN (${ipNumberList})
+              AND EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Disbillmast.IP_NO)
      GROUP BY Disbillmast.Dmc_Slno,
               Disbillmast.Dm_No,
               Disbillmast.Dmd_Date,
@@ -930,13 +929,13 @@ FROM (
               AND NVL (Billdetl.Bmc_Cancel, 'N') = 'N'
               AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
               AND Disbillmast.Dmd_Date >=
-                     TO_DATE ('${fromDate}',
+                     TO_DATE (:fromDate,
                               'dd/MM/yyyy hh24:mi:ss') --45
               AND Disbillmast.Dmd_Date <=
-                     TO_DATE ('${toDate}',
+                     TO_DATE (:toDate,
                               'dd/MM/yyyy hh24:mi:ss') --46
               AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-              AND Disbillmast.IP_NO IN (${ipNumberList})
+              AND EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Disbillmast.IP_NO)
      GROUP BY Disbillmast.Dmc_Slno,
               Disbillmast.Dm_No,
               Disbillmast.Dmd_Date,
@@ -979,13 +978,13 @@ FROM (
               AND NVL (Billdetl.Bmc_Cancel, 'N') = 'N'
               AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
               AND Disbillmast.Dmd_Date >=
-                     TO_DATE ('${fromDate}',
+                     TO_DATE (:fromDate,
                               'dd/MM/yyyy hh24:mi:ss') 
               AND Disbillmast.Dmd_Date <=
-                     TO_DATE ('${toDate}',
+                     TO_DATE (:toDate,
                               'dd/MM/yyyy hh24:mi:ss') 
               AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-              AND Disbillmast.IP_NO IN (${ipNumberList})
+              AND EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Disbillmast.IP_NO)
      GROUP BY Disbillmast.Dmc_Slno,
               Disbillmast.Dm_No,
               Disbillmast.Dmd_Date,
@@ -1027,12 +1026,12 @@ FROM (
               AND Pbillmast.Bmc_Cacr IN ('I')
               AND NVL (Pbillmast.Bmc_Cancel, 'N') = 'N'
               AND Disbillmast.Dmd_Date >=
-                     TO_DATE ('${fromDate}',
+                     TO_DATE (:fromDate,
                               'dd/MM/yyyy hh24:mi:ss') --49
               AND Disbillmast.Dmd_Date <=
-                     TO_DATE ('${toDate}',
+                     TO_DATE (:toDate,
                               'dd/MM/yyyy hh24:mi:ss') --50
-              AND Disbillmast.IP_NO IN (${ipNumberList})
+              AND EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Disbillmast.IP_NO)
               AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
      GROUP BY Disbillmast.Dmc_Slno,
               Disbillmast.Dm_No,
@@ -1088,12 +1087,12 @@ FROM (
                       AND NVL (Mretmast.Mrc_Cancel, 'N') = 'N'
                       AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                       AND Disbillmast.Dmd_Date >=
-                             TO_DATE ('${fromDate}',
+                             TO_DATE (:fromDate,
                                       'dd/MM/yyyy hh24:mi:ss') --51
                       AND Disbillmast.Dmd_Date <=
-                             TO_DATE ('${toDate}',
+                             TO_DATE (:toDate,
                                       'dd/MM/yyyy hh24:mi:ss') --52
-                      AND Disbillmast.IP_NO IN (${ipNumberList})
+                      AND EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Disbillmast.IP_NO)
                       AND DISBILLMAST.MH_CODE IN
                              (SELECT MH_CODE FROM multihospital)) A
      GROUP BY A.Slno,
@@ -1144,10 +1143,10 @@ FROM (
                                    AND NVL (Iprefunditemdetl.Ric_Cancel,
                                             'N') = 'N'
                                    AND Iprefundmast.Rid_Date >=
-                                          TO_DATE ( '${fromDate}',  'dd/MM/yyyy hh24:mi:ss') --53
+                                          TO_DATE ( :fromDate,  'dd/MM/yyyy hh24:mi:ss') --53
                                    AND Iprefundmast.Rid_Date <=
-                                          TO_DATE ( '${toDate}', 'dd/MM/yyyy hh24:mi:ss') --54
-                                    AND Iprefundmast.IP_NO IN (${ipNumberList})
+                                          TO_DATE ( :toDate, 'dd/MM/yyyy hh24:mi:ss') --54
+                                    AND EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Iprefundmast.IP_NO) 
                                    AND IPREFUNDMAST.MH_CODE IN
                                           (SELECT MH_CODE
                                              FROM multihospital)
@@ -1187,10 +1186,10 @@ FROM (
               AND NVL (Iprefundmast.Ric_Cancel, 'N') = 'N'
               AND NVL (Iprefunditemdetl.Ric_Cancel, 'N') = 'N'
               AND Iprefundmast.Rid_Date >=
-                      TO_DATE ( '${fromDate}',  'dd/MM/yyyy hh24:mi:ss') --53
+                      TO_DATE ( :fromDate,  'dd/MM/yyyy hh24:mi:ss') --53
               AND Iprefundmast.Rid_Date <=
-                     TO_DATE ( '${toDate}', 'dd/MM/yyyy hh24:mi:ss') --54
-              AND Iprefundmast.IP_NO IN (${ipNumberList})
+                     TO_DATE ( :toDate, 'dd/MM/yyyy hh24:mi:ss') --54
+              AND EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Iprefundmast.IP_NO)
               AND IPREFUNDMAST.MH_CODE IN
                      (SELECT MH_CODE FROM multihospital)
      GROUP BY Iprefundmast.Ric_Slno,
@@ -1231,10 +1230,10 @@ FROM (
               AND NVL (Iprefundmast.Ric_Cancel, 'N') = 'N'
               AND NVL (Iprefunditemdetl.Ric_Cancel, 'N') = 'N'
               AND Iprefundmast.Rid_Date >=
-                     TO_DATE ( '${fromDate}',  'dd/MM/yyyy hh24:mi:ss') --53
+                     TO_DATE ( :fromDate,  'dd/MM/yyyy hh24:mi:ss') --53
               AND Iprefundmast.Rid_Date <=
-                      TO_DATE ( '${toDate}', 'dd/MM/yyyy hh24:mi:ss') --54
-              AND Iprefundmast.IP_NO IN (${ipNumberList})
+                      TO_DATE ( :toDate, 'dd/MM/yyyy hh24:mi:ss') --54
+              AND EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Iprefundmast.IP_NO)
               AND IPREFUNDMAST.MH_CODE IN
                      (SELECT MH_CODE FROM multihospital)
      GROUP BY Iprefundmast.Ric_Slno,
@@ -1275,10 +1274,10 @@ FROM (
               AND NVL (Iprefundmast.Ric_Cancel, 'N') = 'N'
               AND NVL (Iprefunditemdetl.Ric_Cancel, 'N') = 'N'
               AND Iprefundmast.Rid_Date >=
-                      TO_DATE ( '${fromDate}',  'dd/MM/yyyy hh24:mi:ss') --53
+                      TO_DATE ( :fromDate,  'dd/MM/yyyy hh24:mi:ss') --53
               AND Iprefundmast.Rid_Date <=
-                     TO_DATE ( '${toDate}', 'dd/MM/yyyy hh24:mi:ss') --54
-              AND Iprefundmast.IP_NO IN (${ipNumberList})
+                     TO_DATE ( :toDate, 'dd/MM/yyyy hh24:mi:ss') --54
+              AND EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Iprefundmast.IP_NO)
               AND IPREFUNDMAST.MH_CODE IN
                      (SELECT MH_CODE FROM multihospital)
      GROUP BY Iprefundmast.Ric_Slno,
@@ -1317,10 +1316,10 @@ FROM (
               AND NVL (Iprefundmast.Ric_Cancel, 'N') = 'N'
               AND NVL (Iprefunditemdetl.Ric_Cancel, 'N') = 'N'
               AND Iprefundmast.Rid_Date >=
-                      TO_DATE ( '${fromDate}',  'dd/MM/yyyy hh24:mi:ss') --53
+                      TO_DATE ( :fromDate,  'dd/MM/yyyy hh24:mi:ss') --53
               AND Iprefundmast.Rid_Date <=
-                     TO_DATE ( '${toDate}', 'dd/MM/yyyy hh24:mi:ss') --54
-              AND Iprefundmast.IP_NO IN (${ipNumberList})
+                     TO_DATE ( :toDate, 'dd/MM/yyyy hh24:mi:ss') --54
+              AND EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Iprefundmast.IP_NO)
               AND IPREFUNDMAST.MH_CODE IN
                      (SELECT MH_CODE FROM multihospital)
      GROUP BY Iprefundmast.Ric_Slno,
@@ -1358,10 +1357,10 @@ FROM (
               AND NVL (Iprefundmast.Ric_Cancel, 'N') = 'N'
               AND NVL (Iprefunditemdetl.Ric_Cancel, 'N') = 'N'
               AND Iprefundmast.Rid_Date >=
-                     TO_DATE ( '${fromDate}',  'dd/MM/yyyy hh24:mi:ss') --53
+                     TO_DATE ( :fromDate,  'dd/MM/yyyy hh24:mi:ss') --53
               AND Iprefundmast.Rid_Date <=
-                     TO_DATE ( '${toDate}', 'dd/MM/yyyy hh24:mi:ss') --54
-               AND Iprefundmast.IP_NO IN (${ipNumberList})
+                     TO_DATE ( :toDate, 'dd/MM/yyyy hh24:mi:ss') --54
+               AND EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Iprefundmast.IP_NO)
               AND IPREFUNDMAST.MH_CODE IN
                      (SELECT MH_CODE FROM multihospital)
      GROUP BY Iprefundmast.Ric_Slno,
@@ -1394,9 +1393,9 @@ FROM (
                                AND Patient.Pt_Code = Pattype.Pt_Code
                                AND NVL (Ipreceipt.Irc_Cancel, 'N') = 'N'
                                AND NVL (Ipreceipt.Irn_Discount, 0) <> 0
-                               AND Ipreceipt.Ird_Date >= TO_DATE ( '${fromDate}',  'dd/MM/yyyy hh24:mi:ss') --53
-                               AND Ipreceipt.Ird_Date <=  TO_DATE ( '${toDate}', 'dd/MM/yyyy hh24:mi:ss') --54
-                               AND IPRECEIPT.DMC_SLNO IN (SELECT DMC_SLNO FROM DISBILLMAST WHERE IP_NO IN (${ipNumberList}) AND DMC_CANCEL IS NULL )
+                               AND Ipreceipt.Ird_Date >= TO_DATE ( :fromDate,  'dd/MM/yyyy hh24:mi:ss') --53
+                               AND Ipreceipt.Ird_Date <=  TO_DATE ( :toDate, 'dd/MM/yyyy hh24:mi:ss') --54
+                               AND IPRECEIPT.DMC_SLNO IN (SELECT DMC_SLNO FROM DISBILLMAST WHERE EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = DISBILLMAST.IP_NO) AND DMC_CANCEL IS NULL )
                                AND ipreceipt.IPC_MHCODE IN   (SELECT MH_CODE FROM multihospital)
      UNION ALL /*--Billing Direct--   corrected by basil for centralized collection*/
                                                                             SELECT Billmast.Bmc_Slno
@@ -1465,11 +1464,11 @@ FROM (
                                                                                           IS NULL
                                                                                    AND Billmast.Bmd_Date >=
                                                                                           TO_DATE (
-                                                                                             '${fromDate}',
+                                                                                             :fromDate,
                                                                                              'dd/MM/yyyy hh24:mi:ss') --67
                                                                                    AND Billmast.Bmd_Date <=
                                                                                           TO_DATE (
-                                                                                             '${toDate}',
+                                                                                             :toDate,
                                                                                              'dd/MM/yyyy hh24:mi:ss') --68
                                                                                    AND billmast.mh_code IN
                                                                                           (SELECT MH_CODE
@@ -1553,11 +1552,11 @@ FROM (
                                                                                         IS NOT NULL
                                                                                  AND Billmast.BMD_COLLDATE >=
                                                                                         TO_DATE (
-                                                                                           '${fromDate}',
+                                                                                           :fromDate,
                                                                                            'dd/MM/yyyy hh24:mi:ss')  --69
                                                                                  AND Billmast.BMD_COLLDATE <=
                                                                                         TO_DATE (
-                                                                                           '${toDate}',
+                                                                                           :toDate,
                                                                                            'dd/MM/yyyy hh24:mi:ss') --70
                                                                                  AND billmast.mh_code IN
                                                                                         (SELECT MH_CODE
@@ -1648,11 +1647,11 @@ FROM (
                                                                                                 IS NULL
                                                                                          AND Refundbillmast.Rfd_Date >=
                                                                                                 TO_DATE (
-                                                                                                   '${fromDate}',
+                                                                                                   :fromDate,
                                                                                                    'dd/MM/yyyy hh24:mi:ss') --71
                                                                                          AND Refundbillmast.Rfd_Date <=
                                                                                                 TO_DATE (
-                                                                                                   '${toDate}',
+                                                                                                   :toDate,
                                                                                                    'dd/MM/yyyy hh24:mi:ss')  --72
                                                                                          AND refundbillmast.MH_CODE IN
                                                                                                 (SELECT MH_CODE
@@ -1743,11 +1742,11 @@ FROM (
                                                                                                IS NOT NULL
                                                                                         AND Refundbillmast.RFD_RETDATE >=
                                                                                                TO_DATE (
-                                                                                                  '${fromDate}',
+                                                                                                  :fromDate,
                                                                                                   'dd/MM/yyyy hh24:mi:ss')  --73
                                                                                         AND Refundbillmast.RFD_RETDATE <=
                                                                                                TO_DATE (
-                                                                                                  '${toDate}',
+                                                                                                  :toDate,
                                                                                                   'dd/MM/yyyy hh24:mi:ss')--74
                                                                                         AND refundbillmast.MH_CODE IN
                                                                                                (SELECT MH_CODE
@@ -1841,11 +1840,11 @@ FROM (
                                                                                                          IS NULL
                                                                                                   AND Pbillmast.Bmd_Date >=
                                                                                                          TO_DATE (
-                                                                                                            '${fromDate}',
+                                                                                                            :fromDate,
                                                                                                             'dd/MM/yyyy hh24:mi:ss')  
                                                                                                   AND Pbillmast.Bmd_Date <=
                                                                                                          TO_DATE (
-                                                                                                            '${toDate}',
+                                                                                                            :toDate,
                                                                                                             'dd/MM/yyyy hh24:mi:ss')   
                                                                                                   AND pbillmast.MH_CODE IN
                                                                                                          (SELECT MH_CODE
@@ -1928,11 +1927,11 @@ FROM (
                                                                                                      IS NOT NULL
                                                                                               AND Pbillmast.BMD_COLLDATE >=
                                                                                                      TO_DATE (
-                                                                                                        '${fromDate}',
+                                                                                                        :fromDate,
                                                                                                         'dd/MM/yyyy hh24:mi:ss')  --77
                                                                                               AND Pbillmast.BMD_COLLDATE <=
                                                                                                      TO_DATE (
-                                                                                                        '${toDate}',
+                                                                                                        :toDate,
                                                                                                         'dd/MM/yyyy hh24:mi:ss')  --78
                                                                                               AND pbillmast.MH_CODE IN
                                                                                                      (SELECT MH_CODE
@@ -2035,11 +2034,11 @@ FROM (
                                                                                                     IS NULL
                                                                                              AND Mretmast.Mrd_Date >=
                                                                                                     TO_DATE (
-                                                                                                       '${fromDate}',
+                                                                                                       :fromDate,
                                                                                                        'dd/MM/yyyy hh24:mi:ss')  --79
                                                                                              AND Mretmast.Mrd_Date <=
                                                                                                     TO_DATE (
-                                                                                                       '${toDate}',
+                                                                                                       :toDate,
                                                                                                        'dd/MM/yyyy hh24:mi:ss')  --80
                                                                                              AND MRETMAST.MH_CODE IN
                                                                                                     (SELECT MH_CODE
@@ -2130,11 +2129,11 @@ FROM (
                                                   IS NOT NULL
                                            AND Mretmast.MRD_RETDATE >=
                                                   TO_DATE (
-                                                     '${fromDate}',
+                                                     :fromDate,
                                                      'dd/MM/yyyy hh24:mi:ss')  --81
                                            AND Mretmast.MRD_RETDATE <=
                                                   TO_DATE (
-                                                     '${toDate}',
+                                                     :toDate,
                                                      'dd/MM/yyyy hh24:mi:ss')  --82
                                            AND MRETMAST.MH_CODE IN
                                                   (SELECT MH_CODE
@@ -2152,17 +2151,24 @@ FROM (
                                 GROUP BY Ptc_Desc
                                 ORDER BY 1`;
 
-    try {
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
-      // await result.resultSet?.getRows((err, rows) => {
-      // });
-      // callBack(null, );
-      return result.rows;
-    } catch (error) {
-      console.log(error);
-      throw error;
-    } finally {
-      if (conn_ora) await conn_ora.close();
-    }
+    const result = await conn_ora.execute(
+      sql,
+      {
+        fromDate: data.from,
+        toDate: data.to,
+      },
+      {outFormat: oracledb.OUT_FORMAT_OBJECT},
+    );
+    return result.rows;
+    //  try {
+    //    // await result.resultSet?.getRows((err, rows) => {
+    //    // });
+    //    // callBack(null, );
+    //  } catch (error) {
+    //    console.log(error);
+    //    throw error;
+    //  } finally {
+    //    if (conn_ora) await conn_ora.close();
+    //  }
   },
 };

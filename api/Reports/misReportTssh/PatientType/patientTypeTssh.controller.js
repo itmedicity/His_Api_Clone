@@ -1,5 +1,5 @@
 const {controllerHelper} = require("../../../../utls/controller-helperFun");
-const {patientTypeDiscountTssh} = require("./patientTypeTssh.service");
+const {patientTypeDiscountTssh} = require("../../misReportTssh/misReportTssh/patientTypeTssh.service");
 
 module.exports = {
   getpatientTypeDiscountTssh: controllerHelper(patientTypeDiscountTssh, "Patient Type Discount"),

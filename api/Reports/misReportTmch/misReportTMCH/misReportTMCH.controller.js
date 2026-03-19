@@ -6,7 +6,7 @@ const pharmacyCollectionTMCHService = require("./pharmacyTmch.service");
 const procedureTMCHService = require("./proincomeTmch.service");
 const patientTypeDiscountTMCHService = require("./patientTypeTmch.service");
 // FROM TSSH SERVICE FILE IMPORT
-const pharmacyTsshService = require("../../misReportTssh/incomePart/pharmacyincome/pharmacyTssh.service");
+const pharmacyTsshService = require("../../misReportTssh/misReportTssh/pharmacyTssh.service");
 
 const getCollectionAndIncomeMisReportTMCH = async (req, res) => {
   // console.log(req.body);
