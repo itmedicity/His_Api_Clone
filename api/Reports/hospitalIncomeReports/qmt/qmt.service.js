@@ -1,3 +1,4 @@
+const {oracledb} = require("../../../../config/oradbconfig");
 const getMisincexpmast = async (conn_ora) => {
   const sql = `SELECT * FROM MISINCEXPMAST`;
   const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
@@ -5,6 +6,7 @@ const getMisincexpmast = async (conn_ora) => {
 };
 
 const getUngroupedRoomDetl = async (conn_ora, bind) => {
+  console.log(bind);
   const sql = `SELECT NVL (Misincexpgroup.Dg_desc, 'Ungrouped') Dg_desc,
                         NVL (Misincexpgroup.Dg_grcode, 999) AS Code,
                         SUM (
@@ -28,16 +30,16 @@ const getUngroupedRoomDetl = async (conn_ora, bind) => {
                         AND NVL (Disbillmast.Dmc_cancel, 'N') = 'N'
                         AND NVL (Disroomdetl.Dmc_Cancel, 'N') = 'N'
                         AND Disbillmast.Dmc_Cacr <> 'M'
-                        AND Disbillmast.Dmd_Date >= :from
-                        AND Disbillmast.Dmd_Date <= :to
+                        AND Disbillmast.Dmd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                        AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                 GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                 ORDER BY Dg_desc`;
   const result = await conn_ora.execute(
     sql,
     {
-      from: bind.from,
-      to: bind.to,
+      fromDate: bind.from,
+      toDate: bind.to,
     },
     {outFormat: oracledb.OUT_FORMAT_OBJECT},
   );
@@ -65,8 +67,8 @@ const getTheaterIncome = async (conn_ora, bind) => {
                             AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                             AND Disbillmast.Dmc_Cacr <> 'M'
                             AND Disbillmast.Mh_code = Ipparam.Mh_Code
-                            AND Disbillmast.DMD_DATE >= :from
-                            AND Disbillmast.Dmd_Date <= :to
+                            AND Disbillmast.DMD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                            AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                     GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                     UNION ALL
@@ -90,8 +92,8 @@ const getTheaterIncome = async (conn_ora, bind) => {
                             AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                             AND Disbillmast.Dmc_Cacr <> 'M'
                             AND Disbillmast.Mh_code = Ipparam.Mh_Code
-                            AND Disbillmast.DMD_DATE >= :from
-                            AND Disbillmast.Dmd_Date <= :to
+                            AND Disbillmast.DMD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                            AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                     GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                     UNION ALL
@@ -117,8 +119,8 @@ const getTheaterIncome = async (conn_ora, bind) => {
                             AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                             AND Disbillmast.Dmc_Cacr <> 'M'
                             AND Disbillmast.Mh_code = Ipparam.Mh_Code
-                            AND Disbillmast.DMD_DATE >= :from
-                            AND Disbillmast.Dmd_Date <= :to
+                            AND Disbillmast.DMD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                            AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                     GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                     UNION ALL
@@ -144,8 +146,8 @@ const getTheaterIncome = async (conn_ora, bind) => {
                             AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                             AND Disbillmast.Dmc_Cacr <> 'M'
                             AND Disbillmast.Mh_code = Ipparam.Mh_Code
-                            AND Disbillmast.DMD_DATE >= :from
-                            AND Disbillmast.Dmd_Date <= :to
+                            AND Disbillmast.DMD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                            AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                     GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                     UNION ALL
@@ -171,8 +173,8 @@ const getTheaterIncome = async (conn_ora, bind) => {
                             AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                             AND Disbillmast.Dmc_Cacr <> 'M'
                             AND Disbillmast.Mh_code = Ipparam.Mh_Code
-                            AND Disbillmast.DMD_DATE >= :from
-                            AND Disbillmast.Dmd_Date <= :to
+                            AND Disbillmast.DMD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                            AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                     GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                     UNION ALL
@@ -198,8 +200,8 @@ const getTheaterIncome = async (conn_ora, bind) => {
                             AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                             AND Disbillmast.Dmc_Cacr <> 'M'
                             AND Disbillmast.Mh_code = Ipparam.Mh_Code
-                            AND Disbillmast.DMD_DATE >= :from
-                            AND Disbillmast.Dmd_Date <= :to
+                            AND Disbillmast.DMD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                            AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                     GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                     UNION ALL
@@ -225,8 +227,8 @@ const getTheaterIncome = async (conn_ora, bind) => {
                             AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                             AND Disbillmast.Dmc_Cacr <> 'M'
                             AND Disbillmast.Mh_code = Ipparam.Mh_Code
-                            AND Disbillmast.DMD_DATE >= :from
-                            AND Disbillmast.Dmd_Date <= :to
+                            AND Disbillmast.DMD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                            AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                     GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                     UNION ALL
@@ -252,8 +254,8 @@ const getTheaterIncome = async (conn_ora, bind) => {
                             AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                             AND Disbillmast.Dmc_Cacr <> 'M'
                             AND Disbillmast.Mh_code = Ipparam.Mh_Code
-                            AND Disbillmast.DMD_DATE >= :from
-                            AND Disbillmast.Dmd_Date <= :to
+                            AND Disbillmast.DMD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                            AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                     GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                     UNION ALL
@@ -279,8 +281,8 @@ const getTheaterIncome = async (conn_ora, bind) => {
                             AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                             AND Disbillmast.Dmc_Cacr <> 'M'
                             AND Disbillmast.Mh_code = Ipparam.Mh_Code
-                            AND Disbillmast.DMD_DATE >= :from
-                            AND Disbillmast.Dmd_Date <= :to
+                            AND Disbillmast.DMD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                            AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                     GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                     UNION ALL
@@ -309,8 +311,8 @@ const getTheaterIncome = async (conn_ora, bind) => {
                             AND NVL (Patsurgery.Src_Cancel, 'N') = 'N'
                             AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                             AND Disbillmast.Dmc_Cacr <> 'M'
-                            AND Disbillmast.DMD_DATE >= :from
-                            AND Disbillmast.Dmd_Date <= :to
+                            AND Disbillmast.DMD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                            AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             AND NVL (PATSUROTHER.Src_Cancel, 'N') = 'N'
                     GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
@@ -334,8 +336,8 @@ const getTheaterIncome = async (conn_ora, bind) => {
                             AND NVL (Patsurgery.Src_Cancel, 'N') = 'N'
                             AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                             AND Disbillmast.Dmc_Cacr <> 'M'
-                            AND Disbillmast.DMD_DATE >= :from
-                            AND Disbillmast.Dmd_Date <= :to
+                            AND Disbillmast.DMD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                            AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             AND NVL (patsurdetl.Src_Cancel, 'N') = 'N'
                     GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
@@ -360,19 +362,21 @@ const getTheaterIncome = async (conn_ora, bind) => {
                             AND Canbillmast.Cmc_Cacr = 'I'
                             AND Disbillmast.Dmc_Cacr <> 'M'
                             AND Disbillmast.Mh_code = Ipparam.Mh_Code
-                            AND Disbillmast.Dmd_Date >= :from
-                            AND Disbillmast.Dmd_Date <= :to
+                            AND Disbillmast.Dmd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                            AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                     GROUP BY Misincexpgroup.Dg_Grcode, Misincexpgroup.Dg_Desc
                     ORDER BY Dg_desc`;
+  console.log(sql);
   const result = await conn_ora.execute(
     sql,
     {
-      from: bind.from,
-      to: bind.to,
+      fromDate: bind.from,
+      toDate: bind.to,
     },
     {outFormat: oracledb.OUT_FORMAT_OBJECT},
   );
+  console.log(result.rows);
   return result.rows;
 };
 
@@ -396,16 +400,16 @@ const getConsultingIncome = async (conn_ora, bind) => {
                         AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                         AND NVL (VSC_CANCEL, 'N') = 'N'
                         AND Disbillmast.Dmc_Cacr <> 'M'
-                        AND Disbillmast.DMD_DATE >= :from 
-                        AND Disbillmast.Dmd_Date <= :to 
+                        AND Disbillmast.DMD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss') 
+                        AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss') 
                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                 GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                 ORDER BY Dg_desc`;
   const result = await conn_ora.execute(
     sql,
     {
-      from: bind.from,
-      to: bind.to,
+      fromDate: bind.from,
+      toDate: bind.to,
     },
     {outFormat: oracledb.OUT_FORMAT_OBJECT},
   );
@@ -434,16 +438,16 @@ const getIpRefundDetl = async (conn_ora, bind) => {
                     AND Iprefunditemdetl.Ric_Type <> 'PHY'
                     AND Iprefundmast.Ric_Cacr IN ('C', 'R')
                     AND NVL (Iprefundmast.Ric_Cancel, 'N') = 'N'
-                    AND Iprefundmast.Rid_Date >= :from
-                    AND Iprefundmast.Rid_Date <= :to
+                    AND Iprefundmast.Rid_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                    AND Iprefundmast.Rid_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND IPREFUNDMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
             GROUP BY Misincexpgroup.Dg_Grcode, Misincexpgroup.Dg_Desc
             ORDER BY Dg_Desc`;
   const result = await conn_ora.execute(
     sql,
     {
-      from: bind.from,
-      to: bind.to,
+      fromDate: bind.from,
+      toDate: bind.to,
     },
     {outFormat: oracledb.OUT_FORMAT_OBJECT},
   );
@@ -489,16 +493,16 @@ const getIpincomeSection_one = async (conn_ora, bind) => {
                     AND DISRMRENTDETL.pc_code = Misincexpdtl.pc_code(+)
                     AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                     AND Disbillmast.Dmc_Cacr <> 'M'
-                    AND Disbillmast.DMD_DATE >= :from
-                    AND Disbillmast.Dmd_Date <= :to
+                    AND Disbillmast.DMD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                    AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
             GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
             ORDER BY Dg_desc`;
   const result = await conn_ora.execute(
     sql,
     {
-      from: bind.from,
-      to: bind.to,
+      fromDate: bind.from,
+      toDate: bind.to,
     },
     {outFormat: oracledb.OUT_FORMAT_OBJECT},
   );
@@ -527,16 +531,16 @@ const getIpincomeSection_two = async (conn_ora, bind) => {
          AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
          AND NVL (SVC_CANCEL, 'N') = 'N'
          AND Disbillmast.Dmc_Cacr <> 'M'
-         AND Disbillmast.DMD_DATE >= :from
-         AND Disbillmast.Dmd_Date <= :to
+         AND Disbillmast.DMD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+         AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
          AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
 GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
 ORDER BY Dg_desc`;
   const result = await conn_ora.execute(
     sql,
     {
-      from: bind.from,
-      to: bind.to,
+      fromDate: bind.from,
+      toDate: bind.to,
     },
     {outFormat: oracledb.OUT_FORMAT_OBJECT},
   );
@@ -569,8 +573,8 @@ const getTheaterIncome_two = async (conn_ora, bind) => {
                         AND NVL (Patsurgery.Src_Cancel, 'N') = 'N'
                         AND NVL (Opbillmast.OPN_CANCEL, 'N') = 'N'
                         AND Opbillmast.OPC_CACR <> 'M'
-                        AND Opbillmast.OPD_DATE >= :from
-                        AND Opbillmast.OPD_DATE <= :to
+                        AND Opbillmast.OPD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                        AND Opbillmast.OPD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                 GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                 UNION ALL
@@ -593,8 +597,8 @@ const getTheaterIncome_two = async (conn_ora, bind) => {
                         AND NVL (Patsurgery.Src_Cancel, 'N') = 'N'
                         AND NVL (Opbillmast.OPN_CANCEL, 'N') = 'N'
                         AND Opbillmast.OPC_CACR <> 'M'
-                        AND Opbillmast.OPD_DATE >= : from
-                        AND Opbillmast.OPD_DATE <= : to
+                        AND Opbillmast.OPD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                        AND Opbillmast.OPD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                 GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                 UNION ALL
@@ -619,8 +623,8 @@ const getTheaterIncome_two = async (conn_ora, bind) => {
                         AND NVL (Patsurgery.Src_Cancel, 'N') = 'N'
                         AND NVL (Opbillmast.OPN_CANCEL, 'N') = 'N'
                         AND Opbillmast.OPC_CACR <> 'M'
-                        AND Opbillmast.OPD_DATE >= :from
-                        AND Opbillmast.OPD_DATE <= :to
+                        AND Opbillmast.OPD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                        AND Opbillmast.OPD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                 GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                 UNION ALL
@@ -645,8 +649,8 @@ const getTheaterIncome_two = async (conn_ora, bind) => {
                         AND NVL (Patsurgery.Src_Cancel, 'N') = 'N'
                         AND NVL (Opbillmast.OPN_CANCEL, 'N') = 'N'
                         AND Opbillmast.OPC_CACR <> 'M'
-                        AND Opbillmast.OPD_DATE >= :from
-                        AND Opbillmast.OPD_DATE <= :to
+                        AND Opbillmast.OPD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                        AND Opbillmast.OPD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                 GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                 UNION ALL
@@ -671,8 +675,8 @@ const getTheaterIncome_two = async (conn_ora, bind) => {
                         AND NVL (Patsurgery.Src_Cancel, 'N') = 'N'
                         AND NVL (Opbillmast.OPN_CANCEL, 'N') = 'N'
                         AND Opbillmast.OPC_CACR <> 'M'
-                        AND Opbillmast.OPD_DATE >= :from
-                        AND Opbillmast.OPD_DATE <= :to
+                        AND Opbillmast.OPD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                        AND Opbillmast.OPD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                 GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                 UNION ALL
@@ -697,8 +701,8 @@ const getTheaterIncome_two = async (conn_ora, bind) => {
                         AND NVL (Patsurgery.Src_Cancel, 'N') = 'N'
                         AND NVL (Opbillmast.OPN_CANCEL, 'N') = 'N'
                         AND Opbillmast.OPC_CACR <> 'M'
-                        AND Opbillmast.OPD_DATE >= :from
-                        AND Opbillmast.OPD_DATE <= :to
+                        AND Opbillmast.OPD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                        AND Opbillmast.OPD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                 GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                 UNION ALL
@@ -723,8 +727,8 @@ const getTheaterIncome_two = async (conn_ora, bind) => {
                         AND NVL (Patsurgery.Src_Cancel, 'N') = 'N'
                         AND NVL (Opbillmast.OPN_CANCEL, 'N') = 'N'
                         AND Opbillmast.OPC_CACR <> 'M'
-                        AND Opbillmast.OPD_DATE >= :from
-                        AND Opbillmast.OPD_DATE <= :to
+                        AND Opbillmast.OPD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                        AND Opbillmast.OPD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                 GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                 UNION ALL
@@ -749,8 +753,8 @@ const getTheaterIncome_two = async (conn_ora, bind) => {
                         AND NVL (Patsurgery.Src_Cancel, 'N') = 'N'
                         AND NVL (Opbillmast.OPN_CANCEL, 'N') = 'N'
                         AND Opbillmast.OPC_CACR <> 'M'
-                        AND Opbillmast.OPD_DATE >= :from
-                        AND Opbillmast.OPD_DATE <= :to
+                        AND Opbillmast.OPD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                        AND Opbillmast.OPD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                 GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                 UNION ALL
@@ -775,8 +779,8 @@ const getTheaterIncome_two = async (conn_ora, bind) => {
                         AND NVL (Patsurgery.Src_Cancel, 'N') = 'N'
                         AND NVL (Opbillmast.OPN_CANCEL, 'N') = 'N'
                         AND Opbillmast.OPC_CACR <> 'M'
-                        AND Opbillmast.OPD_DATE >= :from
-                        AND Opbillmast.OPD_DATE <= :to
+                        AND Opbillmast.OPD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                        AND Opbillmast.OPD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                 GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                 UNION ALL
@@ -805,8 +809,8 @@ const getTheaterIncome_two = async (conn_ora, bind) => {
                         AND NVL (Patsurgery.Src_Cancel, 'N') = 'N'
                         AND NVL (Opbillmast.OPN_CANCEL, 'N') = 'N'
                         AND Opbillmast.OPC_CACR <> 'M'
-                        AND Opbillmast.OPD_DATE >= :from
-                        AND Opbillmast.OPD_DATE <= :to
+                        AND Opbillmast.OPD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                        AND Opbillmast.OPD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         AND NVL (PATSUROTHER.Src_Cancel, 'N') = 'N'
                 GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
@@ -830,8 +834,8 @@ const getTheaterIncome_two = async (conn_ora, bind) => {
                         AND NVL (Patsurgery.Src_Cancel, 'N') = 'N'
                         AND NVL (Opbillmast.OPN_CANCEL, 'N') = 'N'
                         AND Opbillmast.OPC_CACR <> 'M'
-                        AND Opbillmast.OPD_DATE >= :from
-                        AND Opbillmast.OPD_DATE <= :to
+                        AND Opbillmast.OPD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                        AND Opbillmast.OPD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         AND NVL (PATSURDETL.Src_Cancel, 'N') = 'N'
                 GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
@@ -840,8 +844,8 @@ const getTheaterIncome_two = async (conn_ora, bind) => {
   const result = await conn_ora.execute(
     sql,
     {
-      from: bind.from,
-      to: bind.to,
+      fromDate: bind.from,
+      toDate: bind.to,
     },
     {outFormat: oracledb.OUT_FORMAT_OBJECT},
   );
@@ -890,8 +894,8 @@ const getPharmacyCollection_One = async (conn_ora, bind) => {
                AND pbillmast.BMC_COLLCNCODE IS NULL
                AND NVL (Pbillmast.Bmc_cancel, 'N') IN ('N', 'P')
                AND Pbillmast.Bmc_Cacr IN ('C', 'R', 'M')
-               AND Pbillmast.BMD_DATE >= :from
-               AND Pbillmast.Bmd_Date <= :to
+               AND Pbillmast.BMD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+               AND Pbillmast.Bmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                AND pbillmast.MH_CODE IN (SELECT MH_CODE FROM multihospital)
         UNION ALL
         SELECT SUM (
@@ -916,15 +920,15 @@ const getPharmacyCollection_One = async (conn_ora, bind) => {
                AND NVL (Mretdetl.Mrc_Cancel, 'N') <> 'Y'
                AND NVL (Mretmast.Mrc_Cancel, 'N') <> 'Y'
                AND Mretdetl.MRC_CACR IN ('C', 'R')
-               AND Mretdetl.MRD_DATE >= :from
+               AND Mretdetl.MRD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                AND MRETDETL.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-               AND Mretdetl.Mrd_Date <= :to) A`;
+               AND Mretdetl.Mrd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')) A`;
 
   const result = await conn_ora.execute(
     sql,
     {
-      from: data.from,
-      to: data.to,
+      fromDate: bind.from,
+      toDate: bind.to,
     },
     {outFormat: oracledb.OUT_FORMAT_OBJECT},
   );
@@ -946,14 +950,14 @@ const getIpRefundDetl_one = async (conn_ora, bind) => {
                     AND Iprefunditemdetl.Ric_Type = 'PHY'
                     AND Iprefundmast.Ric_Cacr IN ('C', 'R')
                     AND NVL (Iprefundmast.Ric_Cancel, 'N') = 'N'
-                    AND Iprefundmast.Rid_Date >= :from
+                    AND Iprefundmast.Rid_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND IPREFUNDMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-                    AND Iprefundmast.Rid_Date <= :to`;
+                    AND Iprefundmast.Rid_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
   const result = await conn_ora.execute(
     sql,
     {
-      from: bind.from,
-      to: bind.to,
+      fromDate: bind.from,
+      toDate: bind.to,
     },
     {outFormat: oracledb.OUT_FORMAT_OBJECT},
   );
@@ -995,16 +999,16 @@ const getIpincomeSection_three = async (conn_ora, bind) => {
                         AND Misincexpdtl.Pc_code(+) = Progroup.pc_code
                         AND (NVL (RECEIPTMAST.RPC_CANCEL, 'N') <> 'C')
                         AND Receiptmast.RPC_CAcr IN ('C', 'R', 'M')
-                        AND Receiptmast.RPD_DATE >= :from
-                        AND Receiptmast.RPD_DATE <= :to
+                        AND Receiptmast.RPD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                        AND Receiptmast.RPD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                         AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                 GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                 ORDER BY Dg_desc`;
   const result = await conn_ora.execute(
     sql,
     {
-      from: bind.from,
-      to: bind.to,
+      fromDate: bind.from,
+      toDate: bind.to,
     },
     {outFormat: oracledb.OUT_FORMAT_OBJECT},
   );
@@ -1038,16 +1042,16 @@ const getProcedureIncomeSection_one = async (conn_ora, bind) => {
          AND Billmast.Bmc_Cacr = 'O'
          AND NVL (Billmast.BMC_CANCEL, 'N') = 'N'
          AND NVL (Opbillmast.Opn_cancel, 'N') = 'N'
-         AND Opbillmast.Opd_date >= :from
-         AND Opbillmast.Opd_date <= :to
+         AND Opbillmast.Opd_date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+         AND Opbillmast.Opd_date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
          AND billmast.mh_code IN (SELECT MH_CODE FROM multihospital)
 GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
 ORDER BY Dg_desc`;
   const result = await conn_ora.execute(
     sql,
     {
-      from: bind.from,
-      to: bind.to,
+      fromDate: bind.from,
+      toDate: bind.to,
     },
     {outFormat: oracledb.OUT_FORMAT_OBJECT},
   );
@@ -1073,13 +1077,13 @@ const getPharamcyReturnSection_one = async (conn_ora, bind) => {
        AND NVL (Opbillmast.OPN_CANCEL, 'N') = 'N'
        AND Opbillmast.Opc_Cacr <> 'M'
        AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-       AND Opbillmast.OPD_DATE >= :from
-       AND Opbillmast.OPD_DATE <= :to`;
+       AND Opbillmast.OPD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+       AND Opbillmast.OPD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
   const result = await conn_ora.execute(
     sql,
     {
-      from: bind.from,
-      to: bind.to,
+      fromDate: bind.from,
+      toDate: bind.to,
     },
     {outFormat: oracledb.OUT_FORMAT_OBJECT},
   );
@@ -1121,8 +1125,8 @@ const getReceiptmasterSection_one = async (conn_ora, bind) => {
          AND Misincexpdtl.Pc_code(+) = Progroup.pc_code
          AND (NVL (RECEIPTMAST.RPC_CANCEL, 'N') = 'N')
          AND Receiptmast.RPC_CAcr IN ('C', 'R', 'M')
-         AND Receiptmast.RPD_COLLDATE >= :from
-         AND Receiptmast.RPD_COLLDATE <= :to
+         AND Receiptmast.RPD_COLLDATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+         AND Receiptmast.RPD_COLLDATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
          AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
   HAVING SUM (
             DECODE (Receiptmast.RPC_CAcr,
@@ -1134,8 +1138,8 @@ ORDER BY Dg_desc`;
   const result = await conn_ora.execute(
     sql,
     {
-      from: bind.from,
-      to: bind.to,
+      fromDate: bind.from,
+      toDate: bind.to,
     },
     {outFormat: oracledb.OUT_FORMAT_OBJECT},
   );
@@ -1156,14 +1160,14 @@ const getPharmacyCollection_Two = async (conn_ora, bind) => {
        AND Pbillmast.Bmc_Cacr = 'O'
        AND Opbillmast.Opc_Cacr <> 'M'
        AND NVL (Opbillmast.Opn_cancel, 'N') = 'N'
-       AND Opbillmast.Opd_date >= :from
+       AND Opbillmast.Opd_date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
        AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-       AND Opbillmast.Opd_Date <= :to`;
+       AND Opbillmast.Opd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
   const result = await conn_ora.execute(
     sql,
     {
-      from: bind.from,
-      to: bind.to,
+      fromDate: bind.from,
+      toDate: bind.to,
     },
     {outFormat: oracledb.OUT_FORMAT_OBJECT},
   );
@@ -1204,16 +1208,16 @@ const getIpRefundReceiptDetlSection_Two = async (conn_ora, bind) => {
          AND NVL (Refundreceiptdetl.Rfc_Cancel, 'N') = 'N'
          AND Refundreceiptmast.Rfc_Cacr IN ('O')
          AND Opbillmast.Opc_Cacr <> 'M'
-         AND Opbillmast.Opd_date >= :from
+         AND Opbillmast.Opd_date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
          AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-         AND Opbillmast.Opd_date <= :to
+         AND Opbillmast.Opd_date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
 GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
 ORDER BY Dg_desc`;
   const result = await conn_ora.execute(
     sql,
     {
-      from: bind.from,
-      to: bind.to,
+      fromDate: bind.from,
+      toDate: bind.to,
     },
     {outFormat: oracledb.OUT_FORMAT_OBJECT},
   );
@@ -1262,8 +1266,8 @@ const getPharamcyCollection_three = async (conn_ora, bind) => {
                AND pbillmast.BMC_COLLCNCODE IS NOT NULL
                AND NVL (Pbillmast.Bmc_cancel, 'N') = 'N'
                AND Pbillmast.Bmc_Cacr IN ('C', 'R', 'M')
-               AND Pbillmast.BMD_COLLDATE >= :from 
-               AND Pbillmast.BMD_COLLDATE <= :to 
+               AND Pbillmast.BMD_COLLDATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss') 
+               AND Pbillmast.BMD_COLLDATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss') 
                AND pbillmast.MH_CODE IN (SELECT MH_CODE FROM multihospital)
         UNION ALL
         SELECT SUM (
@@ -1288,14 +1292,14 @@ const getPharamcyCollection_three = async (conn_ora, bind) => {
                AND NVL (Mretdetl.Mrc_cancel, 'N') = 'N'
                AND NVL (mretmast.Mrc_cancel, 'N') = 'N'
                AND Mretdetl.MRC_CACR IN ('C', 'R')
-               AND Mretmast.MRD_RETDATE >= :from 
+               AND Mretmast.MRD_RETDATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss') 
                AND MRETDETL.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-               AND Mretmast.Mrd_RETDate <= :to ) A`;
+               AND Mretmast.Mrd_RETDate <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss') ) A`;
   const result = await conn_ora.execute(
     sql,
     {
-      from: bind.from,
-      to: bind.to,
+      fromDate: bind.from,
+      toDate: bind.to,
     },
     {outFormat: oracledb.OUT_FORMAT_OBJECT},
   );
@@ -1347,15 +1351,15 @@ const getIpincomeSection_four = async (conn_ora, bind) => {
          AND Misincexpdtl.Dg_type(+) = 'R'
          AND Billmast.Bmc_Cacr IN ('C', 'R', 'M')
          AND NVL (Billmast.BMC_CANCEL, 'N') <> 'C'
-         AND Billmast.BMD_DATE >= :from
+         AND Billmast.BMD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
          AND billmast.mh_code IN (SELECT MH_CODE FROM multihospital)
-         AND Billmast.Bmd_Date <= :to
+         AND Billmast.Bmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
 GROUP BY Misincexpgroup.DG_GRCODE, Misincexpgroup.DG_DESC`;
   const result = await conn_ora.execute(
     sql,
     {
-      from: bind.from,
-      to: bind.to,
+      fromDate: bind.from,
+      toDate: bind.to,
     },
     {outFormat: oracledb.OUT_FORMAT_OBJECT},
   );
@@ -1376,14 +1380,14 @@ const getPharmacyReturnSection_three = async (conn_ora, bind) => {
        AND NVL (Mretdetl.Mrc_cancel, 'N') = 'N'
        AND NVL (Dmc_Cancel, 'N') = 'N'
        AND Disbillmast.Dmc_Cacr <> 'M'
-       AND Disbillmast.Dmd_date >= :from
+       AND Disbillmast.Dmd_date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
        AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-       AND Disbillmast.Dmd_Date <= :to`;
+       AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
   const result = await conn_ora.execute(
     sql,
     {
-      from: bind.from,
-      to: bind.to,
+      fromDate: bind.from,
+      toDate: bind.to,
     },
     {outFormat: oracledb.OUT_FORMAT_OBJECT},
   );
@@ -1435,16 +1439,16 @@ const getProcedureIncomeSecition_two = async (conn_ora, bind) => {
          AND Misincexpdtl.Dg_type(+) = 'R'
          AND Billmast.Bmc_Cacr IN ('C', 'R', 'M')
          AND NVL (Billmast.BMC_CANCEL, 'N') = 'N'
-         AND Billmast.BMD_COLLDATE >= :from
+         AND Billmast.BMD_COLLDATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
          AND billmast.mh_code IN (SELECT MH_CODE FROM multihospital)
-         AND Billmast.BMD_COLLDATE <= :to
+         AND Billmast.BMD_COLLDATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
 GROUP BY Misincexpgroup.DG_GRCODE, Misincexpgroup.DG_DESC
 ORDER BY Dg_desc`;
   const result = await conn_ora.execute(
     sql,
     {
-      from: bind.from,
-      to: bind.to,
+      fromDate: bind.from,
+      toDate: bind.to,
     },
     {outFormat: oracledb.OUT_FORMAT_OBJECT},
   );
@@ -1465,14 +1469,14 @@ const getPharmacyCollection_four = async (conn_ora, bind) => {
        AND Pbillmast.Bmc_Cacr = 'I'
        AND NVL (Dmc_Cancel, 'N') = 'N'
        AND Disbillmast.Dmc_Cacr <> 'M'
-       AND Disbillmast.Dmd_date >= :from
+       AND Disbillmast.Dmd_date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
        AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-       AND Disbillmast.Dmd_Date <= :to`;
+       AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
   const result = await conn_ora.execute(
     sql,
     {
-      from: bind.from,
-      to: bind.to,
+      fromDate: bind.from,
+      toDate: bind.to,
     },
     {outFormat: oracledb.OUT_FORMAT_OBJECT},
   );
@@ -1505,16 +1509,16 @@ const getIpRefundDetlSection_three = async (conn_ora, bind) => {
          AND Misincexpdtl.Pc_code(+) = Progroup.pc_code
          AND NVL (Refundreceiptmast.Rfc_Cancel, 'N') <> 'C'
          AND Refundreceiptmast.Rfc_Cacr IN ('C', 'R')
-         AND Refundreceiptdetl.Rfd_Date >= :from
-         AND Refundreceiptdetl.Rfd_Date <= :to
+         AND Refundreceiptdetl.Rfd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+         AND Refundreceiptdetl.Rfd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
          AND REFUNDRECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
 GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
 ORDER BY Dg_desc`;
   const result = await conn_ora.execute(
     sql,
     {
-      from: bind.from,
-      to: bind.to,
+      fromDate: bind.from,
+      toDate: bind.to,
     },
     {outFormat: oracledb.OUT_FORMAT_OBJECT},
   );
@@ -1548,16 +1552,16 @@ const getIpincomeSection_five = async (conn_ora, bind) => {
          AND Billmast.Bmc_Cacr = 'I'
          AND NVL (Billmast.BMC_CANCEL, 'N') = 'N'
          AND NVL (Disbillmast.Dmc_cancel, 'N') = 'N'
-         AND Disbillmast.dmd_date >= :from
+         AND Disbillmast.dmd_date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
          AND billmast.mh_code IN (SELECT MH_CODE FROM multihospital)
-         AND Disbillmast.dmd_date <= :to
+         AND Disbillmast.dmd_date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
 GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
 ORDER BY Dg_desc`;
   const result = await conn_ora.execute(
     sql,
     {
-      from: bind.from,
-      to: bind.to,
+      fromDate: bind.from,
+      toDate: bind.to,
     },
     {outFormat: oracledb.OUT_FORMAT_OBJECT},
   );
@@ -1596,16 +1600,16 @@ const getIpRefundDetlSection_four = async (conn_ora, bind) => {
          AND Misincexpdtl.Pc_code(+) = Progroup.pc_code
          AND NVL (Refundbillmast.Rfc_Cancel, 'N') <> 'C'
          AND Refundbillmast.Rfc_Cacr IN ('C', 'R')
-         AND Refundbilldetl.Rfd_Date >= :from
-         AND Refundbilldetl.Rfd_Date <= :to
+         AND Refundbilldetl.Rfd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+         AND Refundbilldetl.Rfd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
          AND billmast.mh_code IN (SELECT MH_CODE FROM multihospital)
 GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
 ORDER BY Dg_desc`;
   const result = await conn_ora.execute(
     sql,
     {
-      from: bind.from,
-      to: bind.to,
+      fromDate: bind.from,
+      toDate: bind.to,
     },
     {outFormat: oracledb.OUT_FORMAT_OBJECT},
   );
@@ -1622,8 +1626,8 @@ const getCollectionPortion_one = async (conn_ora, bind) => {
                 WHERE     receiptmast.RPC_CACR IN ('C', 'R')
                     AND receiptmast.RPC_CANCEL IS NULL
                     AND receiptmast.RPC_COLLCNCODE IS NULL
-                    AND receiptmast.RPD_DATE >= :from
-                    AND receiptmast.RPD_DATE <= :to
+                    AND receiptmast.RPD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                    AND receiptmast.RPD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                 UNION ALL
                 SELECT SUM (
@@ -1633,8 +1637,8 @@ const getCollectionPortion_one = async (conn_ora, bind) => {
                         AS Amt
                 FROM Opbillmast
                 WHERE Opbillmast.OPC_CACR IN ('C', 'R') AND Opbillmast.OPN_CANCEL IS NULL
-                    AND Opbillmast.OPD_DATE >= :from
-                    AND Opbillmast.OPD_DATE <= :to
+                    AND Opbillmast.OPD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                    AND Opbillmast.OPD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                 UNION ALL
                 SELECT SUM (
@@ -1646,8 +1650,8 @@ const getCollectionPortion_one = async (conn_ora, bind) => {
                 WHERE     billmast.Bmc_Cacr IN ('C', 'R')
                     AND billmast.BMC_CANCEL IS NULL
                     AND BILLMAST.BMC_COLLCNCODE IS NULL
-                    AND billmast.BMD_DATE >= :from
-                    AND billmast.BMD_DATE <= :to
+                    AND billmast.BMD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                    AND billmast.BMD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                 UNION ALL
                 SELECT SUM (
@@ -1659,8 +1663,8 @@ const getCollectionPortion_one = async (conn_ora, bind) => {
                 WHERE     Pbillmast.Bmc_Cacr IN ('C', 'R')
                     AND Pbillmast.bmc_cancel = 'N'
                     AND pbillmast.BMC_COLLCNCODE IS NULL
-                    AND Pbillmast.BMD_DATE >= :from
-                    AND Pbillmast.BMD_DATE <= :to
+                    AND Pbillmast.BMD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                    AND Pbillmast.BMD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND pbillmast.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                 UNION ALL
                 SELECT SUM (
@@ -1676,12 +1680,12 @@ const getCollectionPortion_one = async (conn_ora, bind) => {
                 FROM IPRECEIPT, Disbillmast
                 WHERE Disbillmast.Dmc_Slno = IPRECEIPT.Dmc_Slno
                     AND IPRECEIPT.DMC_TYPE IN ('C', 'R')
-                    AND DMD_DATE >= :from
-                    AND DMD_DATE <= :to
+                    AND DMD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                    AND DMD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND IRC_CANCEL IS NULL
-                    AND IRD_DATE >= :from
+                    AND IRD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-                    AND IRD_DATE <= :to
+                    AND IRD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                 UNION ALL
                 SELECT SUM (
                             NVL (billmast.BMN_CASH, 0)
@@ -1692,8 +1696,8 @@ const getCollectionPortion_one = async (conn_ora, bind) => {
                 WHERE     billmast.Bmc_Cacr IN ('C', 'R')
                     AND billmast.BMC_CANCEL IS NULL
                     AND BILLMAST.BMC_COLLCNCODE IS NOT NULL
-                    AND BILLMAST.BMD_COLLDATE >= :from
-                    AND BILLMAST.BMD_COLLDATE <= :to
+                    AND BILLMAST.BMD_COLLDATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                    AND BILLMAST.BMD_COLLDATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                 UNION ALL
                 SELECT SUM (
@@ -1705,8 +1709,8 @@ const getCollectionPortion_one = async (conn_ora, bind) => {
                 WHERE     receiptmast.RPC_CACR IN ('C', 'R')
                     AND receiptmast.RPC_CANCEL IS NULL
                     AND receiptmast.RPC_COLLCNCODE IS NOT NULL
-                    AND receiptmast.RPD_COLLDATE >= :from
-                    AND receiptmast.RPD_COLLDATE <= :to
+                    AND receiptmast.RPD_COLLDATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                    AND receiptmast.RPD_COLLDATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                 UNION ALL
                 SELECT SUM (
@@ -1718,14 +1722,14 @@ const getCollectionPortion_one = async (conn_ora, bind) => {
                 WHERE     Pbillmast.Bmc_Cacr IN ('C', 'R')
                     AND NVL (Pbillmast.bmc_cancel, 'N') = 'N'
                     AND pbillmast.BMC_COLLCNCODE IS NOT NULL
-                    AND Pbillmast.BMD_COLLDATE >= :from
-                    AND Pbillmast.BMD_COLLDATE <= :to
+                    AND Pbillmast.BMD_COLLDATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                    AND Pbillmast.BMD_COLLDATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND pbillmast.MH_CODE IN (SELECT MH_CODE FROM multihospital)`;
   const result = await conn_ora.execute(
     sql,
     {
-      from: bind.from,
-      to: bind.to,
+      fromDate: bind.from,
+      toDate: bind.to,
     },
     {outFormat: oracledb.OUT_FORMAT_OBJECT},
   );
@@ -1746,10 +1750,10 @@ const getCollectionPortion_two = async (conn_ora, bind) => {
                0 tax
           FROM ipreceipt, Disbillmast
          WHERE Ipreceipt.Dmc_Slno = Disbillmast.Dmc_Slno
-               AND Disbillmast.Dmd_date < :from
+               AND Disbillmast.Dmd_date < TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                AND Ipreceipt.Dmc_type IN ('C', 'R')
-               AND IRD_DATE >= :from
-               AND ird_date <= :to
+               AND IRD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+               AND ird_date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                AND Irc_cancel IS NULL
         UNION ALL
           SELECT SUM (
@@ -1773,9 +1777,9 @@ const getCollectionPortion_two = async (conn_ora, bind) => {
            WHERE     (NVL (RECEIPTMAST.RPC_CANCEL, 'N') = 'N')
                  AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                  AND RECEIPTMAST.RPC_COLLCNCODE IS NOT NULL
-                 AND RECEIPTMAST.RPD_COLLDATE >= :from
-                 AND RECEIPTMAST.RPD_COLLDATE <= :to
-                 AND RECEIPTMAST.RPD_DATE < TRUNC (:to)
+                 AND RECEIPTMAST.RPD_COLLDATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                 AND RECEIPTMAST.RPD_COLLDATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                 AND RECEIPTMAST.RPD_DATE < TRUNC (TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss'))
         GROUP BY 'Registration'
         UNION ALL
           SELECT (SUM (
@@ -1797,9 +1801,9 @@ const getCollectionPortion_two = async (conn_ora, bind) => {
                     Amt,
                  0 Tax
             FROM REFUNDRECEIPTMAST
-           WHERE REFUNDRECEIPTMAST.RFD_RETDATE >= :from
-                 AND REFUNDRECEIPTMAST.RFD_RETDATE <= :to
-                 AND REFUNDRECEIPTMAST.RFD_DATE < TRUNC (:to)
+           WHERE REFUNDRECEIPTMAST.RFD_RETDATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                 AND REFUNDRECEIPTMAST.RFD_RETDATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                 AND REFUNDRECEIPTMAST.RFD_DATE < TRUNC (TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss'))
                  AND REFUNDRECEIPTMAST.MH_CODE IN
                         (SELECT MH_CODE FROM multihospital)
                  AND (NVL (REFUNDRECEIPTMAST.RFC_CANCEL, 'N') = 'N')
@@ -1828,9 +1832,9 @@ const getCollectionPortion_two = async (conn_ora, bind) => {
            WHERE     (NVL (BILLMAST.BMC_CANCEL, 'N') = 'N')
                  AND billmast.mh_code IN (SELECT MH_CODE FROM multihospital)
                  AND BILLMAST.BMC_COLLCNCODE IS NOT NULL
-                 AND BILLMAST.BMD_COLLDATE >= :from
-                 AND BILLMAST.BMD_COLLDATE <= :to
-                 AND BILLMAST.BMD_DATE < TRUNC (:to)
+                 AND BILLMAST.BMD_COLLDATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                 AND BILLMAST.BMD_COLLDATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                 AND BILLMAST.BMD_DATE < TRUNC (TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss'))
         GROUP BY 'Billing'
         UNION ALL
           SELECT (SUM (
@@ -1852,13 +1856,13 @@ const getCollectionPortion_two = async (conn_ora, bind) => {
                     AS Amt,
                  0 Tax
             FROM REFUNDBILLMAST
-           WHERE REFUNDBILLMAST.RFD_RETDATE >= :from
-                 AND REFUNDBILLMAST.RFD_RETDATE <= :to
+           WHERE REFUNDBILLMAST.RFD_RETDATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                 AND REFUNDBILLMAST.RFD_RETDATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                  AND refundbillmast.MH_CODE IN
                         (SELECT MH_CODE FROM multihospital)
                  AND (NVL (REFUNDBILLMAST.RFC_CANCEL, 'N') = 'N')
                  AND REFUNDBILLMAST.RFC_RETCNCODE IS NOT NULL
-                 AND REFUNDBILLMAST.RFD_DATE < TRUNC (:to)
+                 AND REFUNDBILLMAST.RFD_DATE < TRUNC (TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss'))
                  AND REFUNDBILLMAST.ROC_SLNO IS NULL
         GROUP BY 'Billing'
         UNION ALL
@@ -1884,9 +1888,9 @@ const getCollectionPortion_two = async (conn_ora, bind) => {
                  AND pbillmast.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                  AND PBILLMAST.BMC_COLLCNCODE IS NOT NULL
                  AND PBILLMAST.BMC_CACR IN ('C', 'R')
-                 AND PBILLMAST.BMD_COLLDATE >= :from
-                 AND PBILLMAST.BMD_COLLDATE <= :to
-                 AND PBILLMAST.BMD_DATE < TRUNC (:to)
+                 AND PBILLMAST.BMD_COLLDATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                 AND PBILLMAST.BMD_COLLDATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                 AND PBILLMAST.BMD_DATE < TRUNC (TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss'))
         GROUP BY DECODE (TRIM (PBILLMAST.bmc_ipop),
                          'OP', 'OP',
                          'IP', 'OP',
@@ -1941,9 +1945,9 @@ const getCollectionPortion_two = async (conn_ora, bind) => {
            WHERE     NVL (MRETMAST.MRC_CANCEL, 'N') = 'N'
                  AND MRETMAST.MRC_RETCNCODE IS NOT NULL
                  AND MRETMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-                 AND MRETMAST.MRD_RETDATE >= :from
-                 AND MRETMAST.MRD_RETDATE <= :to
-                 AND MRETMAST.MRD_DATE < TRUNC (:to)
+                 AND MRETMAST.MRD_RETDATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                 AND MRETMAST.MRD_RETDATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                 AND MRETMAST.MRD_DATE < TRUNC (TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss'))
                  AND MRETMAST.MRC_CACR IN ('C', 'R')
         GROUP BY DECODE (TRIM (MRC_IPOP),  'OP', 'OP',  'IP', 'OP',  'OP')
         UNION ALL
@@ -1959,15 +1963,15 @@ const getCollectionPortion_two = async (conn_ora, bind) => {
                  AND OPBILLMAST.OPC_CACR IN ('C', 'R')
                  AND Cn_Code IS NOT NULL
                  AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-                 AND OPBILLMAST.OPD_DATE >= :from
-                 AND OPBILLMAST.OPD_DATE <= :to
-                 AND OPBILLMAST.OPD_DATE < TRUNC (:to)
+                 AND OPBILLMAST.OPD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                 AND OPBILLMAST.OPD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                 AND OPBILLMAST.OPD_DATE < TRUNC (TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss'))
         GROUP BY 'OP')`;
   const result = await conn_ora.execute(
     sql,
     {
-      from: bind.from,
-      to: bind.to,
+      fromDate: bind.from,
+      toDate: bind.to,
     },
     {outFormat: oracledb.OUT_FORMAT_OBJECT},
   );
@@ -1984,8 +1988,8 @@ const getPerttyCash = async (conn_ora, bind) => {
           FROM Ippettycash
          WHERE NVL (Ippettycash.Pcc_Cancel, 'N') = 'N'
                AND NVL (Ippettycash.Pcn_Amount, 0) <> 0
-               AND Ippettycash.Pcd_Date >= :from
-               AND Ippettycash.Pcd_Date <= :to
+               AND Ippettycash.Pcd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+               AND Ippettycash.Pcd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                AND IPPETTYCASH.ITC_MHCODE IN
                       (SELECT MH_CODE FROM multihospital)
         UNION ALL
@@ -1997,8 +2001,8 @@ const getPerttyCash = async (conn_ora, bind) => {
           FROM Oppettycash
          WHERE NVL (Oppettycash.Pcc_Cancel, 'N') = 'N'
                AND NVL (Oppettycash.Pcn_Amount, 0) <> 0
-               AND Oppettycash.Pcd_Date >= :from
-               AND Oppettycash.Pcd_Date <= :to
+               AND Oppettycash.Pcd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+               AND Oppettycash.Pcd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                AND OPPETTYCASH.PCC_MHCODE IN
                       (SELECT MH_CODE FROM multihospital)
         UNION ALL
@@ -2010,8 +2014,8 @@ const getPerttyCash = async (conn_ora, bind) => {
           FROM Billpettycash
          WHERE NVL (Billpettycash.Pcc_Cancel, 'N') = 'N'
                AND NVL (Billpettycash.Pcn_Amount, 0) <> 0
-               AND Billpettycash.Pcd_Date >= :from
-               AND Billpettycash.Pcd_Date <= :to
+               AND Billpettycash.Pcd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+               AND Billpettycash.Pcd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                AND BILLPETTYCASH.PCC_MHCODE IN
                       (SELECT MH_CODE FROM multihospital)
         UNION ALL
@@ -2023,15 +2027,15 @@ const getPerttyCash = async (conn_ora, bind) => {
           FROM Phpettycash
          WHERE NVL (Phpettycash.Pcc_Cancel, 'N') = 'N'
                AND NVL (Phpettycash.Pcn_Amount, 0) <> 0
-               AND Phpettycash.Pcd_Date >= :from
-               AND Phpettycash.Pcd_Date <= :to
+               AND Phpettycash.Pcd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+               AND Phpettycash.Pcd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                AND PHPETTYCASH.PCC_MHCODE IN
                       (SELECT MH_CODE FROM multihospital))`;
   const result = await conn_ora.execute(
     sql,
     {
-      from: bind.from,
-      to: bind.to,
+      fromDate: bind.from,
+      toDate: bind.to,
     },
     {outFormat: oracledb.OUT_FORMAT_OBJECT},
   );
@@ -2048,8 +2052,8 @@ const getCollectionPortion_three = async (conn_ora, bind) => {
           Amt,
        0 tax
   FROM RECPCOLLECTIONMAST
- WHERE RECPCOLLECTIONMAST.RCD_DATE >= :from
-       AND RECPCOLLECTIONMAST.RCD_DATE <= :to
+ WHERE RECPCOLLECTIONMAST.RCD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+       AND RECPCOLLECTIONMAST.RCD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
        AND RECPCOLLECTIONMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
        AND NVL (RECPCOLLECTIONMAST.RCC_CANCEL, 'N') = 'N'
 HAVING SUM (
@@ -2067,15 +2071,15 @@ SELECT (  SUM (NVL (Recpcollectionmast.Rfn_Cash, 0))
           Amt,
        0 tax
   FROM Recpcollectionmast
- WHERE Recpcollectionmast.Rfd_Date >= :from
+ WHERE Recpcollectionmast.Rfd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
        AND RECPCOLLECTIONMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-       AND Recpcollectionmast.Rfd_Date <= :to
+       AND Recpcollectionmast.Rfd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
        AND NVL (Rcc_Cancel, 'N') = 'N'`;
   const result = await conn_ora.execute(
     sql,
     {
-      from: bind.from,
-      to: bind.to,
+      fromDate: bind.from,
+      toDate: bind.to,
     },
     {outFormat: oracledb.OUT_FORMAT_OBJECT},
   );
@@ -2098,8 +2102,8 @@ const getIpRefundDetlSection_five = async (conn_ora, bind) => {
        AND (   NVL (Refundreceiptmast.RFN_CASH, 0) > 0
             OR NVL (Refundreceiptmast.RFN_CARD, 0) > 0
             OR NVL (Refundreceiptmast.RFN_CHEQUE, 0) > 0)
-       AND Refundreceiptmast.Rfd_Date >= :from
-       AND Refundreceiptmast.Rfd_Date <= :to
+       AND Refundreceiptmast.Rfd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+       AND Refundreceiptmast.Rfd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
        AND REFUNDRECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
 UNION ALL
 SELECT SUM (
@@ -2121,8 +2125,8 @@ SELECT SUM (
        AND (   NVL (refundbillmast.RFN_CASH, 0) > 0
             OR NVL (refundbillmast.RFN_CARD, 0) > 0
             OR NVL (refundbillmast.RFN_CHEQUE, 0) > 0)
-       AND refundbillmast.Rfd_Date >= :from
-       AND refundbillmast.Rfd_Date <= :to
+       AND refundbillmast.Rfd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+       AND refundbillmast.Rfd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
        AND refundbillmast.MH_CODE IN (SELECT MH_CODE FROM multihospital)
 UNION ALL
 SELECT SUM (
@@ -2145,8 +2149,8 @@ SELECT SUM (
        AND (   NVL (Mretmast.MRN_CASH, 0) > 0
             OR NVL (Mretmast.MRN_CARD, 0) > 0
             OR NVL (Mretmast.MRN_CHEQUE, 0) > 0)
-       AND Mretmast.MRD_DATE >= :from
-       AND Mretmast.MRD_DATE <= :to
+       AND Mretmast.MRD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+       AND Mretmast.MRD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
        AND MRETMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
 UNION ALL
 SELECT SUM (
@@ -2161,8 +2165,8 @@ SELECT SUM (
        AND (   NVL (IPRECEIPTrefund.irf_cash, 0) > 0
             OR NVL (IPRECEIPTrefund.irf_card, 0) > 0
             OR NVL (IPRECEIPTrefund.irf_cheque, 0) > 0)
-       AND IRF_DATE >= :from
-       AND IRF_DATE <= :to
+       AND IRF_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+       AND IRF_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
        AND ipreceiptrefund.IRC_MHCODE IN (SELECT MH_CODE FROM multihospital)
 UNION ALL
 SELECT SUM (NVL (Ron_Cash, 0) + NVL (Ron_Card, 0) + NVL (Ron_Cheque, 0)) * -1
@@ -2173,8 +2177,8 @@ SELECT SUM (NVL (Ron_Cash, 0) + NVL (Ron_Card, 0) + NVL (Ron_Cheque, 0)) * -1
        AND (   NVL (Ron_Cash, 0) > 0
             OR NVL (Ron_Cheque, 0) > 0
             OR NVL (Ron_Card, 0) > 0)
-       AND Opbillrefundmast.Rod_Date >= :from
-       AND Opbillrefundmast.Rod_Date <= :to
+       AND Opbillrefundmast.Rod_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+       AND Opbillrefundmast.Rod_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
        AND OPBILLREFUNDMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
 UNION ALL
 SELECT SUM (NVL (Rin_Cash, 0) + NVL (Rin_Card, 0) + NVL (Rin_Cheque, 0)) * -1
@@ -2184,9 +2188,9 @@ SELECT SUM (NVL (Rin_Cash, 0) + NVL (Rin_Card, 0) + NVL (Rin_Cheque, 0)) * -1
  WHERE     Ric_Cacr IN ('C', 'R')
        AND NVL (Ric_Cancel, 'N') = 'N'
        AND Dmc_Slno IS NOT NULL
-       AND Rid_Date >= :from
+       AND Rid_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
        AND IPREFUNDMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-       AND Rid_Date <= :to
+       AND Rid_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
 UNION ALL
 SELECT SUM (
             NVL (Refundreceiptmast.RFN_CASH, 0)
@@ -2203,8 +2207,8 @@ SELECT SUM (
        AND (   NVL (Refundreceiptmast.RFN_CASH, 0) > 0
             OR NVL (Refundreceiptmast.RFN_CARD, 0) > 0
             OR NVL (Refundreceiptmast.RFN_CHEQUE, 0) > 0)
-       AND Refundreceiptmast.RFD_RETDATE >= :from
-       AND Refundreceiptmast.RFD_RETDATE <= :to
+       AND Refundreceiptmast.RFD_RETDATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+       AND Refundreceiptmast.RFD_RETDATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
        AND REFUNDRECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
 UNION ALL
 SELECT SUM (
@@ -2226,8 +2230,8 @@ SELECT SUM (
        AND (   NVL (refundbillmast.RFN_CASH, 0) > 0
             OR NVL (refundbillmast.RFN_CARD, 0) > 0
             OR NVL (refundbillmast.RFN_CHEQUE, 0) > 0)
-       AND refundbillmast.RFD_RETDATE >= :from
-       AND refundbillmast.RFD_RETDATE <= :to
+       AND refundbillmast.RFD_RETDATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+       AND refundbillmast.RFD_RETDATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
        AND refundbillmast.MH_CODE IN (SELECT MH_CODE FROM multihospital)
 UNION ALL
 SELECT SUM (
@@ -2250,14 +2254,14 @@ SELECT SUM (
        AND (   NVL (Mretmast.MRN_CASH, 0) > 0
             OR NVL (Mretmast.MRN_CARD, 0) > 0
             OR NVL (Mretmast.MRN_CHEQUE, 0) > 0)
-       AND Mretmast.MRD_RETDATE >= :from
-       AND Mretmast.MRD_RETDATE <= :to
+       AND Mretmast.MRD_RETDATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+       AND Mretmast.MRD_RETDATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
        AND MRETMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)`;
   const result = await conn_ora.execute(
     sql,
     {
-      from: bind.from,
-      to: bind.to,
+      fromDate: bind.from,
+      toDate: bind.to,
     },
     {outFormat: oracledb.OUT_FORMAT_OBJECT},
   );
@@ -2269,8 +2273,8 @@ const getCollectionPortion_four = async (conn_ora, bind) => {
                 SUM (NVL (opbillmast.OPN_TOTTAX, 0)) Tax
             FROM Opbillmast
             WHERE Opbillmast.OPC_CACR = 'M' AND Opbillmast.OPN_CANCEL IS NULL
-                AND Opbillmast.OPD_DATE >= :from
-                AND Opbillmast.OPD_DATE <= :to
+                AND Opbillmast.OPD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                AND Opbillmast.OPD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                 AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
             UNION ALL
             SELECT SUM (NVL (Disbillmast.DMN_NETAMT, 0)) Amt,
@@ -2285,14 +2289,14 @@ const getCollectionPortion_four = async (conn_ora, bind) => {
                     TAX
             FROM Disbillmast
             WHERE Dmc_Cacr = 'M' AND Dmc_Cancel IS NULL
-                AND DMD_DATE >= :from
+                AND DMD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-                AND DMD_DATE <= :to`;
+                AND DMD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
   const result = await conn_ora.execute(
     sql,
     {
-      from: bind.from,
-      to: bind.to,
+      fromDate: bind.from,
+      toDate: bind.to,
     },
     {outFormat: oracledb.OUT_FORMAT_OBJECT},
   );
@@ -2302,24 +2306,24 @@ const getCollectionPortion_four = async (conn_ora, bind) => {
 const getDiscount = async (conn_ora, bind) => {
   const sql = `SELECT SUM (NVL (RECPCOLLECTIONMAST.RCN_DISCOUNT, 0)) AS Discount
                 FROM RECPCOLLECTIONMAST
-                WHERE RECPCOLLECTIONMAST.RCD_DATE >= :from
-                    AND RECPCOLLECTIONMAST.RCD_DATE <= :to
+                WHERE RECPCOLLECTIONMAST.RCD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                    AND RECPCOLLECTIONMAST.RCD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND RECPCOLLECTIONMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                     AND NVL (RECPCOLLECTIONMAST.RCC_CANCEL, 'N') = 'N'
                 HAVING SUM (NVL (RECPCOLLECTIONMAST.RCN_DISCOUNT, 0)) > 0
                 UNION ALL
                 SELECT SUM (NVL (RECPCOLLECTIONMAST.RCN_DISCOUNT, 0)) * -1 AS Discount
                 FROM Recpcollectionmast
-                WHERE Recpcollectionmast.Rfd_Date >= :from
-                    AND Recpcollectionmast.Rfd_Date <= :to
+                WHERE Recpcollectionmast.Rfd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                    AND Recpcollectionmast.Rfd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND RECPCOLLECTIONMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                     AND NVL (Rcc_Cancel, 'N') = 'N'
                 HAVING SUM (NVL (RECPCOLLECTIONMAST.RCN_DISCOUNT, 0)) > 0`;
   const result = await conn_ora.execute(
     sql,
     {
-      from: bind.from,
-      to: bind.to,
+      fromDate: bind.from,
+      toDate: bind.to,
     },
     {outFormat: oracledb.OUT_FORMAT_OBJECT},
   );
@@ -2362,16 +2366,16 @@ const getIpincomeSection_six = async (conn_ora, bind) => {
                     AND NVL (Refundbilldetl.Rfc_Cancel, 'N') = 'N'
                     AND Refundbillmast.Rfc_Cacr IN ('I')
                     AND Disbillmast.Dmc_Cacr <> 'M'
-                    AND Disbillmast.dmd_date >= :from
-                    AND Disbillmast.dmd_date <= :to
+                    AND Disbillmast.dmd_date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                    AND Disbillmast.dmd_date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
             GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
             ORDER BY Dg_desc`;
   const result = await conn_ora.execute(
     sql,
     {
-      from: bind.from,
-      to: bind.to,
+      fromDate: bind.from,
+      toDate: bind.to,
     },
     {outFormat: oracledb.OUT_FORMAT_OBJECT},
   );
@@ -2382,17 +2386,17 @@ const getDiscount_one = async (conn_ora, bind) => {
   const sql = `SELECT SUM (NVL (Irn_Discount, 0)) Discount
             FROM ipreceipt, Disbillmast
             WHERE Ipreceipt.Dmc_slno = Disbillmast.Dmc_slno
-                AND Disbillmast.Dmd_date < :from
+                AND Disbillmast.Dmd_date < TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                 AND Ipreceipt.Dmc_type IN ('C', 'R')
-                AND IRD_DATE >= :from
+                AND IRD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-                AND IRD_DATE <= :to
+                AND IRD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                 AND NVL (Irc_cancel, 'N') = 'N'`;
   const result = await conn_ora.execute(
     sql,
     {
-      from: bind.from,
-      to: bind.to,
+      fromDate: bind.from,
+      toDate: bind.to,
     },
     {outFormat: oracledb.OUT_FORMAT_OBJECT},
   );
@@ -2403,35 +2407,35 @@ const getCollectionPortion_five = async (conn_ora, bind) => {
   const sql = `SELECT SUM (NVL (ARN_AMOUNT, 0)) Amt, 0 tax
                 FROM OPADVANCE
                 WHERE NVL (ARC_CANCEL, 'N') = 'N'
-                    AND ARD_DATE >= :from
-                    AND ARD_DATE <= :to
+                    AND ARD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                    AND ARD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND OPADVANCE.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                 UNION ALL
                 SELECT SUM (NVL (ARN_AMOUNT, 0)) Amt, 0 tax
                 FROM PHADVANCEENTRY
                 WHERE (NVL (ARC_CANCEL, 'N') = 'N')
-                    AND ARD_DATE >= :from
+                    AND ARD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND PHADVANCEENTRY.ARC_MHCODE IN (SELECT MH_CODE FROM multihospital)
-                    AND ARD_DATE <= :to
+                    AND ARD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                 UNION ALL
                 SELECT SUM (NVL (ARN_AMOUNT, 0)) Amt, 0 tax
                 FROM IPADVANCE
                 WHERE (NVL (ARC_CANCEL, 'N') = 'N')
-                    AND ARD_DATE >= :from
-                    AND ARD_DATE <= :to
+                    AND ARD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                    AND ARD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND IPADVANCE.IAC_MHCODE IN (SELECT MH_CODE FROM multihospital)
                 UNION ALL
                 SELECT SUM (NVL (ARN_AMOUNT, 0)) Amt, 0 tax
                 FROM ADVANCEENTRY
                 WHERE (NVL (ARC_CANCEL, 'N') = 'N')
-                    AND ARD_DATE >= :from
-                    AND ARD_DATE <= :to
+                    AND ARD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                    AND ARD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND ADVANCEENTRY.ARC_MHCODE IN (SELECT MH_CODE FROM multihospital)`;
   const result = await conn_ora.execute(
     sql,
     {
-      from: bind.from,
-      to: bind.to,
+      fromDate: bind.from,
+      toDate: bind.to,
     },
     {outFormat: oracledb.OUT_FORMAT_OBJECT},
   );
@@ -2442,53 +2446,53 @@ const getCollectionPortion_six = async (conn_ora, bind) => {
   const sql = `SELECT SUM (NVL (Opn_advance, 0)) Amt, 0 tax
                 FROM Opbillmast
                 WHERE NVL (OPN_CANCEL, 'N') = 'N'
-                    AND OPD_DATE >= :from
-                    AND OPD_DATE <= :to
+                    AND OPD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                    AND OPD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                 UNION ALL
                 SELECT SUM (NVL (bmn_advamount, 0)) Amt, 0 tax
                 FROM Pbillmast
                 WHERE NVL (BMC_CANCEL, 'N') = 'N'
-                    AND BMD_DATE >= :from
+                    AND BMD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND pbillmast.BMC_COLLCNCODE IS NULL
-                    AND BMD_DATE <= :to
+                    AND BMD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND pbillmast.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                 UNION ALL
                 SELECT SUM (NVL (Dmn_advance, 0)) Amt, 0 TAX
                 FROM Disbillmast
                 WHERE NVL (Disbillmast.Dmc_cancel, 'N') = 'N'
-                    AND Disbillmast.Dmd_date >= :from
-                    AND Disbillmast.Dmd_Date <= :to
+                    AND Disbillmast.Dmd_date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                    AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                 UNION ALL
                 SELECT SUM (NVL (BMN_ADVAMOUNT, 0)) Amt, 0 Tax
                 FROM Billmast
                 WHERE NVL (BMC_CANCEL, 'N') = 'N'
-                    AND BMD_DATE >= :from
+                    AND BMD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND BILLMAST.BMC_COLLCNCODE IS NULL
                     AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-                    AND Bmd_Date <= :to
+                    AND Bmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                 UNION ALL
                 SELECT SUM (NVL (bmn_advamount, 0)) Amt, 0 Tax
                 FROM Pbillmast
                 WHERE NVL (BMC_CANCEL, 'N') = 'N'
-                    AND BMD_COLLDATE >= :from
+                    AND BMD_COLLDATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND pbillmast.BMC_COLLCNCODE IS NOT NULL
-                    AND BMD_COLLDATE <= :to
+                    AND BMD_COLLDATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND pbillmast.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                 UNION ALL
                 SELECT SUM (NVL (BMN_ADVAMOUNT, 0)) Amt, 0 Tax
                 FROM Billmast
                 WHERE NVL (BMC_CANCEL, 'N') = 'N'
-                    AND BMD_COLLDATE >= :from
+                    AND BMD_COLLDATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND BILLMAST.BMC_COLLCNCODE IS NOT NULL
                     AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-                    AND BMD_COLLDATE <= :to`;
+                    AND BMD_COLLDATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
   const result = await conn_ora.execute(
     sql,
     {
-      from: bind.from,
-      to: bind.to,
+      fromDate: bind.from,
+      toDate: bind.to,
     },
     {outFormat: oracledb.OUT_FORMAT_OBJECT},
   );
@@ -2503,8 +2507,8 @@ const getIpRefundDetlSection_six = async (conn_ora, bind) => {
                     AND NVL (Refundreceiptmast.Rfc_Cancel, 'N') <> 'C'
                     AND NVL (Refundreceiptmast.RPN_RTCREDIT, 0) > 0
                     AND Refundreceiptmast.Roc_Slno IS NULL
-                    AND Refundreceiptmast.Rfd_Date >= :from
-                    AND Refundreceiptmast.Rfd_Date <= :to
+                    AND Refundreceiptmast.Rfd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                    AND Refundreceiptmast.Rfd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND REFUNDRECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                 UNION ALL
                 SELECT SUM (NVL (refundbillmast.BMN_RTCREDIT, 0)) * -1 AS Amt,
@@ -2519,9 +2523,9 @@ const getIpRefundDetlSection_six = async (conn_ora, bind) => {
                     AND refundbillmast.RFC_RETCNCODE IS NULL
                     AND NVL (refundbillmast.BMN_RTCREDIT, 0) > 0
                     AND RefundBillmast.Roc_Slno IS NULL
-                    AND refundbillmast.Rfd_Date >= :from
+                    AND refundbillmast.Rfd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND refundbillmast.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-                    AND refundbillmast.Rfd_Date <= :to
+                    AND refundbillmast.Rfd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                 HAVING SUM (NVL (refundbillmast.BMN_RTCREDIT, 0)) > 0
                 UNION ALL
                 SELECT SUM (
@@ -2542,8 +2546,8 @@ const getIpRefundDetlSection_six = async (conn_ora, bind) => {
                     AND NVL (Mretmast.MRC_CANCEL, 'N') <> 'Y'
                     AND NVL (Mretmast.BMN_RTCREDIT, 0) > 0
                     AND Mretmast.MRC_RETCNCODE IS NULL
-                    AND Mretmast.MRD_DATE >= :from
-                    AND Mretmast.MRD_DATE <= :to
+                    AND Mretmast.MRD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                    AND Mretmast.MRD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND MRETMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                 UNION ALL
                 SELECT SUM (DECODE (Opbillrefundmast.Roc_Cacr, 'R', NVL (Ron_Credit, 0), 0))
@@ -2552,8 +2556,8 @@ const getIpRefundDetlSection_six = async (conn_ora, bind) => {
                     SUM (NVL (opbillrefundmast.RON_TOTTAX, 0) * -1) Tax
                 FROM Opbillrefundmast
                 WHERE (NVL (Roc_Cancel, 'N') = 'N')
-                    AND Opbillrefundmast.Rod_Date >= :from
-                    AND Opbillrefundmast.Rod_Date <= :to
+                    AND Opbillrefundmast.Rod_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                    AND Opbillrefundmast.Rod_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND OPBILLREFUNDMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                     AND (DECODE (Opbillrefundmast.Roc_Cacr, 'R', Ron_Credit, 0)) <> 0
                 UNION ALL
@@ -2563,9 +2567,9 @@ const getIpRefundDetlSection_six = async (conn_ora, bind) => {
                 WHERE     Ric_Cacr IN ('R')
                     AND NVL (Ric_Cancel, 'N') = 'N'
                     AND Dmc_Slno IS NOT NULL
-                    AND Rid_Date >= :from
+                    AND Rid_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND IPREFUNDMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-                    AND Rid_Date <= :to
+                    AND Rid_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                 UNION ALL
                 SELECT SUM (NVL (refundbillmast.BMN_RTCREDIT, 0)) * -1 AS Amt,
                     SUM (
@@ -2579,9 +2583,9 @@ const getIpRefundDetlSection_six = async (conn_ora, bind) => {
                     AND NVL (refundbillmast.BMN_RTCREDIT, 0) <> 0
                     AND RefundBillmast.Roc_Slno IS NULL
                     AND refundbillmast.RFC_RETCNCODE IS NOT NULL
-                    AND refundbillmast.RFD_RETDATE >= :from
+                    AND refundbillmast.RFD_RETDATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND refundbillmast.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-                    AND refundbillmast.RFD_RETDATE <= :to
+                    AND refundbillmast.RFD_RETDATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                 HAVING SUM (NVL (refundbillmast.BMN_RTCREDIT, 0)) > 0
                 UNION ALL
                 SELECT SUM (
@@ -2602,14 +2606,14 @@ const getIpRefundDetlSection_six = async (conn_ora, bind) => {
                     AND NVL (Mretmast.MRC_CANCEL, 'N') = 'N'
                     AND NVL (Mretmast.BMN_RTCREDIT, 0) <> 0
                     AND Mretmast.MRC_RETCNCODE IS NOT NULL
-                    AND Mretmast.MRD_RETDATE >= :from
-                    AND Mretmast.MRD_RETDATE <= :to
+                    AND Mretmast.MRD_RETDATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                    AND Mretmast.MRD_RETDATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND MRETMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)`;
   const result = await conn_ora.execute(
     sql,
     {
-      from: bind.from,
-      to: bind.to,
+      fromDate: bind.from,
+      toDate: bind.to,
     },
     {outFormat: oracledb.OUT_FORMAT_OBJECT},
   );
@@ -2620,17 +2624,17 @@ const getAdvanceRefund = async (conn_ora, bind) => {
   const sql = `SELECT SUM (NVL (REFUNDOPADVANCE.RFN_AMT, 0)) Amt, 0 tax
                 FROM REFUNDOPADVANCE
                 WHERE REFUNDOPADVANCE.Rfc_Cancel = 'N'
-                    AND REFUNDOPADVANCE.Rfd_Date >= :from
+                    AND REFUNDOPADVANCE.Rfd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND REFUNDOPADVANCE.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-                    AND REFUNDOPADVANCE.Rfd_Date <= :to
+                    AND REFUNDOPADVANCE.Rfd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                 HAVING SUM (NVL (REFUNDOPADVANCE.RFN_AMT, 0)) > 0
                 UNION ALL
                 SELECT SUM (NVL (REFUNDADVANCE.RFN_AMT, 0)) Amt, 0 tax
                 FROM REFUNDADVANCE
                 WHERE NVL (REFUNDADVANCE.RFC_CANCEL, 'N') = 'N'
-                    AND REFUNDADVANCE.Rfd_Date >= :from
+                    AND REFUNDADVANCE.Rfd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND REFUNDADVANCE.RFC_MHCODE IN (SELECT MH_CODE FROM multihospital)
-                    AND REFUNDADVANCE.Rfd_Date <= :to
+                    AND REFUNDADVANCE.Rfd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                 HAVING SUM (NVL (REFUNDADVANCE.RFN_AMT, 0)) > 0
                 UNION ALL
                 SELECT SUM (
@@ -2641,9 +2645,9 @@ const getAdvanceRefund = async (conn_ora, bind) => {
                     0 tax
                 FROM IPRECEIPT
                 WHERE DMC_TYPE = 'A' AND IRC_CANCEL IS NULL
-                    AND IPRECEIPT.IRD_DATE >= :from
+                    AND IPRECEIPT.IRD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND ipreceipt.IPC_MHCODE IN (SELECT MH_CODE FROM multihospital)
-                    AND IPRECEIPT.IRD_DATE <= :to
+                    AND IPRECEIPT.IRD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                 HAVING SUM (
                         (  NVL (Ipreceipt.irn_balance, 0)
                         + NVL (Ipreceipt.IRN_REFCHEQ, 0)
@@ -2652,15 +2656,15 @@ const getAdvanceRefund = async (conn_ora, bind) => {
                 SELECT SUM (NVL (ADVANCERETURN.RAN_AMT, 0)) Amt, 0 tax
                 FROM ADVANCERETURN
                 WHERE (NVL (ADVANCERETURN.RAC_CANCEL, 'N') = 'N')
-                    AND ADVANCERETURN.RAD_DATE >= :from
+                    AND ADVANCERETURN.RAD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND ADVANCERETURN.RAC_MHCODE IN (SELECT MH_CODE FROM multihospital)
-                    AND ADVANCERETURN.RAD_DATE <= :to
+                    AND ADVANCERETURN.RAD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                 HAVING SUM (NVL (ADVANCERETURN.RAN_AMT, 0)) > 0`;
   const result = await conn_ora.execute(
     sql,
     {
-      from: bind.from,
-      to: bind.to,
+      fromDate: bind.from,
+      toDate: bind.to,
     },
     {outFormat: oracledb.OUT_FORMAT_OBJECT},
   );
@@ -2674,8 +2678,8 @@ const getCollectionPortion_seven = async (conn_ora, bind) => {
                 WHERE     receiptmast.RPC_CACR IN ('R')
                     AND NVL (Receiptmast.Rpc_Cancel, 'N') <> 'C'
                     AND receiptmast.rpc_collcncode IS NULL
-                    AND receiptmast.RPD_DATE >= :from
-                    AND receiptmast.RPD_DATE <= :to
+                    AND receiptmast.RPD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                    AND receiptmast.RPD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND NVL (Rpn_credit, 0) <> 0
                     AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                 UNION ALL
@@ -2686,10 +2690,10 @@ const getCollectionPortion_seven = async (conn_ora, bind) => {
                 FROM Opbillmast
                 WHERE Opbillmast.OPC_CACR IN ('C', 'R')
                     AND NVL (Opbillmast.OPN_CANCEL, 'N') = 'N'
-                    AND Opbillmast.OPD_DATE >= :from
+                    AND Opbillmast.OPD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND (NVL (Opbillmast.OPN_CREDIT, 0)
                             + NVL (OPBILLMAST.OPN_SALETAXCR, 0)) <> 0
-                    AND Opbillmast.Opd_Date <= :to
+                    AND Opbillmast.Opd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                 UNION ALL
                 SELECT SUM (NVL (BMN_CREDIT, 0)) AS Amt,
@@ -2698,8 +2702,8 @@ const getCollectionPortion_seven = async (conn_ora, bind) => {
                 WHERE     billmast.Bmc_Cacr IN ('R')
                     AND NVL (billmast.BMC_CANCEL, 'N') <> 'C'
                     AND BILLMAST.BMC_COLLCNCODE IS NULL
-                    AND billmast.BMD_DATE >= :from
-                    AND Billmast.Bmd_Date <= :to
+                    AND billmast.BMD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                    AND Billmast.Bmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND billmast.mh_code IN (SELECT MH_CODE FROM multihospital)
                 UNION ALL
                 SELECT SUM (
@@ -2719,8 +2723,8 @@ const getCollectionPortion_seven = async (conn_ora, bind) => {
                     AND NVL (Pbillmast.bmc_cancel, 'N') IN ('N', 'P')
                     AND pbillmast.BMC_COLLCNCODE IS NULL
                     AND NVL (Bmn_credit, 0) <> 0
-                    AND Pbillmast.BMD_DATE >= :from
-                    AND Pbillmast.BMD_DATE <= :to
+                    AND Pbillmast.BMD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                    AND Pbillmast.BMD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND pbillmast.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                 UNION ALL
                 SELECT SUM (NVL (Disbillmast.DMN_FINALCREDIT, 0))
@@ -2737,9 +2741,9 @@ const getCollectionPortion_seven = async (conn_ora, bind) => {
                         TAX
                 FROM Disbillmast
                 WHERE Dmc_Cacr = 'R' AND NVL (Disbillmast.DMC_CANCEL, 'N') = 'N'
-                    AND DMD_DATE >= :from
+                    AND DMD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-                    AND DMD_DATE <= :to
+                    AND DMD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                 UNION ALL
                 SELECT SUM (NVL (BMN_CREDIT, 0)) AS Amt,
                     SUM (NVL (billmast.BMN_TOTTAX, 0) + NVL (Billmast.Bmn_Totcess, 0)) Tax
@@ -2747,8 +2751,8 @@ const getCollectionPortion_seven = async (conn_ora, bind) => {
                 WHERE     billmast.Bmc_Cacr IN ('R')
                     AND NVL (billmast.BMC_CANCEL, 'N') = 'N'
                     AND BILLMAST.BMC_COLLCNCODE IS NOT NULL
-                    AND BILLMAST.BMD_COLLDATE >= :from
-                    AND BILLMAST.BMD_COLLDATE <= :to
+                    AND BILLMAST.BMD_COLLDATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                    AND BILLMAST.BMD_COLLDATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND billmast.mh_code IN (SELECT MH_CODE FROM multihospital)
                 UNION ALL
                 SELECT SUM (
@@ -2767,8 +2771,8 @@ const getCollectionPortion_seven = async (conn_ora, bind) => {
                 WHERE     Pbillmast.Bmc_Cacr = 'R'
                     AND NVL (Pbillmast.bmc_cancel, 'N') = 'N'
                     AND pbillmast.BMC_COLLCNCODE IS NOT NULL
-                    AND Pbillmast.BMD_COLLDATE >= :from
-                    AND Pbillmast.BMD_COLLDATE <= :to
+                    AND Pbillmast.BMD_COLLDATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                    AND Pbillmast.BMD_COLLDATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND pbillmast.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                 UNION ALL
                 SELECT SUM (NVL (RPN_CREDIT, 0)) AS Amt,
@@ -2777,14 +2781,14 @@ const getCollectionPortion_seven = async (conn_ora, bind) => {
                 WHERE     receiptmast.RPC_CACR IN ('R')
                     AND NVL (receiptmast.RPC_CANCEL, 'N') = 'N'
                     AND receiptmast.RPC_COLLCNCODE IS NOT NULL
-                    AND receiptmast.RPD_COLLDATE >= :from
-                    AND receiptmast.RPD_COLLDATE <= :to
+                    AND receiptmast.RPD_COLLDATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                    AND receiptmast.RPD_COLLDATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)`;
   const result = await conn_ora.execute(
     sql,
     {
-      from: bind.from,
-      to: bind.to,
+      fromDate: bind.from,
+      toDate: bind.to,
     },
     {outFormat: oracledb.OUT_FORMAT_OBJECT},
   );
@@ -2807,8 +2811,8 @@ const getCollectionPortion_eight = async (conn_ora, bind) => {
                         WHERE     Dmc_Cacr IN ('C', 'R')
                             AND NVL (Disbillmast.Dmc_cancel, 'N') = 'N'
                             AND NVL (DMN_FINALPTPAYABLE, 0) <> 0
-                            AND Disbillmast.Dmd_date >= :from
-                            AND disbillmast.dmd_date <= :to
+                            AND Disbillmast.Dmd_date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                            AND disbillmast.dmd_date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         UNION ALL
                         SELECT SUM (
@@ -2834,13 +2838,13 @@ const getCollectionPortion_eight = async (conn_ora, bind) => {
                                 TAX
                         FROM ipreceipt, Disbillmast
                         WHERE Ipreceipt.Dmc_Slno = Disbillmast.Dmc_Slno
-                            AND Disbillmast.Dmd_date >= :from
-                            AND disbillmast.dmd_date <= :to
+                            AND Disbillmast.Dmd_date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                            AND disbillmast.dmd_date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                             AND Ipreceipt.Dmc_type IN ('C', 'R')
-                            AND IRD_DATE >= :from
+                            AND IRD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                             AND ipreceipt.IPC_MHCODE IN
                                     (SELECT MH_CODE FROM multihospital)
-                            AND ird_date <= :to
+                            AND ird_date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                             AND Irc_cancel IS NULL
                             AND ( (  NVL (Ipreceipt.irn_amount, 0)
                                     + NVL (Ipreceipt.irn_cheque, 0)
@@ -2854,8 +2858,8 @@ const getCollectionPortion_eight = async (conn_ora, bind) => {
                         SELECT SUM (NVL (Rpn_Ptpayable, 0)) Payable,
                             SUM (NVL (Opn_Saletaxch, 0) + NVL (Opn_Saletaxcr, 0)) Tax
                         FROM Opbillmast
-                        WHERE Opbillmast.Opd_Date >= :from
-                            AND Opbillmast.Opd_Date <= :to
+                        WHERE Opbillmast.Opd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                            AND Opbillmast.Opd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                             AND Opbillmast.Opc_Cacr IN ('C', 'R')
                             AND Rpn_Ptpayable > 0
                             AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
@@ -2871,8 +2875,8 @@ const getCollectionPortion_eight = async (conn_ora, bind) => {
                                 + NVL (Bmn_Totcesscr, 0))
                                 Tax
                         FROM Billmast
-                        WHERE Billmast.Bmd_Date >= :from
-                            AND Billmast.Bmd_Date <= :to
+                        WHERE Billmast.Bmd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                            AND Billmast.Bmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                             AND Billmast.Bmc_Cacr IN ('C', 'R')
                             AND Rpn_Ptpayable > 0
                             AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
@@ -2897,14 +2901,14 @@ const getCollectionPortion_eight = async (conn_ora, bind) => {
                             AND Rpn_Rtptpayable > 0
                             AND NVL (Refundbillmast.Roc_Slno, 'N') = 'N'
                             AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-                            AND Refundbillmast.Rfd_Date >= :from
-                            AND Refundbillmast.Rfd_Date <= :to
+                            AND Refundbillmast.Rfd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                            AND Refundbillmast.Rfd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                         UNION ALL
                         SELECT SUM (NVL (Receiptmast.Rpn_Netamt, 0)) Payable,
                             SUM (NVL (Rpn_Tottaxch, 0) + NVL (Rpn_Tottaxcr, 0)) Tax
                         FROM Receiptmast
-                        WHERE Receiptmast.Rpd_Date >= :from
-                            AND Receiptmast.Rpd_Date <= :to
+                        WHERE Receiptmast.Rpd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                            AND Receiptmast.Rpd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                             AND Receiptmast.Rpc_Cacr IN ('C', 'R')
                             AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             AND NVL (Receiptmast.Rpc_Cancel, 'N') <> 'C'
@@ -2924,8 +2928,8 @@ const getCollectionPortion_eight = async (conn_ora, bind) => {
                             AND TRUNC (Refundreceiptmast.Rfd_Date) <>
                                     TRUNC (NVL (Rfd_Retdate, SYSDATE + 1))
                             AND Rpn_Rtptpayable > 0
-                            AND Refundreceiptmast.Rfd_Date >= :from
-                            AND Refundreceiptmast.Rfd_Date <= :to
+                            AND Refundreceiptmast.Rfd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                            AND Refundreceiptmast.Rfd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                         UNION ALL
                         SELECT SUM (NVL (Pbillmast.Rpn_Finalptpayable, 0)) Payable,
                             SUM (
@@ -2941,8 +2945,8 @@ const getCollectionPortion_eight = async (conn_ora, bind) => {
                             AND TRUNC (Pbillmast.Bmd_Date) <>
                                     TRUNC (NVL (Bmd_Colldate, SYSDATE + 1))
                             AND Rpn_Ptpayable > 0
-                            AND Pbillmast.Bmd_Date >= :from
-                            AND Pbillmast.Bmd_Date <= :to
+                            AND Pbillmast.Bmd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                            AND Pbillmast.Bmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                         UNION ALL
                         SELECT SUM (NVL (Rpn_Finalrtptpayable, 0)) * -1 Payable,
                             SUM (
@@ -2959,13 +2963,13 @@ const getCollectionPortion_eight = async (conn_ora, bind) => {
                             AND TRUNC (Mretmast.Mrd_Date) <>
                                     TRUNC (NVL (Mrd_Retdate, SYSDATE + 1))
                             AND Rpn_Rtptpayable > 0
-                            AND Mretmast.Mrd_Date >= :from
-                            AND Mretmast.Mrd_Date <= :to) A`;
+                            AND Mretmast.Mrd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                            AND Mretmast.Mrd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')) A`;
   const result = await conn_ora.execute(
     sql,
     {
-      from: bind.from,
-      to: bind.to,
+      fromDate: bind.from,
+      toDate: bind.to,
     },
     {outFormat: oracledb.OUT_FORMAT_OBJECT},
   );
@@ -3009,16 +3013,16 @@ const getIpRefundDetlSection_seven = async (conn_ora, bind) => {
                     AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                     AND NVL (Refundbilldetl.Rfc_Cancel, 'N') = 'N'
                     AND Opbillmast.Opc_Cacr <> 'M'
-                    AND Opbillmast.Opd_date >= :from
-                    AND Opbillmast.Opd_date <= :to
+                    AND Opbillmast.Opd_date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                    AND Opbillmast.Opd_date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
             GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
             ORDER BY Dg_desc`;
   const result = await conn_ora.execute(
     sql,
     {
-      from: bind.from,
-      to: bind.to,
+      fromDate: bind.from,
+      toDate: bind.to,
     },
     {outFormat: oracledb.OUT_FORMAT_OBJECT},
   );
@@ -3029,10 +3033,8 @@ const getWriteoffamnt = async (conn_ora, bind) => {
   const sql = `SELECT SUM (NVL (recpcollectiondetl.RCN_DISPUT, 0)) AS writeoffamt
                 FROM RECPCOLLECTIONMAST, recpcollectiondetl
                 WHERE RECPCOLLECTIONDETL.RCC_SLNO = RECPCOLLECTIONMAST.RCC_SLNO
-                    AND RECPCOLLECTIONMAST.RCD_DATE >=
-                            TO_DATE ('01-12-2025 00:00:00', 'dd/MM/yyyy hh24:mi:ss')
-                    AND RECPCOLLECTIONMAST.RCD_DATE <=
-                            TO_DATE ('01-12-2025 23:59:59', 'dd/MM/yyyy hh24:mi:ss')
+                    AND RECPCOLLECTIONMAST.RCD_DATE >=TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                    AND RECPCOLLECTIONMAST.RCD_DATE <=TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND RECPCOLLECTIONMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                     AND NVL (RECPCOLLECTIONMAST.RCC_CANCEL, 'N') = 'N'
                 HAVING SUM (NVL (recpcollectiondetl.RCN_DISPUT, 0)) > 0
@@ -3040,18 +3042,16 @@ const getWriteoffamnt = async (conn_ora, bind) => {
                 SELECT SUM (NVL (recpcollectiondetl.RCN_DISPUT, 0)) * -1 AS writeoffamt
                 FROM Recpcollectionmast, recpcollectiondetl
                 WHERE RECPCOLLECTIONDETL.RCC_SLNO = RECPCOLLECTIONMAST.RCC_SLNO
-                    AND Recpcollectionmast.Rfd_Date >=
-                            TO_DATE ('01-12-2025 00:00:00', 'dd/MM/yyyy hh24:mi:ss')
-                    AND Recpcollectionmast.Rfd_Date <=
-                            TO_DATE ('01-12-2025 23:59:59', 'dd/MM/yyyy hh24:mi:ss')
+                    AND Recpcollectionmast.Rfd_Date >=TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                    AND Recpcollectionmast.Rfd_Date <=TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND RECPCOLLECTIONMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                     AND NVL (RECPCOLLECTIONMAST.Rcc_Cancel, 'N') = 'N'
                 HAVING SUM (NVL (recpcollectiondetl.RCN_DISPUT, 0)) > 0`;
   const result = await conn_ora.execute(
     sql,
     {
-      from: bind.from,
-      to: bind.to,
+      fromDate: bind.from,
+      toDate: bind.to,
     },
     {outFormat: oracledb.OUT_FORMAT_OBJECT},
   );
@@ -3066,17 +3066,17 @@ const getDiscount_three = async (conn_ora, bind) => {
                     AND Ipreceipt.Dmc_Type IN ('C', 'R')
                     AND Disbillmast.Dmc_Cacr <> 'M'
                     AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
-                    AND Disbillmast.Dmd_Date >= :from
-                    AND Disbillmast.Dmd_Date <= :to
-                    AND Ipreceipt.Ird_date >= :from
-                    AND Ipreceipt.Ird_date <= :to
+                    AND Disbillmast.Dmd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                    AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                    AND Ipreceipt.Ird_date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                    AND Ipreceipt.Ird_date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                     AND NVL (irn_discount, 0) > 0`;
   const result = await conn_ora.execute(
     sql,
     {
-      from: bind.from,
-      to: bind.to,
+      fromDate: bind.from,
+      toDate: bind.to,
     },
     {outFormat: oracledb.OUT_FORMAT_OBJECT},
   );
@@ -3108,8 +3108,8 @@ const getTypeDiscount = async (conn_ora, bind) => {
                    AND Patient.Pt_Code = Pattype.Pt_Code(+)
                    AND NVL (Receiptmast.Rpc_Cancel, 'N') = 'N'
                    AND Receiptmast.Rpc_Cacr IN ('C', 'R')
-                   AND Receiptmast.Rpd_Date >= :from')
-                   AND Receiptmast.Rpd_Date <= :to')
+                   AND Receiptmast.Rpd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Receiptmast.Rpd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                    AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
           GROUP BY Receiptmast.Rpc_Slno,
                    Receiptmast.Rp_No,
@@ -3143,8 +3143,8 @@ const getTypeDiscount = async (conn_ora, bind) => {
                    AND Patient.Pt_Code = Pattype.Pt_Code
                    AND NVL (Receiptmast.Rpc_Cancel, 'N') = 'N'
                    AND Receiptmast.Rpc_Cacr IN ('C', 'R')
-                   AND Receiptmast.RPD_COLLDATE >= :from
-                   AND Receiptmast.RPD_COLLDATE <= :to
+                   AND Receiptmast.RPD_COLLDATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Receiptmast.RPD_COLLDATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                    AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
           GROUP BY Receiptmast.Rpc_Slno,
                    Receiptmast.Rp_No,
@@ -3219,8 +3219,8 @@ const getTypeDiscount = async (conn_ora, bind) => {
                                                          ('C', 'R')
                                                   AND Receiptmast.Rpc_Cacr IN
                                                          ('C', 'R')
-                                                  AND Refundreceiptmast.Rfd_Date >= :from
-                                                  AND Refundreceiptmast.Rfd_Date <= :to
+                                                  AND Refundreceiptmast.Rfd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                                                  AND Refundreceiptmast.Rfd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                                                   AND REFUNDRECEIPTMAST.MH_CODE IN
                                                          (SELECT MH_CODE
                                                             FROM multihospital)
@@ -3263,8 +3263,8 @@ const getTypeDiscount = async (conn_ora, bind) => {
                    AND NVL (Refundreceiptmast.Rfc_Cancel, 'N') = 'N'
                    AND Refundreceiptmast.Rfc_Cacr IN ('C', 'R')
                    AND Receiptmast.Rpc_Cacr IN ('C', 'R')
-                   AND Refundreceiptmast.RFD_RETDATE >= :from
-                   AND Refundreceiptmast.RFD_RETDATE <= :to
+                   AND Refundreceiptmast.RFD_RETDATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Refundreceiptmast.RFD_RETDATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                    AND REFUNDRECEIPTMAST.MH_CODE IN
                           (SELECT MH_CODE FROM multihospital)
           GROUP BY Refundreceiptmast.Rfc_Slno,
@@ -3322,8 +3322,8 @@ const getTypeDiscount = async (conn_ora, bind) => {
                                                        Pattype.Pt_Code
                                                 AND Opbillmast.Pt_No =
                                                        Patient.Pt_No
-                                                AND Opbillmast.Opd_Date >= :from
-                                                AND Opbillmast.Opd_Date <= :to
+                                                AND Opbillmast.Opd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                                                AND Opbillmast.Opd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                                                 AND OPBILLMAST.MH_CODE IN
                                                        (SELECT MH_CODE
                                                           FROM multihospital)
@@ -3362,8 +3362,8 @@ const getTypeDiscount = async (conn_ora, bind) => {
                    AND Patsurdetl.Da_Code = Discountauthority.Da_Code(+)
                    AND Patient.Pt_Code = Pattype.Pt_Code
                    AND Opbillmast.Pt_No = Patient.Pt_No
-                   AND Opbillmast.Opd_Date >= :from
-                   AND Opbillmast.Opd_Date <= :to
+                   AND Opbillmast.Opd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Opbillmast.Opd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                    AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
           GROUP BY Opbillmast.Opc_Slno,
                    Opbillmast.Op_No,
@@ -3400,8 +3400,8 @@ const getTypeDiscount = async (conn_ora, bind) => {
                    AND Patsurother.Da_Code = Discountauthority.Da_Code(+)
                    AND Patient.Pt_Code = Pattype.Pt_Code
                    AND Opbillmast.Pt_No = Patient.Pt_No
-                   AND Opbillmast.Opd_Date >= :from
-                   AND Opbillmast.Opd_Date <= :to
+                   AND Opbillmast.Opd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Opbillmast.Opd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                    AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
           GROUP BY Opbillmast.Opc_Slno,
                    Opbillmast.Op_No,
@@ -3441,8 +3441,8 @@ const getTypeDiscount = async (conn_ora, bind) => {
                    AND Receiptmast.Rpc_Cacr IN ('O')
                    AND NVL (Receiptmast.Rpc_Cancel, 'N') = 'N'
                    AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
-                   AND Opbillmast.Opd_Date >= :from
-                   AND Opbillmast.Opd_Date <= :to
+                   AND Opbillmast.Opd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Opbillmast.Opd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                    AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
           GROUP BY Opbillmast.Opc_Slno,
                    Opbillmast.Op_No,
@@ -3485,8 +3485,8 @@ const getTypeDiscount = async (conn_ora, bind) => {
                    AND NVL (Refundreceiptmast.Rfc_Cancel, 'N') = 'N'
                    AND NVL (Receiptmast.Rpc_Cancel, 'N') = 'N'
                    AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
-                   AND Opbillmast.Opd_Date >= :from
-                   AND Opbillmast.Opd_Date <= :to
+                   AND Opbillmast.Opd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Opbillmast.Opd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                    AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
           GROUP BY Opbillmast.Opc_Slno,
                    Opbillmast.Op_No,
@@ -3522,8 +3522,8 @@ const getTypeDiscount = async (conn_ora, bind) => {
                    AND Billmast.Bmc_Cacr IN ('O')
                    AND NVL (Billmast.Bmc_Cancel, 'N') = 'N'
                    AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
-                   AND Opbillmast.Opd_Date >= :from
-                   AND Opbillmast.Opd_Date <= :to
+                   AND Opbillmast.Opd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Opbillmast.Opd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                    AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
           GROUP BY Opbillmast.Opc_Slno,
                    Opbillmast.Op_No,
@@ -3570,8 +3570,8 @@ const getTypeDiscount = async (conn_ora, bind) => {
                    AND NVL (Refundbillmast.Rfc_Cancel, 'N') = 'N'
                    AND NVL (Billmast.Bmc_Cancel, 'N') = 'N'
                    AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
-                   AND Opbillmast.Opd_Date >= :from
-                   AND Opbillmast.Opd_Date <= :to
+                   AND Opbillmast.Opd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Opbillmast.Opd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                    AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
           GROUP BY Opbillmast.Opc_Slno,
                    Opbillmast.Op_No,
@@ -3656,8 +3656,8 @@ const getTypeDiscount = async (conn_ora, bind) => {
                                                                                        'N'
                                                                                 AND Opbillmast.Opc_Cacr <>
                                                                                        'M'
-                                                                                AND Opbillmast.Opd_Date >= :from
-                                                                                AND Opbillmast.Opd_Date <= :to
+                                                                                AND Opbillmast.Opd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                                                                                AND Opbillmast.Opd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                                                                                 AND OPBILLMAST.MH_CODE IN
                                                                                        (SELECT MH_CODE
                                                                                           FROM multihospital)
@@ -3702,8 +3702,8 @@ const getTypeDiscount = async (conn_ora, bind) => {
                    AND Pbillmast.Bmc_Cacr IN ('O')
                    AND NVL (Pbillmast.Bmc_Cancel, 'N') = 'N'
                    AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
-                   AND Opbillmast.Opd_Date >= :from
-                   AND Opbillmast.Opd_Date <= :to
+                   AND Opbillmast.Opd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Opbillmast.Opd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                    AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
           GROUP BY Opbillmast.Opc_Slno,
                    Opbillmast.Op_No,
@@ -3762,8 +3762,8 @@ const getTypeDiscount = async (conn_ora, bind) => {
                            AND Mretmast.Mrc_Cacr IN ('O')
                            AND NVL (Mretmast.Mrc_Cancel, 'N') = 'N'
                            AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
-                           AND Opbillmast.Opd_Date >= :from
-                           AND Opbillmast.Opd_Date <= :to
+                           AND Opbillmast.Opd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                           AND Opbillmast.Opd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                            AND OPBILLMAST.MH_CODE IN
                                   (SELECT MH_CODE FROM multihospital)) A
           GROUP BY A.Slno,
@@ -3826,8 +3826,8 @@ const getTypeDiscount = async (conn_ora, bind) => {
                                           AND NVL (
                                                  Refundreceiptmast.Rfc_Cancel,
                                                  'N') = 'N'
-                                          AND Opbillrefundmast.Rod_Date >= :from
-                                          AND Opbillrefundmast.Rod_Date <= :to
+                                          AND Opbillrefundmast.Rod_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                                          AND Opbillrefundmast.Rod_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                                           AND OPBILLREFUNDMAST.MH_CODE IN
                                                  (SELECT MH_CODE
                                                     FROM multihospital)
@@ -3870,8 +3870,8 @@ const getTypeDiscount = async (conn_ora, bind) => {
                    AND NVL (Refundbillmast.Rfc_Cancel, 'N') = 'N'
                    AND NVL (Billdetl.Bmc_Cancel, 'N') = 'N'
                    AND NVL (Opbillrefundmast.Roc_Cancel, 'N') = 'N'
-                   AND Opbillrefundmast.Rod_Date >= :from
-                   AND Opbillrefundmast.Rod_Date <= :to
+                   AND Opbillrefundmast.Rod_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Opbillrefundmast.Rod_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                    AND OPBILLREFUNDMAST.MH_CODE IN
                           (SELECT MH_CODE FROM multihospital)
           GROUP BY Opbillrefundmast.Roc_Slno,
@@ -3919,8 +3919,8 @@ const getTypeDiscount = async (conn_ora, bind) => {
                                                'N'
                                         AND NVL (Patservice.Svc_Cancel, 'N') =
                                                'N'
-                                        AND Disbillmast.Dmd_Date >= :from
-                                        AND Disbillmast.Dmd_Date <= :to
+                                        AND Disbillmast.Dmd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                                        AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN
                                                (SELECT MH_CODE
                                                   FROM multihospital)
@@ -3963,8 +3963,8 @@ const getTypeDiscount = async (conn_ora, bind) => {
                    AND Disbillmast.Pt_No = Patient.Pt_No
                    AND Patient.Pt_Code = Pattype.Pt_Code
                    AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
-                   AND Disbillmast.Dmd_Date >= :from
-                   AND Disbillmast.Dmd_Date <= :to
+                   AND Disbillmast.Dmd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                    AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
           GROUP BY Disbillmast.Dmc_Slno,
                    Disbillmast.Dm_No,
@@ -4006,8 +4006,8 @@ const getTypeDiscount = async (conn_ora, bind) => {
                    AND Patient.Pt_Code = Pattype.Pt_Code
                    AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                    AND NVL (PATVISIT.VSC_CANCEL, 'N') = 'N'
-                   AND Disbillmast.Dmd_Date >= :from
-                   AND Disbillmast.Dmd_Date <= :to
+                   AND Disbillmast.Dmd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                    AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
           GROUP BY Disbillmast.Dmc_Slno,
                    Disbillmast.Dm_No,
@@ -4053,8 +4053,8 @@ const getTypeDiscount = async (conn_ora, bind) => {
                    AND Patient.Pt_Code = Pattype.Pt_Code
                    AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                    AND NVL (Patsurgery.Src_Cancel, 'N') = 'N'
-                   AND Disbillmast.Dmd_Date >= :from
-                   AND Disbillmast.Dmd_Date <= :to
+                   AND Disbillmast.Dmd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                    AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
           GROUP BY Disbillmast.Dmc_Slno,
                    Disbillmast.Dm_No,
@@ -4098,8 +4098,8 @@ const getTypeDiscount = async (conn_ora, bind) => {
                    AND Patient.Pt_Code = Pattype.Pt_Code
                    AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                    AND NVL (Patsurgery.Src_Cancel, 'N') = 'N'
-                   AND Disbillmast.Dmd_Date >= :from
-                   AND Disbillmast.Dmd_Date <= :to
+                   AND Disbillmast.Dmd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                    AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
           GROUP BY Disbillmast.Dmc_Slno,
                    Disbillmast.Dm_No,
@@ -4143,8 +4143,8 @@ const getTypeDiscount = async (conn_ora, bind) => {
                    AND Patient.Pt_Code = Pattype.Pt_Code
                    AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                    AND NVL (Patsurgery.Src_Cancel, 'N') = 'N'
-                   AND Disbillmast.Dmd_Date >= :from
-                   AND Disbillmast.Dmd_Date <= :to
+                   AND Disbillmast.Dmd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                    AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
           GROUP BY Disbillmast.Dmc_Slno,
                    Disbillmast.Dm_No,
@@ -4189,8 +4189,8 @@ const getTypeDiscount = async (conn_ora, bind) => {
                    AND Billmast.Bmc_Cacr IN ('I')
                    AND NVL (Billdetl.Bmc_Cancel, 'N') = 'N'
                    AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
-                   AND Disbillmast.Dmd_Date >= :from
-                   AND Disbillmast.Dmd_Date <= :to
+                   AND Disbillmast.Dmd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                    AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
           GROUP BY Disbillmast.Dmc_Slno,
                    Disbillmast.Dm_No,
@@ -4233,8 +4233,8 @@ const getTypeDiscount = async (conn_ora, bind) => {
                    AND NVL (Refundbillmast.Rfc_Cancel, 'N') = 'N'
                    AND NVL (Billdetl.Bmc_Cancel, 'N') = 'N'
                    AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
-                   AND Disbillmast.Dmd_Date >= :from
-                   AND Disbillmast.Dmd_Date <= :to
+                   AND Disbillmast.Dmd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                    AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
           GROUP BY Disbillmast.Dmc_Slno,
                    Disbillmast.Dm_No,
@@ -4276,8 +4276,8 @@ const getTypeDiscount = async (conn_ora, bind) => {
                    AND Disbillmast.Pt_No = Patient.Pt_No
                    AND Pbillmast.Bmc_Cacr IN ('I')
                    AND NVL (Pbillmast.Bmc_Cancel, 'N') = 'N'
-                   AND Disbillmast.Dmd_Date >= :from
-                   AND Disbillmast.Dmd_Date <= :to
+                   AND Disbillmast.Dmd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                    AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
           GROUP BY Disbillmast.Dmc_Slno,
                    Disbillmast.Dm_No,
@@ -4332,8 +4332,8 @@ const getTypeDiscount = async (conn_ora, bind) => {
                            AND Mretmast.Mrc_Cacr IN ('I')
                            AND NVL (Mretmast.Mrc_Cancel, 'N') = 'N'
                            AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
-                           AND Disbillmast.Dmd_Date >= :from
-                           AND Disbillmast.Dmd_Date <= :to
+                           AND Disbillmast.Dmd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                           AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                            AND DISBILLMAST.MH_CODE IN
                                   (SELECT MH_CODE FROM multihospital)) A
           GROUP BY A.Slno,
@@ -4383,8 +4383,8 @@ const getTypeDiscount = async (conn_ora, bind) => {
                                                'N'
                                         AND NVL (Iprefunditemdetl.Ric_Cancel,
                                                  'N') = 'N'
-                                        AND Iprefundmast.Rid_Date >= :from
-                                        AND Iprefundmast.Rid_Date <= :to
+                                        AND Iprefundmast.Rid_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                                        AND Iprefundmast.Rid_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                                         AND IPREFUNDMAST.MH_CODE IN
                                                (SELECT MH_CODE
                                                   FROM multihospital)
@@ -4423,8 +4423,8 @@ const getTypeDiscount = async (conn_ora, bind) => {
                    AND Patient.Pt_Code = Pattype.Pt_Code
                    AND NVL (Iprefundmast.Ric_Cancel, 'N') = 'N'
                    AND NVL (Iprefunditemdetl.Ric_Cancel, 'N') = 'N'
-                   AND Iprefundmast.Rid_Date >= :from
-                   AND Iprefundmast.Rid_Date <= :to
+                   AND Iprefundmast.Rid_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Iprefundmast.Rid_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                    AND IPREFUNDMAST.MH_CODE IN
                           (SELECT MH_CODE FROM multihospital)
           GROUP BY Iprefundmast.Ric_Slno,
@@ -4464,8 +4464,8 @@ const getTypeDiscount = async (conn_ora, bind) => {
                    AND Patient.Pt_Code = Pattype.Pt_Code
                    AND NVL (Iprefundmast.Ric_Cancel, 'N') = 'N'
                    AND NVL (Iprefunditemdetl.Ric_Cancel, 'N') = 'N'
-                   AND Iprefundmast.Rid_Date >= :from
-                   AND Iprefundmast.Rid_Date <= :to
+                   AND Iprefundmast.Rid_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Iprefundmast.Rid_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                    AND IPREFUNDMAST.MH_CODE IN
                           (SELECT MH_CODE FROM multihospital)
           GROUP BY Iprefundmast.Ric_Slno,
@@ -4505,8 +4505,8 @@ const getTypeDiscount = async (conn_ora, bind) => {
                    AND Patient.Pt_Code = Pattype.Pt_Code
                    AND NVL (Iprefundmast.Ric_Cancel, 'N') = 'N'
                    AND NVL (Iprefunditemdetl.Ric_Cancel, 'N') = 'N'
-                   AND Iprefundmast.Rid_Date >= :from
-                   AND Iprefundmast.Rid_Date <= :to
+                   AND Iprefundmast.Rid_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Iprefundmast.Rid_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                    AND IPREFUNDMAST.MH_CODE IN
                           (SELECT MH_CODE FROM multihospital)
           GROUP BY Iprefundmast.Ric_Slno,
@@ -4544,8 +4544,8 @@ const getTypeDiscount = async (conn_ora, bind) => {
                    AND Patient.Pt_Code = Pattype.Pt_Code
                    AND NVL (Iprefundmast.Ric_Cancel, 'N') = 'N'
                    AND NVL (Iprefunditemdetl.Ric_Cancel, 'N') = 'N'
-                   AND Iprefundmast.Rid_Date >= :from
-                   AND Iprefundmast.Rid_Date <= :to
+                   AND Iprefundmast.Rid_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Iprefundmast.Rid_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                    AND IPREFUNDMAST.MH_CODE IN
                           (SELECT MH_CODE FROM multihospital)
           GROUP BY Iprefundmast.Ric_Slno,
@@ -4582,8 +4582,8 @@ const getTypeDiscount = async (conn_ora, bind) => {
                    AND Patient.Pt_Code = Pattype.Pt_Code
                    AND NVL (Iprefundmast.Ric_Cancel, 'N') = 'N'
                    AND NVL (Iprefunditemdetl.Ric_Cancel, 'N') = 'N'
-                   AND Iprefundmast.Rid_Date >= :from
-                   AND Iprefundmast.Rid_Date <= :to
+                   AND Iprefundmast.Rid_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Iprefundmast.Rid_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                    AND IPREFUNDMAST.MH_CODE IN
                           (SELECT MH_CODE FROM multihospital)
           GROUP BY Iprefundmast.Ric_Slno,
@@ -4616,8 +4616,8 @@ const getTypeDiscount = async (conn_ora, bind) => {
                                     AND Patient.Pt_Code = Pattype.Pt_Code
                                     AND NVL (Ipreceipt.Irc_Cancel, 'N') = 'N'
                                     AND NVL (Ipreceipt.Irn_Discount, 0) <> 0
-                                    AND Ipreceipt.Ird_Date >= :from
-                                    AND Ipreceipt.Ird_Date <= :to
+                                    AND Ipreceipt.Ird_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                                    AND Ipreceipt.Ird_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                                     AND ipreceipt.IPC_MHCODE IN
                                            (SELECT MH_CODE FROM multihospital)
           UNION ALL /*--Billing Direct--   corrected by basil for centralized collection*/
@@ -4688,8 +4688,8 @@ const getTypeDiscount = async (conn_ora, bind) => {
                                                                                                'N'
                                                                                         AND billmast.BMC_COLLCNCODE
                                                                                                IS NULL
-                                                                                        AND Billmast.Bmd_Date >= :from
-                                                                                        AND Billmast.Bmd_Date <= :to
+                                                                                        AND Billmast.Bmd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                                                                                        AND Billmast.Bmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                                                                                         AND billmast.mh_code IN
                                                                                                (SELECT MH_CODE
                                                                                                   FROM multihospital)
@@ -4773,8 +4773,8 @@ const getTypeDiscount = async (conn_ora, bind) => {
                                                                                              'N'
                                                                                       AND billmast.BMC_COLLCNCODE
                                                                                              IS NOT NULL
-                                                                                      AND Billmast.BMD_COLLDATE >= :from
-                                                                                      AND Billmast.BMD_COLLDATE <= :to
+                                                                                      AND Billmast.BMD_COLLDATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                                                                                      AND Billmast.BMD_COLLDATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                                                                                       AND billmast.mh_code IN
                                                                                              (SELECT MH_CODE
                                                                                                 FROM multihospital)
@@ -4865,8 +4865,8 @@ const getTypeDiscount = async (conn_ora, bind) => {
                                                                                                      'N'
                                                                                               AND Refundbillmast.RFC_RETCNCODE
                                                                                                      IS NULL
-                                                                                              AND Refundbillmast.Rfd_Date >= :from
-                                                                                              AND Refundbillmast.Rfd_Date <= :to
+                                                                                              AND Refundbillmast.Rfd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                                                                                              AND Refundbillmast.Rfd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                                                                                               AND refundbillmast.MH_CODE IN
                                                                                                      (SELECT MH_CODE
                                                                                                         FROM multihospital)
@@ -4957,8 +4957,8 @@ const getTypeDiscount = async (conn_ora, bind) => {
                                                                                                     'N'
                                                                                              AND Refundbillmast.RFC_RETCNCODE
                                                                                                     IS NOT NULL
-                                                                                             AND Refundbillmast.RFD_RETDATE >= :from
-                                                                                             AND Refundbillmast.RFD_RETDATE <= :to
+                                                                                             AND Refundbillmast.RFD_RETDATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                                                                                             AND Refundbillmast.RFD_RETDATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                                                                                              AND refundbillmast.MH_CODE IN
                                                                                                     (SELECT MH_CODE
                                                                                                        FROM multihospital)
@@ -5049,8 +5049,8 @@ const getTypeDiscount = async (conn_ora, bind) => {
                                                                                                               0
                                                                                                        AND pbillmast.BMC_COLLCNCODE
                                                                                                               IS NULL
-                                                                                                       AND Pbillmast.Bmd_Date >= :from
-                                                                                                       AND Pbillmast.Bmd_Date <= :to
+                                                                                                       AND Pbillmast.Bmd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                                                                                                       AND Pbillmast.Bmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                                                                                                        AND pbillmast.MH_CODE IN
                                                                                                               (SELECT MH_CODE
                                                                                                                  FROM multihospital)
@@ -5130,8 +5130,8 @@ const getTypeDiscount = async (conn_ora, bind) => {
                                                                                                           0
                                                                                                    AND pbillmast.BMC_COLLCNCODE
                                                                                                           IS NOT NULL
-                                                                                                   AND Pbillmast.BMD_COLLDATE >= :from
-                                                                                                   AND Pbillmast.BMD_COLLDATE <= :to
+                                                                                                   AND Pbillmast.BMD_COLLDATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                                                                                                   AND Pbillmast.BMD_COLLDATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                                                                                                    AND pbillmast.MH_CODE IN
                                                                                                           (SELECT MH_CODE
                                                                                                              FROM multihospital)
@@ -5231,8 +5231,8 @@ const getTypeDiscount = async (conn_ora, bind) => {
                                                                                                          'N'
                                                                                                   AND Mretmast.MRC_RETCNCODE
                                                                                                          IS NULL
-                                                                                                  AND Mretmast.Mrd_Date >= :from
-                                                                                                  AND Mretmast.Mrd_Date <= :to
+                                                                                                  AND Mretmast.Mrd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                                                                                                  AND Mretmast.Mrd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                                                                                                   AND MRETMAST.MH_CODE IN
                                                                                                          (SELECT MH_CODE
                                                                                                             FROM multihospital)
@@ -5320,8 +5320,8 @@ const getTypeDiscount = async (conn_ora, bind) => {
                                                          'N') = 'N'
                                                 AND Mretmast.MRC_RETCNCODE
                                                        IS NOT NULL
-                                                AND Mretmast.MRD_RETDATE >= :from
-                                                AND Mretmast.MRD_RETDATE <= :to
+                                                AND Mretmast.MRD_RETDATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                                                AND Mretmast.MRD_RETDATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                                                 AND MRETMAST.MH_CODE IN
                                                        (SELECT MH_CODE
                                                           FROM multihospital)
@@ -5340,8 +5340,8 @@ ORDER BY 1`;
   const result = await conn_ora.execute(
     sql,
     {
-      from: bind.from,
-      to: bind.to,
+      fromDate: bind.from,
+      toDate: bind.to,
     },
     {outFormat: oracledb.OUT_FORMAT_OBJECT},
   );
@@ -5392,4 +5392,5 @@ module.exports = {
   getAdvanceRefund,
   getWriteoffamnt,
   getTypeDiscount,
+  getPerttyCash,
 };

@@ -130,6 +130,12 @@ const getMisReportsQMT = require("./api/Reports/misReport/misReportQMT/misReport
 const getMisReportsTMCH = require("./api/Reports/misReportTmch/misReportTMCH/misReportTMCH.route");
 const getMisReportsTSSH = require("./api/Reports/misReportTssh/misReportTssh/misReportTSSH.route");
 
+// *  LATEST VERSION  V-5.1.0  -- NEW REPORT API FROM -> APRIL - 2026
+
+const getQMT = require("./api/Reports/hospitalIncomeReports/qmt/qmt.route");
+// const getTMCH = require("./api/Reports/misReportTmch/misReportTMCH/misReportTMCH.route");
+// const getTSSH = require("./api/Reports/misReportTssh/misReportTssh/misReportTSSH.route");
+
 app.use(express.json());
 
 app.use((req, res, next) => {
@@ -227,11 +233,17 @@ app.use("/api/storeReport", storeReport);
  *  LATEST VERSION  V-5.0.1
  */
 
-//GET MIS REPORTS QMT
+//GET MIS REPORTS QMT --
 
 app.use("/api/getMisReportsQmt", getMisReportsQMT);
 app.use("/api/getMisReportsTmch", getMisReportsTMCH);
 app.use("/api/getMisReportsTssh", getMisReportsTSSH);
+
+// *  LATEST VERSION  V-5.1.0  -- NEW REPORT API FROM -> APRIL - 2026
+
+app.use("/api/getQmt", getQMT); // <---------- qmt
+// app.use("/api/getTmch", getMisReportsTMCH); // <---------- tmch
+// app.use("/api/getTssh", getMisReportsTSSH); // <---------- tssh
 
 app.listen(process.env.APP_PORT, (val) => {
   console.log(`Server Up and Running ${process.env.APP_PORT}`);
