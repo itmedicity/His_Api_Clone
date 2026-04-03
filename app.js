@@ -133,8 +133,8 @@ const getMisReportsTSSH = require("./api/Reports/misReportTssh/misReportTssh/mis
 // *  LATEST VERSION  V-5.1.0  -- NEW REPORT API FROM -> APRIL - 2026
 
 const getQMT = require("./api/Reports/hospitalIncomeReports/qmt/qmt.route");
-// const getTMCH = require("./api/Reports/misReportTmch/misReportTMCH/misReportTMCH.route");
-// const getTSSH = require("./api/Reports/misReportTssh/misReportTssh/misReportTSSH.route");
+const getTMCH = require("./api/Reports/hospitalIncomeReports/tmch/tmch.route");
+const getTSSH = require("./api/Reports/hospitalIncomeReports/tssh/tssh.route");
 
 app.use(express.json());
 
@@ -242,8 +242,8 @@ app.use("/api/getMisReportsTssh", getMisReportsTSSH);
 // *  LATEST VERSION  V-5.1.0  -- NEW REPORT API FROM -> APRIL - 2026
 
 app.use("/api/getQmt", getQMT); // <---------- qmt
-// app.use("/api/getTmch", getMisReportsTMCH); // <---------- tmch
-// app.use("/api/getTssh", getMisReportsTSSH); // <---------- tssh
+app.use("/api/getTmch", getTMCH); // <---------- tmch
+app.use("/api/getTssh", getTSSH); // <---------- tssh
 
 app.listen(process.env.APP_PORT, (val) => {
   console.log(`Server Up and Running ${process.env.APP_PORT}`);
