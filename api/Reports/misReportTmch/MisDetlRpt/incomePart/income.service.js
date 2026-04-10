@@ -1,19 +1,15 @@
 // @ts-nocheck
-const { oracledb, connectionClose, oraConnection } = require('../../../../../config/oradbconfig');
+const {oracledb, getTmcConnection} = require("../../../../../config/oradbconfig");
 
 module.exports = {
+  // BED INCOME
+  bedIncome: async (data) => {
+    let conn_ora = await getTmcConnection();
+    const ipNumberList = data?.ptno?.join(",");
+    const fromDate = data.from;
+    const toDate = data.to;
 
-        // BED INCOME 
-        bedIncome: async (data, callBack) => {
-
-                let pool_ora = await oraConnection();
-                let conn_ora = await pool_ora.getConnection();
-
-                const ipNumberList = data?.ptno?.join(',');
-                const fromDate = data.from;
-                const toDate = data.to;
-
-                const sql = `SELECT INITCAP(Pcc_Desc) Pcc_Desc,
+    const sql = `SELECT INITCAP(Pcc_Desc) Pcc_Desc,
                                         Code,
                                         SUM(Amt) Amt,
                                         SUM(Taxamt) Taxamt
@@ -1392,35 +1388,25 @@ module.exports = {
                                 GROUP BY Code, Pcc_Desc
                                 HAVING SUM(Amt) <> 0
                                 ORDER BY Pcc_Desc`;
-                try {
-                        const result = await conn_ora.execute(
-                                sql,
-                                {},
-                                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-                        )
-                        await result.resultSet?.getRows((err, rows) => {
-                                callBack(err, rows)
-                        })
+    try {
+      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      //       callBack(null, );
+      return result.rows;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    } finally {
+      if (conn_ora) await conn_ora.close();
+    }
+  },
+  nsIncome: async (data) => {
+    let conn_ora = await getTmcConnection();
 
-                } catch (error) {
-                        console.log(error)
-                } finally {
-                        if (conn_ora) {
-                                await conn_ora.close();
-                                await pool_ora.close();
-                        }
-                }
-        },
-        nsIncome: async (data, callBack) => {
+    const ipNumberList = data.ptno.join(",");
+    const fromDate = data.from;
+    const toDate = data.to;
 
-                let pool_ora = await oraConnection();
-                let conn_ora = await pool_ora.getConnection();
-
-                const ipNumberList = data.ptno.join(',');
-                const fromDate = data.from;
-                const toDate = data.to;
-
-                const sql = `SELECT INITCAP (Pcc_Desc) Pcc_Desc,
+    const sql = `SELECT INITCAP (Pcc_Desc) Pcc_Desc,
                                         Code,
                                         SUM (Amt) Amt,
                                         SUM (Taxamt) Taxamt
@@ -2752,35 +2738,25 @@ module.exports = {
                                 GROUP BY Code, Pcc_Desc
                                 HAVING SUM (Amt) <> 0
                                 ORDER BY Pcc_Desc`;
-                try {
-                        const result = await conn_ora.execute(
-                                sql,
-                                {},
-                                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-                        )
-                        await result.resultSet?.getRows((err, rows) => {
-                                callBack(err, rows)
-                        })
+    try {
+      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      //       callBack(null, );
+      return result.rows;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    } finally {
+      if (conn_ora) await conn_ora.close();
+    }
+  },
+  roomRentIncome: async (data) => {
+    let conn_ora = await getTmcConnection();
 
-                } catch (error) {
-                        console.log(error)
-                } finally {
-                        if (conn_ora) {
-                                await conn_ora.close();
-                                await pool_ora.close();
-                        }
-                }
-        },
-        roomRentIncome: async (data, callBack) => {
+    const ipNumberList = data.ptno.join(",");
+    const fromDate = data.from;
+    const toDate = data.to;
 
-                let pool_ora = await oraConnection();
-                let conn_ora = await pool_ora.getConnection();
-
-                const ipNumberList = data.ptno.join(',');
-                const fromDate = data.from;
-                const toDate = data.to;
-
-                const sql = `SELECT INITCAP (Pcc_Desc) Pcc_Desc,
+    const sql = `SELECT INITCAP (Pcc_Desc) Pcc_Desc,
                                         Code,
                                         SUM (Amt) Amt,
                                         SUM (Taxamt) Taxamt
@@ -4163,35 +4139,25 @@ module.exports = {
                                 HAVING SUM (Amt) <> 0
                                 ORDER BY Pcc_Desc`;
 
-                try {
-                        const result = await conn_ora.execute(
-                                sql,
-                                {},
-                                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-                        )
-                        await result.resultSet?.getRows((err, rows) => {
-                                callBack(err, rows)
-                        })
+    try {
+      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      //       callBack(null, );
+      return result.rows;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    } finally {
+      if (conn_ora) await conn_ora.close();
+    }
+  },
+  otherIncome: async (data) => {
+    let conn_ora = await getTmcConnection();
 
-                } catch (error) {
-                        console.log(error)
-                } finally {
-                        if (conn_ora) {
-                                await conn_ora.close();
-                                await pool_ora.close();
-                        }
-                }
-        },
-        otherIncome: async (data, callBack) => {
+    const ipNumberList = data.ptno.join(",");
+    const fromDate = data.from;
+    const toDate = data.to;
 
-                let pool_ora = await oraConnection();
-                let conn_ora = await pool_ora.getConnection();
-
-                const ipNumberList = data.ptno.join(',');
-                const fromDate = data.from;
-                const toDate = data.to;
-
-                const sql = `SELECT INITCAP (Pcc_Desc) Pcc_Desc,
+    const sql = `SELECT INITCAP (Pcc_Desc) Pcc_Desc,
                                         Code,
                                         SUM (Amt) Amt,
                                         SUM (Taxamt) Taxamt
@@ -5566,35 +5532,25 @@ module.exports = {
                                 HAVING SUM (Amt) <> 0
                                 ORDER BY Pcc_Desc`;
 
-                try {
-                        const result = await conn_ora.execute(
-                                sql,
-                                {},
-                                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-                        )
-                        await result.resultSet?.getRows((err, rows) => {
-                                callBack(err, rows)
-                        })
+    try {
+      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      //       callBack(null, );
+      return result.rows;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    } finally {
+      if (conn_ora) await conn_ora.close();
+    }
+  },
+  consultingIncome: async (data) => {
+    let conn_ora = await getTmcConnection();
 
-                } catch (error) {
-                        console.log(error)
-                } finally {
-                        if (conn_ora) {
-                                await conn_ora.close();
-                                await pool_ora.close();
-                        }
-                }
-        },
-        consultingIncome: async (data, callBack) => {
+    const ipNumberList = data.ptno.join(",");
+    const fromDate = data.from;
+    const toDate = data.to;
 
-                let pool_ora = await oraConnection();
-                let conn_ora = await pool_ora.getConnection();
-
-                const ipNumberList = data.ptno.join(',');
-                const fromDate = data.from;
-                const toDate = data.to;
-
-                const sql = `SELECT INITCAP (Pcc_Desc) Pcc_Desc,
+    const sql = `SELECT INITCAP (Pcc_Desc) Pcc_Desc,
                                         Code,
                                         SUM (Amt) Amt,
                                         SUM (Taxamt) Taxamt
@@ -6973,35 +6929,25 @@ module.exports = {
                                 GROUP BY Code, Pcc_Desc
                                 HAVING SUM (Amt) <> 0
                                 ORDER BY Pcc_Desc`;
-                try {
-                        const result = await conn_ora.execute(
-                                sql,
-                                {},
-                                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-                        )
-                        await result.resultSet?.getRows((err, rows) => {
-                                callBack(err, rows)
-                        })
+    try {
+      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      //       callBack(null, );
+      return result.rows;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    } finally {
+      if (conn_ora) await conn_ora.close();
+    }
+  },
+  anesthetiaIncome: async (data) => {
+    let conn_ora = await getTmcConnection();
 
-                } catch (error) {
-                        console.log(error)
-                } finally {
-                        if (conn_ora) {
-                                await conn_ora.close();
-                                await pool_ora.close();
-                        }
-                }
-        },
-        anesthetiaIncome: async (data, callBack) => {
+    const ipNumberList = data.ptno.join(",");
+    const fromDate = data.from;
+    const toDate = data.to;
 
-                let pool_ora = await oraConnection();
-                let conn_ora = await pool_ora.getConnection();
-
-                const ipNumberList = data.ptno.join(',');
-                const fromDate = data.from;
-                const toDate = data.to;
-
-                const sql = `SELECT INITCAP (Pcc_Desc) Pcc_Desc,
+    const sql = `SELECT INITCAP (Pcc_Desc) Pcc_Desc,
                                         Code,
                                         SUM (Amt) Amt,
                                         SUM (Taxamt) Taxamt
@@ -8380,35 +8326,25 @@ module.exports = {
                                 GROUP BY Code, Pcc_Desc
                                 HAVING SUM (Amt) <> 0
                                 ORDER BY Pcc_Desc`;
-                try {
-                        const result = await conn_ora.execute(
-                                sql,
-                                {},
-                                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-                        )
-                        await result.resultSet?.getRows((err, rows) => {
-                                callBack(err, rows)
-                        })
+    try {
+      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      //       callBack(null, );
+      return result.rows;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    } finally {
+      if (conn_ora) await conn_ora.close();
+    }
+  },
+  surgeonIncome: async (data) => {
+    let conn_ora = await getTmcConnection();
 
-                } catch (error) {
-                        console.log(error)
-                } finally {
-                        if (conn_ora) {
-                                await conn_ora.close();
-                                await pool_ora.close();
-                        }
-                }
-        },
-        surgeonIncome: async (data, callBack) => {
+    const ipNumberList = data.ptno.join(",");
+    const fromDate = data.from;
+    const toDate = data.to;
 
-                let pool_ora = await oraConnection();
-                let conn_ora = await pool_ora.getConnection();
-
-                const ipNumberList = data.ptno.join(',');
-                const fromDate = data.from;
-                const toDate = data.to;
-
-                const sql = `SELECT INITCAP (Pcc_Desc) Pcc_Desc,
+    const sql = `SELECT INITCAP (Pcc_Desc) Pcc_Desc,
                                         Code,
                                         SUM (Amt) Amt,
                                         SUM (Taxamt) Taxamt
@@ -9788,35 +9724,25 @@ module.exports = {
                                 GROUP BY Code, Pcc_Desc
                                 HAVING SUM (Amt) <> 0
                                 ORDER BY Pcc_Desc`;
-                try {
-                        const result = await conn_ora.execute(
-                                sql,
-                                {},
-                                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-                        )
-                        await result.resultSet?.getRows((err, rows) => {
-                                callBack(err, rows)
-                        })
+    try {
+      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      //       callBack(null, );
+      return result.rows;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    } finally {
+      if (conn_ora) await conn_ora.close();
+    }
+  },
+  theaterIncome: async (data) => {
+    let conn_ora = await getTmcConnection();
 
-                } catch (error) {
-                        console.log(error)
-                } finally {
-                        if (conn_ora) {
-                                await conn_ora.close();
-                                await pool_ora.close();
-                        }
-                }
-        },
-        theaterIncome: async (data, callBack) => {
+    const ipNumberList = data.ptno.join(",");
+    const fromDate = data.from;
+    const toDate = data.to;
 
-                let pool_ora = await oraConnection();
-                let conn_ora = await pool_ora.getConnection();
-
-                const ipNumberList = data.ptno.join(',');
-                const fromDate = data.from;
-                const toDate = data.to;
-
-                const sql = `SELECT 
+    const sql = `SELECT 
                                         INITCAP (Pcc_Desc) Pcc_Desc,
                                         Code,
                                         SUM (Amt) Amt,
@@ -11197,35 +11123,25 @@ module.exports = {
                                 HAVING SUM (Amt) <> 0
                                 ORDER BY Pcc_Desc`;
 
-                try {
-                        const result = await conn_ora.execute(
-                                sql,
-                                {},
-                                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-                        )
-                        await result.resultSet?.getRows((err, rows) => {
-                                callBack(err, rows)
-                        })
+    try {
+      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      //       callBack(null, );
+      return result.rows;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    } finally {
+      if (conn_ora) await conn_ora.close();
+    }
+  },
+  cardiologyIncome: async (data) => {
+    let conn_ora = await getTmcConnection();
 
-                } catch (error) {
-                        console.log(error)
-                } finally {
-                        if (conn_ora) {
-                                await conn_ora.close();
-                                await pool_ora.close();
-                        }
-                }
-        },
-        cardiologyIncome: async (data, callBack) => {
+    const ipNumberList = data.ptno.join(",");
+    const fromDate = data.from;
+    const toDate = data.to;
 
-                let pool_ora = await oraConnection();
-                let conn_ora = await pool_ora.getConnection();
-
-                const ipNumberList = data.ptno.join(',');
-                const fromDate = data.from;
-                const toDate = data.to;
-
-                const sql = `SELECT INITCAP (Pcc_Desc) Pcc_Desc,
+    const sql = `SELECT INITCAP (Pcc_Desc) Pcc_Desc,
                                         Code,
                                         SUM (Amt) Amt,
                                         SUM (Taxamt) Taxamt
@@ -12605,37 +12521,26 @@ module.exports = {
                                 HAVING SUM (Amt) <> 0
                                 ORDER BY Pcc_Desc`;
 
+    try {
+      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      //       callBack(null, );
+      return result.rows;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    } finally {
+      if (conn_ora) await conn_ora.close();
+    }
+  },
+  disPosibleItemIncome: async (data) => {
+    let conn_ora = await getTmcConnection();
 
-                try {
-                        const result = await conn_ora.execute(
-                                sql,
-                                {},
-                                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-                        )
-                        await result.resultSet?.getRows((err, rows) => {
-                                callBack(err, rows)
-                        })
+    // const ipNumberList = data.ptno.join(',');
+    const ipNumberList = data.ptno.join(",");
+    const fromDate = data.from;
+    const toDate = data.to;
 
-                } catch (error) {
-                        console.log(error)
-                } finally {
-                        if (conn_ora) {
-                                await conn_ora.close();
-                                await pool_ora.close();
-                        }
-                }
-        },
-        disPosibleItemIncome: async (data, callBack) => {
-
-                let pool_ora = await oraConnection();
-                let conn_ora = await pool_ora.getConnection();
-
-                // const ipNumberList = data.ptno.join(',');
-                const ipNumberList = data.ptno.join(',');
-                const fromDate = data.from;
-                const toDate = data.to;
-
-                const sql = `SELECT INITCAP (Pcc_Desc) Pcc_Desc,
+    const sql = `SELECT INITCAP (Pcc_Desc) Pcc_Desc,
                                         Code,
                                         SUM (Amt) Amt,
                                         SUM (Taxamt) Taxamt
@@ -14016,35 +13921,25 @@ module.exports = {
                                 HAVING SUM (Amt) <> 0
                                 ORDER BY Pcc_Desc`;
 
-                try {
-                        const result = await conn_ora.execute(
-                                sql,
-                                {},
-                                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-                        )
-                        await result.resultSet?.getRows((err, rows) => {
-                                callBack(err, rows)
-                        })
+    try {
+      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      //       callBack(null, );
+      return result.rows;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    } finally {
+      if (conn_ora) await conn_ora.close();
+    }
+  },
+  icuIncome: async (data) => {
+    let conn_ora = await getTmcConnection();
 
-                } catch (error) {
-                        console.log(error)
-                } finally {
-                        if (conn_ora) {
-                                await conn_ora.close();
-                                await pool_ora.close();
-                        }
-                }
-        },
-        icuIncome: async (data, callBack) => {
+    const ipNumberList = data.ptno.join(",");
+    const fromDate = data.from;
+    const toDate = data.to;
 
-                let pool_ora = await oraConnection();
-                let conn_ora = await pool_ora.getConnection();
-
-                const ipNumberList = data.ptno.join(',');
-                const fromDate = data.from;
-                const toDate = data.to;
-
-                const sql = `SELECT INITCAP (Pcc_Desc) Pcc_Desc,
+    const sql = `SELECT INITCAP (Pcc_Desc) Pcc_Desc,
                                         Code,
                                         SUM (Amt) Amt,
                                         SUM (Taxamt) Taxamt
@@ -15423,35 +15318,25 @@ module.exports = {
                                 GROUP BY Code, Pcc_Desc
                                 HAVING SUM (Amt) <> 0
                                 ORDER BY Pcc_Desc`;
-                try {
-                        const result = await conn_ora.execute(
-                                sql,
-                                {},
-                                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-                        )
-                        await result.resultSet?.getRows((err, rows) => {
-                                callBack(err, rows)
-                        })
+    try {
+      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      //       callBack(null, );
+      return result.rows;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    } finally {
+      if (conn_ora) await conn_ora.close();
+    }
+  },
+  icuprocedureIncome: async (data) => {
+    let conn_ora = await getTmcConnection();
 
-                } catch (error) {
-                        console.log(error)
-                } finally {
-                        if (conn_ora) {
-                                await conn_ora.close();
-                                await pool_ora.close();
-                        }
-                }
-        },
-        icuprocedureIncome: async (data, callBack) => {
+    const ipNumberList = data.ptno.join(",");
+    const fromDate = data.from;
+    const toDate = data.to;
 
-                let pool_ora = await oraConnection();
-                let conn_ora = await pool_ora.getConnection();
-
-                const ipNumberList = data.ptno.join(',');
-                const fromDate = data.from;
-                const toDate = data.to;
-
-                const sql = `SELECT INITCAP (Pcc_Desc) Pcc_Desc,
+    const sql = `SELECT INITCAP (Pcc_Desc) Pcc_Desc,
                                         Code,
                                         SUM (Amt) Amt,
                                         SUM (Taxamt) Taxamt
@@ -16831,35 +16716,25 @@ module.exports = {
                                 GROUP BY Code, Pcc_Desc
                                 HAVING SUM (Amt) <> 0
                                 ORDER BY Pcc_Desc`;
-                try {
-                        const result = await conn_ora.execute(
-                                sql,
-                                {},
-                                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-                        )
-                        await result.resultSet?.getRows((err, rows) => {
-                                callBack(err, rows)
-                        })
+    try {
+      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      //       callBack(null, );
+      return result.rows;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    } finally {
+      if (conn_ora) await conn_ora.close();
+    }
+  },
+  radiologyIncome: async (data) => {
+    let conn_ora = await getTmcConnection();
 
-                } catch (error) {
-                        console.log(error)
-                } finally {
-                        if (conn_ora) {
-                                await conn_ora.close();
-                                await pool_ora.close();
-                        }
-                }
-        },
-        radiologyIncome: async (data, callBack) => {
+    const ipNumberList = data.ptno.join(",");
+    const fromDate = data.from;
+    const toDate = data.to;
 
-                let pool_ora = await oraConnection();
-                let conn_ora = await pool_ora.getConnection();
-
-                const ipNumberList = data.ptno.join(',');
-                const fromDate = data.from;
-                const toDate = data.to;
-
-                const sql = `SELECT INITCAP (Pcc_Desc) Pcc_Desc,
+    const sql = `SELECT INITCAP (Pcc_Desc) Pcc_Desc,
                                         Code,
                                         SUM (Amt) Amt,
                                         SUM (Taxamt) Taxamt
@@ -18238,35 +18113,25 @@ module.exports = {
                                 GROUP BY Code, Pcc_Desc
                                 HAVING SUM (Amt) <> 0
                                 ORDER BY Pcc_Desc`;
-                try {
-                        const result = await conn_ora.execute(
-                                sql,
-                                {},
-                                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-                        )
-                        await result.resultSet?.getRows((err, rows) => {
-                                callBack(err, rows)
-                        })
+    try {
+      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      //       callBack(null, );
+      return result.rows;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    } finally {
+      if (conn_ora) await conn_ora.close();
+    }
+  },
+  laboratoryIncome: async (data) => {
+    let conn_ora = await getTmcConnection();
 
-                } catch (error) {
-                        console.log(error)
-                } finally {
-                        if (conn_ora) {
-                                await conn_ora.close();
-                                await pool_ora.close();
-                        }
-                }
-        },
-        laboratoryIncome: async (data, callBack) => {
+    const ipNumberList = data.ptno.join(",");
+    const fromDate = data.from;
+    const toDate = data.to;
 
-                let pool_ora = await oraConnection();
-                let conn_ora = await pool_ora.getConnection();
-
-                const ipNumberList = data.ptno.join(',');
-                const fromDate = data.from;
-                const toDate = data.to;
-
-                const sql = `SELECT INITCAP (Pcc_Desc) Pcc_Desc,
+    const sql = `SELECT INITCAP (Pcc_Desc) Pcc_Desc,
                                         Code,
                                         SUM (Amt) Amt,
                                         SUM (Taxamt) Taxamt
@@ -19645,35 +19510,25 @@ module.exports = {
                                 GROUP BY Code, Pcc_Desc
                                 HAVING SUM (Amt) <> 0
                                 ORDER BY Pcc_Desc`;
-                try {
-                        const result = await conn_ora.execute(
-                                sql,
-                                {},
-                                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-                        )
-                        await result.resultSet?.getRows((err, rows) => {
-                                callBack(err, rows)
-                        })
+    try {
+      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      //       callBack(null, );
+      return result.rows;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    } finally {
+      if (conn_ora) await conn_ora.close();
+    }
+  },
+  mriIncome: async (data) => {
+    let conn_ora = await getTmcConnection();
 
-                } catch (error) {
-                        console.log(error)
-                } finally {
-                        if (conn_ora) {
-                                await conn_ora.close();
-                                await pool_ora.close();
-                        }
-                }
-        },
-        mriIncome: async (data, callBack) => {
+    const ipNumberList = data.ptno.join(",");
+    const fromDate = data.from;
+    const toDate = data.to;
 
-                let pool_ora = await oraConnection();
-                let conn_ora = await pool_ora.getConnection();
-
-                const ipNumberList = data.ptno.join(',');
-                const fromDate = data.from;
-                const toDate = data.to;
-
-                const sql = `SELECT INITCAP (Pcc_Desc) Pcc_Desc,
+    const sql = `SELECT INITCAP (Pcc_Desc) Pcc_Desc,
                                         Code,
                                         SUM (Amt) Amt,
                                         SUM (Taxamt) Taxamt
@@ -21053,35 +20908,25 @@ module.exports = {
                                 GROUP BY Code, Pcc_Desc
                                 HAVING SUM (Amt) <> 0
                                 ORDER BY Pcc_Desc`;
-                try {
-                        const result = await conn_ora.execute(
-                                sql,
-                                {},
-                                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-                        )
-                        await result.resultSet?.getRows((err, rows) => {
-                                callBack(err, rows)
-                        })
+    try {
+      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      //       callBack(null, );
+      return result.rows;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    } finally {
+      if (conn_ora) await conn_ora.close();
+    }
+  },
+  dietIncome: async (data) => {
+    let conn_ora = await getTmcConnection();
 
-                } catch (error) {
-                        console.log(error)
-                } finally {
-                        if (conn_ora) {
-                                await conn_ora.close();
-                                await pool_ora.close();
-                        }
-                }
-        },
-        dietIncome: async (data, callBack) => {
+    const ipNumberList = data.ptno.join(",");
+    const fromDate = data.from;
+    const toDate = data.to;
 
-                let pool_ora = await oraConnection();
-                let conn_ora = await pool_ora.getConnection();
-
-                const ipNumberList = data.ptno.join(',');
-                const fromDate = data.from;
-                const toDate = data.to;
-
-                const sql = `SELECT INITCAP (Pcc_Desc) Pcc_Desc,
+    const sql = `SELECT INITCAP (Pcc_Desc) Pcc_Desc,
                                         Code,
                                         SUM (Amt) Amt,
                                         SUM (Taxamt) Taxamt
@@ -22461,35 +22306,25 @@ module.exports = {
                                 GROUP BY Code, Pcc_Desc
                                 HAVING SUM (Amt) <> 0
                                 ORDER BY Pcc_Desc`;
-                try {
-                        const result = await conn_ora.execute(
-                                sql,
-                                {},
-                                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-                        )
-                        await result.resultSet?.getRows((err, rows) => {
-                                callBack(err, rows)
-                        })
+    try {
+      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      //       callBack(null, );
+      return result.rows;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    } finally {
+      if (conn_ora) await conn_ora.close();
+    }
+  },
+  pharmacyIncomePart1: async (data) => {
+    let conn_ora = await getTmcConnection();
 
-                } catch (error) {
-                        console.log(error)
-                } finally {
-                        if (conn_ora) {
-                                await conn_ora.close();
-                                await pool_ora.close();
-                        }
-                }
-        },
-        pharmacyIncomePart1: async (data, callBack) => {
+    const ipNumberList = data.ptno.join(",");
+    const fromDate = data.from;
+    const toDate = data.to;
 
-                let pool_ora = await oraConnection();
-                let conn_ora = await pool_ora.getConnection();
-
-                const ipNumberList = data.ptno.join(',');
-                const fromDate = data.from;
-                const toDate = data.to;
-
-                const sql = `SELECT Bm_No,
+    const sql = `SELECT Bm_No,
                                 Bmc_Slno,
                                 Bmd_Date,
                                 Pt_No,
@@ -22642,35 +22477,25 @@ module.exports = {
                                 Ptc_Ptname
                         HAVING SUM (Amt) <> 0
                         ORDER BY Bmd_Date`;
-                try {
-                        const result = await conn_ora.execute(
-                                sql,
-                                {},
-                                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-                        )
-                        await result.resultSet?.getRows((err, rows) => {
-                                callBack(err, rows)
-                        })
+    try {
+      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      //       callBack(null, );
+      return result.rows;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    } finally {
+      if (conn_ora) await conn_ora.close();
+    }
+  },
+  pharmacyIncomePart2: async (data) => {
+    let conn_ora = await getTmcConnection();
 
-                } catch (error) {
-                        console.log(error)
-                } finally {
-                        if (conn_ora) {
-                                await conn_ora.close();
-                                await pool_ora.close();
-                        }
-                }
-        },
-        pharmacyIncomePart2: async (data, callBack) => {
+    const ipNumberList = data.ptno.join(",");
+    const fromDate = data.from;
+    const toDate = data.to;
 
-                let pool_ora = await oraConnection();
-                let conn_ora = await pool_ora.getConnection();
-
-                const ipNumberList = data.ptno.join(',');
-                const fromDate = data.from;
-                const toDate = data.to;
-
-                const sql = `SELECT Op_No,
+    const sql = `SELECT Op_No,
                                     Opc_Slno,
                                     Opd_Date,
                                     Pt_No,
@@ -22761,35 +22586,25 @@ module.exports = {
                                     Ptc_Ptname
                             HAVING SUM (Amt) <> 0
                             ORDER BY Opd_Date`;
-                try {
-                        const result = await conn_ora.execute(
-                                sql,
-                                {},
-                                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-                        )
-                        await result.resultSet?.getRows((err, rows) => {
-                                callBack(err, rows)
-                        })
+    try {
+      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      //       callBack(null, );
+      return result.rows;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    } finally {
+      if (conn_ora) await conn_ora.close();
+    }
+  },
+  pharmacyIncomePart3: async (data) => {
+    let conn_ora = await getTmcConnection();
 
-                } catch (error) {
-                        console.log(error)
-                } finally {
-                        if (conn_ora) {
-                                await conn_ora.close();
-                                await pool_ora.close();
-                        }
-                }
-        },
-        pharmacyIncomePart3: async (data, callBack) => {
+    const ipNumberList = data.ptno.join(",");
+    const fromDate = data.from;
+    const toDate = data.to;
 
-                let pool_ora = await oraConnection();
-                let conn_ora = await pool_ora.getConnection();
-
-                const ipNumberList = data.ptno.join(',');
-                const fromDate = data.from;
-                const toDate = data.to;
-
-                const sql = `SELECT Iprefundmast.Ri_No,
+    const sql = `SELECT Iprefundmast.Ri_No,
                                 Iprefundmast.Ric_Slno,
                                 Iprefundmast.Rid_Date,
                                 Patient.Pt_No,
@@ -22813,36 +22628,25 @@ module.exports = {
                                 Patient.Pt_No,
                                 Ptc_Ptname`;
 
+    try {
+      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      //       callBack(null, );
+      return result.rows;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    } finally {
+      if (conn_ora) await conn_ora.close();
+    }
+  },
+  pharmacyIncomePart4: async (data) => {
+    let conn_ora = await getTmcConnection();
 
-                try {
-                        const result = await conn_ora.execute(
-                                sql,
-                                {},
-                                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-                        )
-                        await result.resultSet?.getRows((err, rows) => {
-                                callBack(err, rows)
-                        })
+    const ipNumberList = data.ptno.join(",");
+    const fromDate = data.from;
+    const toDate = data.to;
 
-                } catch (error) {
-                        console.log(error)
-                } finally {
-                        if (conn_ora) {
-                                await conn_ora.close();
-                                await pool_ora.close();
-                        }
-                }
-        },
-        pharmacyIncomePart4: async (data, callBack) => {
-
-                let pool_ora = await oraConnection();
-                let conn_ora = await pool_ora.getConnection();
-
-                const ipNumberList = data.ptno.join(',');
-                const fromDate = data.from;
-                const toDate = data.to;
-
-                const sql = `SELECT Dm_No,
+    const sql = `SELECT Dm_No,
                                         Dmc_Slno,
                                         Dmd_Date,
                                         Pt_No,
@@ -22932,22 +22736,15 @@ module.exports = {
                                         Ptc_Ptname
                                 HAVING SUM (Amt) <> 0
                                 ORDER BY Dmd_Date`;
-                try {
-                        const result = await conn_ora.execute(
-                                sql,
-                                {},
-                                { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT },
-                        )
-                        await result.resultSet?.getRows((err, rows) => {
-                                callBack(err, rows)
-                        })
-                } catch (error) {
-                        console.log(error)
-                } finally {
-                        if (conn_ora) {
-                                await conn_ora.close();
-                                await pool_ora.close();
-                        }
-                }
-        }
-}
+    try {
+      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      //       callBack(null, );
+      return result.rows;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    } finally {
+      if (conn_ora) await conn_ora.close();
+    }
+  },
+};

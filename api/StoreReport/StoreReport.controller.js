@@ -1,119 +1,119 @@
-const { getPurchaseMastDatas, getGrmDetails, getpendingApprovalQtn, getPurchaseDetails, getItemDetails } = require('./StoreReport.service')
+const {getPurchaseMastDatas, getGrmDetails, getpendingApprovalQtn, getPurchaseDetails, getItemDetails} = require("./StoreReport.service");
 
 module.exports = {
-    getPurchaseMastDatas: (req, res) => {
-        const body = req.body;
-        getPurchaseMastDatas(body, (err, results) => {
-            if (err) {
-                return res.status(200).json({
-                    success: 0,
-                    message: err
-                })
-            }
-            if (Object.keys(results).length === 0) {
-                return res.status(200).json({
-                    success: 1,
-                    message: 'No Data Found'
-                })
-            }
-            return res.status(200).json({
-                success: 2,
-                message: "Fetched Purchase Datas",
-                data: results
-            });
+  getPurchaseMastDatas: async (req, res) => {
+    try {
+      const body = req.body;
+      const data = await getPurchaseMastDatas(body);
+      if (!data) {
+        return res.status(200).json({
+          success: 1,
+          message: "No Data Found",
         });
-    },
-    getGrmDetails: (req, res) => {
-        const body = req.body;
-        getGrmDetails(body, (err, results) => {
-            if (err) {
-                return res.status(200).json({
-                    success: 0,
-                    message: err
-                })
-            }
-            if (Object.keys(results).length === 0) {
-                return res.status(200).json({
-                    success: 1,
-                    message: 'No Data Found'
-                })
-            }
-            return res.status(200).json({
-                success: 2,
-                message: "Fetched GRN Datas",
-                data: results
-            });
+      }
+      return res.status(200).json({
+        success: 2,
+        message: "Fetched Purchase Datas",
+        data: data,
+      });
+    } catch (error) {
+      return res.status(200).json({
+        success: 0,
+        message: error,
+      });
+    }
+  },
+  getGrmDetails: async (req, res) => {
+    try {
+      const body = req.body;
+      const data = await getGrmDetails(body);
+      if (!data) {
+        return res.status(200).json({
+          success: 1,
+          message: "No Data Found",
         });
-    },
+      }
 
-    getpendingApprovalQtn: (req, res) => {
-        getpendingApprovalQtn((err, results) => {
-            if (err) {
-                return res.status(200).json({
-                    success: 0,
-                    message: err
-                })
-            }
-            if (Object.keys(results).length === 0) {
-                return res.status(200).json({
-                    success: 2,
-                    message: "No Data Found"
+      return res.status(200).json({
+        success: 2,
+        message: "Fetched GRN Datas",
+        data: data,
+      });
+    } catch (error) {
+      return res.status(200).json({
+        success: 0,
+        message: error,
+      });
+    }
+  },
 
-                })
-            }
-            return res.status(200).json({
-                success: 1,
-                data: results
-            })
-        })
-    },
-    getPurchaseDetails: (req, res) => {
-        const id = req.params.id;
-        // console.log("id");
-        getPurchaseDetails(id, (err, results) => {
-            if (err) {
-                return res.status(200).json({
-                    success: 0,
-                    message: err.message
-                });
-            }
-            if (Object.keys(results).length === 0) {
-                return res.status(200).json({
-                    success: 2,
-                    message: "No Result",
-                    data: []
-                });
-            }
-            return res.status(200).json({
-                success: 1,
-                message: "Purchase Details",
-                data: results
-            });
-        })
-    },
-    getItemDetails: (req, res) => {
-        const id = req.params.id;
-        // console.log("id");
-        getItemDetails(id, (err, results) => {
-            if (err) {
-                return res.status(200).json({
-                    success: 0,
-                    message: err.message
-                });
-            }
-            if (Object.keys(results).length === 0) {
-                return res.status(200).json({
-                    success: 2,
-                    message: "No Result",
-                    data: []
-                });
-            }
-            return res.status(200).json({
-                success: 1,
-                message: "PItem Details",
-                data: results
-            });
-        })
-    },
-}
+  getpendingApprovalQtn: async (req, res) => {
+    try {
+      const data = await getpendingApprovalQtn();
+      if (!data) {
+        return res.status(200).json({
+          success: 2,
+          message: "No Data Found",
+        });
+      }
 
+      return res.status(200).json({
+        success: 1,
+        data: data,
+      });
+    } catch (error) {
+      return res.status(200).json({
+        success: 0,
+        message: error,
+      });
+    }
+  },
+  getPurchaseDetails: async (req, res) => {
+    try {
+      const id = req.params.id;
+      const data = await getPurchaseDetails(id);
+      if (!data) {
+        return res.status(200).json({
+          success: 2,
+          message: "No Result",
+          data: [],
+        });
+      }
+
+      return res.status(200).json({
+        success: 1,
+        message: "Purchase Details",
+        data: data,
+      });
+    } catch (error) {
+      return res.status(200).json({
+        success: 0,
+        message: error,
+      });
+    }
+  },
+  getItemDetails: async (req, res) => {
+    try {
+      const id = req.params.id;
+      const data = await getItemDetails(id);
+      if (!data) {
+        return res.status(200).json({
+          success: 2,
+          message: "No Result",
+          data: [],
+        });
+      }
+
+      return res.status(200).json({
+        success: 1,
+        message: "PItem Details",
+        data: data,
+      });
+    } catch (error) {
+      return res.status(200).json({
+        success: 0,
+        message: error,
+      });
+    }
+  },
+};

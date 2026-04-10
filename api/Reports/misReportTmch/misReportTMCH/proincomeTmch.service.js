@@ -1,14 +1,13 @@
 // @ts-ignore
-const {oracledb, connectionClose, oraConnection} = require("../../../../../config/oradbconfig");
+const {oracledb, getTmcConnection} = require("../../../../config/oradbconfig");
 
 module.exports = {
-  proIncomePart1Tmch: async (data, callBack) => {
-    let pool_ora = await oraConnection();
-    let conn_ora = await pool_ora.getConnection();
+  proIncomePart1Tmch: async (conn_ora, data) => {
+    //     let conn_ora = await getTmcConnection();
 
-    const ipNumberList = data.ptno.join(",");
-    const fromDate = data.from;
-    const toDate = data.to;
+    //     const ipNumberList = data.ptno.join(",");
+    //     const fromDate = data.from;
+    //     const toDate = data.to;
 
     const sql = `SELECT Misincexpgroup.Dg_desc,
                                 Misincexpgroup.Dg_grcode AS Code,
@@ -31,10 +30,10 @@ module.exports = {
                                 AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                 AND NVL (SVC_CANCEL, 'N') = 'N'
                                 AND Disbillmast.Dmc_Cacr <> 'M'
-                                AND Disbillmast.DMD_DATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND Disbillmast.Dmd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                AND Disbillmast.DMD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                                AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-                                AND DISBILLMAST.IP_NO NOT IN (${ipNumberList})
+                                AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = DISBILLMAST.IP_NO)
                         GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                         UNION ALL
                         SELECT Misincexpgroup.Dg_desc,
@@ -55,9 +54,9 @@ module.exports = {
                                 AND NVL (Disbillmast.Dmc_cancel, 'N') = 'N'
                                 AND NVL (Disroomdetl.Dmc_Cancel, 'N') = 'N'
                                 AND Disbillmast.Dmc_Cacr <> 'M'
-                                AND Disbillmast.Dmd_Date >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND Disbillmast.Dmd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND DISBILLMAST.IP_NO NOT IN (${ipNumberList})
+                                AND Disbillmast.Dmd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                                AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                                AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = DISBILLMAST.IP_NO)
                                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                         UNION ALL
@@ -80,9 +79,9 @@ module.exports = {
                                 AND NVL (Patsurgery.Src_Cancel, 'N') = 'N'
                                 AND NVL (Opbillmast.OPN_CANCEL, 'N') = 'N'
                                 AND Opbillmast.OPC_CACR <> 'M'
-                                AND Opbillmast.OPD_DATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND Opbillmast.OPD_DATE <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND Patsurgery.IP_NO NOT IN  (${ipNumberList})
+                                AND Opbillmast.OPD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                                AND Opbillmast.OPD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                                AND  NOT EXISTS  (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Patsurgery.IP_NO)
                                 AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                         UNION ALL
@@ -105,9 +104,9 @@ module.exports = {
                                 AND NVL (Patsurgery.Src_Cancel, 'N') = 'N'
                                 AND NVL (Opbillmast.OPN_CANCEL, 'N') = 'N'
                                 AND Opbillmast.OPC_CACR <> 'M'
-                                AND Opbillmast.OPD_DATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND Opbillmast.OPD_DATE <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND Patsurgery.IP_NO NOT IN  (${ipNumberList})
+                                AND Opbillmast.OPD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                                AND Opbillmast.OPD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                                AND NOT EXISTS  (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Patsurgery.IP_NO)
                                 AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                         UNION ALL
@@ -132,9 +131,9 @@ module.exports = {
                                 AND NVL (Patsurgery.Src_Cancel, 'N') = 'N'
                                 AND NVL (Opbillmast.OPN_CANCEL, 'N') = 'N'
                                 AND Opbillmast.OPC_CACR <> 'M'
-                                AND Opbillmast.OPD_DATE >=  TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND Opbillmast.OPD_DATE <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND Patsurgery.IP_NO NOT IN  (${ipNumberList})
+                                AND Opbillmast.OPD_DATE >=  TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                                AND Opbillmast.OPD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                                AND  NOT EXISTS  (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Patsurgery.IP_NO)
                                 AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                         UNION ALL
@@ -159,9 +158,9 @@ module.exports = {
                                 AND NVL (Patsurgery.Src_Cancel, 'N') = 'N'
                                 AND NVL (Opbillmast.OPN_CANCEL, 'N') = 'N'
                                 AND Opbillmast.OPC_CACR <> 'M'
-                                AND Opbillmast.OPD_DATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND Opbillmast.OPD_DATE <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND Patsurgery.IP_NO NOT IN (${ipNumberList})
+                                AND Opbillmast.OPD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                                AND Opbillmast.OPD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                                AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Patsurgery.IP_NO)
                                 AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                         UNION ALL
@@ -186,9 +185,9 @@ module.exports = {
                                 AND NVL (Patsurgery.Src_Cancel, 'N') = 'N'
                                 AND NVL (Opbillmast.OPN_CANCEL, 'N') = 'N'
                                 AND Opbillmast.OPC_CACR <> 'M'
-                                AND Opbillmast.OPD_DATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND Opbillmast.OPD_DATE <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND Patsurgery.IP_NO NOT IN (${ipNumberList})
+                                AND Opbillmast.OPD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                                AND Opbillmast.OPD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                                AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Patsurgery.IP_NO)
                                 AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                         UNION ALL
@@ -213,9 +212,9 @@ module.exports = {
                                 AND NVL (Patsurgery.Src_Cancel, 'N') = 'N'
                                 AND NVL (Opbillmast.OPN_CANCEL, 'N') = 'N'
                                 AND Opbillmast.OPC_CACR <> 'M'
-                                AND Opbillmast.OPD_DATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND Opbillmast.OPD_DATE <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND Patsurgery.IP_NO NOT IN  (${ipNumberList})
+                                AND Opbillmast.OPD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                                AND Opbillmast.OPD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                                AND NOT EXISTS  (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Patsurgery.IP_NO)
                                 AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                         UNION ALL
@@ -240,9 +239,9 @@ module.exports = {
                                 AND NVL (Patsurgery.Src_Cancel, 'N') = 'N'
                                 AND NVL (Opbillmast.OPN_CANCEL, 'N') = 'N'
                                 AND Opbillmast.OPC_CACR <> 'M'
-                                AND Opbillmast.OPD_DATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND Opbillmast.OPD_DATE <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND Patsurgery.IP_NO NOT IN  (${ipNumberList})
+                                AND Opbillmast.OPD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                                AND Opbillmast.OPD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                                AND NOT EXISTS  (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Patsurgery.IP_NO)
                                 AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                         UNION ALL
@@ -267,9 +266,9 @@ module.exports = {
                                 AND NVL (Patsurgery.Src_Cancel, 'N') = 'N'
                                 AND NVL (Opbillmast.OPN_CANCEL, 'N') = 'N'
                                 AND Opbillmast.OPC_CACR <> 'M'
-                                AND Opbillmast.OPD_DATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND Opbillmast.OPD_DATE <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND Patsurgery.IP_NO NOT IN  (${ipNumberList})
+                                AND Opbillmast.OPD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                                AND Opbillmast.OPD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                                AND NOT EXISTS  (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Patsurgery.IP_NO)
                                 AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                         UNION ALL
@@ -294,9 +293,9 @@ module.exports = {
                                 AND NVL (Patsurgery.Src_Cancel, 'N') = 'N'
                                 AND NVL (Opbillmast.OPN_CANCEL, 'N') = 'N'
                                 AND Opbillmast.OPC_CACR <> 'M'
-                                AND Opbillmast.OPD_DATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND Opbillmast.OPD_DATE <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND Patsurgery.IP_NO NOT IN  (${ipNumberList})
+                                AND Opbillmast.OPD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                                AND Opbillmast.OPD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                                AND  NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Patsurgery.IP_NO)
                                 AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                         UNION ALL
@@ -325,9 +324,9 @@ module.exports = {
                                 AND NVL (Patsurgery.Src_Cancel, 'N') = 'N'
                                 AND NVL (Opbillmast.OPN_CANCEL, 'N') = 'N'
                                 AND Opbillmast.OPC_CACR <> 'M'
-                                AND Opbillmast.OPD_DATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND Opbillmast.OPD_DATE <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND Patsurgery.IP_NO NOT IN  (${ipNumberList})
+                                AND Opbillmast.OPD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                                AND Opbillmast.OPD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                                AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Patsurgery.IP_NO)
                                 AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 AND NVL (PATSUROTHER.Src_Cancel, 'N') = 'N'
                         GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
@@ -351,9 +350,9 @@ module.exports = {
                                 AND NVL (Patsurgery.Src_Cancel, 'N') = 'N'
                                 AND NVL (Opbillmast.OPN_CANCEL, 'N') = 'N'
                                 AND Opbillmast.OPC_CACR <> 'M'
-                                AND Opbillmast.OPD_DATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND Opbillmast.OPD_DATE <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND Patsurgery.IP_NO NOT IN  (${ipNumberList})
+                                AND Opbillmast.OPD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                                AND Opbillmast.OPD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                                AND NOT EXISTS  (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Patsurgery.IP_NO)
                                 AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 AND NVL (PATSURDETL.Src_Cancel, 'N') = 'N'
                         GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
@@ -374,9 +373,9 @@ module.exports = {
                                 AND DISRMRENTDETL.pc_code = Misincexpdtl.pc_code
                                 AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                 AND Disbillmast.Dmc_Cacr <> 'M'
-                                AND Disbillmast.DMD_DATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND Disbillmast.Dmd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND Disbillmast.IP_NO NOT IN  (${ipNumberList})
+                                AND Disbillmast.DMD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                                AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                                AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Disbillmast.IP_NO)
                                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                         UNION ALL
@@ -397,8 +396,8 @@ module.exports = {
                                 AND Iprefunditemdetl.Ric_Type <> 'PHY'
                                 AND Iprefundmast.Ric_Cacr IN ('C', 'R')
                                 AND NVL (Iprefundmast.Ric_Cancel, 'N') = 'N'
-                                AND Iprefundmast.Rid_Date >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND Iprefundmast.Rid_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                AND Iprefundmast.Rid_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                                AND Iprefundmast.Rid_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                                 AND IPREFUNDMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         GROUP BY Misincexpgroup.Dg_Grcode, Misincexpgroup.Dg_Desc
                         UNION ALL
@@ -420,33 +419,41 @@ module.exports = {
                                 AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                 AND NVL (VSC_CANCEL, 'N') = 'N'
                                 AND Disbillmast.Dmc_Cacr <> 'M'
-                                AND Disbillmast.DMD_DATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND Disbillmast.Dmd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND Disbillmast.IP_NO NOT IN  (${ipNumberList})
+                                AND Disbillmast.DMD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                                AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                                AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Disbillmast.IP_NO)
                                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                         ORDER BY Dg_desc`;
-    try {
-      const result = await conn_ora.execute(sql, {}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
-      await result.resultSet?.getRows((err, rows) => {
-        callBack(err, rows);
-      });
-    } catch (error) {
-      console.log(error);
-    } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-        await pool_ora.close();
-      }
-    }
+    const result = await conn_ora.execute(
+      sql,
+      {
+        fromDate: data.from,
+        toDate: data.to,
+      },
+      {outFormat: oracledb.OUT_FORMAT_OBJECT},
+    );
+    return result.rows;
+    //     try {
+    //       //       callBack(null, );
+    //       //       await result.resultSet?.getRows((err, rows) => {
+    //       //       });
+    //     } catch (error) {
+    //       console.log(error);
+    //       throw error;
+    //     } finally {
+    //       if (conn_ora) {
+    //         await conn_ora.close();
+    //         // await pool_ora.close();
+    //       }
+    //     }
   },
-  proIncomePart2Tmch: async (data, callBack) => {
-    let pool_ora = await oraConnection();
-    let conn_ora = await pool_ora.getConnection();
+  proIncomePart2Tmch: async (conn_ora, data) => {
+    //     let conn_ora = await getTmcConnection();
 
-    const ipNumberList = data.ptno.join(",");
-    const fromDate = data.from;
-    const toDate = data.to;
+    //     const ipNumberList = data.ptno.join(",");
+    //     const fromDate = data.from;
+    //     const toDate = data.to;
 
     const sql = `SELECT Misincexpgroup.Dg_desc,
                                 Misincexpgroup.Dg_grcode AS Code,
@@ -476,8 +483,8 @@ module.exports = {
                                 AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                 AND NVL (Refundbilldetl.Rfc_Cancel, 'N') = 'N'
                                 AND Opbillmast.Opc_Cacr <> 'M'
-                                AND Opbillmast.Opd_date >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND Opbillmast.Opd_date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                AND Opbillmast.Opd_date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                                AND Opbillmast.Opd_date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                                 AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                         UNION ALL
@@ -508,9 +515,9 @@ module.exports = {
                                 AND NVL (Refundbilldetl.Rfc_Cancel, 'N') = 'N'
                                 AND Refundbillmast.Rfc_Cacr IN ('I')
                                 AND Disbillmast.Dmc_Cacr <> 'M'
-                                AND Disbillmast.dmd_date >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND Disbillmast.dmd_date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND DISBILLMAST.IP_NO NOT IN (${ipNumberList})
+                                AND Disbillmast.dmd_date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                                AND Disbillmast.dmd_date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                                AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Disbillmast.IP_NO)
                                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                         UNION ALL
@@ -539,8 +546,8 @@ module.exports = {
                                 AND NVL (Opbillmast.Opn_cancel, 'N') = 'N'
                                 AND Opbillmast.Opc_Cacr <> 'M'
                                 AND Receiptmast.RPC_CAcr = 'O'
-                                AND Opbillmast.Opd_date >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND Opbillmast.Opd_date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                AND Opbillmast.Opd_date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                                AND Opbillmast.Opd_date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                                 AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                         UNION ALL
@@ -566,31 +573,39 @@ module.exports = {
                                 AND Misincexpdtl.Dg_type = 'R'
                                 AND Billmast.Bmc_Cacr IN ('C', 'R')
                                 AND NVL (Billmast.BMC_CANCEL, 'N') = 'N'
-                                AND Billmast.BMD_DATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                AND Billmast.BMD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                                 AND billmast.mh_code IN (SELECT MH_CODE FROM multihospital)
-                                AND Billmast.Bmd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                AND Billmast.Bmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                         GROUP BY Misincexpgroup.DG_GRCODE, Misincexpgroup.DG_DESC`;
-    try {
-      const result = await conn_ora.execute(sql, {}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
-      await result.resultSet?.getRows((err, rows) => {
-        callBack(err, rows);
-      });
-    } catch (error) {
-      console.log(error);
-    } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-        await pool_ora.close();
-      }
-    }
+    const result = await conn_ora.execute(
+      sql,
+      {
+        fromDate: data.from,
+        toDate: data.to,
+      },
+      {outFormat: oracledb.OUT_FORMAT_OBJECT},
+    );
+    return result.rows;
+    //     try {
+    //       //       callBack(null, );
+    //       //       await result.resultSet?.getRows((err, rows) => {
+    //       //       });
+    //     } catch (error) {
+    //       console.log(error);
+    //       throw error;
+    //     } finally {
+    //       if (conn_ora) {
+    //         await conn_ora.close();
+    //         // await pool_ora.close();
+    //       }
+    //     }
   },
-  proIncomePart3Tmch: async (data, callBack) => {
-    let pool_ora = await oraConnection();
-    let conn_ora = await pool_ora.getConnection();
+  proIncomePart3Tmch: async (conn_ora, data) => {
+    //     let conn_ora = await getTmcConnection();
 
-    const ipNumberList = data.ptno.join(",");
-    const fromDate = data.from;
-    const toDate = data.to;
+    //     const ipNumberList = data.ptno.join(",");
+    //     const fromDate = data.from;
+    //     const toDate = data.to;
 
     const sql = `SELECT Misincexpgroup.Dg_desc,
                             Misincexpgroup.Dg_grcode AS Code,
@@ -617,8 +632,8 @@ module.exports = {
                             AND Billmast.Bmc_Cacr = 'O'
                             AND NVL (Billmast.BMC_CANCEL, 'N') = 'N'
                             AND NVL (Opbillmast.Opn_cancel, 'N') = 'N'
-                            AND Opbillmast.Opd_date >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
-                            AND Opbillmast.Opd_date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                            AND Opbillmast.Opd_date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                            AND Opbillmast.Opd_date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                             AND billmast.mh_code IN (SELECT MH_CODE FROM multihospital)
                     GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                     UNION ALL
@@ -644,9 +659,9 @@ module.exports = {
                             AND Misincexpdtl.Dg_type = 'R'
                             AND Billmast.Bmc_Cacr IN ('C', 'R')
                             AND NVL (Billmast.BMC_CANCEL, 'N') = 'N'
-                            AND Billmast.BMD_COLLDATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                            AND Billmast.BMD_COLLDATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                             AND billmast.mh_code IN (SELECT MH_CODE FROM multihospital)
-                            AND Billmast.BMD_COLLDATE <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                            AND Billmast.BMD_COLLDATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                     GROUP BY Misincexpgroup.DG_GRCODE, Misincexpgroup.DG_DESC
                     UNION ALL
                     SELECT Misincexpgroup.Dg_desc,
@@ -674,31 +689,39 @@ module.exports = {
                             AND Billmast.Bmc_Cacr = 'I'
                             AND NVL (Billmast.BMC_CANCEL, 'N') = 'N'
                             AND NVL (Disbillmast.Dmc_cancel, 'N') = 'N'
-                            AND Disbillmast.dmd_date >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                            AND Disbillmast.dmd_date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                             AND billmast.mh_code IN (SELECT MH_CODE FROM multihospital)
-                            AND Disbillmast.dmd_date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
-                            AND DISBILLMAST.IP_NO NOT IN (${ipNumberList})
+                            AND Disbillmast.dmd_date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                            AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Disbillmast.IP_NO)
                     GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc`;
-    try {
-      const result = await conn_ora.execute(sql, {}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
-      await result.resultSet?.getRows((err, rows) => {
-        callBack(err, rows);
-      });
-    } catch (error) {
-      console.log(error);
-    } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-        await pool_ora.close();
-      }
-    }
+    const result = await conn_ora.execute(
+      sql,
+      {
+        fromDate: data.from,
+        toDate: data.to,
+      },
+      {outFormat: oracledb.OUT_FORMAT_OBJECT},
+    );
+    return result.rows;
+    //     try {
+    //       //       callBack(null, );
+    //       //       await result.resultSet?.getRows((err, rows) => {
+    //       //       });
+    //     } catch (error) {
+    //       console.log(error);
+    //       throw error;
+    //     } finally {
+    //       if (conn_ora) {
+    //         await conn_ora.close();
+    //         // await pool_ora.close();
+    //       }
+    //     }
   },
-  proIncomePart4Tmch: async (data, callBack) => {
-    let pool_ora = await oraConnection();
-    let conn_ora = await pool_ora.getConnection();
+  proIncomePart4Tmch: async (conn_ora, data) => {
+    //     let conn_ora = await getTmcConnection();
 
-    const fromDate = data.from;
-    const toDate = data.to;
+    //     const fromDate = data.from;
+    //     const toDate = data.to;
 
     const sql = ` SELECT Misincexpgroup.Dg_desc,
                                 Misincexpgroup.Dg_grcode AS Code,
@@ -722,8 +745,8 @@ module.exports = {
                                 AND Misincexpdtl.Pc_code = Progroup.pc_code
                                 AND (NVL (RECEIPTMAST.RPC_CANCEL, 'N') = 'N')
                                 AND Receiptmast.RPC_CAcr IN ('C', 'R')
-                                AND Receiptmast.RPD_COLLDATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND Receiptmast.RPD_COLLDATE <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                AND Receiptmast.RPD_COLLDATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                                AND Receiptmast.RPD_COLLDATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                                 AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         HAVING SUM ( DECODE (Receiptmast.RPC_CAcr,   'C', receiptdetl.rpn_netamt,  'R', receiptdetl.rpn_netamt, 0)) <> 0
                         GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
@@ -756,9 +779,9 @@ module.exports = {
                                 AND NVL (Refundreceiptdetl.Rfc_Cancel, 'N') = 'N'
                                 AND Refundreceiptmast.Rfc_Cacr IN ('O')
                                 AND Opbillmast.Opc_Cacr <> 'M'
-                                AND Opbillmast.Opd_date >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                AND Opbillmast.Opd_date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                                 AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-                                AND Opbillmast.Opd_date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                AND Opbillmast.Opd_date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                         GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                         UNION ALL
                         SELECT Misincexpgroup.Dg_desc,
@@ -782,8 +805,8 @@ module.exports = {
                                 AND Misincexpdtl.Pc_code = Progroup.pc_code
                                 AND Refundreceiptmast.Rfc_Cancel IS NULL
                                 AND Refundreceiptmast.Rfc_Cacr IN ('C', 'R')
-                                AND Refundreceiptdetl.Rfd_Date >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND Refundreceiptdetl.Rfd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                AND Refundreceiptdetl.Rfd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                                AND Refundreceiptdetl.Rfd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                                 AND REFUNDRECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                         UNION ALL
@@ -810,8 +833,8 @@ module.exports = {
                                 AND Misincexpdtl.Pc_code = Progroup.pc_code
                                 AND Refundbillmast.Rfc_Cancel IS NULL
                                 AND Refundbillmast.Rfc_Cacr IN ('C', 'R')
-                                AND Refundbilldetl.Rfd_Date >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND Refundbilldetl.Rfd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                AND Refundbilldetl.Rfd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                                AND Refundbilldetl.Rfd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                                 AND billmast.mh_code IN (SELECT MH_CODE FROM multihospital)
                         GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                         UNION ALL
@@ -837,31 +860,39 @@ module.exports = {
                                 AND Misincexpdtl.Pc_code = Progroup.pc_code
                                 AND (NVL (RECEIPTMAST.RPC_CANCEL, 'N') = 'N')
                                 AND Receiptmast.RPC_CAcr IN ('C', 'R')
-                                AND Receiptmast.RPD_DATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND Receiptmast.RPD_DATE <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                AND Receiptmast.RPD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                                AND Receiptmast.RPD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                                 AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc`;
-    try {
-      const result = await conn_ora.execute(sql, {}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
-      await result.resultSet?.getRows((err, rows) => {
-        callBack(err, rows);
-      });
-    } catch (error) {
-      console.log(error);
-    } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-        await pool_ora.close();
-      }
-    }
+    const result = await conn_ora.execute(
+      sql,
+      {
+        fromDate: data.from,
+        toDate: data.to,
+      },
+      {outFormat: oracledb.OUT_FORMAT_OBJECT},
+    );
+    return result.rows;
+    //     try {
+    //       //       callBack(null, );
+    //       //       await result.resultSet?.getRows((err, rows) => {
+    //       //       });
+    //     } catch (error) {
+    //       console.log(error);
+    //       throw error;
+    //     } finally {
+    //       if (conn_ora) {
+    //         await conn_ora.close();
+    //         // await pool_ora.close();
+    //       }
+    //     }
   },
-  theaterIncomeTmch: async (data, callBack) => {
-    let pool_ora = await oraConnection();
-    let conn_ora = await pool_ora.getConnection();
+  theaterIncomeTmch: async (conn_ora, data) => {
+    //     let conn_ora = await getTmcConnection();
 
-    const ipNumberList = data.ptno.join(",");
-    const fromDate = data.from;
-    const toDate = data.to;
+    //     const ipNumberList = data.ptno.join(",");
+    //     const fromDate = data.from;
+    //     const toDate = data.to;
 
     const sql = `SELECT Misincexpgroup.Dg_desc,
                                 Misincexpgroup.Dg_grcode AS Code,
@@ -882,9 +913,9 @@ module.exports = {
                                 AND NVL (Patsurgery.Src_Cancel, 'N') = 'N'
                                 AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                 AND Disbillmast.Dmc_Cacr <> 'M'
-                                AND Disbillmast.DMD_DATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND Disbillmast.Dmd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND DISBILLMAST.IP_NO NOT IN (${ipNumberList})
+                                AND Disbillmast.DMD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                                AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                                AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Disbillmast.IP_NO)
                                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                         UNION ALL
@@ -907,9 +938,9 @@ module.exports = {
                                 AND NVL (Patsurgery.Src_Cancel, 'N') = 'N'
                                 AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                 AND Disbillmast.Dmc_Cacr <> 'M'
-                                AND Disbillmast.DMD_DATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND Disbillmast.Dmd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND DISBILLMAST.IP_NO NOT IN (${ipNumberList})
+                                AND Disbillmast.DMD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                                AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                                AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Disbillmast.IP_NO)
                                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                         UNION ALL
@@ -934,9 +965,9 @@ module.exports = {
                                 AND NVL (Patsurgery.Src_Cancel, 'N') = 'N'
                                 AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                 AND Disbillmast.Dmc_Cacr <> 'M'
-                                AND Disbillmast.DMD_DATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND Disbillmast.Dmd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND DISBILLMAST.IP_NO NOT IN (${ipNumberList})
+                                AND Disbillmast.DMD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                                AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                                AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Disbillmast.IP_NO)
                                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                         UNION ALL
@@ -961,9 +992,9 @@ module.exports = {
                                 AND NVL (Patsurgery.Src_Cancel, 'N') = 'N'
                                 AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                 AND Disbillmast.Dmc_Cacr <> 'M'
-                                AND Disbillmast.DMD_DATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND Disbillmast.Dmd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND DISBILLMAST.IP_NO NOT IN (${ipNumberList})
+                                AND Disbillmast.DMD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                                AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                                AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Disbillmast.IP_NO)
                                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                         UNION ALL
@@ -988,9 +1019,9 @@ module.exports = {
                                 AND NVL (Patsurgery.Src_Cancel, 'N') = 'N'
                                 AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                 AND Disbillmast.Dmc_Cacr <> 'M'
-                                AND Disbillmast.DMD_DATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND Disbillmast.Dmd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND DISBILLMAST.IP_NO NOT IN (${ipNumberList})
+                                AND Disbillmast.DMD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                                AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                                AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Disbillmast.IP_NO)
                                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                         UNION ALL
@@ -1015,9 +1046,9 @@ module.exports = {
                                 AND NVL (Patsurgery.Src_Cancel, 'N') = 'N'
                                 AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                 AND Disbillmast.Dmc_Cacr <> 'M'
-                                AND Disbillmast.DMD_DATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND Disbillmast.Dmd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND DISBILLMAST.IP_NO NOT IN (${ipNumberList})
+                                AND Disbillmast.DMD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                                AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                                AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Disbillmast.IP_NO)
                                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                         UNION ALL
@@ -1042,9 +1073,9 @@ module.exports = {
                                 AND NVL (Patsurgery.Src_Cancel, 'N') = 'N'
                                 AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                 AND Disbillmast.Dmc_Cacr <> 'M'
-                                AND Disbillmast.DMD_DATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND Disbillmast.Dmd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND DISBILLMAST.IP_NO NOT IN (${ipNumberList})
+                                AND Disbillmast.DMD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                                AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                                AND NOT exists (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Disbillmast.IP_NO)
                                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                         UNION ALL
@@ -1069,9 +1100,9 @@ module.exports = {
                                 AND NVL (Patsurgery.Src_Cancel, 'N') = 'N'
                                 AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                 AND Disbillmast.Dmc_Cacr <> 'M'
-                                AND Disbillmast.DMD_DATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND Disbillmast.Dmd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND DISBILLMAST.IP_NO NOT IN (${ipNumberList})
+                                AND Disbillmast.DMD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                                AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                                AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Disbillmast.IP_NO)
                                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                         UNION ALL
@@ -1096,9 +1127,9 @@ module.exports = {
                                 AND NVL (Patsurgery.Src_Cancel, 'N') = 'N'
                                 AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                 AND Disbillmast.Dmc_Cacr <> 'M'
-                                AND Disbillmast.DMD_DATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND Disbillmast.Dmd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND DISBILLMAST.IP_NO NOT IN (${ipNumberList})
+                                AND Disbillmast.DMD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                                AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                                AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Disbillmast.IP_NO)
                                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                         UNION ALL
@@ -1127,9 +1158,9 @@ module.exports = {
                                 AND NVL (Patsurgery.Src_Cancel, 'N') = 'N'
                                 AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                 AND Disbillmast.Dmc_Cacr <> 'M'
-                                AND Disbillmast.DMD_DATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND Disbillmast.Dmd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND DISBILLMAST.IP_NO NOT IN (${ipNumberList})
+                                AND Disbillmast.DMD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                                AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                                AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Disbillmast.IP_NO)
                                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 AND NVL (PATSUROTHER.Src_Cancel, 'N') = 'N'
                         GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
@@ -1153,9 +1184,9 @@ module.exports = {
                                 AND NVL (Patsurgery.Src_Cancel, 'N') = 'N'
                                 AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                 AND Disbillmast.Dmc_Cacr <> 'M'
-                                AND Disbillmast.DMD_DATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND Disbillmast.Dmd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND DISBILLMAST.IP_NO NOT IN (${ipNumberList})
+                                AND Disbillmast.DMD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                                AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                                AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Disbillmast.IP_NO)
                                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 AND NVL (patsurdetl.Src_Cancel, 'N') = 'N'
                         GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
@@ -1179,24 +1210,33 @@ module.exports = {
                                 AND NVL (Canbillmast.Cmc_Cancel, 'N') = 'N'
                                 AND Canbillmast.Cmc_Cacr = 'I'
                                 AND Disbillmast.Dmc_Cacr <> 'M'
-                                AND Disbillmast.Dmd_Date >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND Disbillmast.Dmd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND DISBILLMAST.IP_NO NOT IN (${ipNumberList})
+                                AND Disbillmast.Dmd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                                AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                                AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Disbillmast.IP_NO)
                                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         GROUP BY Misincexpgroup.Dg_Grcode, Misincexpgroup.Dg_Desc
                         ORDER BY Dg_desc`;
-    try {
-      const result = await conn_ora.execute(sql, {}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
-      await result.resultSet?.getRows((err, rows) => {
-        callBack(err, rows);
-      });
-    } catch (error) {
-      console.log(error);
-    } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-        await pool_ora.close();
-      }
-    }
+    const result = await conn_ora.execute(
+      sql,
+      {
+        fromDate: data.from,
+        toDate: data.to,
+      },
+      {outFormat: oracledb.OUT_FORMAT_OBJECT},
+    );
+    return result.rows;
+    //     try {
+    //       //       callBack(null, );
+    //       //       await result.resultSet?.getRows((err, rows) => {
+    //       //       });
+    //     } catch (error) {
+    //       console.log(error);
+    //       throw error;
+    //     } finally {
+    //       if (conn_ora) {
+    //         await conn_ora.close();
+    //         // await pool_ora.close();
+    //       }
+    //     }
   },
 };
