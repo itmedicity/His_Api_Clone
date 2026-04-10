@@ -22,6 +22,7 @@ module.exports = {
         message: "User Rights Updated",
       });
     } catch (error) {
+      console.log(error);
       return res.status(200).json({
         success: 0,
         message: error.message,

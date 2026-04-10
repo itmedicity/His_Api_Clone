@@ -381,7 +381,7 @@ const getTheaterIncome = async (conn_ora, bind) => {
                             AND EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Disbillmast.IP_NO)
                     GROUP BY Misincexpgroup.Dg_Grcode, Misincexpgroup.Dg_Desc
                     ORDER BY Dg_desc`;
-  console.log(sql);
+  // console.log(sql);
   const result = await conn_ora.execute(
     sql,
     {
@@ -390,7 +390,7 @@ const getTheaterIncome = async (conn_ora, bind) => {
     },
     {outFormat: oracledb.OUT_FORMAT_OBJECT},
   );
-  console.log(result.rows);
+  // console.log(result.rows);
   return result.rows;
 };
 

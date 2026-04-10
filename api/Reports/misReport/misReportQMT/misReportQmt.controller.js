@@ -5,7 +5,7 @@ const procedureQmtService = require("../incomePart/procedureIncome/proincome.ser
 const patientTypeDiscountQmtService = require("../PatientType/patientType.service");
 
 const getCollectionAndIncomeMisReportQMT = async (req, res) => {
-  console.log(req.body);
+  // console.log(req.body);
   let conn;
   try {
     conn = await getTmcConnection();

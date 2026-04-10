@@ -10,10 +10,7 @@ const getTmchReport = async (req, res) => {
   const body = req.body;
   const {from, to, ptno, grouped, phar} = req.body;
   //   console.log(`body`, body);
-  console.log("ptno" + ptno);
-  console.log("grouped" + grouped);
-  const includedGroupedPtno = [...ptno, ...grouped];
-  console.log("grp-include" + includedGroupedPtno);
+  // console.log("ptno" + ptno);
 
   try {
     await insertIntoGTT(conn, ptno);

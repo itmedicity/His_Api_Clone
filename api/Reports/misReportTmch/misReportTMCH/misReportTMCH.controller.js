@@ -13,9 +13,10 @@ const getCollectionAndIncomeMisReportTMCH = async (req, res) => {
   let conn;
   try {
     conn = await getTmcConnection();
-    const {from, to, ptno, grouped, phar} = req.body;
+    const {from, to, ptno, grouped, phar, ipNoColl} = req.body;
 
     // console.log(ptno);
+    // console.log("ptno" + ptno.length());
 
     const bind = {
       from: from,
@@ -33,7 +34,6 @@ const getCollectionAndIncomeMisReportTMCH = async (req, res) => {
     const collectionAgainstSalePart1 = await collectionTMCHService.collectionAgainstSalePart1Tmch(conn, bind);
     const collectionAgainstSalePart2 = await collectionTMCHService.collectionAgainstSalePart2Tmch(conn, bind);
     const complimentory = await collectionTMCHService.complimentory(conn, bind);
-    const creditInsuranceBillCollection = await collectionTMCHService.creditInsuranceBillCollectionTmch(conn, bind);
     const creditInsuranceBill = await collectionTMCHService.creditInsuranceBillTmch(conn, bind);
     const ipConsolidatedDiscount = await collectionTMCHService.ipConsolidatedDiscountTmch(conn, bind);
 
@@ -171,7 +171,7 @@ const getCollectionAndIncomeMisReportTMCH = async (req, res) => {
 
       const notInclPat = results.filter((e) => !array.map((e) => e.ip_no).includes(e.IP_NO));
 
-      return notInclPat.length === 0 ? results : notInclPat;
+      return notInclPat.length === 0 ? [] : notInclPat;
     };
 
     const ipPreviousDayCollectionResult = await ipPreviousDayCollection(conn, bind);
@@ -209,6 +209,9 @@ const getCollectionAndIncomeMisReportTMCH = async (req, res) => {
     const TmchGroupedTsshSalePart3 = await pharmacyTsshService.TmchGroupedTsshSalePart3(conn, bind);
     const TmchGroupedTsshReturnPart3 = await pharmacyTsshService.TmchGroupedTsshReturnPart3(conn, bind);
     const TmchGroupedRoundOffAmntTssh = await pharmacyTsshService.TmchGroupedRoundOffAmntTssh(conn, bind);
+    await conn.commit(); // clear GTT table ip_data
+    await insertIntoGTT(conn, ipNoColl); // insert grouped ip_no in  to the GTT temp table
+    const creditInsuranceBillCollection = await collectionTMCHService.creditInsuranceBillCollectionTmch(conn, bind);
 
     // console.timeEnd("misReportQmt");
     const result = {

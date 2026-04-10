@@ -6,7 +6,7 @@ const getMisincexpmast = async (conn_ora) => {
 };
 
 const getUngroupedRoomDetl = async (conn_ora, bind) => {
-  console.log(bind);
+  //   console.log(bind);
   const sql = `SELECT NVL (Misincexpgroup.Dg_desc, 'Ungrouped') Dg_desc,
                         NVL (Misincexpgroup.Dg_grcode, 999) AS Code,
                         SUM (
@@ -367,7 +367,7 @@ const getTheaterIncome = async (conn_ora, bind) => {
                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                     GROUP BY Misincexpgroup.Dg_Grcode, Misincexpgroup.Dg_Desc
                     ORDER BY Dg_desc`;
-  console.log(sql);
+  //   console.log(sql);
   const result = await conn_ora.execute(
     sql,
     {
@@ -376,7 +376,7 @@ const getTheaterIncome = async (conn_ora, bind) => {
     },
     {outFormat: oracledb.OUT_FORMAT_OBJECT},
   );
-  console.log(result.rows);
+  //   console.log(result.rows);
   return result.rows;
 };
 

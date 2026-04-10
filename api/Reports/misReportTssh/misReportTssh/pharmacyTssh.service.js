@@ -587,11 +587,11 @@ module.exports = {
     return result.rows;
   },
   getTempTableList: async (conn_ora, text) => {
-    console.log(text);
+    // console.log(text);
     const sql = `select * from GTT_EXCLUDE_IP`;
 
     const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
-    console.log(result.rows);
+    // console.log(result.rows);
     // return result.rows;
   },
 };

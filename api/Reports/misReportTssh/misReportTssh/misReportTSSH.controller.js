@@ -13,7 +13,7 @@ const getCollectionAndIncomeMisReportTSSH = async (req, res) => {
   let conn;
   try {
     conn = await getTmcConnection();
-    const {from, to, ptno, grouped, phar, group, groupIdForPrevious} = req.body;
+    const {from, to, ptno, grouped, phar, group, groupIdForPrevious, ipNoColl} = req.body;
 
     // console.log(ptno);
 
@@ -34,7 +34,6 @@ const getCollectionAndIncomeMisReportTSSH = async (req, res) => {
     const collectionAgainstSalePart1 = await collectionTSSHService.collectionAgainstSalePart1Tssh(conn, bind);
     const collectionAgainstSalePart2 = await collectionTSSHService.collectionAgainstSalePart2Tssh(conn, bind);
     const complimentory = await collectionTSSHService.complimentoryTssh(conn, bind);
-    const creditInsuranceBillCollection = await collectionTSSHService.creditInsuranceBillCollectionTssh(conn, bind);
     const creditInsuranceBill = await collectionTSSHService.creditInsuranceBillTssh(conn, bind);
     const ipConsolidatedDiscount = await collectionTSSHService.ipConsolidatedDiscountTssh(conn, bind);
 
@@ -79,12 +78,11 @@ const getCollectionAndIncomeMisReportTSSH = async (req, res) => {
         return [];
       }
 
-      //   const array = Object.values(JSON.parse(JSON.stringify(getResult)));
-
-      //   const notInclPat = results.filter((e) => !array.map((e) => e.ip_no).includes(e.IP_NO));
-
-      const ipSet = new Set(getResult.map((e) => e.ip_no));
-      const notInclPat = results.filter((e) => ipSet.has(e.IP_NO));
+      // const array = Object.values(JSON.parse(JSON.stringify(getResult)));
+      // const notInclPat = results.filter((e) => !array.map((e) => e.ip_no).includes(e.IP_NO));
+      const notInclPat = results?.filter((e) => getResult?.find((v) => v.ip_no === e.IP_NO));
+      // const ipSet = new Set(getResult.map((e) => e.ip_no));
+      // const notInclPat = results.filter((e) => ipSet.has(e.IP_NO));
       // console.log(notInclPat);
 
       //   return notInclPat.length === 0 ? results : notInclPat;
@@ -126,6 +124,9 @@ const getCollectionAndIncomeMisReportTSSH = async (req, res) => {
     const TmchGroupedTsshSalePart3 = await pharmacyTsshService.TmchGroupedTsshSalePart3(conn, bind);
     const TmchGroupedTsshReturnPart3 = await pharmacyTsshService.TmchGroupedTsshReturnPart3(conn, bind);
     const TmchGroupedRoundOffAmntTssh = await pharmacyTsshService.TmchGroupedRoundOffAmntTssh(conn, bind);
+    await conn.commit();
+    await insertIntoGTT(conn, ipNoColl);
+    const creditInsuranceBillCollection = await collectionTSSHService.creditInsuranceBillCollectionTssh(conn, bind);
 
     // console.timeEnd("misReportQmt");
     const result = {

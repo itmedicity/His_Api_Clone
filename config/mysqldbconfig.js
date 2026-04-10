@@ -56,7 +56,12 @@ async function query(poolName, sql, params = []) {
    Transaction Helper (CRON-SAFE) - multi query 
 -------------------------------------------------- */
 async function transaction(poolName, queries = []) {
-  const conn = await pools[poolName].getConnection();
+  const pool = pools[poolName];
+  // console.log("Requested pool:", poolName);
+  // console.log("Available pools:", Object.keys(pools));
+  if (!pool) throw new Error(`Unknown pool: ${poolName}`);
+
+  const conn = await pool.getConnection();
 
   try {
     await setupSession(conn);

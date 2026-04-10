@@ -4,7 +4,7 @@ module.exports = {
   getModuleList: async (req, res) => {
     try {
       const data = await getModuleList();
-      console.log(data);
+      // console.log(data);
       return res.status(200).json({
         success: 2,
         data: data,
@@ -65,7 +65,7 @@ module.exports = {
   getGroupMapDetails: async (req, res) => {
     try {
       const data = await getGroupMapDetails();
-      console.log(data);
+      // console.log(data);
       if (data.length === 0) {
         return res.status(200).json({
           success: 1,

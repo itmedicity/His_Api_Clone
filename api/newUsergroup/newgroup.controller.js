@@ -24,7 +24,7 @@ module.exports = {
     }
   },
 
-  getUserGroup: async (res) => {
+  getUserGroup: async (req, res) => {
     try {
       const data = await getUserGroup();
       if (data.length === 0) {
@@ -91,7 +91,7 @@ module.exports = {
     }
   },
 
-  activetUserGroup: async (res) => {
+  activetUserGroup: async (req, res) => {
     try {
       const data = await activetUserGroup();
       if (data.length === 0) {
