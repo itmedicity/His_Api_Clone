@@ -78,7 +78,7 @@ module.exports = {
     }
   },
 
-  getImportedDate: async (res) => {
+  getImportedDate: async (req,res) => {
     try {
       const data = await getImportedDate();
       if (Object.keys(data).length === 0) {
@@ -98,7 +98,7 @@ module.exports = {
     }
   },
 
-  getMedicinesFromMysql: async (res) => {
+  getMedicinesFromMysql: async (req,res) => {
     try {
       const data = await getMedicinesFromMysql();
       if (Object.keys(data).length === 0) {

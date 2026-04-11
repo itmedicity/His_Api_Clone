@@ -1,7 +1,7 @@
 const {getPharmacyList, searchRequestFromOra, updateReqQntyToOracle, insertToRolSetting, truncateRolSetting} = require("./storereq.service");
 
 module.exports = {
-  getPharmacyList: async (res) => {
+  getPharmacyList: async (req,res) => {
     try {
       const data = await getPharmacyList();
 

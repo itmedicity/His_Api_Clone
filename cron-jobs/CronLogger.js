@@ -165,17 +165,7 @@ const captureDischargeHistory = async (row) => {
 -------------------------------------------------- */
 
 const getSchemaByCompanyAndModule = async (companySlno, moduleCode) => {
-  const schemaDetail = await pools.meliora.execute(
-    `
-        SELECT schema_name
-        FROM hsp_company_schema_map
-        WHERE hsp_company_slno = ?
-          AND hsp_module_code  = ?
-          AND hsp_map_status = 1
-        `,
-    [companySlno, moduleCode],
-  );
-
+  const schemaDetail = await query("meliora", "SELECT schema_name FROM hsp_company_schema_map WHERE hsp_company_slno = ? AND hsp_module_code  = ? AND hsp_map_status = 1",[companySlno, moduleCode])
   // MySQL returns array of rows
   if (!schemaDetail || schemaDetail?.length === 0) {
     throw new Error(`Schema not found for company ${companySlno}, module ${moduleCode}`);

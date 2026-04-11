@@ -4,7 +4,7 @@ module.exports = {
   getMedicinesFromOracle: async (data, callBack) => {
     let conn_ora = await getTmcConnection();
     try {
-      const medicneList = await query(`select it_code,itc_desc from medicine_descriptions`);
+      const medicneList = await query("ellider",`select it_code,itc_desc from medicine_descriptions`);
 
       let checkMeddescAlreadyExist = (callBack) => {
         pool.query(`select it_code,itc_desc from medicine_descriptions`, [], (error, result) => {
@@ -59,7 +59,7 @@ module.exports = {
   getMedicinesForUpdates: async (data) => {
     let conn_ora = await getTmcConnection();
     try {
-      const meddescFromSql = await query(`select it_code,itc_desc from medicine_descriptions`);
+      const meddescFromSql = await query("ellider",`select it_code,itc_desc from medicine_descriptions`);
       // let checkMeddescAlreadyExist = (callBack) => {
       //   pool.query(`select it_code,itc_desc from medicine_descriptions`, [], (error, result) => {
       //     if (error) throw error;
@@ -98,7 +98,7 @@ module.exports = {
       });
 
       if (newMedArray.length !== 0) {
-        await transaction(
+        await transaction("ellider",
           newMedArray?.map((value, index) => ({
             sql: `insert into medicine_descriptions (it_code,itc_desc,itc_alias,itn_pack,itn_strip,itc_status) values (?,?,?,?,?,?)`,
             values: [value.IT_CODE, value.ITC_DESC, value.ITC_ALIAS, value.ITN_PACK, value.ITN_STRIP, value.ITC_STATUS],
@@ -107,7 +107,7 @@ module.exports = {
       }
 
       if (updatedData.length !== 0) {
-        return await transaction(
+        return await transaction("ellider",
           updatedData?.map((value, index) => ({
             sql: `update medicine_descriptions set itc_desc = ?, itn_strip = ?, itn_pack = ? where it_code = ? `,
             values: [value.ITC_DESC, value.ITN_STRIP, value.ITN_PACK, value.IT_CODE],
@@ -180,21 +180,21 @@ module.exports = {
   },
 
   medicineImportedDateUpdate: async (data) => {
-    const result = await query(`update medi_ellider.meddesc_lastupdate set lastupdate = ? where sl_no=1`, [data.lastupdate]);
+    const result = await query("ellider",`update medi_ellider.meddesc_lastupdate set lastupdate = ? where sl_no=1`, [data.lastupdate]);
     return result;
   },
 
   getImportedDate: async () => {
-    const result = await query(`select lastupdate from  medi_ellider.meddesc_lastupdate where sl_no=1`);
+    const result = await query("ellider",`select lastupdate from  medi_ellider.meddesc_lastupdate where sl_no=1`);
     return result;
   },
 
   getMedicinesFromMysql: async () => {
-    return query(`select * from medicine_descriptions order by itc_desc`);
+    return query("ellider",`select * from medicine_descriptions order by itc_desc`);
   },
 
   searchMedicines: async (data) => {
-    const result = await query(
+    const result = await query("ellider",
       `select  * from medicine_descriptions
         where itc_alias like ? and itc_desc like ? order by itc_desc`,
       ["%" + data.itc_alias + "%", "%" + data.itc_desc + "%"],
@@ -203,7 +203,7 @@ module.exports = {
   },
 
   medicineDetailsUpdate: async (data) => {
-    const result = await query(`update medi_ellider.medicine_descriptions set  itn_strip = ?, itn_pack = ? where it_code = ?`, [data.itn_strip, data.itn_pack, data.it_code]);
+    const result = await query("ellider",`update medi_ellider.medicine_descriptions set  itn_strip = ?, itn_pack = ? where it_code = ?`, [data.itn_strip, data.itn_pack, data.it_code]);
     return result;
   },
 
