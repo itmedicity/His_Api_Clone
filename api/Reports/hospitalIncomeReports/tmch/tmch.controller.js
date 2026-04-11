@@ -52,10 +52,9 @@ const getTmchReport = async (req, res) => {
       if (!getResult || getResult.length === 0) {
         return results;
       }
-
-      const array = Object.values(JSON.parse(JSON.stringify(getResult)));
-      const notInclPat = results.filter((e) => !array.map((e) => e.ip_no).includes(e.IP_NO));
-      return notInclPat.length === 0 ? results : notInclPat;
+      const ipSet = new Set(getResult.map((e) => e.ip_no));
+      const notInclPat = results?.filter((e) => !ipSet.has(e.IP_NO));
+      return notInclPat;
     };
 
     const getIpPreviousDayCollection = await ipPreviousDayCollection(conn, body);
