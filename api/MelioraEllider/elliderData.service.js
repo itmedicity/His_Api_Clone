@@ -755,6 +755,7 @@ module.exports = {
 
       // FOR DYNAMICALLY FETCHING DETAIL BASED ON SCHEMA
       const SCHEMA_NAME = await getSchemaByCompanyAndModule(companySlno, "00");
+      // console.log(SCHEMA_NAME)
 
       const sql = `
             SELECT DSC_DESCRIPTION 
@@ -766,7 +767,9 @@ module.exports = {
               AND DS.IP_NO = :IP_NO
         `;
 
+        // console.log(sql)
       const result = await conn_ora.execute(sql, {IP_NO: data.IP_NO}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      // console.log(result)
       // callBack(null, result.rows);
       return result.rows;
       // result.resultSet.getRows((err, rows) => {

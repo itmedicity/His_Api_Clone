@@ -3,7 +3,7 @@ const {getTmcConnection, oracledb} = require("../../config/oradbconfig");
 
 module.exports = {
   getPharmacyList: async () => {
-    const result = await query(`select * from medi_ellider.outlet`, []);
+    const result = await query("ellider",`select * from medi_ellider.outlet`, []);
     return result;
   },
 
@@ -89,7 +89,7 @@ module.exports = {
   truncateRolSetting: async () => {
     let conn_ora = await getTmcConnection();
     try {
-      return await conn_ora.execute(` TRUNCATE TABLE rol_setting`, []);
+      return await conn_ora.execute(`TRUNCATE TABLE rol_setting`, []);
     } catch (error) {
       throw error;
     } finally {
