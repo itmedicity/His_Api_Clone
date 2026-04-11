@@ -1682,7 +1682,7 @@ const getCollectionPortion_one = async (conn_ora, bind) => {
 };
 // INCLUDED BUT NOT PRESENT FOR THE REPORT
 const getCollectionPortion_two = async (conn_ora, bind) => {
-  const sql = `SELECT SUM (Amt) Amt, SUM (Tax) Tax
+  const sql = `SELECT SUM (Amt) Amt, SUM (Tax) Tax,IP_NO
   FROM (SELECT SUM (
                   (  NVL (Ipreceipt.irn_amount, 0)
                    + NVL (Ipreceipt.irn_cheque, 0)
@@ -1740,7 +1740,7 @@ const getCollectionPortion_two = async (conn_ora, bind) => {
                  AND REFUNDBILLMAST.RFC_RETCNCODE IS NOT NULL
                  AND REFUNDBILLMAST.RFD_DATE < TRUNC (TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss'))
                  AND REFUNDBILLMAST.ROC_SLNO IS NULL
-        GROUP BY 'Billing',BILLMAST.IP_NO)`;
+        GROUP BY 'Billing',BILLMAST.IP_NO) GROUP BY IP_NO`;
   const result = await conn_ora.execute(
     sql,
     {
