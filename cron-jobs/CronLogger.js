@@ -166,8 +166,7 @@ const captureDischargeHistory = async (row) => {
 
 const getSchemaByCompanyAndModule = async (companySlno, moduleCode) => {
   const schemaDetail = await pools.meliora.execute(
-    `
-        SELECT schema_name
+    `SELECT schema_name
         FROM hsp_company_schema_map
         WHERE hsp_company_slno = ?
           AND hsp_module_code  = ?
