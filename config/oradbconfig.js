@@ -24,8 +24,8 @@ async function initializePools() {
         connectString: process.env.ORA_CONN_STRING,
         poolAlias: "TMC_POOL",
         poolMin: 2,
-        poolMax: 5,
-        poolIncrement: 1,
+        poolMax: 20,
+        poolIncrement: 2,
         poolTimeout: 60,
         queueTimeout: 60000,
         stmtCacheSize: 30,
@@ -41,12 +41,14 @@ async function initializePools() {
         password: process.env.ORAC_PASS,
         connectString: process.env.ORA_CONN_STRING,
         poolAlias: "TMC_CRONE_POOL",
-        poolMin: 1,
-        poolMax: 3,
-        poolIncrement: 1,
+        poolMin: 2,
+        poolMax: 10,
+        poolIncrement: 2,
         queueTimeout: 60000,
         stmtCacheSize: 30,
         poolPingInterval: 60,
+        poolTimeout: 60,
+        callTimeout: 120000,
       });
       console.log("TMC Oracle_CRONE pool initialized");
     }
@@ -59,11 +61,12 @@ async function initializePools() {
         poolAlias: "KMC_POOL",
         poolMin: 2,
         poolMax: 6,
-        poolIncrement: 1,
+        poolIncrement: 2,
         poolTimeout: 60,
         queueTimeout: 60000,
         stmtCacheSize: 30,
         poolPingInterval: 60,
+        callTimeout: 120000,
       });
       console.log("KMC Oracle pool initialized");
     }

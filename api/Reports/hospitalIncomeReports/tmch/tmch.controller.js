@@ -72,7 +72,7 @@ const getTmchReport = async (req, res) => {
 
       const array = Object.values(JSON.parse(JSON.stringify(getResult)));
       const notInclPat = results.filter((e) => !array.map((e) => e.ip_no).includes(e.IP_NO));
-      return notInclPat.length === 0 ? results : notInclPat;
+      return notInclPat;
     };
 
     const getIpPreviousDayDicount = await ipPreviousDayDiscount(conn, body);
