@@ -16,6 +16,8 @@ const getTsshReport = async (req, res) => {
       groupIdForPrevious: groupIdForPrevious,
     };
     //   console.log(`body`, body);
+    await conn.execute("DELETE FROM GTT_EXCLUDE_IP");
+    await conn.commit();
     await insertIntoGTT(conn, ptno);
 
     const getMisincexpmast = await qmtService.getMisincexpmast(conn);

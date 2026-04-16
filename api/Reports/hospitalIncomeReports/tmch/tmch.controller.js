@@ -1,11 +1,16 @@
-const {getTmcConnection} = require("../../../../config/oradbconfig");
+const {getTmcConnection, oracleConnectionClose} = require("../../../../config/oradbconfig");
 const {insertIntoGTT} = require("../../../../utls/controller-helperFun");
 const {getIpNumberFromPreviousDayCollection} = require("../../misReportTmch/misReportTMCH/collectionTmch.service");
 const qmtService = require("./tmch.service");
 const groupedService = require("../tssh/tssh.service");
 
 const getTmchReport = async (req, res) => {
-  const conn = await getTmcConnection();
+  let main_conn;
+  let income_conn;
+  let pharma_conn;
+  let secon_conn;
+
+  // const conn = await getTmcConnection();
 
   const body = req.body;
   const {from, to, ptno, grouped, phar} = req.body;
@@ -13,33 +18,38 @@ const getTmchReport = async (req, res) => {
   // console.log("ptno" + ptno);
 
   try {
-    await insertIntoGTT(conn, ptno);
-    const getMisincexpmast = await qmtService.getMisincexpmast(conn);
-    const getMisincexpgroup = await qmtService.getMisincexpgroup(conn);
-    const getUngroupedRoomDetl = await qmtService.getUngroupedRoomDetl(conn, body);
-    const getTheaterIncome = await qmtService.getTheaterIncome(conn, body);
-    const getTheaterIncome_two = await qmtService.getTheaterIncome_two(conn, body);
-    const getConsultingIncome = await qmtService.getConsultingIncome(conn, body);
-    const getIpRefundDetl = await qmtService.getIpRefundDetl(conn, body);
-    const getIpRefundDetl_one = await qmtService.getIpRefundDetl_one(conn, body);
-    const getIpincomeSection_one = await qmtService.getIpincomeSection_one(conn, body);
-    const getIpincomeSection_two = await qmtService.getIpincomeSection_two(conn, body);
-    const getIpincomeSection_three = await qmtService.getIpincomeSection_three(conn, body);
-    const getProcedureIncomeSection_one = await qmtService.getProcedureIncomeSection_one(conn, body);
-    const getReceiptmasterSection_one = await qmtService.getReceiptmasterSection_one(conn, body);
-    const getIpRefundReceiptDetlSection_Two = await qmtService.getIpRefundReceiptDetlSection_Two(conn, body);
-    const getIpincomeSection_four = await qmtService.getIpincomeSection_four(conn, body);
-    const getProcedureIncomeSecition_two = await qmtService.getProcedureIncomeSecition_two(conn, body);
-    const getIpRefundDetlSection_three = await qmtService.getIpRefundDetlSection_three(conn, body);
-    const getIpincomeSection_five = await qmtService.getIpincomeSection_five(conn, body);
-    const getIpRefundDetlSection_four = await qmtService.getIpRefundDetlSection_four(conn, body);
-    const getCollectionAgainstSales_one = await qmtService.getCollectionPortion_one(conn, body);
-    const getPerttyCash = await qmtService.getPerttyCash(conn, body);
-    const getCeditInsuranceBillCollection = await qmtService.getCollectionPortion_three(conn, body);
-    const getCollectionAgainstSales_two = await qmtService.getIpRefundDetlSection_five(conn, body);
-    const getCollectionPortion_four = await qmtService.getCollectionPortion_four(conn, body);
-    const getDiscount = await qmtService.getDiscount(conn, body);
-    const getIpincomeSection_six = await qmtService.getIpincomeSection_six(conn, body);
+    [main_conn, income_conn, pharma_conn, secon_conn] = await Promise.all([getTmcConnection(), getTmcConnection(), getTmcConnection(), getTmcConnection()]);
+
+    await main_conn.execute("DELETE FROM GTT_EXCLUDE_IP");
+    await main_conn.commit();
+    await insertIntoGTT(main_conn, ptno);
+    const getMisincexpmast = await qmtService.getMisincexpmast(main_conn);
+    const getMisincexpgroup = await qmtService.getMisincexpgroup(main_conn);
+    const getUngroupedRoomDetl = await qmtService.getUngroupedRoomDetl(main_conn, body);
+    const getTheaterIncome = await qmtService.getTheaterIncome(main_conn, body);
+    const getTheaterIncome_two = await qmtService.getTheaterIncome_two(main_conn, body);
+    const getConsultingIncome = await qmtService.getConsultingIncome(main_conn, body);
+    const getIpRefundDetl = await qmtService.getIpRefundDetl(main_conn, body);
+    const getIpRefundDetl_one = await qmtService.getIpRefundDetl_one(main_conn, body);
+    const getIpincomeSection_one = await qmtService.getIpincomeSection_one(main_conn, body);
+    const getIpincomeSection_two = await qmtService.getIpincomeSection_two(main_conn, body);
+    const getIpincomeSection_three = await qmtService.getIpincomeSection_three(main_conn, body);
+    const getProcedureIncomeSection_one = await qmtService.getProcedureIncomeSection_one(main_conn, body);
+    const getReceiptmasterSection_one = await qmtService.getReceiptmasterSection_one(main_conn, body);
+
+    const getIpRefundReceiptDetlSection_Two = await qmtService.getIpRefundReceiptDetlSection_Two(main_conn, body);
+    const getIpincomeSection_four = await qmtService.getIpincomeSection_four(main_conn, body);
+    const getProcedureIncomeSecition_two = await qmtService.getProcedureIncomeSecition_two(main_conn, body);
+    const getIpRefundDetlSection_three = await qmtService.getIpRefundDetlSection_three(main_conn, body);
+    const getIpincomeSection_five = await qmtService.getIpincomeSection_five(main_conn, body);
+    const getIpRefundDetlSection_four = await qmtService.getIpRefundDetlSection_four(main_conn, body);
+    const getCollectionAgainstSales_one = await qmtService.getCollectionPortion_one(main_conn, body);
+    const getPerttyCash = await qmtService.getPerttyCash(main_conn, body);
+    const getCeditInsuranceBillCollection = await qmtService.getCollectionPortion_three(main_conn, body);
+    const getCollectionAgainstSales_two = await qmtService.getIpRefundDetlSection_five(main_conn, body);
+    const getCollectionPortion_four = await qmtService.getCollectionPortion_four(main_conn, body);
+    const getDiscount = await qmtService.getDiscount(main_conn, body);
+    const getIpincomeSection_six = await qmtService.getIpincomeSection_six(main_conn, body);
 
     const ipPreviousDayCollection = async (conn, bind) => {
       const results = await qmtService.getCollectionPortion_two(conn, bind);
@@ -57,7 +67,7 @@ const getTmchReport = async (req, res) => {
       return notInclPat;
     };
 
-    const getIpPreviousDayCollection = await ipPreviousDayCollection(conn, body);
+    const getIpPreviousDayCollection = await ipPreviousDayCollection(main_conn, body);
     const ipPreviousDayDiscount = async (conn, bind) => {
       const results = await qmtService.getDiscount_one(conn, bind);
       if (!results || results.length === 0) {
@@ -75,34 +85,38 @@ const getTmchReport = async (req, res) => {
       return notInclPat;
     };
 
-    const getIpPreviousDayDicount = await ipPreviousDayDiscount(conn, body);
+    const getIpPreviousDayDicount = await ipPreviousDayDiscount(main_conn, body);
 
-    const getAdvanceCollection = await qmtService.getCollectionPortion_five(conn, body);
-    const getAdvanceSettled = await qmtService.getCollectionPortion_six(conn, body);
-    const Credit_Insurance_Bill_two = await qmtService.getIpRefundDetlSection_six(conn, body);
-    const getAdvanceRefund = await qmtService.getAdvanceRefund(conn, body);
-    const Credit_Insurance_Bill_one = await qmtService.getCollectionPortion_seven(conn, body);
-    const getUnsettledAmount = await qmtService.getCollectionPortion_eight(conn, body);
-    const getIpRefundDetlSection_seven = await qmtService.getIpRefundDetlSection_seven(conn, body);
-    const getWriteoffamnt = await qmtService.getWriteoffamnt(conn, body);
-    const IpConsolidated_Discount = await qmtService.getDiscount_three(conn, body);
-    const getTypeDiscount = await qmtService.getTypeDiscount(conn, body);
+    const getAdvanceCollection = await qmtService.getCollectionPortion_five(main_conn, body);
+    const getAdvanceSettled = await qmtService.getCollectionPortion_six(main_conn, body);
+    const Credit_Insurance_Bill_two = await qmtService.getIpRefundDetlSection_six(main_conn, body);
+    const getAdvanceRefund = await qmtService.getAdvanceRefund(main_conn, body);
+    const Credit_Insurance_Bill_one = await qmtService.getCollectionPortion_seven(main_conn, body);
+    const getUnsettledAmount = await qmtService.getCollectionPortion_eight(main_conn, body);
+    const getIpRefundDetlSection_seven = await qmtService.getIpRefundDetlSection_seven(main_conn, body);
+    const getWriteoffamnt = await qmtService.getWriteoffamnt(main_conn, body);
+    const IpConsolidated_Discount = await qmtService.getDiscount_three(main_conn, body);
+    const getTypeDiscount = await qmtService.getTypeDiscount(main_conn, body);
     // PHARMACY INCOME
-    await conn.commit();
-    await insertIntoGTT(conn, phar);
-    const getPharmacyCollection_One = await qmtService.getPharmacyCollection_One(conn, body);
-    const getPharamcyReturnSection_one = await qmtService.getPharamcyReturnSection_one(conn, body);
-    const getPharmacyCollection_Two = await qmtService.getPharmacyCollection_Two(conn, body);
-    const getPharamcyCollection_three = await qmtService.getPharamcyCollection_three(conn, body);
-    const getPharmacyCollection_four = await qmtService.getPharmacyCollection_four(conn, body);
-    const getPharmacyReturnSection_three = await qmtService.getPharmacyReturnSection_three(conn, body);
+    await pharma_conn.execute("DELETE FROM GTT_EXCLUDE_IP");
+    await pharma_conn.commit();
+    await insertIntoGTT(pharma_conn, phar);
+    const getPharmacyCollection_One = await qmtService.getPharmacyCollection_One(pharma_conn, body);
+    const getPharamcyReturnSection_one = await qmtService.getPharamcyReturnSection_one(pharma_conn, body);
+    const getPharmacyCollection_Two = await qmtService.getPharmacyCollection_Two(pharma_conn, body);
+    const getPharamcyCollection_three = await qmtService.getPharamcyCollection_three(pharma_conn, body);
+    const getPharmacyCollection_four = await qmtService.getPharmacyCollection_four(pharma_conn, body);
+    const getPharmacyReturnSection_three = await qmtService.getPharmacyReturnSection_three(pharma_conn, body);
 
     // GROUPED PHARMACY SERVICE FROM TSSH
-    await conn.commit();
-    await insertIntoGTT(conn, grouped);
-    const getGroupedPharmacyService_One = await groupedService.getPharmacyCollection_Two(conn, body);
-    const getGroupedPharmacyService_Two = await groupedService.getPharmacyCollection_four(conn, body);
-    const getGroupedPharmacyService_Three = await groupedService.getPharmacyReturnSection_three(conn, body);
+    await secon_conn.execute("DELETE FROM GTT_EXCLUDE_IP");
+    await secon_conn.commit();
+    await insertIntoGTT(secon_conn, grouped);
+    const getGroupedPharmacyService_One = await groupedService.getPharmacyCollection_Two(secon_conn, body);
+    const getGroupedPharmacyService_Two = await groupedService.getPharmacyCollection_four(secon_conn, body);
+    const getGroupedPharmacyService_Three = await groupedService.getPharmacyReturnSection_three(secon_conn, body);
+    await secon_conn.execute("DELETE FROM GTT_EXCLUDE_IP");
+    await secon_conn.commit();
 
     const result = {
       income: {
@@ -197,13 +211,7 @@ const getTmchReport = async (req, res) => {
       message: error.message || "Internal Server Error",
     });
   } finally {
-    if (conn) {
-      try {
-        await conn.close();
-      } catch (closeErr) {
-        console.error("Error closing Oracle connection:", closeErr);
-      }
-    }
+    await Promise.all([oracleConnectionClose(main_conn), oracleConnectionClose(income_conn), oracleConnectionClose(pharma_conn), oracleConnectionClose(secon_conn)]);
   }
 };
 
