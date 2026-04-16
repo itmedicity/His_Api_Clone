@@ -1,4 +1,4 @@
-const {getTmcConnection} = require("../../../../config/oradbconfig");
+const {getTmcConnection, oracleConnectionClose} = require("../../../../config/oradbconfig");
 const {insertIntoGTT} = require("../../../../utls/controller-helperFun");
 const {getIpNumberFromPreviousDayCollection} = require("../../misReportTssh/misReportTssh/collectionTssh.service");
 const qmtService = require("./tssh.service");
@@ -16,6 +16,8 @@ const getTsshReport = async (req, res) => {
       groupIdForPrevious: groupIdForPrevious,
     };
     //   console.log(`body`, body);
+    await conn.execute("DELETE FROM GTT_EXCLUDE_IP");
+    await conn.commit();
     await insertIntoGTT(conn, ptno);
 
     const getMisincexpmast = await qmtService.getMisincexpmast(conn);
@@ -192,13 +194,7 @@ const getTsshReport = async (req, res) => {
       message: error.message || "Internal Server Error",
     });
   } finally {
-    if (conn) {
-      try {
-        await conn.close();
-      } catch (closeErr) {
-        console.error("Error closing Oracle connection:", closeErr);
-      }
-    }
+    await oracleConnectionClose(conn)
   }
 };
 
