@@ -1,5 +1,5 @@
 const {pools, query} = require("../../config/mysqldbconfig");
-const {oracledb, getTmcConnection} = require("../../config/oradbconfig");
+const {oracledb, getTmcConnection, getTmcCronConnection} = require("../../config/oradbconfig");
 const {getCompanySlno, getSchemaByCompanyAndModule} = require("../../cron-jobs/CronLogger");
 module.exports = {
   //using
@@ -746,7 +746,7 @@ module.exports = {
   getInpatientFollowUp: async (data) => {
     let conn_ora;
     try {
-      conn_ora = await getTmcConnection();
+      conn_ora = await getTmcCronConnection();
 
       const companySlno = await getCompanySlno();
       if (isNaN(Number(companySlno))) {
@@ -757,15 +757,11 @@ module.exports = {
       const SCHEMA_NAME = await getSchemaByCompanyAndModule(companySlno, "00");
       // console.log(SCHEMA_NAME)
 
-      const sql = `
-            SELECT DSC_DESCRIPTION 
-            FROM ${SCHEMA_NAME}.DISCHARGESUMMARYHTML DS
-            LEFT JOIN ${SCHEMA_NAME}.DISCHARGESUMMARY D
-                   ON DS.DS_SLNO = D.DS_SLNO
-            WHERE D.DSC_APPROVAL = 'Y'
-              AND DS.DSC_HEAD = 'DSC_FOLLOWUP'
-              AND DS.IP_NO = :IP_NO
-        `;
+      const sql = `SELECT DS.DSC_DESCRIPTION
+                    FROM ${SCHEMA_NAME}.DISCHARGESUMMARYHTML DS
+                    JOIN ${SCHEMA_NAME}.DISCHARGESUMMARY D ON DS.DS_SLNO = D.DS_SLNO AND D.DSC_APPROVAL = 'Y'
+                    WHERE DS.IP_NO = :IP_NO
+                      AND DS.DSC_HEAD = 'DSC_FOLLOWUP'`;
 
         // console.log(sql)
       const result = await conn_ora.execute(sql, {IP_NO: data.IP_NO}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
