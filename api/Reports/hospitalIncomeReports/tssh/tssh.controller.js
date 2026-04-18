@@ -7,7 +7,7 @@ const getTsshReport = async (req, res) => {
   let conn;
   try {
     conn = await getTmcConnection();
-    const {from, to, ptno, grouped, phar, group, groupIdForPrevious} = req.body;
+    const {from, to, ptno, grouped, phar, group, groupIdForPrevious, ipNoColl} = req.body;
 
     const body = {
       from: from,
@@ -16,7 +16,6 @@ const getTsshReport = async (req, res) => {
       groupIdForPrevious: groupIdForPrevious,
     };
     //   console.log(`body`, body);
-    await conn.execute("DELETE FROM GTT_EXCLUDE_IP");
     await conn.commit();
     await insertIntoGTT(conn, ptno);
 
@@ -27,25 +26,25 @@ const getTsshReport = async (req, res) => {
     const getTheaterIncome_two = await qmtService.getTheaterIncome_two(conn, body);
     const getConsultingIncome = await qmtService.getConsultingIncome(conn, body);
     const getIpRefundDetl = await qmtService.getIpRefundDetl(conn, body);
-    // const getIpRefundDetl_one = await qmtService.getIpRefundDetl_one(conn, body);
     const getIpincomeSection_one = await qmtService.getIpincomeSection_one(conn, body);
     const getIpincomeSection_two = await qmtService.getIpincomeSection_two(conn, body);
-    // const getPharmacyCollection_One = await qmtService.getPharmacyCollection_One(conn, body);
-    // const getIpincomeSection_three = await qmtService.getIpincomeSection_three(conn, body);
     const getProcedureIncomeSection_one = await qmtService.getProcedureIncomeSection_one(conn, body);
-    // const getPharamcyReturnSection_one = await qmtService.getPharamcyReturnSection_one(conn, body);
-    // const getReceiptmasterSection_one = await qmtService.getReceiptmasterSection_one(conn, body);
     const getPharmacyCollection_Two = await qmtService.getPharmacyCollection_Two(conn, body);
     const getIpRefundReceiptDetlSection_Two = await qmtService.getIpRefundReceiptDetlSection_Two(conn, body);
+    const getPharmacyReturnSection_three = await qmtService.getPharmacyReturnSection_three(conn, body);
+    const getPharmacyCollection_four = await qmtService.getPharmacyCollection_four(conn, body);
+    const getIpincomeSection_five = await qmtService.getIpincomeSection_five(conn, body);
+    const getCollectionAgainstSales_one = await qmtService.getCollectionPortion_one(conn, body);
+    // const getIpRefundDetl_one = await qmtService.getIpRefundDetl_one(conn, body);
+    // const getPharmacyCollection_One = await qmtService.getPharmacyCollection_One(conn, body);
+    // const getIpincomeSection_three = await qmtService.getIpincomeSection_three(conn, body);
+    // const getPharamcyReturnSection_one = await qmtService.getPharamcyReturnSection_one(conn, body);
+    // const getReceiptmasterSection_one = await qmtService.getReceiptmasterSection_one(conn, body);
     // const getPharamcyCollection_three = await qmtService.getPharamcyCollection_three(conn, body);
     // const getIpincomeSection_four = await qmtService.getIpincomeSection_four(conn, body);
-    const getPharmacyReturnSection_three = await qmtService.getPharmacyReturnSection_three(conn, body);
     // const getProcedureIncomeSecition_two = await qmtService.getProcedureIncomeSecition_two(conn, body);
-    const getPharmacyCollection_four = await qmtService.getPharmacyCollection_four(conn, body);
     // const getIpRefundDetlSection_three = await qmtService.getIpRefundDetlSection_three(conn, body);
-    const getIpincomeSection_five = await qmtService.getIpincomeSection_five(conn, body);
     // const getIpRefundDetlSection_four = await qmtService.getIpRefundDetlSection_four(conn, body);
-    const getCollectionAgainstSales_one = await qmtService.getCollectionPortion_one(conn, body);
 
     const ipPreviousDayCollection = async (conn, bind) => {
       const results = await qmtService.getCollectionPortion_two(conn, bind);
@@ -90,7 +89,6 @@ const getTsshReport = async (req, res) => {
     const getIpPreviousDayDicount = await ipPreviousDayDiscount(conn, body);
 
     const getPerttyCash = await qmtService.getPerttyCash(conn, body);
-    const getCeditInsuranceBillCollection = await qmtService.getCollectionPortion_three(conn, body);
     const getCollectionAgainstSales_two = await qmtService.getIpRefundDetlSection_five(conn, body);
     const getCollectionPortion_four = await qmtService.getCollectionPortion_four(conn, body);
     const getDiscount = await qmtService.getDiscount(conn, body);
@@ -105,6 +103,11 @@ const getTsshReport = async (req, res) => {
     const getWriteoffamnt = await qmtService.getWriteoffamnt(conn, body);
     const IpConsolidated_Discount = await qmtService.getDiscount_three(conn, body);
     const getTypeDiscount = await qmtService.getTypeDiscount(conn, body);
+
+    await conn.commit();
+    await insertIntoGTT(conn, ipNoColl);
+    const getCeditInsuranceBillCollection = await qmtService.getCollectionPortion_three(conn, body);
+    await conn.commit();
 
     const result = {
       income: {
@@ -194,7 +197,7 @@ const getTsshReport = async (req, res) => {
       message: error.message || "Internal Server Error",
     });
   } finally {
-    await oracleConnectionClose(conn)
+    await oracleConnectionClose(conn);
   }
 };
 

@@ -7,7 +7,7 @@ module.exports = {
    * @description ORACLE UPDATION : IP ADMISSION
    */
   ipAdmissionList: async (data) => {
-    let conn_ora; 
+    let conn_ora;
     try {
       conn_ora = await getTmcConnection();
       const sql = ` SELECT 
@@ -99,7 +99,7 @@ module.exports = {
     return query("ellider", `DELETE FROM tssh_ipadmiss WHERE ip_slno IN (?)`, [data]);
   },
   getPatientData: async (ptno) => {
-    let conn_ora; 
+    let conn_ora;
     try {
       conn_ora = await getTmcConnection();
       const {rows} = await conn_ora.execute(
@@ -136,7 +136,7 @@ module.exports = {
     );
   },
   getTotalPatientList: async (data) => {
-      let conn_ora;
+    let conn_ora;
     try {
       conn_ora = await getTmcConnection();
       const sql = `SELECT  
@@ -188,14 +188,14 @@ module.exports = {
                     WHERE  DMD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND DMD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND IPADMISS.IPC_PTFLAG = 'N'`;
-                    const {rows} = await conn_ora.execute(
-                      sql,
-                      {
-                        fromDate: data.from,
-                        toDate: data.to,
-                      },
-                      {outFormat: oracledb.OUT_FORMAT_OBJECT},
-                      );
+      const {rows} = await conn_ora.execute(
+        sql,
+        {
+          fromDate: data.from,
+          toDate: data.to,
+        },
+        {outFormat: oracledb.OUT_FORMAT_OBJECT},
+      );
       return rows;
     } catch (error) {
       console.log(error);
@@ -221,7 +221,7 @@ module.exports = {
     );
   },
   getLastDischargeUpdateDate: async () => {
-    return query("ellider",`SELECT Last_dis_updateDate FROM last_dis_updatedate`);
+    return query("ellider", `SELECT Last_dis_updateDate FROM last_dis_updatedate`);
   },
   updateDischargedPatient: async (data) => {
     return transaction(
@@ -236,7 +236,7 @@ module.exports = {
     );
   },
   updateLastDischargeDate: async (data) => {
-    return query("ellider",`UPDATE last_dis_updatedate SET Last_dis_updateDate = ? WHERE slno = 1`, [data.date]);
+    return query("ellider", `UPDATE last_dis_updatedate SET Last_dis_updateDate = ? WHERE slno = 1`, [data.date]);
   },
   getDischargedipNoFromMysql: (data) => {
     return query(
@@ -283,7 +283,7 @@ module.exports = {
     );
   },
   getIpadmissChecks: async (data) => {
-    let conn_ora; 
+    let conn_ora;
     try {
       conn_ora = await getTmcConnection();
       const {rows} = await conn_ora.execute(
@@ -306,7 +306,7 @@ module.exports = {
   },
   // GET DISCHARGE INFO FROM ORACLE
   getIpReceiptPatientInfo: async (data) => {
-    let conn_ora; 
+    let conn_ora;
     try {
       conn_ora = await getTmcConnection();
       const fromDate = data.from;
