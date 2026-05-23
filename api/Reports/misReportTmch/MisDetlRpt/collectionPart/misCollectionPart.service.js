@@ -1014,46 +1014,63 @@ module.exports = {
     const fromDate = data.from;
     const toDate = data.to;
 
-    const sql = `SELECT X.Rc_no BillNo,
-                            NVL (Rcn_cash, 0) Cash,
-                            NVL (Rcn_chk, 0) Cheque,
-                            NVL (Rcn_dd, 0) DD,
-                            NVL (Rcn_Card, 0) Card,
-                            NVL (RCN_NEFT, 0) Bankamt,
-                            INITCAP (Rcc_Bank) Bank,
-                            INITCAP (Cuc_name) Customer,
-                            INITCAP (Usc_name) UserName
-                    FROM Recpcollectionmast X, Customer Y, Users Z,Recpcollectiondetl R
-                    WHERE X.Cu_code = Y.Cu_code
-                            AND X.Us_code = Z.Us_code(+)
-                            AND NVL (X.Rcc_cancel, 'N') = 'N'
-                            AND R.RCC_SLNO(+) = X.RCC_SLNO
-                            AND X.Rcd_date >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
-                            AND X.Rcd_date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
-                            AND X.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-                            AND (R.IP_NO IS NOT NULL)
-                            AND R.IP_NO NOT IN (${ipNumberList})
-                            GROUP BY X.Rc_no,Rcn_cash,Rcn_chk,Rcn_dd,Rcn_Card,RCN_NEFT,Rcc_Bank,Cuc_name,Usc_name
-                    UNION ALL
-                    SELECT X.Rc_no BillNo,
-                            NVL (Rcn_cash, 0) Cash,
-                            NVL (Rcn_chk, 0) Cheque,
-                            NVL (Rcn_dd, 0) DD,
-                            NVL (Rcn_Card, 0) Card,
-                            NVL (RCN_NEFT, 0) Bankamt,
-                            INITCAP (Rcc_Bank) Bank,
-                            INITCAP (Cuc_name) Customer,
-                            INITCAP (Usc_name) UserName
-                    FROM Recpcollectionmast X, Customer Y, Users Z,Recpcollectiondetl R
-                    WHERE X.Cu_code = Y.Cu_code
-                            AND X.Us_code = Z.Us_code(+)
-                            AND NVL (X.Rcc_cancel, 'N') = 'N'
-                            AND R.RCC_SLNO(+) = X.RCC_SLNO
-                            AND X.Rcd_date >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
-                            AND X.Rcd_date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
-                            AND X.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-                            AND R.IP_NO IS NULL
-                            GROUP BY X.Rc_no,Rcn_cash,Rcn_chk,Rcn_dd,Rcn_Card,RCN_NEFT,Rcc_Bank,Cuc_name,Usc_name`;
+    const sql = `WITH GTT_FILTER
+     AS (SELECT/*+ MATERIALIZE */ DISTINCT IP_NO FROM GTT_EXCLUDE_IP WHERE STATUS = 1),
+     R_FILTER AS (SELECT DISTINCT RCC_SLNO, IP_NO FROM Recpcollectiondetl),
+     BASE
+     AS (SELECT X.RCC_SLNO,
+                X.Rc_no,
+                X.Rcd_date,
+                X.Rfd_Date,
+                NVL (X.Rcn_cash, 0) Rcn_cash,
+                NVL (X.Rcn_chk, 0) Rcn_chk,
+                NVL (X.Rcn_dd, 0) Rcn_dd,
+                NVL (X.Rcn_Card, 0) Rcn_card,
+                NVL (X.RCN_NEFT, 0) Rcn_bank,
+                NVL (X.Rfn_Cash, 0) Rfn_cash,
+                NVL (X.Rfn_Chk, 0) Rfn_chk,
+                NVL (X.Rfn_Dd, 0) Rfn_dd,
+                NVL (X.Rfn_Card, 0) Rfn_card,
+                INITCAP (X.Rcc_Bank) Bank,
+                INITCAP (Y.Cuc_name) Customer,
+                INITCAP (Z.Usc_name) UserName
+           FROM Recpcollectionmast X
+                JOIN Customer Y
+                   ON X.Cu_code = Y.Cu_code
+                LEFT JOIN Users Z
+                   ON X.Us_code = Z.Us_code
+          WHERE NVL (X.Rcc_cancel, 'N') = 'N'
+                AND X.MH_CODE IN (SELECT MH_CODE FROM multihospital))
+                -- COLLECTION
+                SELECT B.Rc_no BillNo,
+                B.Rcn_cash Cash,
+                B.Rcn_chk Cheque,
+                B.Rcn_dd DD,
+                B.Rcn_card Card,
+                B.Rcn_bank Bankamt,
+                B.Bank,
+                B.Customer,
+                B.UserName
+                FROM BASE B
+                LEFT JOIN R_FILTER R ON R.RCC_SLNO = B.RCC_SLNO
+                LEFT JOIN GTT_FILTER G  ON G.IP_NO = R.IP_NO
+                WHERE B.Rcd_date BETWEEN TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss') AND TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                AND (R.IP_NO IS NULL OR G.IP_NO IS NULL)
+                UNION ALL
+                SELECT B.Rc_no BillNo,
+                B.Rfn_cash Cash,
+                B.Rfn_chk Cheque,
+                B.Rfn_dd DD,
+                B.Rfn_card Card,
+                0 Bankamt,
+                B.Bank,
+                B.Customer,
+                B.UserName
+                FROM BASE B
+                LEFT JOIN R_FILTER R ON R.RCC_SLNO = B.RCC_SLNO
+                LEFT JOIN GTT_FILTER G ON G.IP_NO = R.IP_NO
+                WHERE B.Rfd_Date BETWEEN TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss') AND TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                AND (R.IP_NO IS NULL OR G.IP_NO IS NULL)`;
     try {
       const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       //       callBack(null, );

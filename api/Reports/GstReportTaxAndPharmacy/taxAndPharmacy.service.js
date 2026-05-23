@@ -950,11 +950,12 @@ TO_DATE(:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
     );
     return result;
   },
-  tmchGstReport: async (data) => {
+
+  /****GST REPORT TMCH START */
+  tmchGstReport: async (conn_ora, data) => {
     //GST FIRST REPORTS
     const reportTmch_One = new Promise(async (resolve, reject) => {
-      let conn_ora = await getTmcConnection();
-
+      // let conn_ora = await getTmcConnection();
       const ipNumberListString = data?.ptno?.map((item) => `'${item}'`).join(",") || null;
       const fromDate = data.from;
       const toDate = data.to;
@@ -1026,8 +1027,8 @@ TO_DATE(:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
       // console.log(sql)
       try {
         const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
-        resolve({status: 1, message: err, data: result.rows});
-
+        resolve({status: 1, message: "Success", data: result.rows});
+        // console.log(result.rows);
         // result.resultSet?.getRows((err, rows) => {
         //   if (err) {
         //     reject({status: 0, message: err, data: []});
@@ -1036,14 +1037,12 @@ TO_DATE(:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
         // });
       } catch (error) {
         reject({status: 0, message: error, data: []});
-      } finally {
-        if (conn_ora) await conn_ora.close();
       }
     });
 
     /// SECOND REPORT
     const reportTmch_Two = new Promise(async (resolve, reject) => {
-      let conn_ora = await getTmcConnection();
+      // let conn_ora = await getTmcConnection();
       const ipNumberListString = data?.ptno?.map((item) => `'${item}'`).join(",") || null;
       const fromDate = data.from;
       const toDate = data.to;
@@ -1090,18 +1089,16 @@ TO_DATE(:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
         //       } else {
         //     }
         // });
-        resolve({status: 1, message: err, data: result.rows});
+        resolve({status: 1, message: "Success", data: result.rows});
       } catch (error) {
         reject({status: 0, message: error, data: []});
-      } finally {
-        if (conn_ora) await conn_ora.close();
       }
     });
 
     // THIR REPORTS
 
     const reportTmch_Three = new Promise(async (resolve, reject) => {
-      let conn_ora = await getTmcConnection();
+      // let conn_ora = await getTmcConnection();
 
       const ipNumberListString = data?.ptno?.map((item) => `'${item}'`).join(",") || null;
       const fromDate = data.from;
@@ -1182,16 +1179,14 @@ TO_DATE(:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
         //       } else {
         //     }
         // });
-        resolve({status: 1, message: err, data: result.rows});
+        resolve({status: 1, message: "Success", data: result.rows});
       } catch (error) {
         reject({status: 0, message: error, data: []});
-      } finally {
-        if (conn_ora) await conn_ora.close();
       }
     });
 
     const reportTmch_Four = new Promise(async (resolve, reject) => {
-      let conn_ora = await getTmcConnection();
+      // let conn_ora = await getTmcConnection();
 
       const ipNumberListString = data?.ptno?.map((item) => `'${item}'`).join(",") || null;
       const fromDate = data.from;
@@ -1238,16 +1233,14 @@ TO_DATE(:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
         //       } else {
         //     }
         // });
-        resolve({status: 1, message: err, data: result.rows});
+        resolve({status: 1, message: "Success", data: result.rows});
       } catch (error) {
         reject({status: 0, message: error, data: []});
-      } finally {
-        if (conn_ora) await conn_ora.close();
       }
     });
 
     const reportTmch_Five = new Promise(async (resolve, reject) => {
-      let conn_ora = await getTmcConnection();
+      // let conn_ora = await getTmcConnection();
 
       const ipNumberListString = data?.ptno?.map((item) => `'${item}'`).join(",") || null;
       const fromDate = data.from;
@@ -1294,11 +1287,9 @@ TO_DATE(:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
         //       } else {
         //     }
         // });
-        resolve({status: 1, message: err, data: result.rows});
+        resolve({status: 1, message: "Success", data: result.rows});
       } catch (error) {
         reject({status: 0, message: error, data: []});
-      } finally {
-        if (conn_ora) await conn_ora.close();
       }
     });
 
@@ -1310,6 +1301,7 @@ TO_DATE(:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
           ?.filter((e) => e.status === 1)
           ?.map((e) => e.data)
           ?.flat();
+        // console.log(result);
         if (resultChcek === undefined) {
           return {status: 1, message: "success", data: fiterdResult};
         } else {
@@ -1317,13 +1309,16 @@ TO_DATE(:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
         }
       })
       .catch((error) => {
+        console.log(error);
         return {status: 0, message: error, data: []};
       });
   },
-  tsshGstReports: async (data) => {
-    const reportTssh_One = new Promise(async (resolve, reject) => {
-      let conn_ora = await getTmcConnection();
 
+  /*******TMCH REPORT END */
+  /*******TSSH REPORT START */
+  tsshGstReports: async (conn_ora, data) => {
+    const reportTssh_One = new Promise(async (resolve, reject) => {
+      // let conn_ora = await getTmcConnection();
       const ipNumberListString = data?.ptno?.map((item) => `'${item}'`).join(",") || null;
       const fromDate = data.from;
       const toDate = data.to;
@@ -1369,20 +1364,14 @@ TO_DATE(:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
         //       } else {
         //     }
         // });
-        resolve({status: 1, message: err, data: result.rows});
+        resolve({status: 1, message: "Success", data: result.rows});
       } catch (error) {
         reject({status: 0, message: error, data: []});
-      } finally {
-        if (conn_ora) await conn_ora.close();
-        //      {
-        //   await conn_ora.close();
-        //   await pool_ora.close();
-        // }
       }
     });
 
     const reportTssh_Two = new Promise(async (resolve, reject) => {
-      let conn_ora = await getTmcConnection();
+      // let conn_ora = await getTmcConnection();
 
       const ipNumberListString = data?.ptno?.map((item) => `'${item}'`).join(",") || null;
       const fromDate = data.from;
@@ -1428,20 +1417,14 @@ TO_DATE(:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
         //       } else {
         //     }
         // });
-        resolve({status: 1, message: err, data: result.rows});
+        resolve({status: 1, message: "Success", data: result.rows});
       } catch (error) {
         reject({status: 0, message: error, data: []});
-      } finally {
-        if (conn_ora) await conn_ora.close();
-        //     {
-
-        //   await pool_ora.close();
-        // }
       }
     });
 
     const reportTssh_Three = new Promise(async (resolve, reject) => {
-      let conn_ora = await getTmcConnection();
+      // let conn_ora = await getTmcConnection();
       const ipNumberListString = data?.ptno?.map((item) => `'${item}'`).join(",") || null;
       const fromDate = data.from;
       const toDate = data.to;
@@ -1486,13 +1469,9 @@ TO_DATE(:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
         //       } else {
         //     }
         // });
-        resolve({status: 1, message: err, data: result.rows});
+        resolve({status: 1, message: "Success", data: result.rows});
       } catch (error) {
         reject({status: 0, message: error, data: []});
-      } finally {
-        if (conn_ora) {
-          await conn_ora.close();
-        }
       }
     });
 
@@ -1514,4 +1493,5 @@ TO_DATE(:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
         return {status: 0, message: error, data: []};
       });
   },
+  /*******TSSH REPORTS END******/
 };

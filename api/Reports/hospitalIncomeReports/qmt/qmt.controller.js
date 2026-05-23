@@ -1,4 +1,5 @@
 const {getTmcConnection, oracleConnectionClose} = require("../../../../config/oradbconfig");
+const {controllerHelper} = require("../../../../utls/controller-helperFun");
 const qmtService = require("./qmt.service");
 
 const getQmtReport = async (req, res) => {
@@ -154,4 +155,7 @@ const getQmtReport = async (req, res) => {
   }
 };
 
-module.exports = getQmtReport;
+const getTsshCeditInsuranceBillCollection = controllerHelper(qmtService.get_qmt_CreditInsuranceBillCollection, "get_CreditInsuranceBillCollection");
+const getTsshCreditInsuranceBillDetail = controllerHelper(qmtService.get_qmt_CreditInsuranceBill, "get_CreditInsuranceBillDetail");
+
+module.exports = {getQmtReport, getTsshCeditInsuranceBillCollection, getTsshCreditInsuranceBillDetail};

@@ -1,4 +1,5 @@
 // @ts-nocheck
+const {getTmcConnection} = require("../../../config/oradbconfig");
 const {
   getGstReportOfPharmacy,
   getGstReportPharmacyWise,
@@ -362,11 +363,14 @@ module.exports = {
     }
   },
   tmchGstReport: async (req, res) => {
+    let ora_conn;
     try {
+      ora_conn = await getTmcConnection();
       const body = req.body;
-      const {status, message, data} = await tmchGstReport(body);
+      const {status, message, data} = await tmchGstReport(ora_conn, body);
+      console.log(status, message);
 
-      if (status !== 0) {
+      if (status === 0) {
         return res.status(200).json({
           success: 0,
           message: message,
@@ -382,12 +386,18 @@ module.exports = {
         success: 0,
         message: error,
       });
+    } finally {
+      if (ora_conn) {
+        await ora_conn.close();
+      }
     }
   },
   tsshGstReport: async (req, res) => {
+    let ora_conn;
+    ora_conn = await getTmcConnection();
     try {
       const body = req.body;
-      const {status, message, data} = await tsshGstReports(body);
+      const {status, message, data} = await tsshGstReports(ora_conn, body);
       if (status === 1) {
         return res.status(200).json({
           success: 1,
@@ -404,6 +414,10 @@ module.exports = {
         success: 0,
         message: error,
       });
+    } finally {
+      if (ora_conn) {
+        await ora_conn.close();
+      }
     }
   },
 };

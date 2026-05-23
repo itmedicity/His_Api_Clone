@@ -1,4 +1,4 @@
-const {getTmcConnection, oracleConnectionClose, closeConnection} = require("../config/oradbconfig");
+const {getTmcConnection, oracleConnectionClose, closeConnection, oracledb} = require("../config/oradbconfig");
 
 const controllerHelper = (serviceFun, successMessage) => {
   return async (req, res) => {
@@ -66,12 +66,75 @@ const controllerGETHelper = (serviceFun, successMessage) => {
   };
 };
 
-const insertIntoGTT = async (conn, ptnoList = []) => {
-  if (!ptnoList.length) return;
+// const insertIntoGTT = async (conn, ptnoList = []) => {
+//   if (!ptnoList.length) return;
 
-  const rows = ptnoList.map((ip) => [ip]);
+//   const rows = ptnoList.map((ip) => [ip]);
 
-  await conn.executeMany(`INSERT INTO GTT_EXCLUDE_IP (IP_NO) VALUES (:1)`, rows, {autoCommit: false});
+//   await conn.executeMany(`INSERT INTO GTT_EXCLUDE_IP (IP_NO) VALUES (:1)`, rows, {autoCommit: false});
+// };
+
+// const insertIntoGTT = async (conn, data = []) => {
+//   if (!data.length) return;
+
+//   let sql = `INSERT ALL\n`;
+//   const binds = {};
+
+//   data.forEach((row, index) => {
+//     const ipKey = `ip${index}`;
+//     const statusKey = `status${index}`;
+
+//     sql += `  INTO MEDIWARE.GTT_EXCLUDE_IP (IP_NO, STATUS) VALUES (:${ipKey}, :${statusKey})\n`;
+
+//     binds[ipKey] = row.ip;
+//     binds[statusKey] = row.status ?? 1;
+//   });
+
+//   sql += `SELECT 1 FROM DUAL`;
+
+//   await conn.execute(sql, binds, {autoCommit: false});
+// };
+
+const insertIntoGTT = async (conn, data = []) => {
+  if (!data.length) return;
+
+  const ipArray = data.map((d) => d.ip || d); // support both ["IP1"] or [{ip, status}]
+  const statusArray = data.map((d) => d.status ?? 1);
+
+  const sql = `
+    DECLARE
+      TYPE ip_tab IS TABLE OF VARCHAR2(10) INDEX BY PLS_INTEGER;
+      TYPE status_tab IS TABLE OF NUMBER INDEX BY PLS_INTEGER;
+
+      v_ip     ip_tab;
+      v_status status_tab;
+    BEGIN
+      -- bind arrays into PL/SQL collections
+      v_ip := :ip_list;
+      v_status := :status_list;
+
+      FORALL i IN 1 .. v_ip.COUNT
+        INSERT INTO MEDIWARE.GTT_EXCLUDE_IP (IP_NO, STATUS)
+        VALUES (v_ip(i), v_status(i));
+    END;
+  `;
+
+  await conn.execute(
+    sql,
+    {
+      ip_list: {
+        dir: oracledb.BIND_IN,
+        type: oracledb.STRING,
+        val: ipArray,
+      },
+      status_list: {
+        dir: oracledb.BIND_IN,
+        type: oracledb.NUMBER,
+        val: statusArray,
+      },
+    },
+    {autoCommit: false},
+  );
 };
 
 module.exports = {controllerHelper, controllerGETHelper, insertIntoGTT};

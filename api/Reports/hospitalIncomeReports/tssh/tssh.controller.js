@@ -1,5 +1,5 @@
 const {getTmcConnection, oracleConnectionClose} = require("../../../../config/oradbconfig");
-const {insertIntoGTT} = require("../../../../utls/controller-helperFun");
+const {insertIntoGTT, controllerHelper} = require("../../../../utls/controller-helperFun");
 const {getIpNumberFromPreviousDayCollection} = require("../../misReportTssh/misReportTssh/collectionTssh.service");
 const qmtService = require("./tssh.service");
 
@@ -15,9 +15,16 @@ const getTsshReport = async (req, res) => {
       patient: ptno,
       groupIdForPrevious: groupIdForPrevious,
     };
+
+    const ipListMap = [
+      {data: ptno, status: 1},
+      {data: ipNoColl, status: 2},
+    ];
+
+    const ipLists = ipListMap.flatMap(({data, status}) => (data || []).map((ip) => ({ip, status})));
     //   console.log(`body`, body);
     await conn.commit();
-    await insertIntoGTT(conn, ptno);
+    await insertIntoGTT(conn, ipLists);
 
     const getMisincexpmast = await qmtService.getMisincexpmast(conn);
     const getMisincexpgroup = await qmtService.getMisincexpgroup(conn);
@@ -104,8 +111,8 @@ const getTsshReport = async (req, res) => {
     const IpConsolidated_Discount = await qmtService.getDiscount_three(conn, body);
     const getTypeDiscount = await qmtService.getTypeDiscount(conn, body);
 
-    await conn.commit();
-    await insertIntoGTT(conn, ipNoColl);
+    // await conn.commit();
+    // await insertIntoGTT(conn, ipNoColl);
     const getCeditInsuranceBillCollection = await qmtService.getCollectionPortion_three(conn, body);
     await conn.commit();
 
@@ -189,6 +196,7 @@ const getTsshReport = async (req, res) => {
     return res.status(200).json({
       success: 1,
       data: result,
+      result: ipLists,
     });
   } catch (error) {
     console.error(error);
@@ -201,4 +209,7 @@ const getTsshReport = async (req, res) => {
   }
 };
 
-module.exports = getTsshReport;
+const getTsshCeditInsuranceBillCollection = controllerHelper(qmtService.get_CreditInsuranceBillCollection, "get_CreditInsuranceBillCollection");
+const getTsshCreditInsuranceBillDetail = controllerHelper(qmtService.get_CreditInsuranceBill, "get_CreditInsuranceBillDetail");
+
+module.exports = {getTsshReport, getTsshCeditInsuranceBillCollection, getTsshCreditInsuranceBillDetail};
