@@ -6,7 +6,7 @@ const getMisincexpmast = async (conn_ora) => {
 };
 
 const getUngroupedRoomDetl = async (conn_ora, bind) => {
-  //   console.log(bind);
+  // console.log(bind);
   const sql = `SELECT NVL (Misincexpgroup.Dg_desc, 'Ungrouped') Dg_desc,
                         NVL (Misincexpgroup.Dg_grcode, 999) AS Code,
                         SUM (
@@ -33,6 +33,7 @@ const getUngroupedRoomDetl = async (conn_ora, bind) => {
                         AND Disbillmast.Dmd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                         AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                        AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Disbillmast.IP_NO AND G.STATUS = 1)
                 GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                 ORDER BY Dg_desc`;
   const result = await conn_ora.execute(
@@ -70,6 +71,7 @@ const getTheaterIncome = async (conn_ora, bind) => {
                             AND Disbillmast.DMD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                             AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                            AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Disbillmast.IP_NO AND G.STATUS = 1)
                     GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                     UNION ALL
                     SELECT NVL (Misincexpgroup.Dg_desc, 'Ungrouped') Dg_desc,
@@ -95,6 +97,7 @@ const getTheaterIncome = async (conn_ora, bind) => {
                             AND Disbillmast.DMD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                             AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                            AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Disbillmast.IP_NO AND G.STATUS = 1)
                     GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                     UNION ALL
                     SELECT NVL (Misincexpgroup.Dg_desc, 'Ungrouped') Dg_desc,
@@ -122,6 +125,7 @@ const getTheaterIncome = async (conn_ora, bind) => {
                             AND Disbillmast.DMD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                             AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                            AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Disbillmast.IP_NO AND G.STATUS = 1)
                     GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                     UNION ALL
                     SELECT NVL (Misincexpgroup.Dg_desc, 'Ungrouped') Dg_desc,
@@ -149,6 +153,7 @@ const getTheaterIncome = async (conn_ora, bind) => {
                             AND Disbillmast.DMD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                             AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                            AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Disbillmast.IP_NO AND G.STATUS = 1)
                     GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                     UNION ALL
                     SELECT NVL (Misincexpgroup.Dg_desc, 'Ungrouped') Dg_desc,
@@ -176,6 +181,7 @@ const getTheaterIncome = async (conn_ora, bind) => {
                             AND Disbillmast.DMD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                             AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                            AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Disbillmast.IP_NO AND G.STATUS = 1)
                     GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                     UNION ALL
                     SELECT NVL (Misincexpgroup.Dg_desc, 'Ungrouped') Dg_desc,
@@ -203,6 +209,7 @@ const getTheaterIncome = async (conn_ora, bind) => {
                             AND Disbillmast.DMD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                             AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                            AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Disbillmast.IP_NO AND G.STATUS = 1)
                     GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                     UNION ALL
                     SELECT NVL (Misincexpgroup.Dg_desc, 'Ungrouped') Dg_desc,
@@ -230,6 +237,7 @@ const getTheaterIncome = async (conn_ora, bind) => {
                             AND Disbillmast.DMD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                             AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                            AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Disbillmast.IP_NO AND G.STATUS = 1)
                     GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                     UNION ALL
                     SELECT NVL (Misincexpgroup.Dg_desc, 'Ungrouped') Dg_desc,
@@ -257,6 +265,7 @@ const getTheaterIncome = async (conn_ora, bind) => {
                             AND Disbillmast.DMD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                             AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                            AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Disbillmast.IP_NO AND G.STATUS = 1)
                     GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                     UNION ALL
                     SELECT NVL (Misincexpgroup.Dg_desc, 'Ungrouped') Dg_desc,
@@ -284,6 +293,7 @@ const getTheaterIncome = async (conn_ora, bind) => {
                             AND Disbillmast.DMD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                             AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                            AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Disbillmast.IP_NO AND G.STATUS = 1)
                     GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                     UNION ALL
                     SELECT NVL (Misincexpgroup.Dg_desc, 'Ungrouped') Dg_desc,
@@ -315,6 +325,7 @@ const getTheaterIncome = async (conn_ora, bind) => {
                             AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             AND NVL (PATSUROTHER.Src_Cancel, 'N') = 'N'
+                            AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Disbillmast.IP_NO AND G.STATUS = 1)
                     GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                     UNION ALL
                     SELECT NVL (Misincexpgroup.Dg_desc, 'Ungrouped') Dg_desc,
@@ -340,6 +351,7 @@ const getTheaterIncome = async (conn_ora, bind) => {
                             AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             AND NVL (patsurdetl.Src_Cancel, 'N') = 'N'
+                            AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Disbillmast.IP_NO AND G.STATUS = 1)
                     GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                     UNION ALL
                     SELECT NVL (Misincexpgroup.Dg_desc, 'Ungrouped') Dg_desc,
@@ -365,9 +377,10 @@ const getTheaterIncome = async (conn_ora, bind) => {
                             AND Disbillmast.Dmd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                             AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                            AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Disbillmast.IP_NO AND G.STATUS = 1)
                     GROUP BY Misincexpgroup.Dg_Grcode, Misincexpgroup.Dg_Desc
                     ORDER BY Dg_desc`;
-  //   console.log(sql);
+  // console.log(sql);
   const result = await conn_ora.execute(
     sql,
     {
@@ -376,7 +389,7 @@ const getTheaterIncome = async (conn_ora, bind) => {
     },
     {outFormat: oracledb.OUT_FORMAT_OBJECT},
   );
-  //   console.log(result.rows);
+  // console.log(result.rows);
   return result.rows;
 };
 
@@ -403,6 +416,7 @@ const getConsultingIncome = async (conn_ora, bind) => {
                         AND Disbillmast.DMD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss') 
                         AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss') 
                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                        AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Disbillmast.IP_NO AND G.STATUS = 1)
                 GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                 ORDER BY Dg_desc`;
   const result = await conn_ora.execute(
@@ -441,6 +455,7 @@ const getIpRefundDetl = async (conn_ora, bind) => {
                     AND Iprefundmast.Rid_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND Iprefundmast.Rid_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND IPREFUNDMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                    AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = IPREFUNDMAST.IP_NO AND G.STATUS = 1)
             GROUP BY Misincexpgroup.Dg_Grcode, Misincexpgroup.Dg_Desc
             ORDER BY Dg_Desc`;
   const result = await conn_ora.execute(
@@ -496,6 +511,7 @@ const getIpincomeSection_one = async (conn_ora, bind) => {
                     AND Disbillmast.DMD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                    AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Disbillmast.IP_NO AND G.STATUS = 1)
             GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
             ORDER BY Dg_desc`;
   const result = await conn_ora.execute(
@@ -534,6 +550,7 @@ const getIpincomeSection_two = async (conn_ora, bind) => {
          AND Disbillmast.DMD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
          AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
          AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+         AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Disbillmast.IP_NO AND G.STATUS = 1)
 GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
 ORDER BY Dg_desc`;
   const result = await conn_ora.execute(
@@ -576,6 +593,7 @@ const getTheaterIncome_two = async (conn_ora, bind) => {
                         AND Opbillmast.OPD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                         AND Opbillmast.OPD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                        AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Patsurgery.IP_NO AND G.STATUS = 1)
                 GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                 UNION ALL
                 SELECT NVL (Misincexpgroup.Dg_desc, 'Ungrouped') Dg_desc,
@@ -600,6 +618,7 @@ const getTheaterIncome_two = async (conn_ora, bind) => {
                         AND Opbillmast.OPD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                         AND Opbillmast.OPD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                        AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Patsurgery.IP_NO AND G.STATUS = 1)
                 GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                 UNION ALL
                 SELECT NVL (Misincexpgroup.Dg_desc, 'Ungrouped') Dg_desc,
@@ -626,6 +645,7 @@ const getTheaterIncome_two = async (conn_ora, bind) => {
                         AND Opbillmast.OPD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                         AND Opbillmast.OPD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                        AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Patsurgery.IP_NO AND G.STATUS = 1)
                 GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                 UNION ALL
                 SELECT NVL (Misincexpgroup.Dg_desc, 'Ungrouped') Dg_desc,
@@ -652,6 +672,7 @@ const getTheaterIncome_two = async (conn_ora, bind) => {
                         AND Opbillmast.OPD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                         AND Opbillmast.OPD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                        AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Patsurgery.IP_NO AND G.STATUS = 1)
                 GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                 UNION ALL
                 SELECT NVL (Misincexpgroup.Dg_desc, 'Ungrouped') Dg_desc,
@@ -678,6 +699,7 @@ const getTheaterIncome_two = async (conn_ora, bind) => {
                         AND Opbillmast.OPD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                         AND Opbillmast.OPD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                        AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Patsurgery.IP_NO AND G.STATUS = 1)
                 GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                 UNION ALL
                 SELECT NVL (Misincexpgroup.Dg_desc, 'Ungrouped') Dg_desc,
@@ -704,6 +726,7 @@ const getTheaterIncome_two = async (conn_ora, bind) => {
                         AND Opbillmast.OPD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                         AND Opbillmast.OPD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                        AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Patsurgery.IP_NO AND G.STATUS = 1)
                 GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                 UNION ALL
                 SELECT NVL (Misincexpgroup.Dg_desc, 'Ungrouped') Dg_desc,
@@ -730,6 +753,7 @@ const getTheaterIncome_two = async (conn_ora, bind) => {
                         AND Opbillmast.OPD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                         AND Opbillmast.OPD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                        AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Patsurgery.IP_NO AND G.STATUS = 1)
                 GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                 UNION ALL
                 SELECT NVL (Misincexpgroup.Dg_desc, 'Ungrouped') Dg_desc,
@@ -756,6 +780,7 @@ const getTheaterIncome_two = async (conn_ora, bind) => {
                         AND Opbillmast.OPD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                         AND Opbillmast.OPD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                        AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Patsurgery.IP_NO AND G.STATUS = 1)
                 GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                 UNION ALL
                 SELECT NVL (Misincexpgroup.Dg_desc, 'Ungrouped') Dg_desc,
@@ -782,6 +807,7 @@ const getTheaterIncome_two = async (conn_ora, bind) => {
                         AND Opbillmast.OPD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                         AND Opbillmast.OPD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                        AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Patsurgery.IP_NO AND G.STATUS = 1)
                 GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                 UNION ALL
                 SELECT NVL (Misincexpgroup.Dg_desc, 'Ungrouped') Dg_desc,
@@ -813,6 +839,7 @@ const getTheaterIncome_two = async (conn_ora, bind) => {
                         AND Opbillmast.OPD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         AND NVL (PATSUROTHER.Src_Cancel, 'N') = 'N'
+                        AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Patsurgery.IP_NO AND G.STATUS = 1)
                 GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                 UNION ALL
                 SELECT NVL (Misincexpgroup.Dg_desc, 'Ungrouped') Dg_desc,
@@ -838,6 +865,7 @@ const getTheaterIncome_two = async (conn_ora, bind) => {
                         AND Opbillmast.OPD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         AND NVL (PATSURDETL.Src_Cancel, 'N') = 'N'
+                        AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Patsurgery.IP_NO AND G.STATUS = 1)
                 GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                 ORDER BY Dg_desc`;
 
@@ -934,7 +962,7 @@ const getPharmacyCollection_One = async (conn_ora, bind) => {
   );
   return result.rows;
 };
-
+//  -------> CHECKED
 const getIpRefundDetl_one = async (conn_ora, bind) => {
   const sql = `SELECT SUM (NVL (Iprefunditemdetl.Rin_Netamt, 0)) * -1 Amt,
                     SUM (
@@ -1016,6 +1044,7 @@ const getIpincomeSection_three = async (conn_ora, bind) => {
 };
 
 const getProcedureIncomeSection_one = async (conn_ora, bind) => {
+  // INCLUDED
   const sql = `SELECT NVL (Misincexpgroup.Dg_desc, 'Ungrouped') Dg_desc,
          NVL (Misincexpgroup.Dg_grcode, 999) AS Code,
          SUM ( (Billdetl.pdn_rate * pdn_qty) - NVL (Billdetl.bmn_disamt, 0))
@@ -1044,6 +1073,7 @@ const getProcedureIncomeSection_one = async (conn_ora, bind) => {
          AND NVL (Opbillmast.Opn_cancel, 'N') = 'N'
          AND Opbillmast.Opd_date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
          AND Opbillmast.Opd_date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+         AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Billmast.IP_NO AND G.STATUS = 1)
          AND billmast.mh_code IN (SELECT MH_CODE FROM multihospital)
 GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
 ORDER BY Dg_desc`;
@@ -1147,6 +1177,7 @@ ORDER BY Dg_desc`;
 };
 
 const getPharmacyCollection_Two = async (conn_ora, bind) => {
+  // INCLUDED
   const sql = `SELECT SUM (NVL (Pbilldetl.Bdn_amount, 0)) Amt,
        SUM (NVL (Pbilldetl.Bdn_amount, 0) + NVL (Pbilldetl.Bmn_disamt, 0))
           GrossAmt,
@@ -1154,12 +1185,13 @@ const getPharmacyCollection_Two = async (conn_ora, bind) => {
        SUM (0) AS Comp,
        SUM (NVL (PBILLDETL.BMN_CESS, 0) + NVL (PBILLDETL.BMN_SALETAX, 0)) TAX
   FROM Pbillmast, Pbilldetl, Opbillmast
- WHERE     Pbilldetl.Bmc_Slno = Pbillmast.Bmc_Slno
+ WHERE Pbilldetl.Bmc_Slno = Pbillmast.Bmc_Slno
        AND Pbilldetl.Opc_Slno = Opbillmast.Opc_Slno
        AND NVL (Pbillmast.Bmc_cancel, 'N') = 'N'
        AND Pbillmast.Bmc_Cacr = 'O'
        AND Opbillmast.Opc_Cacr <> 'M'
        AND NVL (Opbillmast.Opn_cancel, 'N') = 'N'
+       AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = PBILLMAST.IP_NO AND G.STATUS = 2)
        AND Opbillmast.Opd_date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
        AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
        AND Opbillmast.Opd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
@@ -1267,7 +1299,7 @@ const getPharamcyCollection_three = async (conn_ora, bind) => {
                AND NVL (Pbillmast.Bmc_cancel, 'N') = 'N'
                AND Pbillmast.Bmc_Cacr IN ('C', 'R', 'M')
                AND Pbillmast.BMD_COLLDATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss') 
-               AND Pbillmast.BMD_COLLDATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss') 
+               AND Pbillmast.BMD_COLLDATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                AND pbillmast.MH_CODE IN (SELECT MH_CODE FROM multihospital)
         UNION ALL
         SELECT SUM (
@@ -1380,6 +1412,7 @@ const getPharmacyReturnSection_three = async (conn_ora, bind) => {
        AND NVL (Mretdetl.Mrc_cancel, 'N') = 'N'
        AND NVL (Dmc_Cancel, 'N') = 'N'
        AND Disbillmast.Dmc_Cacr <> 'M'
+       AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Disbillmast.IP_NO AND G.STATUS = 2)
        AND Disbillmast.Dmd_date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
        AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
        AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
@@ -1456,6 +1489,7 @@ ORDER BY Dg_desc`;
 };
 
 const getPharmacyCollection_four = async (conn_ora, bind) => {
+  // INCLUDED
   const sql = `SELECT SUM (NVL (Pbilldetl.Bdn_amount, 0)) Amt,
        SUM (NVL (Pbilldetl.Bdn_amount, 0) + NVL (Pbilldetl.Bmn_disamt, 0))
           GrossAmt,
@@ -1469,6 +1503,7 @@ const getPharmacyCollection_four = async (conn_ora, bind) => {
        AND Pbillmast.Bmc_Cacr = 'I'
        AND NVL (Dmc_Cancel, 'N') = 'N'
        AND Disbillmast.Dmc_Cacr <> 'M'
+       AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Pbillmast.IP_NO AND G.STATUS = 2)
        AND Disbillmast.Dmd_date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
        AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
        AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
@@ -1552,6 +1587,7 @@ const getIpincomeSection_five = async (conn_ora, bind) => {
          AND Billmast.Bmc_Cacr = 'I'
          AND NVL (Billmast.BMC_CANCEL, 'N') = 'N'
          AND NVL (Disbillmast.Dmc_cancel, 'N') = 'N'
+         AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Disbillmast.IP_NO AND G.STATUS = 1)
          AND Disbillmast.dmd_date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
          AND billmast.mh_code IN (SELECT MH_CODE FROM multihospital)
          AND Disbillmast.dmd_date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
@@ -1686,6 +1722,7 @@ const getCollectionPortion_one = async (conn_ora, bind) => {
                     AND IRD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                     AND IRD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                    AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = DISBILLMAST.IP_NO AND G.STATUS = 1)
                 UNION ALL
                 SELECT SUM (
                             NVL (billmast.BMN_CASH, 0)
@@ -1737,8 +1774,10 @@ const getCollectionPortion_one = async (conn_ora, bind) => {
 };
 
 const getCollectionPortion_two = async (conn_ora, bind) => {
-  const sql = `SELECT SUM (Amt) Amt, SUM (Tax) Tax
-  FROM (SELECT SUM (
+  // INCLUDED
+  const sql = `SELECT SUM (Amt) Amt, SUM (Tax) Tax,IP_NO
+  FROM (
+    SELECT SUM (
                   (  NVL (Ipreceipt.irn_amount, 0)
                    + NVL (Ipreceipt.irn_cheque, 0)
                    + NVL (Ipreceipt.irn_card, 0)
@@ -1747,7 +1786,8 @@ const getCollectionPortion_two = async (conn_ora, bind) => {
                      + NVL (Ipreceipt.IRN_REFCHEQ, 0)
                      + NVL (Ipreceipt.irn_refcard, 0)))
                   Amt,
-               0 tax
+               0 tax,
+               DISBILLMAST.IP_NO
           FROM ipreceipt, Disbillmast
          WHERE Ipreceipt.Dmc_Slno = Disbillmast.Dmc_Slno
                AND Disbillmast.Dmd_date < TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
@@ -1755,6 +1795,7 @@ const getCollectionPortion_two = async (conn_ora, bind) => {
                AND IRD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                AND ird_date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                AND Irc_cancel IS NULL
+               GROUP BY DISBILLMAST.IP_NO
         UNION ALL
           SELECT SUM (
                     DECODE (RECEIPTMAST.RPC_CACR,
@@ -1772,7 +1813,8 @@ const getCollectionPortion_two = async (conn_ora, bind) => {
                               'C', NVL (RPN_CARD, 0),
                               0))
                     Amt,
-                 0 Tax
+                 0 Tax,
+                 NULL "IP_NO"
             FROM RECEIPTMAST
            WHERE     (NVL (RECEIPTMAST.RPC_CANCEL, 'N') = 'N')
                  AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
@@ -1799,7 +1841,8 @@ const getCollectionPortion_two = async (conn_ora, bind) => {
                                0)))
                  * -1
                     Amt,
-                 0 Tax
+                 0 Tax,
+                 NULL "IP_NO"
             FROM REFUNDRECEIPTMAST
            WHERE REFUNDRECEIPTMAST.RFD_RETDATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                  AND REFUNDRECEIPTMAST.RFD_RETDATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
@@ -1827,7 +1870,8 @@ const getCollectionPortion_two = async (conn_ora, bind) => {
                               'R', NVL (BILLMAST.BMN_CARD, 0),
                               0))
                     Amt,
-                 0 Tax
+                 0 Tax,
+                 BILLMAST.IP_NO
             FROM BILLMAST
            WHERE     (NVL (BILLMAST.BMC_CANCEL, 'N') = 'N')
                  AND billmast.mh_code IN (SELECT MH_CODE FROM multihospital)
@@ -1835,7 +1879,8 @@ const getCollectionPortion_two = async (conn_ora, bind) => {
                  AND BILLMAST.BMD_COLLDATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                  AND BILLMAST.BMD_COLLDATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                  AND BILLMAST.BMD_DATE < TRUNC (TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss'))
-        GROUP BY 'Billing'
+                 AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = BILLMAST.IP_NO AND G.STATUS = 1)
+        GROUP BY 'Billing',IP_NO
         UNION ALL
           SELECT (SUM (
                      DECODE (REFUNDBILLMAST.RFC_CACR,
@@ -1854,8 +1899,8 @@ const getCollectionPortion_two = async (conn_ora, bind) => {
                                0)))
                  * -1
                     AS Amt,
-                 0 Tax
-            FROM REFUNDBILLMAST
+                 0 Tax,BILLMAST.IP_NO
+            FROM REFUNDBILLMAST RIGHT JOIN BILLMAST ON BILLMAST.BMC_SLNO = REFUNDBILLMAST.BMC_SLNO
            WHERE REFUNDBILLMAST.RFD_RETDATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                  AND REFUNDBILLMAST.RFD_RETDATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                  AND refundbillmast.MH_CODE IN
@@ -1864,7 +1909,8 @@ const getCollectionPortion_two = async (conn_ora, bind) => {
                  AND REFUNDBILLMAST.RFC_RETCNCODE IS NOT NULL
                  AND REFUNDBILLMAST.RFD_DATE < TRUNC (TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss'))
                  AND REFUNDBILLMAST.ROC_SLNO IS NULL
-        GROUP BY 'Billing'
+                 AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = BILLMAST.IP_NO AND G.STATUS = 1)
+        GROUP BY 'Billing',BILLMAST.IP_NO
         UNION ALL
           SELECT SUM (
                     DECODE (PBILLMAST.BMC_CACR,
@@ -1882,7 +1928,7 @@ const getCollectionPortion_two = async (conn_ora, bind) => {
                               'R', NVL (PBILLMAST.BMN_CARD, 0),
                               0))
                     Amt,
-                 0 Tax
+                 0 Tax,PBILLMAST.IP_NO
             FROM PBILLMAST
            WHERE     (NVL (PBILLMAST.BMC_CANCEL, 'N') = 'N')
                  AND pbillmast.MH_CODE IN (SELECT MH_CODE FROM multihospital)
@@ -1894,7 +1940,7 @@ const getCollectionPortion_two = async (conn_ora, bind) => {
         GROUP BY DECODE (TRIM (PBILLMAST.bmc_ipop),
                          'OP', 'OP',
                          'IP', 'OP',
-                         'OP')
+                         'OP'),PBILLMAST.IP_NO
           HAVING    SUM (
                        DECODE (PBILLMAST.BMC_CACR,
                                'C', NVL (PBILLMAST.BMN_CASH, 0),
@@ -1940,7 +1986,7 @@ const getCollectionPortion_two = async (conn_ora, bind) => {
                                0)))
                  * -1
                     Amt,
-                 0 Tax
+                 0 Tax,NULL IP_NO
             FROM MRETMAST
            WHERE     NVL (MRETMAST.MRC_CANCEL, 'N') = 'N'
                  AND MRETMAST.MRC_RETCNCODE IS NOT NULL
@@ -1957,7 +2003,7 @@ const getCollectionPortion_two = async (conn_ora, bind) => {
                  + SUM (
                       DECODE (OPBILLMAST.OPC_CACR, 'M', 0, NVL (OPN_CARD, 0)))
                     Amt,
-                 0 Tax
+                 0 Tax,NULL IP_NO
             FROM OPBILLMAST
            WHERE     (NVL (OPBILLMAST.OPN_CANCEL, 'N') = 'N')
                  AND OPBILLMAST.OPC_CACR IN ('C', 'R')
@@ -1966,7 +2012,8 @@ const getCollectionPortion_two = async (conn_ora, bind) => {
                  AND OPBILLMAST.OPD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                  AND OPBILLMAST.OPD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                  AND OPBILLMAST.OPD_DATE < TRUNC (TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss'))
-        GROUP BY 'OP')`;
+        GROUP BY 'OP'
+        ) GROUP BY IP_NO`;
   const result = await conn_ora.execute(
     sql,
     {
@@ -2041,40 +2088,89 @@ const getPerttyCash = async (conn_ora, bind) => {
   );
   return result.rows;
 };
-
+// INCLUDED
 const getCollectionPortion_three = async (conn_ora, bind) => {
-  const sql = `SELECT SUM (
-            NVL (RECPCOLLECTIONMAST.RCN_CASH, 0)
-          + NVL (RECPCOLLECTIONMAST.RCN_CHK, 0)
-          + NVL (RECPCOLLECTIONMAST.RCN_DD, 0)
-          + NVL (RECPCOLLECTIONMAST.RCN_Card, 0)
-          + NVL (RECPCOLLECTIONMAST.RCN_NEFT, 0))
-          Amt,
-       0 tax
-  FROM RECPCOLLECTIONMAST
- WHERE RECPCOLLECTIONMAST.RCD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
-       AND RECPCOLLECTIONMAST.RCD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
-       AND RECPCOLLECTIONMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-       AND NVL (RECPCOLLECTIONMAST.RCC_CANCEL, 'N') = 'N'
-HAVING SUM (
-            NVL (RECPCOLLECTIONMAST.RCN_CASH, 0)
-          + NVL (RECPCOLLECTIONMAST.RCN_CHK, 0)
-          + NVL (RECPCOLLECTIONMAST.RCN_DD, 0)
-          + NVL (RECPCOLLECTIONMAST.RCN_Card, 0)
-          + NVL (RECPCOLLECTIONMAST.RCN_NEFT, 0)) > 0
-UNION ALL
-SELECT (  SUM (NVL (Recpcollectionmast.Rfn_Cash, 0))
-        + SUM (NVL (Recpcollectionmast.Rfn_Chk, 0))
-        + SUM (NVL (Recpcollectionmast.Rfn_Dd, 0))
-        + SUM (NVL (Recpcollectionmast.Rfn_Card, 0)))
-       * -1
-          Amt,
-       0 tax
-  FROM Recpcollectionmast
- WHERE Recpcollectionmast.Rfd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
-       AND RECPCOLLECTIONMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-       AND Recpcollectionmast.Rfd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
-       AND NVL (Rcc_Cancel, 'N') = 'N'`;
+  const sql = `SELECT 
+                            SUM (NVL (RECPCOLLECTIONMAST.RCN_CASH, 0) + NVL (RECPCOLLECTIONMAST.RCN_CHK, 0) + NVL (RECPCOLLECTIONMAST.RCN_DD, 0) + NVL (RECPCOLLECTIONMAST.RCN_Card, 0) + NVL (RECPCOLLECTIONMAST.RCN_NEFT, 0)) Amt,
+                            0 tax
+                        FROM RECPCOLLECTIONMAST
+                        WHERE RECPCOLLECTIONMAST.RCD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                            AND RECPCOLLECTIONMAST.RCD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                            AND RECPCOLLECTIONMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                            AND RECPCOLLECTIONMAST.RCC_CANCEL IS NULL
+                            AND RECPCOLLECTIONMAST.RCC_SLNO IN (
+                                SELECT 
+                                    RCC_SLNO 
+                                FROM RECPCOLLECTIONDETL 
+                                WHERE RECPCOLLECTIONDETL.RCD_DATE >= TO_DATE (:fromDate,'dd/MM/yyyy hh24:mi:ss')
+                                AND RECPCOLLECTIONDETL.RCD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss') 
+                                AND RECPCOLLECTIONDETL.MODULES <> 'IPC'
+                            )
+                        HAVING SUM ( NVL (RECPCOLLECTIONMAST.RCN_CASH, 0) + NVL (RECPCOLLECTIONMAST.RCN_CHK, 0) + NVL (RECPCOLLECTIONMAST.RCN_DD, 0)  + NVL (RECPCOLLECTIONMAST.RCN_Card, 0) + NVL (RECPCOLLECTIONMAST.RCN_NEFT, 0)) > 0
+                        UNION ALL
+                        SELECT 
+                            SUM (NVL (RECPCOLLECTIONMAST.RCN_CASH, 0) + NVL (RECPCOLLECTIONMAST.RCN_CHK, 0) + NVL (RECPCOLLECTIONMAST.RCN_DD, 0) + NVL (RECPCOLLECTIONMAST.RCN_Card, 0) + NVL (RECPCOLLECTIONMAST.RCN_NEFT, 0)) Amt,
+                            0 tax
+                        FROM RECPCOLLECTIONMAST
+                        WHERE RECPCOLLECTIONMAST.RCD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                            AND RECPCOLLECTIONMAST.RCD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                            AND RECPCOLLECTIONMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                            AND RECPCOLLECTIONMAST.RCC_CANCEL IS NULL
+                            AND RECPCOLLECTIONMAST.RCC_SLNO IN (
+                                SELECT 
+                                    RCC_SLNO 
+                                FROM RECPCOLLECTIONDETL 
+                                WHERE RECPCOLLECTIONDETL.RCD_DATE >= TO_DATE (:fromDate,'dd/MM/yyyy hh24:mi:ss')
+                                AND RECPCOLLECTIONDETL.RCD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss') 
+                                AND RECPCOLLECTIONDETL.MODULES = 'IPC'
+                                AND NOT EXISTS (
+                                SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = RECPCOLLECTIONDETL.IP_NO AND G.STATUS = 4
+                                ) 
+                            )
+                        HAVING SUM ( NVL (RECPCOLLECTIONMAST.RCN_CASH, 0) + NVL (RECPCOLLECTIONMAST.RCN_CHK, 0) + NVL (RECPCOLLECTIONMAST.RCN_DD, 0)  + NVL (RECPCOLLECTIONMAST.RCN_Card, 0) + NVL (RECPCOLLECTIONMAST.RCN_NEFT, 0)) > 0
+                        UNION ALL
+                        SELECT 
+                            (SUM (NVL (Recpcollectionmast.Rfn_Cash, 0)) + SUM (NVL (Recpcollectionmast.Rfn_Chk, 0)) + SUM (NVL (Recpcollectionmast.Rfn_Dd, 0)) + SUM (NVL (Recpcollectionmast.Rfn_Card, 0))) * -1 Amt,
+                            0 tax
+                        FROM Recpcollectionmast
+                        WHERE Recpcollectionmast.Rfd_Date >= TO_DATE (:fromDate,'dd/MM/yyyy hh24:mi:ss')
+                            AND RECPCOLLECTIONMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                            AND Recpcollectionmast.Rfd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                            AND NVL (Rcc_Cancel, 'N') = 'N'
+                            AND RECPCOLLECTIONMAST.RCC_SLNO IN (
+                        SELECT 
+                            RCC_SLNO 
+                        FROM RECPCOLLECTIONDETL 
+                        WHERE RECPCOLLECTIONDETL.RCD_DATE >= TO_DATE (:fromDate,'dd/MM/yyyy hh24:mi:ss')
+                        AND RECPCOLLECTIONDETL.RCD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss') 
+                        AND NOT EXISTS (
+                        SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = RECPCOLLECTIONDETL.IP_NO AND G.STATUS = 4
+                        ))
+                        UNION ALL
+                        SELECT 
+                            SUM (NVL (RECPCOLLECTIONMAST.RCN_CASH, 0) 
+                            + NVL (RECPCOLLECTIONMAST.RCN_CHK, 0) 
+                            + NVL (RECPCOLLECTIONMAST.RCN_DD, 0) 
+                            + NVL (RECPCOLLECTIONMAST.RCN_Card, 0) 
+                            + NVL (RECPCOLLECTIONMAST.RCN_NEFT, 0)) Amt,
+                            0 tax
+                        FROM RECPCOLLECTIONMAST
+                        WHERE RECPCOLLECTIONMAST.RCD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                            AND RECPCOLLECTIONMAST.RCD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                            AND RECPCOLLECTIONMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                            AND RECPCOLLECTIONMAST.RCC_CANCEL IS NULL
+                            AND RECPCOLLECTIONMAST.RCC_SLNO NOT IN (
+                                SELECT 
+                                    RCC_SLNO 
+                                FROM RECPCOLLECTIONDETL 
+                                WHERE RECPCOLLECTIONDETL.RCD_DATE >= TO_DATE (:fromDate,'dd/MM/yyyy hh24:mi:ss')
+                                AND RECPCOLLECTIONDETL.RCD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss') 
+                            )
+                        HAVING SUM ( NVL (RECPCOLLECTIONMAST.RCN_CASH, 0) 
+                        + NVL (RECPCOLLECTIONMAST.RCN_CHK, 0) 
+                        + NVL (RECPCOLLECTIONMAST.RCN_DD, 0)  
+                        + NVL (RECPCOLLECTIONMAST.RCN_Card, 0) 
+                        + NVL (RECPCOLLECTIONMAST.RCN_NEFT, 0)) > 0`;
   const result = await conn_ora.execute(
     sql,
     {
@@ -2085,178 +2181,115 @@ SELECT (  SUM (NVL (Recpcollectionmast.Rfn_Cash, 0))
   );
   return result.rows;
 };
-
+// INCLUDED
 const getIpRefundDetlSection_five = async (conn_ora, bind) => {
-  const sql = `SELECT SUM (
-            NVL (Refundreceiptmast.RFN_CASH, 0)
-          + NVL (Refundreceiptmast.RFN_CARD, 0)
-          + NVL (Refundreceiptmast.RFN_CHEQUE, 0))
-       * -1
-          AS Amt,
-       SUM (NVL (Refundreceiptmast.RFN_TOTTAX, 0)) * -1 tax
-  FROM Refundreceiptmast
- WHERE     Refundreceiptmast.Rfc_Cacr IN ('C', 'R')
-       AND Refundreceiptmast.Rfc_Cancel IS NULL
-       AND Refundreceiptmast.RFC_RETCNCODE IS NULL
-       AND Refundreceiptmast.Roc_Slno IS NULL
-       AND (   NVL (Refundreceiptmast.RFN_CASH, 0) > 0
-            OR NVL (Refundreceiptmast.RFN_CARD, 0) > 0
-            OR NVL (Refundreceiptmast.RFN_CHEQUE, 0) > 0)
-       AND Refundreceiptmast.Rfd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
-       AND Refundreceiptmast.Rfd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
-       AND REFUNDRECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-UNION ALL
-SELECT SUM (
-            NVL (refundbillmast.RFN_CASH, 0)
-          + NVL (refundbillmast.RFN_CARD, 0)
-          + NVL (refundbillmast.RFN_CHEQUE, 0))
-       * -1
-          AS Amt,
-       SUM (
-          NVL (refundbillmast.RFN_TOTTAX, 0)
-          + NVL (Refundbillmast.Rfn_Totcess, 0))
-       * -1
-          tax
-  FROM refundbillmast
- WHERE     refundbillmast.Rfc_Cacr IN ('C', 'R')
-       AND refundbillmast.Rfc_Cancel IS NULL
-       AND Refundbillmast.RFC_RETCNCODE IS NULL
-       AND RefundBillmast.Roc_Slno IS NULL
-       AND (   NVL (refundbillmast.RFN_CASH, 0) > 0
-            OR NVL (refundbillmast.RFN_CARD, 0) > 0
-            OR NVL (refundbillmast.RFN_CHEQUE, 0) > 0)
-       AND refundbillmast.Rfd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
-       AND refundbillmast.Rfd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
-       AND refundbillmast.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-UNION ALL
-SELECT SUM (
-            NVL (Mretmast.MRN_CASH, 0)
-          + NVL (Mretmast.MRN_CARD, 0)
-          + NVL (Mretmast.MRN_CHEQUE, 0))
-       * -1
-          AS Amt,
-       SUM (
-            NVL (MRN_SALETAXCH, 0)
-          + NVL (MRN_SALETAXCR, 0)
-          + NVL (MRN_CESSCH, 0)
-          + NVL (MRN_CESSCR, 0))
-       * -1
-          Tax
-  FROM Mretmast
- WHERE     Mretmast.MRC_CACR IN ('C', 'R')
-       AND NVL (Mretmast.MRC_CANCEL, 'N') = 'N'
-       AND Mretmast.MRC_RETCNCODe IS NULL
-       AND (   NVL (Mretmast.MRN_CASH, 0) > 0
-            OR NVL (Mretmast.MRN_CARD, 0) > 0
-            OR NVL (Mretmast.MRN_CHEQUE, 0) > 0)
-       AND Mretmast.MRD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
-       AND Mretmast.MRD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
-       AND MRETMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-UNION ALL
-SELECT SUM (
-            NVL (IPRECEIPTrefund.irf_cash, 0)
-          + NVL (IPRECEIPTrefund.irf_card, 0)
-          + NVL (IPRECEIPTrefund.irf_cheque, 0))
-       * -1
-          AS Amt,
-       0 tax
-  FROM IPRECEIPTrefund
- WHERE IRF_CACR IN ('C') AND IRF_CANCEL IS NULL
-       AND (   NVL (IPRECEIPTrefund.irf_cash, 0) > 0
-            OR NVL (IPRECEIPTrefund.irf_card, 0) > 0
-            OR NVL (IPRECEIPTrefund.irf_cheque, 0) > 0)
-       AND IRF_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
-       AND IRF_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
-       AND ipreceiptrefund.IRC_MHCODE IN (SELECT MH_CODE FROM multihospital)
-UNION ALL
-SELECT SUM (NVL (Ron_Cash, 0) + NVL (Ron_Card, 0) + NVL (Ron_Cheque, 0)) * -1
-          AS Amt,
-       SUM (NVL (opbillrefundmast.RON_TOTTAX, 0)) * -1 Tax
-  FROM Opbillrefundmast
- WHERE (NVL (Roc_Cancel, 'N') = 'N')
-       AND (   NVL (Ron_Cash, 0) > 0
-            OR NVL (Ron_Cheque, 0) > 0
-            OR NVL (Ron_Card, 0) > 0)
-       AND Opbillrefundmast.Rod_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
-       AND Opbillrefundmast.Rod_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
-       AND OPBILLREFUNDMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-UNION ALL
-SELECT SUM (NVL (Rin_Cash, 0) + NVL (Rin_Card, 0) + NVL (Rin_Cheque, 0)) * -1
-          Amt,
-       SUM (NVL (IPREFUNDMAST.RIN_TOTTAX, 0) * -1) Tax
-  FROM Iprefundmast
- WHERE     Ric_Cacr IN ('C', 'R')
-       AND NVL (Ric_Cancel, 'N') = 'N'
-       AND Dmc_Slno IS NOT NULL
-       AND Rid_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
-       AND IPREFUNDMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-       AND Rid_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
-UNION ALL
-SELECT SUM (
-            NVL (Refundreceiptmast.RFN_CASH, 0)
-          + NVL (Refundreceiptmast.RFN_CARD, 0)
-          + NVL (Refundreceiptmast.RFN_CHEQUE, 0))
-       * -1
-          AS Amt,
-       SUM (NVL (Refundreceiptmast.RFN_TOTTAX, 0)) * -1 tax
-  FROM Refundreceiptmast
- WHERE     Refundreceiptmast.Rfc_Cacr IN ('C', 'R')
-       AND Refundreceiptmast.Rfc_Cancel IS NULL
-       AND Refundreceiptmast.RFC_RETCNCODE IS NOT NULL
-       AND Refundreceiptmast.Roc_Slno IS NULL
-       AND (   NVL (Refundreceiptmast.RFN_CASH, 0) > 0
-            OR NVL (Refundreceiptmast.RFN_CARD, 0) > 0
-            OR NVL (Refundreceiptmast.RFN_CHEQUE, 0) > 0)
-       AND Refundreceiptmast.RFD_RETDATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
-       AND Refundreceiptmast.RFD_RETDATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
-       AND REFUNDRECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-UNION ALL
-SELECT SUM (
-            NVL (refundbillmast.RFN_CASH, 0)
-          + NVL (refundbillmast.RFN_CARD, 0)
-          + NVL (refundbillmast.RFN_CHEQUE, 0))
-       * -1
-          AS Amt,
-       SUM (
-          NVL (refundbillmast.RFN_TOTTAX, 0)
-          + NVL (Refundbillmast.Rfn_Totcess, 0))
-       * -1
-          tax
-  FROM refundbillmast
- WHERE     refundbillmast.Rfc_Cacr IN ('C', 'R')
-       AND refundbillmast.Rfc_Cancel IS NULL
-       AND Refundbillmast.RFC_RETCNCODE IS NOT NULL
-       AND RefundBillmast.Roc_Slno IS NULL
-       AND (   NVL (refundbillmast.RFN_CASH, 0) > 0
-            OR NVL (refundbillmast.RFN_CARD, 0) > 0
-            OR NVL (refundbillmast.RFN_CHEQUE, 0) > 0)
-       AND refundbillmast.RFD_RETDATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
-       AND refundbillmast.RFD_RETDATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
-       AND refundbillmast.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-UNION ALL
-SELECT SUM (
-            NVL (Mretmast.MRN_CASH, 0)
-          + NVL (Mretmast.MRN_CARD, 0)
-          + NVL (Mretmast.MRN_CHEQUE, 0))
-       * -1
-          AS Amt,
-       SUM (
-            NVL (MRN_SALETAXCH, 0)
-          + NVL (MRN_SALETAXCR, 0)
-          + NVL (MRN_CESSCH, 0)
-          + NVL (MRN_CESSCR, 0))
-       * -1
-          Tax
-  FROM Mretmast
- WHERE     Mretmast.MRC_CACR IN ('C', 'R')
-       AND Mretmast.MRC_CANCEL = 'N'
-       AND Mretmast.MRC_RETCNCODE IS NOT NULL
-       AND (   NVL (Mretmast.MRN_CASH, 0) > 0
-            OR NVL (Mretmast.MRN_CARD, 0) > 0
-            OR NVL (Mretmast.MRN_CHEQUE, 0) > 0)
-       AND Mretmast.MRD_RETDATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
-       AND Mretmast.MRD_RETDATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
-       AND MRETMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)`;
+  const sql = ` SELECT 
+                        SUM ( NVL (Refundreceiptmast.RFN_CASH, 0)  + NVL (Refundreceiptmast.RFN_CARD, 0)  + NVL (Refundreceiptmast.RFN_CHEQUE, 0)) * -1 AS Amt,
+                        SUM (NVL (Refundreceiptmast.RFN_TOTTAX, 0)) * -1 tax
+                    FROM Refundreceiptmast
+                    WHERE     Refundreceiptmast.Rfc_Cacr IN ('C', 'R')
+                        AND Refundreceiptmast.Rfc_Cancel IS NULL
+                        AND Refundreceiptmast.RFC_RETCNCODE IS NULL
+                        AND Refundreceiptmast.Roc_Slno IS NULL
+                        AND (   NVL (Refundreceiptmast.RFN_CASH, 0) > 0  OR NVL (Refundreceiptmast.RFN_CARD, 0) > 0 OR NVL (Refundreceiptmast.RFN_CHEQUE, 0) > 0)
+                        AND Refundreceiptmast.Rfd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                        AND Refundreceiptmast.Rfd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                        AND REFUNDRECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                    UNION ALL
+                    SELECT SUM (  NVL (refundbillmast.RFN_CASH, 0)  + NVL (refundbillmast.RFN_CARD, 0)  + NVL (refundbillmast.RFN_CHEQUE, 0))  * -1 AS Amt,
+                        SUM (NVL (refundbillmast.RFN_TOTTAX, 0)) * -1 tax
+                    FROM refundbillmast
+                    WHERE     refundbillmast.Rfc_Cacr IN ('C', 'R')
+                        AND refundbillmast.Rfc_Cancel IS NULL
+                        AND Refundbillmast.RFC_RETCNCODE IS NULL
+                        AND RefundBillmast.Roc_Slno IS NULL
+                        AND (   NVL (refundbillmast.RFN_CASH, 0) > 0 OR NVL (refundbillmast.RFN_CARD, 0) > 0 OR NVL (refundbillmast.RFN_CHEQUE, 0) > 0)
+                        AND refundbillmast.Rfd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                        AND refundbillmast.Rfd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                        AND refundbillmast.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                    UNION ALL
+                    SELECT 
+                        SUM ( NVL (Mretmast.MRN_CASH, 0)  + NVL (Mretmast.MRN_CARD, 0) + NVL (Mretmast.MRN_CHEQUE, 0)) * -1 AS Amt,
+                        SUM ( NVL (MRN_SALETAXCH, 0)  + NVL (MRN_SALETAXCR, 0)  + NVL (MRN_CESSCH, 0) + NVL (MRN_CESSCR, 0))  * -1 Tax
+                    FROM Mretmast
+                    WHERE     Mretmast.MRC_CACR IN ('C', 'R')
+                        AND NVL (Mretmast.MRC_CANCEL, 'N') = 'N'
+                        AND Mretmast.MRC_RETCNCODe IS NULL
+                        AND (NVL (Mretmast.MRN_CASH, 0) > 0 OR NVL (Mretmast.MRN_CARD, 0) > 0 OR NVL (Mretmast.MRN_CHEQUE, 0) > 0)
+                        AND Mretmast.MRD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                        AND Mretmast.MRD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                        AND MRETMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                    UNION ALL
+                    SELECT SUM (NVL (IPRECEIPTrefund.irf_cash, 0) + NVL (IPRECEIPTrefund.irf_card, 0) + NVL (IPRECEIPTrefund.irf_cheque, 0))  * -1 AS Amt,
+                        0 tax
+                    FROM IPRECEIPTrefund
+                    WHERE IRF_CACR IN ('C') AND IRF_CANCEL IS NULL
+                        AND (NVL (IPRECEIPTrefund.irf_cash, 0) > 0 OR NVL (IPRECEIPTrefund.irf_card, 0) > 0  OR NVL (IPRECEIPTrefund.irf_cheque, 0) > 0)
+                        AND IRF_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                        AND IRF_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                        AND ipreceiptrefund.IRC_MHCODE IN (SELECT MH_CODE FROM multihospital)
+                        AND NOT EXISTS (
+                        SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = IPRECEIPTREFUND.IP_NO AND G.STATUS = 1
+                        )
+                    UNION ALL
+                    SELECT 
+                        SUM (NVL (Ron_Cash, 0) + NVL (Ron_Card, 0) + NVL (Ron_Cheque, 0)) * -1 AS Amt,
+                        SUM (NVL (opbillrefundmast.RON_TOTTAX, 0)) * -1 Tax
+                    FROM Opbillrefundmast
+                    WHERE (NVL (Roc_Cancel, 'N') = 'N')
+                        AND (NVL (Ron_Cash, 0) > 0 OR NVL (Ron_Cheque, 0) > 0 OR NVL (Ron_Card, 0) > 0)
+                        AND Opbillrefundmast.Rod_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                        AND Opbillrefundmast.Rod_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                        AND OPBILLREFUNDMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                    UNION ALL
+                    SELECT 
+                            SUM (NVL (Rin_Cash, 0) + NVL (Rin_Card, 0) + NVL (Rin_Cheque, 0)) * -1 Amt,
+                            SUM (NVL (IPREFUNDMAST.RIN_TOTTAX, 0) * -1) Tax
+                    FROM Iprefundmast
+                    WHERE  Ric_Cacr IN ('C', 'R')
+                        AND NVL (Ric_Cancel, 'N') = 'N'
+                        AND Dmc_Slno IS NOT NULL
+                        AND Rid_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                        AND IPREFUNDMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                        AND Rid_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                    UNION ALL
+                    SELECT 
+                        SUM ( NVL (Refundreceiptmast.RFN_CASH, 0) + NVL (Refundreceiptmast.RFN_CARD, 0) + NVL (Refundreceiptmast.RFN_CHEQUE, 0)) * -1  AS Amt,
+                        SUM (NVL (Refundreceiptmast.RFN_TOTTAX, 0)) * -1 tax
+                    FROM Refundreceiptmast
+                    WHERE     Refundreceiptmast.Rfc_Cacr IN ('C', 'R')
+                        AND Refundreceiptmast.Rfc_Cancel IS NULL
+                        AND Refundreceiptmast.RFC_RETCNCODE IS NOT NULL
+                        AND Refundreceiptmast.Roc_Slno IS NULL
+                        AND (   NVL (Refundreceiptmast.RFN_CASH, 0) > 0 OR NVL (Refundreceiptmast.RFN_CARD, 0) > 0 OR NVL (Refundreceiptmast.RFN_CHEQUE, 0) > 0)
+                        AND Refundreceiptmast.RFD_RETDATE >=  TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                        AND Refundreceiptmast.RFD_RETDATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                        AND REFUNDRECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                    UNION ALL
+                    SELECT 
+                        SUM (NVL (refundbillmast.RFN_CASH, 0)  + NVL (refundbillmast.RFN_CARD, 0) + NVL (refundbillmast.RFN_CHEQUE, 0)) * -1  AS Amt,
+                        SUM (NVL (refundbillmast.RFN_TOTTAX, 0)) * -1 tax
+                    FROM refundbillmast
+                    WHERE refundbillmast.Rfc_Cacr IN ('C', 'R')
+                        AND refundbillmast.Rfc_Cancel IS NULL
+                        AND Refundbillmast.RFC_RETCNCODE IS NOT NULL
+                        AND RefundBillmast.Roc_Slno IS NULL
+                        AND (   NVL (refundbillmast.RFN_CASH, 0) > 0 OR NVL (refundbillmast.RFN_CARD, 0) > 0 OR NVL (refundbillmast.RFN_CHEQUE, 0) > 0)
+                        AND refundbillmast.RFD_RETDATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                        AND refundbillmast.RFD_RETDATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                        AND refundbillmast.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                    UNION ALL
+                    SELECT 
+                        SUM (  NVL (Mretmast.MRN_CASH, 0) + NVL (Mretmast.MRN_CARD, 0) + NVL (Mretmast.MRN_CHEQUE, 0)) * -1 AS Amt,
+                        SUM ( NVL (MRN_SALETAXCH, 0) + NVL (MRN_SALETAXCR, 0) + NVL (MRN_CESSCH, 0)  + NVL (MRN_CESSCR, 0)) * -1 Tax
+                    FROM Mretmast
+                    WHERE     Mretmast.MRC_CACR IN ('C', 'R')
+                        AND Mretmast.MRC_CANCEL = 'N'
+                        AND Mretmast.MRC_RETCNCODE IS NOT NULL
+                        AND (NVL (Mretmast.MRN_CASH, 0) > 0 OR NVL (Mretmast.MRN_CARD, 0) > 0 OR NVL (Mretmast.MRN_CHEQUE, 0) > 0)
+                        AND Mretmast.MRD_RETDATE >=  TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                        AND Mretmast.MRD_RETDATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                        AND MRETMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)`;
   const result = await conn_ora.execute(
     sql,
     {
@@ -2329,7 +2362,7 @@ const getDiscount = async (conn_ora, bind) => {
   );
   return result.rows;
 };
-
+// INCLUDED
 const getIpincomeSection_six = async (conn_ora, bind) => {
   const sql = `SELECT NVL (Misincexpgroup.Dg_desc, 'Ungrouped') Dg_desc,
                     NVL (Misincexpgroup.Dg_grcode, 999) AS Code,
@@ -2368,6 +2401,7 @@ const getIpincomeSection_six = async (conn_ora, bind) => {
                     AND Disbillmast.Dmc_Cacr <> 'M'
                     AND Disbillmast.dmd_date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND Disbillmast.dmd_date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                    AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Disbillmast.IP_NO AND G.STATUS = 1)
                     AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
             GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
             ORDER BY Dg_desc`;
@@ -2381,9 +2415,9 @@ const getIpincomeSection_six = async (conn_ora, bind) => {
   );
   return result.rows;
 };
-
+// INCLUDED
 const getDiscount_one = async (conn_ora, bind) => {
-  const sql = `SELECT SUM (NVL (Irn_Discount, 0)) Discount
+  const sql = `SELECT SUM (NVL (Irn_Discount, 0)) Discount,DISBILLMAST.IP_NO
             FROM ipreceipt, Disbillmast
             WHERE Ipreceipt.Dmc_slno = Disbillmast.Dmc_slno
                 AND Disbillmast.Dmd_date < TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
@@ -2391,7 +2425,9 @@ const getDiscount_one = async (conn_ora, bind) => {
                 AND IRD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                 AND IRD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
-                AND NVL (Irc_cancel, 'N') = 'N'`;
+                AND NVL (Irc_cancel, 'N') = 'N'
+                AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Disbillmast.IP_NO AND G.STATUS = 1)
+                GROUP BY DISBILLMAST.IP_NO`;
   const result = await conn_ora.execute(
     sql,
     {
@@ -2402,7 +2438,7 @@ const getDiscount_one = async (conn_ora, bind) => {
   );
   return result.rows;
 };
-
+// INCLUDED
 const getCollectionPortion_five = async (conn_ora, bind) => {
   const sql = `SELECT SUM (NVL (ARN_AMOUNT, 0)) Amt, 0 tax
                 FROM OPADVANCE
@@ -2410,6 +2446,7 @@ const getCollectionPortion_five = async (conn_ora, bind) => {
                     AND ARD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND ARD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND OPADVANCE.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                    AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = OPADVANCE.IP_NO AND G.STATUS = 1)
                 UNION ALL
                 SELECT SUM (NVL (ARN_AMOUNT, 0)) Amt, 0 tax
                 FROM PHADVANCEENTRY
@@ -2424,6 +2461,7 @@ const getCollectionPortion_five = async (conn_ora, bind) => {
                     AND ARD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND ARD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND IPADVANCE.IAC_MHCODE IN (SELECT MH_CODE FROM multihospital)
+                    AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = IPADVANCE.IP_NO AND G.STATUS = 1)
                 UNION ALL
                 SELECT SUM (NVL (ARN_AMOUNT, 0)) Amt, 0 tax
                 FROM ADVANCEENTRY
@@ -2441,7 +2479,7 @@ const getCollectionPortion_five = async (conn_ora, bind) => {
   );
   return result.rows;
 };
-
+// INCLUDED
 const getCollectionPortion_six = async (conn_ora, bind) => {
   const sql = `SELECT SUM (NVL (Opn_advance, 0)) Amt, 0 tax
                 FROM Opbillmast
@@ -2457,6 +2495,7 @@ const getCollectionPortion_six = async (conn_ora, bind) => {
                     AND pbillmast.BMC_COLLCNCODE IS NULL
                     AND BMD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND pbillmast.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                    AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = PBILLMAST.IP_NO AND G.STATUS = 1)
                 UNION ALL
                 SELECT SUM (NVL (Dmn_advance, 0)) Amt, 0 TAX
                 FROM Disbillmast
@@ -2464,6 +2503,7 @@ const getCollectionPortion_six = async (conn_ora, bind) => {
                     AND Disbillmast.Dmd_date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                    AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = DISBILLMAST.IP_NO AND G.STATUS = 1)
                 UNION ALL
                 SELECT SUM (NVL (BMN_ADVAMOUNT, 0)) Amt, 0 Tax
                 FROM Billmast
@@ -2480,6 +2520,7 @@ const getCollectionPortion_six = async (conn_ora, bind) => {
                     AND pbillmast.BMC_COLLCNCODE IS NOT NULL
                     AND BMD_COLLDATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND pbillmast.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                    AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = PBILLMAST.IP_NO AND G.STATUS = 1)
                 UNION ALL
                 SELECT SUM (NVL (BMN_ADVAMOUNT, 0)) Amt, 0 Tax
                 FROM Billmast
@@ -2487,7 +2528,8 @@ const getCollectionPortion_six = async (conn_ora, bind) => {
                     AND BMD_COLLDATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND BILLMAST.BMC_COLLCNCODE IS NOT NULL
                     AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-                    AND BMD_COLLDATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
+                    AND BMD_COLLDATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                    AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = BILLMAST.IP_NO AND G.STATUS = 1)`;
   const result = await conn_ora.execute(
     sql,
     {
@@ -2627,6 +2669,9 @@ const getAdvanceRefund = async (conn_ora, bind) => {
                     AND REFUNDOPADVANCE.Rfd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND REFUNDOPADVANCE.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                     AND REFUNDOPADVANCE.Rfd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                    AND REFUNDOPADVANCE.AR_SLNO IN (SELECT AR_SLNO FROM OPADVANCE WHERE NOT EXISTS (
+                      SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = OPADVANCE.IP_NO AND G.STATUS = 1
+                    ))
                 HAVING SUM (NVL (REFUNDOPADVANCE.RFN_AMT, 0)) > 0
                 UNION ALL
                 SELECT SUM (NVL (REFUNDADVANCE.RFN_AMT, 0)) Amt, 0 tax
@@ -2635,6 +2680,9 @@ const getAdvanceRefund = async (conn_ora, bind) => {
                     AND REFUNDADVANCE.Rfd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND REFUNDADVANCE.RFC_MHCODE IN (SELECT MH_CODE FROM multihospital)
                     AND REFUNDADVANCE.Rfd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                    AND REFUNDADVANCE.AR_SLNO IN (SELECT AR_SLNO FROM OPADVANCE WHERE NOT EXISTS (
+                    SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = OPADVANCE.IP_NO AND G.STATUS = 1
+                    ))
                 HAVING SUM (NVL (REFUNDADVANCE.RFN_AMT, 0)) > 0
                 UNION ALL
                 SELECT SUM (
@@ -2648,6 +2696,13 @@ const getAdvanceRefund = async (conn_ora, bind) => {
                     AND IPRECEIPT.IRD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND ipreceipt.IPC_MHCODE IN (SELECT MH_CODE FROM multihospital)
                     AND IPRECEIPT.IRD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                    AND IPRECEIPT.DMC_SLNO IN (SELECT DMC_SLNO 
+            FROM DISBILLMAST 
+            WHERE DMD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss') 
+                    AND DMD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss') 
+                    AND NOT EXISTS (
+                    SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = DISBILLMAST.IP_NO AND G.STATUS = 1
+                    ))
                 HAVING SUM (
                         (  NVL (Ipreceipt.irn_balance, 0)
                         + NVL (Ipreceipt.IRN_REFCHEQ, 0)
@@ -2659,6 +2714,9 @@ const getAdvanceRefund = async (conn_ora, bind) => {
                     AND ADVANCERETURN.RAD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND ADVANCERETURN.RAC_MHCODE IN (SELECT MH_CODE FROM multihospital)
                     AND ADVANCERETURN.RAD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                    AND ADVANCERETURN.AR_SLNO IN (SELECT AR_SLNO FROM OPADVANCE WHERE NOT EXISTS (
+                    SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = OPADVANCE.IP_NO AND G.STATUS = 1
+                    ))
                 HAVING SUM (NVL (ADVANCERETURN.RAN_AMT, 0)) > 0`;
   const result = await conn_ora.execute(
     sql,
@@ -2670,7 +2728,7 @@ const getAdvanceRefund = async (conn_ora, bind) => {
   );
   return result.rows;
 };
-
+// INCLUDED
 const getCollectionPortion_seven = async (conn_ora, bind) => {
   const sql = `SELECT SUM (NVL (RPN_CREDIT, 0)) AS Amt,
                     SUM (NVL (receiptmast.RPN_TOTTAX, 0)) Tax
@@ -2744,6 +2802,7 @@ const getCollectionPortion_seven = async (conn_ora, bind) => {
                     AND DMD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                     AND DMD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                    AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Disbillmast.IP_NO AND G.STATUS = 1)
                 UNION ALL
                 SELECT SUM (NVL (BMN_CREDIT, 0)) AS Amt,
                     SUM (NVL (billmast.BMN_TOTTAX, 0) + NVL (Billmast.Bmn_Totcess, 0)) Tax
@@ -2794,7 +2853,7 @@ const getCollectionPortion_seven = async (conn_ora, bind) => {
   );
   return result.rows;
 };
-
+// INCLUDED
 const getCollectionPortion_eight = async (conn_ora, bind) => {
   const sql = `SELECT SUM (NVL (Payable, 0)) Amt, SUM (tax) tax
                 FROM (SELECT SUM (NVL (DMN_FINALPTPAYABLE, 0)) Payable,
@@ -2813,6 +2872,7 @@ const getCollectionPortion_eight = async (conn_ora, bind) => {
                             AND NVL (DMN_FINALPTPAYABLE, 0) <> 0
                             AND Disbillmast.Dmd_date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                             AND disbillmast.dmd_date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                            AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Disbillmast.IP_NO AND G.STATUS = 1)
                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         UNION ALL
                         SELECT SUM (
@@ -2845,6 +2905,7 @@ const getCollectionPortion_eight = async (conn_ora, bind) => {
                             AND ipreceipt.IPC_MHCODE IN
                                     (SELECT MH_CODE FROM multihospital)
                             AND ird_date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                            AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Disbillmast.IP_NO AND G.STATUS = 1)
                             AND Irc_cancel IS NULL
                             AND ( (  NVL (Ipreceipt.irn_amount, 0)
                                     + NVL (Ipreceipt.irn_cheque, 0)
@@ -3070,6 +3131,7 @@ const getDiscount_three = async (conn_ora, bind) => {
                     AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND Ipreceipt.Ird_date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND Ipreceipt.Ird_date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                    AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Disbillmast.IP_NO AND G.STATUS = 1)
                     AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                     AND NVL (irn_discount, 0) > 0`;
   const result = await conn_ora.execute(
@@ -3084,7 +3146,7 @@ const getDiscount_three = async (conn_ora, bind) => {
 };
 
 const getTypeDiscount = async (conn_ora, bind) => {
-  const sql = `SELECT Ptc_Desc, SUM (Discount) Discount, SUM (tax) tax
+  const sql = ` SELECT Ptc_Desc, SUM (Discount) Discount, SUM (tax) tax
     FROM (  SELECT Receiptmast.Rpc_Slno Slno,
                    Receiptmast.Rp_No BillNo,
                    Receiptmast.Rpd_Date BillDate,
@@ -3108,8 +3170,10 @@ const getTypeDiscount = async (conn_ora, bind) => {
                    AND Patient.Pt_Code = Pattype.Pt_Code(+)
                    AND NVL (Receiptmast.Rpc_Cancel, 'N') = 'N'
                    AND Receiptmast.Rpc_Cacr IN ('C', 'R')
-                   AND Receiptmast.Rpd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
-                   AND Receiptmast.Rpd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Receiptmast.Rpd_Date >=
+                          TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Receiptmast.Rpd_Date <=
+                          TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                    AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
           GROUP BY Receiptmast.Rpc_Slno,
                    Receiptmast.Rp_No,
@@ -3143,8 +3207,10 @@ const getTypeDiscount = async (conn_ora, bind) => {
                    AND Patient.Pt_Code = Pattype.Pt_Code
                    AND NVL (Receiptmast.Rpc_Cancel, 'N') = 'N'
                    AND Receiptmast.Rpc_Cacr IN ('C', 'R')
-                   AND Receiptmast.RPD_COLLDATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
-                   AND Receiptmast.RPD_COLLDATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Receiptmast.RPD_COLLDATE >=
+                          TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Receiptmast.RPD_COLLDATE <=
+                          TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                    AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
           GROUP BY Receiptmast.Rpc_Slno,
                    Receiptmast.Rp_No,
@@ -3155,83 +3221,50 @@ const getTypeDiscount = async (conn_ora, bind) => {
                    Discountauthority.Da_Code,
                    INITCAP (Pattype.Ptc_Desc)
           UNION ALL                           /*--Op Direct Billing Refund--*/
-                                           SELECT Refundreceiptmast.Rfc_Slno
-                                                     Slno,
-                                                  Refundreceiptmast.Rf_No
-                                                     BillNo,
-                                                  Refundreceiptmast.Rfd_Date
-                                                     BillDate,
-                                                  Patient.Pt_No,
-                                                  INITCAP (Patient.Ptc_Ptname)
-                                                     Ptname,
-                                                  MAX (
-                                                     NVL (
-                                                        Refundreceiptmast.Rfn_Netamt,
-                                                        0))
-                                                  * -1
-                                                     Net,
-                                                  SUM (
-                                                     NVL (
-                                                        Refundreceiptdetl.Rpn_Disamt,
-                                                        0))
-                                                  * -1
-                                                     Discount,
-                                                  INITCAP (Dac_Desc) Dac_Desc,
-                                                  Discountauthority.Da_Code,
-                                                  INITCAP (Pattype.Ptc_Desc)
-                                                     Ptc_Desc,
-                                                  SUM (
-                                                     NVL (
-                                                        refundreceiptmast.RFN_TOTTAX,
-                                                        0))
-                                                  * -1
-                                                     Tax
-                                             FROM Receiptmast,
-                                                  Receiptdetl,
-                                                  Patient,
-                                                  Discountauthority,
-                                                  Refundreceiptmast,
-                                                  Refundreceiptdetl,
-                                                  Pattype
-                                            WHERE Receiptdetl.Rpc_Slno =
-                                                     Refundreceiptdetl.Rpc_Slno
-                                                  AND refundreceiptmast.RFC_RETCNCODE
-                                                         IS NULL
-                                                  AND Receiptdetl.Rpc_Cnt =
-                                                         Refundreceiptdetl.Rpc_Cnt
-                                                  AND Refundreceiptmast.Rfc_Slno =
-                                                         Refundreceiptdetl.Rfc_Slno
-                                                  AND Receiptmast.Rpc_Slno =
-                                                         Receiptdetl.Rpc_Slno
-                                                  AND Receiptmast.Pt_No =
-                                                         Patient.Pt_No
-                                                  AND Patient.Pt_Code =
-                                                         Pattype.Pt_Code
-                                                  AND Receiptdetl.Da_Code =
-                                                         Discountauthority.Da_Code(+)
-                                                  AND NVL (
-                                                         Receiptmast.Rpc_Cancel,
-                                                         'N') = 'N'
-                                                  AND NVL (
-                                                         Refundreceiptmast.Rfc_Cancel,
-                                                         'N') = 'N'
-                                                  AND Refundreceiptmast.Rfc_Cacr IN
-                                                         ('C', 'R')
-                                                  AND Receiptmast.Rpc_Cacr IN
-                                                         ('C', 'R')
-                                                  AND Refundreceiptmast.Rfd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
-                                                  AND Refundreceiptmast.Rfd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
-                                                  AND REFUNDRECEIPTMAST.MH_CODE IN
-                                                         (SELECT MH_CODE
-                                                            FROM multihospital)
-                                         GROUP BY Refundreceiptmast.Rfc_Slno,
-                                                  Refundreceiptmast.Rf_No,
-                                                  Refundreceiptmast.Rfd_Date,
-                                                  Patient.Pt_No,
-                                                  INITCAP (Patient.Ptc_Ptname),
-                                                  INITCAP (Dac_Desc),
-                                                  Discountauthority.Da_Code,
-                                                  INITCAP (Pattype.Ptc_Desc)
+            SELECT Refundreceiptmast.Rfc_Slno Slno,
+                   Refundreceiptmast.Rf_No BillNo,
+                   Refundreceiptmast.Rfd_Date BillDate,
+                   Patient.Pt_No,
+                   INITCAP (Patient.Ptc_Ptname) Ptname,
+                   MAX (NVL (Refundreceiptmast.Rfn_Netamt, 0)) * -1 Net,
+                   SUM (NVL (Refundreceiptdetl.Rpn_Disamt, 0)) * -1 Discount,
+                   INITCAP (Dac_Desc) Dac_Desc,
+                   Discountauthority.Da_Code,
+                   INITCAP (Pattype.Ptc_Desc) Ptc_Desc,
+                   SUM (NVL (refundreceiptmast.RFN_TOTTAX, 0)) * -1 Tax
+              FROM Receiptmast,
+                   Receiptdetl,
+                   Patient,
+                   Discountauthority,
+                   Refundreceiptmast,
+                   Refundreceiptdetl,
+                   Pattype
+             WHERE     Receiptdetl.Rpc_Slno = Refundreceiptdetl.Rpc_Slno
+                   AND refundreceiptmast.RFC_RETCNCODE IS NULL
+                   AND Receiptdetl.Rpc_Cnt = Refundreceiptdetl.Rpc_Cnt
+                   AND Refundreceiptmast.Rfc_Slno = Refundreceiptdetl.Rfc_Slno
+                   AND Receiptmast.Rpc_Slno = Receiptdetl.Rpc_Slno
+                   AND Receiptmast.Pt_No = Patient.Pt_No
+                   AND Patient.Pt_Code = Pattype.Pt_Code
+                   AND Receiptdetl.Da_Code = Discountauthority.Da_Code(+)
+                   AND NVL (Receiptmast.Rpc_Cancel, 'N') = 'N'
+                   AND NVL (Refundreceiptmast.Rfc_Cancel, 'N') = 'N'
+                   AND Refundreceiptmast.Rfc_Cacr IN ('C', 'R')
+                   AND Receiptmast.Rpc_Cacr IN ('C', 'R')
+                   AND Refundreceiptmast.Rfd_Date >=
+                          TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Refundreceiptmast.Rfd_Date <=
+                          TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND REFUNDRECEIPTMAST.MH_CODE IN
+                          (SELECT MH_CODE FROM multihospital)
+          GROUP BY Refundreceiptmast.Rfc_Slno,
+                   Refundreceiptmast.Rf_No,
+                   Refundreceiptmast.Rfd_Date,
+                   Patient.Pt_No,
+                   INITCAP (Patient.Ptc_Ptname),
+                   INITCAP (Dac_Desc),
+                   Discountauthority.Da_Code,
+                   INITCAP (Pattype.Ptc_Desc)
           UNION ALL
             SELECT Refundreceiptmast.Rfc_Slno Slno,
                    Refundreceiptmast.Rf_No BillNo,
@@ -3263,8 +3296,10 @@ const getTypeDiscount = async (conn_ora, bind) => {
                    AND NVL (Refundreceiptmast.Rfc_Cancel, 'N') = 'N'
                    AND Refundreceiptmast.Rfc_Cacr IN ('C', 'R')
                    AND Receiptmast.Rpc_Cacr IN ('C', 'R')
-                   AND Refundreceiptmast.RFD_RETDATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
-                   AND Refundreceiptmast.RFD_RETDATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Refundreceiptmast.RFD_RETDATE >=
+                          TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Refundreceiptmast.RFD_RETDATE <=
+                          TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                    AND REFUNDRECEIPTMAST.MH_CODE IN
                           (SELECT MH_CODE FROM multihospital)
           GROUP BY Refundreceiptmast.Rfc_Slno,
@@ -3276,65 +3311,50 @@ const getTypeDiscount = async (conn_ora, bind) => {
                    Discountauthority.Da_Code,
                    INITCAP (Pattype.Ptc_Desc)
           UNION ALL                             /*--Op Consolidate Billing--*/
-                                         SELECT Opbillmast.Opc_Slno Slno,
-                                                Opbillmast.Op_No BillNo,
-                                                Opbillmast.Opd_Date BillDate,
-                                                Opbillmast.Pt_No,
-                                                INITCAP (Patient.Ptc_Ptname)
-                                                   Ptname,
-                                                MAX (
-                                                   NVL (Opbillmast.Opn_Netamt,
-                                                        0)
-                                                   + NVL (
-                                                        OPBILLMAST.OPN_SALETAXCH,
-                                                        0)
-                                                   + NVL (
-                                                        OPBILLMAST.OPN_SALETAXCR,
-                                                        0))
-                                                   Net,
-                                                SUM (
-                                                     NVL (Srn_Operdis, 0)
-                                                   + NVL (Srn_Theardis, 0)
-                                                   + NVL (Srn_Antdis, 0))
-                                                   Discount,
-                                                INITCAP (Dac_Desc) Dac_Desc,
-                                                Discountauthority.Da_Code,
-                                                INITCAP (Pattype.Ptc_Desc)
-                                                   Ptc_Desc,
-                                                SUM (
-                                                   NVL (opbillmast.OPN_TOTTAX,
-                                                        0))
-                                                   Tax
-                                           FROM Opbillmast,
-                                                Patsurgery,
-                                                Discountauthority,
-                                                Patient,
-                                                Pattype
-                                          WHERE (Patsurgery.Operation_Opslno =
-                                                    Opbillmast.Opc_Slno
-                                                 OR Patsurgery.Theater_Opslno =
-                                                       Opbillmast.Opc_Slno
-                                                 OR Patsurgery.Antest_Opslno =
-                                                       Opbillmast.Opc_Slno)
-                                                AND Patsurgery.Da_Code =
-                                                       Discountauthority.Da_Code(+)
-                                                AND Patient.Pt_Code =
-                                                       Pattype.Pt_Code
-                                                AND Opbillmast.Pt_No =
-                                                       Patient.Pt_No
-                                                AND Opbillmast.Opd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
-                                                AND Opbillmast.Opd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
-                                                AND OPBILLMAST.MH_CODE IN
-                                                       (SELECT MH_CODE
-                                                          FROM multihospital)
-                                       GROUP BY Opbillmast.Opc_Slno,
-                                                Opbillmast.Op_No,
-                                                Opbillmast.Opd_Date,
-                                                Opbillmast.Pt_No,
-                                                INITCAP (Patient.Ptc_Ptname),
-                                                INITCAP (Dac_Desc),
-                                                Discountauthority.Da_Code,
-                                                INITCAP (Pattype.Ptc_Desc)
+            SELECT Opbillmast.Opc_Slno Slno,
+                   Opbillmast.Op_No BillNo,
+                   Opbillmast.Opd_Date BillDate,
+                   Opbillmast.Pt_No,
+                   INITCAP (Patient.Ptc_Ptname) Ptname,
+                   MAX (
+                        NVL (Opbillmast.Opn_Netamt, 0)
+                      + NVL (OPBILLMAST.OPN_SALETAXCH, 0)
+                      + NVL (OPBILLMAST.OPN_SALETAXCR, 0))
+                      Net,
+                   SUM (
+                        NVL (Srn_Operdis, 0)
+                      + NVL (Srn_Theardis, 0)
+                      + NVL (Srn_Antdis, 0))
+                      Discount,
+                   INITCAP (Dac_Desc) Dac_Desc,
+                   Discountauthority.Da_Code,
+                   INITCAP (Pattype.Ptc_Desc) Ptc_Desc,
+                   SUM (NVL (opbillmast.OPN_TOTTAX, 0)) Tax
+              FROM Opbillmast,
+                   Patsurgery,
+                   Discountauthority,
+                   Patient,
+                   Pattype
+             WHERE (   Patsurgery.Operation_Opslno = Opbillmast.Opc_Slno
+                    OR Patsurgery.Theater_Opslno = Opbillmast.Opc_Slno
+                    OR Patsurgery.Antest_Opslno = Opbillmast.Opc_Slno)
+                   AND Patsurgery.Da_Code = Discountauthority.Da_Code(+)
+                   AND Patient.Pt_Code = Pattype.Pt_Code
+                   AND Opbillmast.Pt_No = Patient.Pt_No
+                   AND Opbillmast.Opd_Date >=
+                          TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Opbillmast.Opd_Date <=
+                          TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                   AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Patsurgery.IP_NO AND G.STATUS = 1)
+          GROUP BY Opbillmast.Opc_Slno,
+                   Opbillmast.Op_No,
+                   Opbillmast.Opd_Date,
+                   Opbillmast.Pt_No,
+                   INITCAP (Patient.Ptc_Ptname),
+                   INITCAP (Dac_Desc),
+                   Discountauthority.Da_Code,
+                   INITCAP (Pattype.Ptc_Desc)
           UNION ALL
             SELECT Opbillmast.Opc_Slno Slno,
                    Opbillmast.Op_No BillNo,
@@ -3362,9 +3382,12 @@ const getTypeDiscount = async (conn_ora, bind) => {
                    AND Patsurdetl.Da_Code = Discountauthority.Da_Code(+)
                    AND Patient.Pt_Code = Pattype.Pt_Code
                    AND Opbillmast.Pt_No = Patient.Pt_No
-                   AND Opbillmast.Opd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
-                   AND Opbillmast.Opd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Opbillmast.Opd_Date >=
+                          TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Opbillmast.Opd_Date <=
+                          TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                    AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                   AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Patsurgery.IP_NO AND G.STATUS = 1)
           GROUP BY Opbillmast.Opc_Slno,
                    Opbillmast.Op_No,
                    Opbillmast.Opd_Date,
@@ -3400,9 +3423,12 @@ const getTypeDiscount = async (conn_ora, bind) => {
                    AND Patsurother.Da_Code = Discountauthority.Da_Code(+)
                    AND Patient.Pt_Code = Pattype.Pt_Code
                    AND Opbillmast.Pt_No = Patient.Pt_No
-                   AND Opbillmast.Opd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
-                   AND Opbillmast.Opd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Opbillmast.Opd_Date >=
+                          TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Opbillmast.Opd_Date <=
+                          TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                    AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                   AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Patsurgery.IP_NO AND G.STATUS = 1)
           GROUP BY Opbillmast.Opc_Slno,
                    Opbillmast.Op_No,
                    Opbillmast.Opd_Date,
@@ -3441,8 +3467,10 @@ const getTypeDiscount = async (conn_ora, bind) => {
                    AND Receiptmast.Rpc_Cacr IN ('O')
                    AND NVL (Receiptmast.Rpc_Cancel, 'N') = 'N'
                    AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
-                   AND Opbillmast.Opd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
-                   AND Opbillmast.Opd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Opbillmast.Opd_Date >=
+                          TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Opbillmast.Opd_Date <=
+                          TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                    AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
           GROUP BY Opbillmast.Opc_Slno,
                    Opbillmast.Op_No,
@@ -3485,8 +3513,10 @@ const getTypeDiscount = async (conn_ora, bind) => {
                    AND NVL (Refundreceiptmast.Rfc_Cancel, 'N') = 'N'
                    AND NVL (Receiptmast.Rpc_Cancel, 'N') = 'N'
                    AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
-                   AND Opbillmast.Opd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
-                   AND Opbillmast.Opd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Opbillmast.Opd_Date >=
+                          TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Opbillmast.Opd_Date <=
+                          TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                    AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
           GROUP BY Opbillmast.Opc_Slno,
                    Opbillmast.Op_No,
@@ -3522,8 +3552,10 @@ const getTypeDiscount = async (conn_ora, bind) => {
                    AND Billmast.Bmc_Cacr IN ('O')
                    AND NVL (Billmast.Bmc_Cancel, 'N') = 'N'
                    AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
-                   AND Opbillmast.Opd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
-                   AND Opbillmast.Opd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Opbillmast.Opd_Date >=
+                          TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Opbillmast.Opd_Date <=
+                          TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                    AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
           GROUP BY Opbillmast.Opc_Slno,
                    Opbillmast.Op_No,
@@ -3570,8 +3602,10 @@ const getTypeDiscount = async (conn_ora, bind) => {
                    AND NVL (Refundbillmast.Rfc_Cancel, 'N') = 'N'
                    AND NVL (Billmast.Bmc_Cancel, 'N') = 'N'
                    AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
-                   AND Opbillmast.Opd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
-                   AND Opbillmast.Opd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Opbillmast.Opd_Date >=
+                          TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Opbillmast.Opd_Date <=
+                          TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                    AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
           GROUP BY Opbillmast.Opc_Slno,
                    Opbillmast.Op_No,
@@ -3582,96 +3616,55 @@ const getTypeDiscount = async (conn_ora, bind) => {
                    Discountauthority.Da_Code,
                    INITCAP (Pattype.Ptc_Desc)
           UNION ALL /*--Op Consolidate Billing refund(additional modification)--*/
-                                                                         SELECT Opbillmast.Opc_Slno
-                                                                                   Slno,
-                                                                                Opbillmast.Op_No
-                                                                                   BillNo,
-                                                                                Opbillmast.Opd_Date
-                                                                                   BillDate,
-                                                                                Opbillmast.Pt_No,
-                                                                                INITCAP (
-                                                                                   Patient.Ptc_Ptname)
-                                                                                   Ptname,
-                                                                                0
-                                                                                   Net,
-                                                                                SUM (
-                                                                                   NVL (
-                                                                                      Refundbilldetl.Rfn_Disamt,
-                                                                                      0))
-                                                                                   Discount,
-                                                                                INITCAP (
-                                                                                   Dac_Desc)
-                                                                                   Dac_Desc,
-                                                                                Discountauthority.Da_Code,
-                                                                                INITCAP (
-                                                                                   Pattype.Ptc_Desc)
-                                                                                   Ptc_Desc,
-                                                                                SUM (
-                                                                                   NVL (
-                                                                                      REFUNDBILLDETL.RFN_TOTTAX,
-                                                                                      0)
-                                                                                   + NVL (
-                                                                                        Refundbilldetl.Rfn_Totcess,
-                                                                                        0))
-                                                                                   tax
-                                                                           FROM Billdetl,
-                                                                                Billmast,
-                                                                                Refundbilldetl,
-                                                                                Refundbillmast,
-                                                                                Opbillmast,
-                                                                                Patient,
-                                                                                Discountauthority,
-                                                                                Pattype
-                                                                          WHERE Billdetl.Opc_Slno =
-                                                                                   Opbillmast.Opc_Slno
-                                                                                AND Billdetl.Bmc_Slno =
-                                                                                       Billmast.Bmc_Slno
-                                                                                AND Billdetl.Bmc_Slno =
-                                                                                       Refundbilldetl.Bmc_Slno
-                                                                                AND Billdetl.Bmc_Cnt =
-                                                                                       Refundbilldetl.Bmc_Cnt
-                                                                                AND Billdetl.Pd_Code =
-                                                                                       Refundbilldetl.Pd_Code
-                                                                                AND Refundbilldetl.Rfc_Slno =
-                                                                                       Refundbillmast.Rfc_Slno
-                                                                                AND Opbillmast.Pt_No =
-                                                                                       Patient.Pt_No
-                                                                                AND Billdetl.Da_Code =
-                                                                                       Discountauthority.Da_Code(+)
-                                                                                AND Patient.Pt_Code =
-                                                                                       Pattype.Pt_Code
-                                                                                AND Billmast.Bmc_Cacr IN
-                                                                                       ('O')
-                                                                                AND NVL (
-                                                                                       Refundbillmast.Rfc_Cancel,
-                                                                                       'N') =
-                                                                                       'N'
-                                                                                AND NVL (
-                                                                                       Billmast.Bmc_Cancel,
-                                                                                       'N') =
-                                                                                       'N'
-                                                                                AND NVL (
-                                                                                       Opbillmast.Opn_Cancel,
-                                                                                       'N') =
-                                                                                       'N'
-                                                                                AND Opbillmast.Opc_Cacr <>
-                                                                                       'M'
-                                                                                AND Opbillmast.Opd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
-                                                                                AND Opbillmast.Opd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
-                                                                                AND OPBILLMAST.MH_CODE IN
-                                                                                       (SELECT MH_CODE
-                                                                                          FROM multihospital)
-                                                                       GROUP BY Opbillmast.Opc_Slno,
-                                                                                Opbillmast.Op_No,
-                                                                                Opbillmast.Opd_Date,
-                                                                                Opbillmast.Pt_No,
-                                                                                INITCAP (
-                                                                                   Patient.Ptc_Ptname),
-                                                                                INITCAP (
-                                                                                   Dac_Desc),
-                                                                                Discountauthority.Da_Code,
-                                                                                INITCAP (
-                                                                                   Pattype.Ptc_Desc)
+            SELECT Opbillmast.Opc_Slno Slno,
+                   Opbillmast.Op_No BillNo,
+                   Opbillmast.Opd_Date BillDate,
+                   Opbillmast.Pt_No,
+                   INITCAP (Patient.Ptc_Ptname) Ptname,
+                   0 Net,
+                   SUM (NVL (Refundbilldetl.Rfn_Disamt, 0)) Discount,
+                   INITCAP (Dac_Desc) Dac_Desc,
+                   Discountauthority.Da_Code,
+                   INITCAP (Pattype.Ptc_Desc) Ptc_Desc,
+                   SUM (
+                      NVL (REFUNDBILLDETL.RFN_TOTTAX, 0)
+                      + NVL (Refundbilldetl.Rfn_Totcess, 0))
+                      tax
+              FROM Billdetl,
+                   Billmast,
+                   Refundbilldetl,
+                   Refundbillmast,
+                   Opbillmast,
+                   Patient,
+                   Discountauthority,
+                   Pattype
+             WHERE     Billdetl.Opc_Slno = Opbillmast.Opc_Slno
+                   AND Billdetl.Bmc_Slno = Billmast.Bmc_Slno
+                   AND Billdetl.Bmc_Slno = Refundbilldetl.Bmc_Slno
+                   AND Billdetl.Bmc_Cnt = Refundbilldetl.Bmc_Cnt
+                   AND Billdetl.Pd_Code = Refundbilldetl.Pd_Code
+                   AND Refundbilldetl.Rfc_Slno = Refundbillmast.Rfc_Slno
+                   AND Opbillmast.Pt_No = Patient.Pt_No
+                   AND Billdetl.Da_Code = Discountauthority.Da_Code(+)
+                   AND Patient.Pt_Code = Pattype.Pt_Code
+                   AND Billmast.Bmc_Cacr IN ('O')
+                   AND NVL (Refundbillmast.Rfc_Cancel, 'N') = 'N'
+                   AND NVL (Billmast.Bmc_Cancel, 'N') = 'N'
+                   AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
+                   AND Opbillmast.Opc_Cacr <> 'M'
+                   AND Opbillmast.Opd_Date >=
+                          TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Opbillmast.Opd_Date <=
+                          TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+          GROUP BY Opbillmast.Opc_Slno,
+                   Opbillmast.Op_No,
+                   Opbillmast.Opd_Date,
+                   Opbillmast.Pt_No,
+                   INITCAP (Patient.Ptc_Ptname),
+                   INITCAP (Dac_Desc),
+                   Discountauthority.Da_Code,
+                   INITCAP (Pattype.Ptc_Desc)
           UNION ALL
             SELECT Opbillmast.Opc_Slno Slno,
                    Opbillmast.Op_No BillNo,
@@ -3702,8 +3695,10 @@ const getTypeDiscount = async (conn_ora, bind) => {
                    AND Pbillmast.Bmc_Cacr IN ('O')
                    AND NVL (Pbillmast.Bmc_Cancel, 'N') = 'N'
                    AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
-                   AND Opbillmast.Opd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
-                   AND Opbillmast.Opd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Opbillmast.Opd_Date >=
+                          TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Opbillmast.Opd_Date <=
+                          TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                    AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
           GROUP BY Opbillmast.Opc_Slno,
                    Opbillmast.Op_No,
@@ -3762,8 +3757,10 @@ const getTypeDiscount = async (conn_ora, bind) => {
                            AND Mretmast.Mrc_Cacr IN ('O')
                            AND NVL (Mretmast.Mrc_Cancel, 'N') = 'N'
                            AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
-                           AND Opbillmast.Opd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
-                           AND Opbillmast.Opd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                           AND Opbillmast.Opd_Date >=
+                                  TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                           AND Opbillmast.Opd_Date <=
+                                  TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                            AND OPBILLMAST.MH_CODE IN
                                   (SELECT MH_CODE FROM multihospital)) A
           GROUP BY A.Slno,
@@ -3776,69 +3773,49 @@ const getTypeDiscount = async (conn_ora, bind) => {
                    Ptc_Desc,
                    A.tax
           UNION ALL                                   /*--Op Credit Refund--*/
-                                   SELECT Opbillrefundmast.Roc_Slno Slno,
-                                          Opbillrefundmast.Ro_No BillNo,
-                                          Opbillrefundmast.Rod_Date BillDate,
-                                          Patient.Pt_No,
-                                          INITCAP (Patient.Ptc_Ptname) Ptname,
-                                          MAX (
-                                             NVL (Opbillrefundmast.Ron_Netamt,
-                                                  0))
-                                          * -1
-                                             Net,
-                                          SUM (
-                                             NVL (Refundreceiptdetl.Rpn_Disamt,
-                                                  0))
-                                          * -1
-                                             Discount,
-                                          INITCAP (Dac_Desc) Dac_Desc,
-                                          Discountauthority.Da_Code,
-                                          INITCAP (Pattype.Ptc_Desc) Ptc_Desc,
-                                          SUM (
-                                             NVL (Refundreceiptdetl.RFN_TOTTAX,
-                                                  0))
-                                          * -1
-                                             tax
-                                     FROM Opbillrefundmast,
-                                          Receiptmast,
-                                          Receiptdetl,
-                                          Patient,
-                                          Discountauthority,
-                                          Refundreceiptmast,
-                                          Refundreceiptdetl,
-                                          Pattype
-                                    WHERE Opbillrefundmast.Roc_Slno =
-                                             Refundreceiptmast.Roc_Slno
-                                          AND Receiptdetl.Rpc_Slno =
-                                                 Refundreceiptdetl.Rpc_Slno
-                                          AND Receiptdetl.Rpc_Cnt =
-                                                 Refundreceiptdetl.Rpc_Cnt
-                                          AND Refundreceiptmast.Rfc_Slno =
-                                                 Refundreceiptdetl.Rfc_Slno
-                                          AND Receiptmast.Rpc_Slno =
-                                                 Receiptdetl.Rpc_Slno
-                                          AND Receiptmast.Pt_No = Patient.Pt_No
-                                          AND Receiptdetl.Da_Code =
-                                                 Discountauthority.Da_Code(+)
-                                          AND Patient.Pt_Code = Pattype.Pt_Code
-                                          AND NVL (Receiptmast.Rpc_Cancel, 'N') =
-                                                 'N'
-                                          AND NVL (
-                                                 Refundreceiptmast.Rfc_Cancel,
-                                                 'N') = 'N'
-                                          AND Opbillrefundmast.Rod_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
-                                          AND Opbillrefundmast.Rod_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
-                                          AND OPBILLREFUNDMAST.MH_CODE IN
-                                                 (SELECT MH_CODE
-                                                    FROM multihospital)
-                                 GROUP BY Opbillrefundmast.Roc_Slno,
-                                          Opbillrefundmast.Ro_No,
-                                          Opbillrefundmast.Rod_Date,
-                                          Patient.Pt_No,
-                                          INITCAP (Patient.Ptc_Ptname),
-                                          INITCAP (Dac_Desc),
-                                          Discountauthority.Da_Code,
-                                          INITCAP (Pattype.Ptc_Desc)
+            SELECT Opbillrefundmast.Roc_Slno Slno,
+                   Opbillrefundmast.Ro_No BillNo,
+                   Opbillrefundmast.Rod_Date BillDate,
+                   Patient.Pt_No,
+                   INITCAP (Patient.Ptc_Ptname) Ptname,
+                   MAX (NVL (Opbillrefundmast.Ron_Netamt, 0)) * -1 Net,
+                   SUM (NVL (Refundreceiptdetl.Rpn_Disamt, 0)) * -1 Discount,
+                   INITCAP (Dac_Desc) Dac_Desc,
+                   Discountauthority.Da_Code,
+                   INITCAP (Pattype.Ptc_Desc) Ptc_Desc,
+                   SUM (NVL (Refundreceiptdetl.RFN_TOTTAX, 0)) * -1 tax
+              FROM Opbillrefundmast,
+                   Receiptmast,
+                   Receiptdetl,
+                   Patient,
+                   Discountauthority,
+                   Refundreceiptmast,
+                   Refundreceiptdetl,
+                   Pattype
+             WHERE     Opbillrefundmast.Roc_Slno = Refundreceiptmast.Roc_Slno
+                   AND Receiptdetl.Rpc_Slno = Refundreceiptdetl.Rpc_Slno
+                   AND Receiptdetl.Rpc_Cnt = Refundreceiptdetl.Rpc_Cnt
+                   AND Refundreceiptmast.Rfc_Slno = Refundreceiptdetl.Rfc_Slno
+                   AND Receiptmast.Rpc_Slno = Receiptdetl.Rpc_Slno
+                   AND Receiptmast.Pt_No = Patient.Pt_No
+                   AND Receiptdetl.Da_Code = Discountauthority.Da_Code(+)
+                   AND Patient.Pt_Code = Pattype.Pt_Code
+                   AND NVL (Receiptmast.Rpc_Cancel, 'N') = 'N'
+                   AND NVL (Refundreceiptmast.Rfc_Cancel, 'N') = 'N'
+                   AND Opbillrefundmast.Rod_Date >=
+                          TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Opbillrefundmast.Rod_Date <=
+                          TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND OPBILLREFUNDMAST.MH_CODE IN
+                          (SELECT MH_CODE FROM multihospital)
+          GROUP BY Opbillrefundmast.Roc_Slno,
+                   Opbillrefundmast.Ro_No,
+                   Opbillrefundmast.Rod_Date,
+                   Patient.Pt_No,
+                   INITCAP (Patient.Ptc_Ptname),
+                   INITCAP (Dac_Desc),
+                   Discountauthority.Da_Code,
+                   INITCAP (Pattype.Ptc_Desc)
           UNION ALL
             SELECT Opbillrefundmast.Roc_Slno Slno,
                    Opbillrefundmast.Ro_No BillNo,
@@ -3870,8 +3847,10 @@ const getTypeDiscount = async (conn_ora, bind) => {
                    AND NVL (Refundbillmast.Rfc_Cancel, 'N') = 'N'
                    AND NVL (Billdetl.Bmc_Cancel, 'N') = 'N'
                    AND NVL (Opbillrefundmast.Roc_Cancel, 'N') = 'N'
-                   AND Opbillrefundmast.Rod_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
-                   AND Opbillrefundmast.Rod_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Opbillrefundmast.Rod_Date >=
+                          TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Opbillrefundmast.Rod_Date <=
+                          TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                    AND OPBILLREFUNDMAST.MH_CODE IN
                           (SELECT MH_CODE FROM multihospital)
           GROUP BY Opbillrefundmast.Roc_Slno,
@@ -3883,55 +3862,51 @@ const getTypeDiscount = async (conn_ora, bind) => {
                    Discountauthority.Da_Code,
                    INITCAP (Pattype.Ptc_Desc)
           UNION ALL                                     /*--Discharge Bill--*/
-                                 SELECT Disbillmast.Dmc_Slno Slno,
-                                        Disbillmast.Dm_No BillNo,
-                                        Disbillmast.Dmd_Date BillDate,
-                                        Disbillmast.Pt_No,
-                                        INITCAP (Patient.Ptc_Ptname) Ptname,
-                                        MAX (
-                                             NVL (DISBILLMAST.DMN_NETAMT, 0)
-                                           + NVL (DMN_SALESTAXCH, 0)
-                                           + NVL (DMN_SALESTAXCR, 0))
-                                           Net,
-                                        SUM (NVL (Patservice.Svn_Disamt, 0))
-                                           Discount,
-                                        INITCAP (Dac_Desc) Dac_Desc,
-                                        Discountauthority.Da_Code,
-                                        INITCAP (Pattype.Ptc_Desc) Ptc_Desc,
-                                        SUM (
-                                             NVL (DMN_SALESTAXCH, 0)
-                                           + NVL (DMN_SALESTAXCR, 0)
-                                           + NVL (DMN_CESSCH, 0)
-                                           + NVL (DMN_CESSCR, 0))
-                                           Tax
-                                   FROM Disbillmast,
-                                        Patservice,
-                                        Patient,
-                                        Discountauthority,
-                                        Pattype
-                                  WHERE Disbillmast.Dmc_Slno =
-                                           Patservice.Dmc_Slno
-                                        AND Disbillmast.Pt_No = Patient.Pt_No
-                                        AND Patservice.Da_Code =
-                                               Discountauthority.Da_Code(+)
-                                        AND Patient.Pt_Code = Pattype.Pt_Code
-                                        AND NVL (Disbillmast.Dmc_Cancel, 'N') =
-                                               'N'
-                                        AND NVL (Patservice.Svc_Cancel, 'N') =
-                                               'N'
-                                        AND Disbillmast.Dmd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
-                                        AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
-                                        AND DISBILLMAST.MH_CODE IN
-                                               (SELECT MH_CODE
-                                                  FROM multihospital)
-                               GROUP BY Disbillmast.Dmc_Slno,
-                                        Disbillmast.Dm_No,
-                                        Disbillmast.Dmd_Date,
-                                        Disbillmast.Pt_No,
-                                        INITCAP (Patient.Ptc_Ptname),
-                                        INITCAP (Dac_Desc),
-                                        Discountauthority.Da_Code,
-                                        INITCAP (Pattype.Ptc_Desc)
+            SELECT Disbillmast.Dmc_Slno Slno,
+                   Disbillmast.Dm_No BillNo,
+                   Disbillmast.Dmd_Date BillDate,
+                   Disbillmast.Pt_No,
+                   INITCAP (Patient.Ptc_Ptname) Ptname,
+                   MAX (
+                        NVL (DISBILLMAST.DMN_NETAMT, 0)
+                      + NVL (DMN_SALESTAXCH, 0)
+                      + NVL (DMN_SALESTAXCR, 0))
+                      Net,
+                   SUM (NVL (Patservice.Svn_Disamt, 0)) Discount,
+                   INITCAP (Dac_Desc) Dac_Desc,
+                   Discountauthority.Da_Code,
+                   INITCAP (Pattype.Ptc_Desc) Ptc_Desc,
+                   SUM (
+                        NVL (DMN_SALESTAXCH, 0)
+                      + NVL (DMN_SALESTAXCR, 0)
+                      + NVL (DMN_CESSCH, 0)
+                      + NVL (DMN_CESSCR, 0))
+                      Tax
+              FROM Disbillmast,
+                   Patservice,
+                   Patient,
+                   Discountauthority,
+                   Pattype
+             WHERE     Disbillmast.Dmc_Slno = Patservice.Dmc_Slno
+                   AND Disbillmast.Pt_No = Patient.Pt_No
+                   AND Patservice.Da_Code = Discountauthority.Da_Code(+)
+                   AND Patient.Pt_Code = Pattype.Pt_Code
+                   AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
+                   AND NVL (Patservice.Svc_Cancel, 'N') = 'N'
+                   AND Disbillmast.Dmd_Date >=
+                          TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Disbillmast.Dmd_Date <=
+                          TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                   AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Disbillmast.IP_NO AND G.STATUS = 1)
+          GROUP BY Disbillmast.Dmc_Slno,
+                   Disbillmast.Dm_No,
+                   Disbillmast.Dmd_Date,
+                   Disbillmast.Pt_No,
+                   INITCAP (Patient.Ptc_Ptname),
+                   INITCAP (Dac_Desc),
+                   Discountauthority.Da_Code,
+                   INITCAP (Pattype.Ptc_Desc)
           UNION ALL
             SELECT DISTINCT
                    Disbillmast.Dmc_Slno Slno,
@@ -3963,9 +3938,12 @@ const getTypeDiscount = async (conn_ora, bind) => {
                    AND Disbillmast.Pt_No = Patient.Pt_No
                    AND Patient.Pt_Code = Pattype.Pt_Code
                    AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
-                   AND Disbillmast.Dmd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
-                   AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Disbillmast.Dmd_Date >=
+                          TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Disbillmast.Dmd_Date <=
+                          TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                    AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                   AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Disbillmast.IP_NO AND G.STATUS = 1)
           GROUP BY Disbillmast.Dmc_Slno,
                    Disbillmast.Dm_No,
                    Disbillmast.Dmd_Date,
@@ -4006,9 +3984,12 @@ const getTypeDiscount = async (conn_ora, bind) => {
                    AND Patient.Pt_Code = Pattype.Pt_Code
                    AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                    AND NVL (PATVISIT.VSC_CANCEL, 'N') = 'N'
-                   AND Disbillmast.Dmd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
-                   AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Disbillmast.Dmd_Date >=
+                          TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Disbillmast.Dmd_Date <=
+                          TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                    AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                   AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Disbillmast.IP_NO AND G.STATUS = 1)
           GROUP BY Disbillmast.Dmc_Slno,
                    Disbillmast.Dm_No,
                    Disbillmast.Dmd_Date,
@@ -4053,9 +4034,12 @@ const getTypeDiscount = async (conn_ora, bind) => {
                    AND Patient.Pt_Code = Pattype.Pt_Code
                    AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                    AND NVL (Patsurgery.Src_Cancel, 'N') = 'N'
-                   AND Disbillmast.Dmd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
-                   AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Disbillmast.Dmd_Date >=
+                          TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Disbillmast.Dmd_Date <=
+                          TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                    AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                   AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Disbillmast.IP_NO AND G.STATUS = 1)
           GROUP BY Disbillmast.Dmc_Slno,
                    Disbillmast.Dm_No,
                    Disbillmast.Dmd_Date,
@@ -4098,9 +4082,12 @@ const getTypeDiscount = async (conn_ora, bind) => {
                    AND Patient.Pt_Code = Pattype.Pt_Code
                    AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                    AND NVL (Patsurgery.Src_Cancel, 'N') = 'N'
-                   AND Disbillmast.Dmd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
-                   AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Disbillmast.Dmd_Date >=
+                          TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Disbillmast.Dmd_Date <=
+                          TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                    AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                   AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Disbillmast.IP_NO AND G.STATUS = 1)
           GROUP BY Disbillmast.Dmc_Slno,
                    Disbillmast.Dm_No,
                    Disbillmast.Dmd_Date,
@@ -4143,9 +4130,12 @@ const getTypeDiscount = async (conn_ora, bind) => {
                    AND Patient.Pt_Code = Pattype.Pt_Code
                    AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                    AND NVL (Patsurgery.Src_Cancel, 'N') = 'N'
-                   AND Disbillmast.Dmd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
-                   AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Disbillmast.Dmd_Date >=
+                          TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Disbillmast.Dmd_Date <=
+                          TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                    AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                   AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Disbillmast.IP_NO AND G.STATUS = 1)
           GROUP BY Disbillmast.Dmc_Slno,
                    Disbillmast.Dm_No,
                    Disbillmast.Dmd_Date,
@@ -4189,9 +4179,12 @@ const getTypeDiscount = async (conn_ora, bind) => {
                    AND Billmast.Bmc_Cacr IN ('I')
                    AND NVL (Billdetl.Bmc_Cancel, 'N') = 'N'
                    AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
-                   AND Disbillmast.Dmd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
-                   AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Disbillmast.Dmd_Date >=
+                          TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Disbillmast.Dmd_Date <=
+                          TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                    AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                   AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Disbillmast.IP_NO AND G.STATUS = 1)
           GROUP BY Disbillmast.Dmc_Slno,
                    Disbillmast.Dm_No,
                    Disbillmast.Dmd_Date,
@@ -4233,9 +4226,12 @@ const getTypeDiscount = async (conn_ora, bind) => {
                    AND NVL (Refundbillmast.Rfc_Cancel, 'N') = 'N'
                    AND NVL (Billdetl.Bmc_Cancel, 'N') = 'N'
                    AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
-                   AND Disbillmast.Dmd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
-                   AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Disbillmast.Dmd_Date >=
+                          TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Disbillmast.Dmd_Date <=
+                          TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                    AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                   AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Disbillmast.IP_NO AND G.STATUS = 1)
           GROUP BY Disbillmast.Dmc_Slno,
                    Disbillmast.Dm_No,
                    Disbillmast.Dmd_Date,
@@ -4276,9 +4272,12 @@ const getTypeDiscount = async (conn_ora, bind) => {
                    AND Disbillmast.Pt_No = Patient.Pt_No
                    AND Pbillmast.Bmc_Cacr IN ('I')
                    AND NVL (Pbillmast.Bmc_Cancel, 'N') = 'N'
-                   AND Disbillmast.Dmd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
-                   AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Disbillmast.Dmd_Date >=
+                          TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Disbillmast.Dmd_Date <=
+                          TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                    AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                   AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Disbillmast.IP_NO AND G.STATUS = 1)
           GROUP BY Disbillmast.Dmc_Slno,
                    Disbillmast.Dm_No,
                    Disbillmast.Dmd_Date,
@@ -4332,10 +4331,12 @@ const getTypeDiscount = async (conn_ora, bind) => {
                            AND Mretmast.Mrc_Cacr IN ('I')
                            AND NVL (Mretmast.Mrc_Cancel, 'N') = 'N'
                            AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
-                           AND Disbillmast.Dmd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
-                           AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
-                           AND DISBILLMAST.MH_CODE IN
-                                  (SELECT MH_CODE FROM multihospital)) A
+                           AND Disbillmast.Dmd_Date >=
+                                  TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                           AND Disbillmast.Dmd_Date <=
+                                  TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                           AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Disbillmast.IP_NO AND G.STATUS = 1)
+                           AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)) A
           GROUP BY A.Slno,
                    A.Dm_No,
                    A.Dmd_Date,
@@ -4346,56 +4347,46 @@ const getTypeDiscount = async (conn_ora, bind) => {
                    A.Ptc_Desc,
                    A.tax
           UNION ALL                                     /*--Ip Credit Note--*/
-                                 SELECT Iprefundmast.Ric_Slno Slno,
-                                        Iprefundmast.Ri_No BillNo,
-                                        Iprefundmast.Rid_Date BillDate,
-                                        Patient.Pt_No,
-                                        INITCAP (Patient.Ptc_Ptname) PtName,
-                                        MAX (NVL (Iprefundmast.Rin_Netamt, 0))
-                                        * -1
-                                           Net,
-                                        SUM (
-                                           NVL (Iprefunditemdetl.Rin_Disamt, 0))
-                                        * -1
-                                           Discount,
-                                        INITCAP (Dac_Desc) Dac_Desc,
-                                        Discountauthority.Da_Code,
-                                        INITCAP (Pattype.Ptc_Desc) Ptc_Desc,
-                                        SUM (NVL (iprefundmast.RIN_TOTTAX, 0))
-                                        * -1
-                                           Tax
-                                   FROM Iprefundmast,
-                                        Iprefunditemdetl,
-                                        Patservice,
-                                        Patient,
-                                        Discountauthority,
-                                        Pattype
-                                  WHERE Iprefundmast.Ric_Slno =
-                                           Iprefunditemdetl.Ric_Slno
-                                        AND Iprefunditemdetl.Ric_Type = 'SVR'
-                                        AND Patservice.Sv_Slno =
-                                               Iprefunditemdetl.Rin_Moduleslno
-                                        AND Iprefundmast.Pt_No = Patient.Pt_No
-                                        AND Patservice.Da_Code =
-                                               Discountauthority.Da_Code(+)
-                                        AND Patient.Pt_Code = Pattype.Pt_Code
-                                        AND NVL (Iprefundmast.Ric_Cancel, 'N') =
-                                               'N'
-                                        AND NVL (Iprefunditemdetl.Ric_Cancel,
-                                                 'N') = 'N'
-                                        AND Iprefundmast.Rid_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
-                                        AND Iprefundmast.Rid_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
-                                        AND IPREFUNDMAST.MH_CODE IN
-                                               (SELECT MH_CODE
-                                                  FROM multihospital)
-                               GROUP BY Iprefundmast.Ric_Slno,
-                                        Iprefundmast.Ri_No,
-                                        Iprefundmast.Rid_Date,
-                                        Patient.Pt_No,
-                                        INITCAP (Patient.Ptc_Ptname),
-                                        INITCAP (Dac_Desc),
-                                        Discountauthority.Da_Code,
-                                        INITCAP (Pattype.Ptc_Desc)
+            SELECT Iprefundmast.Ric_Slno Slno,
+                   Iprefundmast.Ri_No BillNo,
+                   Iprefundmast.Rid_Date BillDate,
+                   Patient.Pt_No,
+                   INITCAP (Patient.Ptc_Ptname) PtName,
+                   MAX (NVL (Iprefundmast.Rin_Netamt, 0)) * -1 Net,
+                   SUM (NVL (Iprefunditemdetl.Rin_Disamt, 0)) * -1 Discount,
+                   INITCAP (Dac_Desc) Dac_Desc,
+                   Discountauthority.Da_Code,
+                   INITCAP (Pattype.Ptc_Desc) Ptc_Desc,
+                   SUM (NVL (iprefundmast.RIN_TOTTAX, 0)) * -1 Tax
+              FROM Iprefundmast,
+                   Iprefunditemdetl,
+                   Patservice,
+                   Patient,
+                   Discountauthority,
+                   Pattype
+             WHERE     Iprefundmast.Ric_Slno = Iprefunditemdetl.Ric_Slno
+                   AND Iprefunditemdetl.Ric_Type = 'SVR'
+                   AND Patservice.Sv_Slno = Iprefunditemdetl.Rin_Moduleslno
+                   AND Iprefundmast.Pt_No = Patient.Pt_No
+                   AND Patservice.Da_Code = Discountauthority.Da_Code(+)
+                   AND Patient.Pt_Code = Pattype.Pt_Code
+                   AND NVL (Iprefundmast.Ric_Cancel, 'N') = 'N'
+                   AND NVL (Iprefunditemdetl.Ric_Cancel, 'N') = 'N'
+                   AND Iprefundmast.Rid_Date >=
+                          TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Iprefundmast.Rid_Date <=
+                          TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Iprefundmast.IP_NO AND G.STATUS = 1)
+                   AND IPREFUNDMAST.MH_CODE IN
+                          (SELECT MH_CODE FROM multihospital)
+          GROUP BY Iprefundmast.Ric_Slno,
+                   Iprefundmast.Ri_No,
+                   Iprefundmast.Rid_Date,
+                   Patient.Pt_No,
+                   INITCAP (Patient.Ptc_Ptname),
+                   INITCAP (Dac_Desc),
+                   Discountauthority.Da_Code,
+                   INITCAP (Pattype.Ptc_Desc)
           UNION ALL
             SELECT Iprefundmast.Ric_Slno Slno,
                    Iprefundmast.Ri_No BillNo,
@@ -4423,8 +4414,11 @@ const getTypeDiscount = async (conn_ora, bind) => {
                    AND Patient.Pt_Code = Pattype.Pt_Code
                    AND NVL (Iprefundmast.Ric_Cancel, 'N') = 'N'
                    AND NVL (Iprefunditemdetl.Ric_Cancel, 'N') = 'N'
-                   AND Iprefundmast.Rid_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
-                   AND Iprefundmast.Rid_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Iprefundmast.Rid_Date >=
+                          TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Iprefundmast.Rid_Date <=
+                          TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Iprefundmast.IP_NO AND G.STATUS = 1)
                    AND IPREFUNDMAST.MH_CODE IN
                           (SELECT MH_CODE FROM multihospital)
           GROUP BY Iprefundmast.Ric_Slno,
@@ -4464,8 +4458,11 @@ const getTypeDiscount = async (conn_ora, bind) => {
                    AND Patient.Pt_Code = Pattype.Pt_Code
                    AND NVL (Iprefundmast.Ric_Cancel, 'N') = 'N'
                    AND NVL (Iprefunditemdetl.Ric_Cancel, 'N') = 'N'
-                   AND Iprefundmast.Rid_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
-                   AND Iprefundmast.Rid_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Iprefundmast.Rid_Date >=
+                          TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Iprefundmast.Rid_Date <=
+                          TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Iprefundmast.IP_NO AND G.STATUS = 1)
                    AND IPREFUNDMAST.MH_CODE IN
                           (SELECT MH_CODE FROM multihospital)
           GROUP BY Iprefundmast.Ric_Slno,
@@ -4505,8 +4502,11 @@ const getTypeDiscount = async (conn_ora, bind) => {
                    AND Patient.Pt_Code = Pattype.Pt_Code
                    AND NVL (Iprefundmast.Ric_Cancel, 'N') = 'N'
                    AND NVL (Iprefunditemdetl.Ric_Cancel, 'N') = 'N'
-                   AND Iprefundmast.Rid_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
-                   AND Iprefundmast.Rid_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Iprefundmast.Rid_Date >=
+                          TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Iprefundmast.Rid_Date <=
+                          TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Iprefundmast.IP_NO AND G.STATUS = 1)
                    AND IPREFUNDMAST.MH_CODE IN
                           (SELECT MH_CODE FROM multihospital)
           GROUP BY Iprefundmast.Ric_Slno,
@@ -4544,8 +4544,11 @@ const getTypeDiscount = async (conn_ora, bind) => {
                    AND Patient.Pt_Code = Pattype.Pt_Code
                    AND NVL (Iprefundmast.Ric_Cancel, 'N') = 'N'
                    AND NVL (Iprefunditemdetl.Ric_Cancel, 'N') = 'N'
-                   AND Iprefundmast.Rid_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
-                   AND Iprefundmast.Rid_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Iprefundmast.Rid_Date >=
+                          TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Iprefundmast.Rid_Date <=
+                          TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Iprefundmast.IP_NO AND G.STATUS = 1)
                    AND IPREFUNDMAST.MH_CODE IN
                           (SELECT MH_CODE FROM multihospital)
           GROUP BY Iprefundmast.Ric_Slno,
@@ -4582,8 +4585,11 @@ const getTypeDiscount = async (conn_ora, bind) => {
                    AND Patient.Pt_Code = Pattype.Pt_Code
                    AND NVL (Iprefundmast.Ric_Cancel, 'N') = 'N'
                    AND NVL (Iprefunditemdetl.Ric_Cancel, 'N') = 'N'
-                   AND Iprefundmast.Rid_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
-                   AND Iprefundmast.Rid_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Iprefundmast.Rid_Date >=
+                          TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Iprefundmast.Rid_Date <=
+                          TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = Iprefundmast.IP_NO AND G.STATUS = 1)
                    AND IPREFUNDMAST.MH_CODE IN
                           (SELECT MH_CODE FROM multihospital)
           GROUP BY Iprefundmast.Ric_Slno,
@@ -4595,1112 +4601,424 @@ const getTypeDiscount = async (conn_ora, bind) => {
                    Discountauthority.Da_Code,
                    INITCAP (Pattype.Ptc_Desc)
           UNION ALL                                         /*--Ip Receipt--*/
-                             SELECT Ipreceipt.Irc_Slno Slno,
-                                    Ir_No BillNo,
-                                    Ird_Date BillDate,
-                                    Ipreceipt.Pt_No,
-                                    INITCAP (Patient.Ptc_Ptname) Ptname,
-                                    NVL (Ipreceipt.Irn_Total, 0) Net,
-                                    NVL (Ipreceipt.Irn_Discount, 0) Discount,
-                                    INITCAP (Dac_Desc) Dac_Desc,
-                                    Discountauthority.Da_Code,
-                                    INITCAP (Pattype.Ptc_Desc) Ptc_Desc,
-                                    0 tax
-                               FROM Ipreceipt,
-                                    Patient,
-                                    Discountauthority,
-                                    Pattype
-                              WHERE Ipreceipt.Da_Code =
-                                       Discountauthority.Da_Code(+)
-                                    AND Patient.Pt_No = Ipreceipt.Pt_No
-                                    AND Patient.Pt_Code = Pattype.Pt_Code
-                                    AND NVL (Ipreceipt.Irc_Cancel, 'N') = 'N'
-                                    AND NVL (Ipreceipt.Irn_Discount, 0) <> 0
-                                    AND Ipreceipt.Ird_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
-                                    AND Ipreceipt.Ird_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
-                                    AND ipreceipt.IPC_MHCODE IN
-                                           (SELECT MH_CODE FROM multihospital)
+          SELECT Ipreceipt.Irc_Slno Slno,
+                 Ir_No BillNo,
+                 Ird_Date BillDate,
+                 Ipreceipt.Pt_No,
+                 INITCAP (Patient.Ptc_Ptname) Ptname,
+                 NVL (Ipreceipt.Irn_Total, 0) Net,
+                 NVL (Ipreceipt.Irn_Discount, 0) Discount,
+                 INITCAP (Dac_Desc) Dac_Desc,
+                 Discountauthority.Da_Code,
+                 INITCAP (Pattype.Ptc_Desc) Ptc_Desc,
+                 0 tax
+            FROM Ipreceipt,
+                 Patient,
+                 Discountauthority,
+                 Pattype,
+                 DISBILLMAST
+           WHERE     Ipreceipt.Da_Code = Discountauthority.Da_Code(+)
+                 AND IPRECEIPT.DMC_SLNO = DISBILLMAST.DMC_SLNO
+                 AND Patient.Pt_No = Ipreceipt.Pt_No
+                 AND Patient.Pt_Code = Pattype.Pt_Code
+                 AND NVL (Ipreceipt.Irc_Cancel, 'N') = 'N'
+                 AND NVL (Ipreceipt.Irn_Discount, 0) <> 0
+                 AND Ipreceipt.Ird_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                 AND Ipreceipt.Ird_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                 AND NOT EXISTS (SELECT 1 FROM GTT_EXCLUDE_IP G WHERE G.IP_NO = DISBILLMAST.IP_NO AND G.STATUS = 1)
+                 AND ipreceipt.IPC_MHCODE IN (SELECT MH_CODE FROM multihospital)
           UNION ALL /*--Billing Direct--   corrected by basil for centralized collection*/
-                                                                                 SELECT Billmast.Bmc_Slno
-                                                                                           Slno,
-                                                                                        Billmast.Bm_No
-                                                                                           BillNo,
-                                                                                        Billmast.Bmd_Date
-                                                                                           BillDate,
-                                                                                        Billmast.Pt_No,
-                                                                                        INITCAP (
-                                                                                           Patient.Ptc_Ptname)
-                                                                                           Ptname,
-                                                                                        MAX (
-                                                                                           DECODE (
-                                                                                              billmast.Bmc_Cacr,
-                                                                                              'C', (Billdetl.pdn_rate
-                                                                                                    * pdn_qty)
-                                                                                                   - NVL (
-                                                                                                        Billdetl.bmn_disamt,
-                                                                                                        0),
-                                                                                              'R', (Billdetl.pdn_rate
-                                                                                                    * pdn_qty)
-                                                                                                   - NVL (
-                                                                                                        Billdetl.bmn_disamt,
-                                                                                                        0),
-                                                                                              0))
-                                                                                           Net,
-                                                                                        SUM (
-                                                                                           NVL (
-                                                                                              Billdetl.Bmn_Disamt,
-                                                                                              0))
-                                                                                           Discount,
-                                                                                        INITCAP (
-                                                                                           Dac_Desc)
-                                                                                           Dac_Desc,
-                                                                                        Discountauthority.Da_Code,
-                                                                                        INITCAP (
-                                                                                           Pattype.Ptc_Desc)
-                                                                                           Ptc_Desc,
-                                                                                        SUM (
-                                                                                           NVL (
-                                                                                              Billdetl.BDN_TOTTAX,
-                                                                                              0)
-                                                                                           + NVL (
-                                                                                                Billdetl.Bdn_Totcess,
-                                                                                                0))
-                                                                                           tax
-                                                                                   FROM Billdetl,
-                                                                                        Billmast,
-                                                                                        Discountauthority,
-                                                                                        Patient,
-                                                                                        Pattype
-                                                                                  WHERE Billdetl.Da_Code =
-                                                                                           Discountauthority.Da_Code(+)
-                                                                                        AND Billmast.Pt_No =
-                                                                                               Patient.Pt_No(+)
-                                                                                        AND Billmast.Bmc_Slno =
-                                                                                               Billdetl.Bmc_Slno
-                                                                                        AND Patient.Pt_Code =
-                                                                                               Pattype.Pt_Code(+)
-                                                                                        AND Billmast.Bmc_Cacr IN
-                                                                                               ('C',
-                                                                                                'R')
-                                                                                        AND NVL (
-                                                                                               Billdetl.Bmc_Cancel,
-                                                                                               'N') =
-                                                                                               'N'
-                                                                                        AND billmast.BMC_COLLCNCODE
-                                                                                               IS NULL
-                                                                                        AND Billmast.Bmd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
-                                                                                        AND Billmast.Bmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
-                                                                                        AND billmast.mh_code IN
-                                                                                               (SELECT MH_CODE
-                                                                                                  FROM multihospital)
-                                                                               GROUP BY Billmast.Bmc_Slno,
-                                                                                        Billmast.Bm_No,
-                                                                                        Billmast.Bmd_Date,
-                                                                                        Billmast.Pt_No,
-                                                                                        INITCAP (
-                                                                                           Patient.Ptc_Ptname),
-                                                                                        INITCAP (
-                                                                                           Dac_Desc),
-                                                                                        Discountauthority.Da_Code,
-                                                                                        INITCAP (
-                                                                                           Pattype.Ptc_Desc)
+            SELECT Billmast.Bmc_Slno Slno,
+                   Billmast.Bm_No BillNo,
+                   Billmast.Bmd_Date BillDate,
+                   Billmast.Pt_No,
+                   INITCAP (Patient.Ptc_Ptname) Ptname,
+                   MAX (
+                      DECODE (
+                         billmast.Bmc_Cacr,
+                         'C', (Billdetl.pdn_rate * pdn_qty)
+                              - NVL (Billdetl.bmn_disamt, 0),
+                         'R', (Billdetl.pdn_rate * pdn_qty)
+                              - NVL (Billdetl.bmn_disamt, 0),
+                         0))
+                      Net,
+                   SUM (NVL (Billdetl.Bmn_Disamt, 0)) Discount,
+                   INITCAP (Dac_Desc) Dac_Desc,
+                   Discountauthority.Da_Code,
+                   INITCAP (Pattype.Ptc_Desc) Ptc_Desc,
+                   SUM (
+                      NVL (Billdetl.BDN_TOTTAX, 0)
+                      + NVL (Billdetl.Bdn_Totcess, 0))
+                      tax
+              FROM Billdetl,
+                   Billmast,
+                   Discountauthority,
+                   Patient,
+                   Pattype
+             WHERE     Billdetl.Da_Code = Discountauthority.Da_Code(+)
+                   AND Billmast.Pt_No = Patient.Pt_No(+)
+                   AND Billmast.Bmc_Slno = Billdetl.Bmc_Slno
+                   AND Patient.Pt_Code = Pattype.Pt_Code(+)
+                   AND Billmast.Bmc_Cacr IN ('C', 'R')
+                   AND NVL (Billdetl.Bmc_Cancel, 'N') = 'N'
+                   AND billmast.BMC_COLLCNCODE IS NULL
+                   AND Billmast.Bmd_Date >=
+                          TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Billmast.Bmd_Date <=
+                          TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND billmast.mh_code IN (SELECT MH_CODE FROM multihospital)
+          GROUP BY Billmast.Bmc_Slno,
+                   Billmast.Bm_No,
+                   Billmast.Bmd_Date,
+                   Billmast.Pt_No,
+                   INITCAP (Patient.Ptc_Ptname),
+                   INITCAP (Dac_Desc),
+                   Discountauthority.Da_Code,
+                   INITCAP (Pattype.Ptc_Desc)
           UNION ALL              /*Added by basil for centralized collection*/
-                                                        /*--Billing Direct--*/
-                                                                               SELECT Billmast.Bmc_Slno
-                                                                                         Slno,
-                                                                                      Billmast.Bm_No
-                                                                                         BillNo,
-                                                                                      Billmast.Bmd_Date
-                                                                                         BillDate,
-                                                                                      Billmast.Pt_No,
-                                                                                      INITCAP (
-                                                                                         Patient.Ptc_Ptname)
-                                                                                         Ptname,
-                                                                                      MAX (
-                                                                                         DECODE (
-                                                                                            billmast.Bmc_Cacr,
-                                                                                            'C', (Billdetl.pdn_rate
-                                                                                                  * pdn_qty)
-                                                                                                 - NVL (
-                                                                                                      Billdetl.bmn_disamt,
-                                                                                                      0),
-                                                                                            'R', (Billdetl.pdn_rate
-                                                                                                  * pdn_qty)
-                                                                                                 - NVL (
-                                                                                                      Billdetl.bmn_disamt,
-                                                                                                      0),
-                                                                                            0))
-                                                                                         Net,
-                                                                                      SUM (
-                                                                                         NVL (
-                                                                                            Billdetl.Bmn_Disamt,
-                                                                                            0))
-                                                                                         Discount,
-                                                                                      INITCAP (
-                                                                                         Dac_Desc)
-                                                                                         Dac_Desc,
-                                                                                      Discountauthority.Da_Code,
-                                                                                      INITCAP (
-                                                                                         Pattype.Ptc_Desc)
-                                                                                         Ptc_Desc,
-                                                                                      SUM (
-                                                                                         NVL (
-                                                                                            Billdetl.BDN_TOTTAX,
-                                                                                            0)
-                                                                                         + NVL (
-                                                                                              Billdetl.Bdn_Totcess,
-                                                                                              0))
-                                                                                         tax
-                                                                                 FROM Billdetl,
-                                                                                      Billmast,
-                                                                                      Discountauthority,
-                                                                                      Patient,
-                                                                                      Pattype
-                                                                                WHERE Billdetl.Da_Code =
-                                                                                         Discountauthority.Da_Code(+)
-                                                                                      AND Billmast.Pt_No =
-                                                                                             Patient.Pt_No(+)
-                                                                                      AND Billmast.Bmc_Slno =
-                                                                                             Billdetl.Bmc_Slno
-                                                                                      AND Patient.Pt_Code =
-                                                                                             Pattype.Pt_Code(+)
-                                                                                      AND Billmast.Bmc_Cacr IN
-                                                                                             ('C',
-                                                                                              'R')
-                                                                                      AND NVL (
-                                                                                             Billdetl.Bmc_Cancel,
-                                                                                             'N') =
-                                                                                             'N'
-                                                                                      AND billmast.BMC_COLLCNCODE
-                                                                                             IS NOT NULL
-                                                                                      AND Billmast.BMD_COLLDATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
-                                                                                      AND Billmast.BMD_COLLDATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
-                                                                                      AND billmast.mh_code IN
-                                                                                             (SELECT MH_CODE
-                                                                                                FROM multihospital)
-                                                                             GROUP BY Billmast.Bmc_Slno,
-                                                                                      Billmast.Bm_No,
-                                                                                      Billmast.Bmd_Date,
-                                                                                      Billmast.Pt_No,
-                                                                                      INITCAP (
-                                                                                         Patient.Ptc_Ptname),
-                                                                                      INITCAP (
-                                                                                         Dac_Desc),
-                                                                                      Discountauthority.Da_Code,
-                                                                                      INITCAP (
-                                                                                         Pattype.Ptc_Desc)
+            /*--Billing Direct--*/
+            SELECT Billmast.Bmc_Slno Slno,
+                   Billmast.Bm_No BillNo,
+                   Billmast.Bmd_Date BillDate,
+                   Billmast.Pt_No,
+                   INITCAP (Patient.Ptc_Ptname) Ptname,
+                   MAX (
+                      DECODE (
+                         billmast.Bmc_Cacr,
+                         'C', (Billdetl.pdn_rate * pdn_qty)
+                              - NVL (Billdetl.bmn_disamt, 0),
+                         'R', (Billdetl.pdn_rate * pdn_qty)
+                              - NVL (Billdetl.bmn_disamt, 0),
+                         0))
+                      Net,
+                   SUM (NVL (Billdetl.Bmn_Disamt, 0)) Discount,
+                   INITCAP (Dac_Desc) Dac_Desc,
+                   Discountauthority.Da_Code,
+                   INITCAP (Pattype.Ptc_Desc) Ptc_Desc,
+                   SUM (
+                      NVL (Billdetl.BDN_TOTTAX, 0)
+                      + NVL (Billdetl.Bdn_Totcess, 0))
+                      tax
+              FROM Billdetl,
+                   Billmast,
+                   Discountauthority,
+                   Patient,
+                   Pattype
+             WHERE     Billdetl.Da_Code = Discountauthority.Da_Code(+)
+                   AND Billmast.Pt_No = Patient.Pt_No(+)
+                   AND Billmast.Bmc_Slno = Billdetl.Bmc_Slno
+                   AND Patient.Pt_Code = Pattype.Pt_Code(+)
+                   AND Billmast.Bmc_Cacr IN ('C', 'R')
+                   AND NVL (Billdetl.Bmc_Cancel, 'N') = 'N'
+                   AND billmast.BMC_COLLCNCODE IS NOT NULL
+                   AND Billmast.BMD_COLLDATE >=
+                          TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Billmast.BMD_COLLDATE <=
+                          TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND billmast.mh_code IN (SELECT MH_CODE FROM multihospital)
+          GROUP BY Billmast.Bmc_Slno,
+                   Billmast.Bm_No,
+                   Billmast.Bmd_Date,
+                   Billmast.Pt_No,
+                   INITCAP (Patient.Ptc_Ptname),
+                   INITCAP (Dac_Desc),
+                   Discountauthority.Da_Code,
+                   INITCAP (Pattype.Ptc_Desc)
           UNION ALL /*Corrected by basil for centralized collection  --Billing Direct Refund--*/
-                                                                                       SELECT Refundbillmast.Rfc_Slno
-                                                                                                 Slno,
-                                                                                              Refundbillmast.Rf_No
-                                                                                                 BillNo,
-                                                                                              Refundbillmast.Rfd_Date
-                                                                                                 BillDate,
-                                                                                              Billmast.Pt_No,
-                                                                                              INITCAP (
-                                                                                                 Patient.Ptc_Ptname)
-                                                                                                 Ptname,
-                                                                                              MAX (
-                                                                                                 NVL (
-                                                                                                    Refundbillmast.Rfn_Netamt,
-                                                                                                    0))
-                                                                                              * -1
-                                                                                                 Net,
-                                                                                              SUM (
-                                                                                                 NVL (
-                                                                                                    Refundbilldetl.Rfn_Disamt,
-                                                                                                    0))
-                                                                                              * -1
-                                                                                                 Discount,
-                                                                                              INITCAP (
-                                                                                                 Dac_Desc)
-                                                                                                 Dac_Desc,
-                                                                                              Discountauthority.Da_Code,
-                                                                                              INITCAP (
-                                                                                                 Pattype.Ptc_Desc)
-                                                                                                 Ptc_Desc,
-                                                                                              SUM (
-                                                                                                 NVL (
-                                                                                                    refundbillmast.RFN_TOTTAX,
-                                                                                                    0)
-                                                                                                 + NVL (
-                                                                                                      Refundbillmast.Rfn_Totcess,
-                                                                                                      0))
-                                                                                              * -1
-                                                                                                 Tax
-                                                                                         FROM Billdetl,
-                                                                                              Billmast,
-                                                                                              Patient,
-                                                                                              Refundbilldetl,
-                                                                                              Refundbillmast,
-                                                                                              Discountauthority,
-                                                                                              Pattype
-                                                                                        WHERE Billdetl.Bmc_Slno =
-                                                                                                 Refundbilldetl.Bmc_Slno
-                                                                                              AND Billdetl.Bmc_Cnt =
-                                                                                                     Refundbilldetl.Bmc_Cnt
-                                                                                              AND Refundbillmast.Rfc_Slno =
-                                                                                                     Refundbilldetl.Rfc_Slno
-                                                                                              AND Billdetl.Da_Code =
-                                                                                                     Discountauthority.Da_Code(+)
-                                                                                              AND Billmast.Pt_No =
-                                                                                                     Patient.Pt_No
-                                                                                              AND Billmast.Bmc_Slno =
-                                                                                                     Billdetl.Bmc_Slno
-                                                                                              AND Patient.Pt_Code =
-                                                                                                     Pattype.Pt_Code(+)
-                                                                                              AND Billmast.Bmc_Cacr IN
-                                                                                                     ('C',
-                                                                                                      'R')
-                                                                                              AND Refundbillmast.Rfc_Cacr IN
-                                                                                                     ('C',
-                                                                                                      'R')
-                                                                                              AND NVL (
-                                                                                                     Refundbillmast.Rfc_Cancel,
-                                                                                                     'N') =
-                                                                                                     'N'
-                                                                                              AND NVL (
-                                                                                                     Billdetl.Bmc_Cancel,
-                                                                                                     'N') =
-                                                                                                     'N'
-                                                                                              AND Refundbillmast.RFC_RETCNCODE
-                                                                                                     IS NULL
-                                                                                              AND Refundbillmast.Rfd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
-                                                                                              AND Refundbillmast.Rfd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
-                                                                                              AND refundbillmast.MH_CODE IN
-                                                                                                     (SELECT MH_CODE
-                                                                                                        FROM multihospital)
-                                                                                     GROUP BY Refundbillmast.Rfc_Slno,
-                                                                                              Refundbillmast.Rf_No,
-                                                                                              Refundbillmast.Rfd_Date,
-                                                                                              Billmast.Pt_No,
-                                                                                              INITCAP (
-                                                                                                 Patient.Ptc_Ptname),
-                                                                                              INITCAP (
-                                                                                                 Dac_Desc),
-                                                                                              Discountauthority.Da_Code,
-                                                                                              INITCAP (
-                                                                                                 Pattype.Ptc_Desc)
+            SELECT Refundbillmast.Rfc_Slno Slno,
+                   Refundbillmast.Rf_No BillNo,
+                   Refundbillmast.Rfd_Date BillDate,
+                   Billmast.Pt_No,
+                   INITCAP (Patient.Ptc_Ptname) Ptname,
+                   MAX (NVL (Refundbillmast.Rfn_Netamt, 0)) * -1 Net,
+                   SUM (NVL (Refundbilldetl.Rfn_Disamt, 0)) * -1 Discount,
+                   INITCAP (Dac_Desc) Dac_Desc,
+                   Discountauthority.Da_Code,
+                   INITCAP (Pattype.Ptc_Desc) Ptc_Desc,
+                   SUM (
+                      NVL (refundbillmast.RFN_TOTTAX, 0)
+                      + NVL (Refundbillmast.Rfn_Totcess, 0))
+                   * -1
+                      Tax
+              FROM Billdetl,
+                   Billmast,
+                   Patient,
+                   Refundbilldetl,
+                   Refundbillmast,
+                   Discountauthority,
+                   Pattype
+             WHERE     Billdetl.Bmc_Slno = Refundbilldetl.Bmc_Slno
+                   AND Billdetl.Bmc_Cnt = Refundbilldetl.Bmc_Cnt
+                   AND Refundbillmast.Rfc_Slno = Refundbilldetl.Rfc_Slno
+                   AND Billdetl.Da_Code = Discountauthority.Da_Code(+)
+                   AND Billmast.Pt_No = Patient.Pt_No
+                   AND Billmast.Bmc_Slno = Billdetl.Bmc_Slno
+                   AND Patient.Pt_Code = Pattype.Pt_Code(+)
+                   AND Billmast.Bmc_Cacr IN ('C', 'R')
+                   AND Refundbillmast.Rfc_Cacr IN ('C', 'R')
+                   AND NVL (Refundbillmast.Rfc_Cancel, 'N') = 'N'
+                   AND NVL (Billdetl.Bmc_Cancel, 'N') = 'N'
+                   AND Refundbillmast.RFC_RETCNCODE IS NULL
+                   AND Refundbillmast.Rfd_Date >=
+                          TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Refundbillmast.Rfd_Date <=
+                          TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND refundbillmast.MH_CODE IN
+                          (SELECT MH_CODE FROM multihospital)
+          GROUP BY Refundbillmast.Rfc_Slno,
+                   Refundbillmast.Rf_No,
+                   Refundbillmast.Rfd_Date,
+                   Billmast.Pt_No,
+                   INITCAP (Patient.Ptc_Ptname),
+                   INITCAP (Dac_Desc),
+                   Discountauthority.Da_Code,
+                   INITCAP (Pattype.Ptc_Desc)
           UNION ALL /*--Billing Direct Refund-- corrected by basil for centralized collection*/
-                                                                                      SELECT Refundbillmast.Rfc_Slno
-                                                                                                Slno,
-                                                                                             Refundbillmast.Rf_No
-                                                                                                BillNo,
-                                                                                             Refundbillmast.Rfd_Date
-                                                                                                BillDate,
-                                                                                             Billmast.Pt_No,
-                                                                                             INITCAP (
-                                                                                                Patient.Ptc_Ptname)
-                                                                                                Ptname,
-                                                                                             MAX (
-                                                                                                NVL (
-                                                                                                   Refundbillmast.Rfn_Netamt,
-                                                                                                   0))
-                                                                                             * -1
-                                                                                                Net,
-                                                                                             SUM (
-                                                                                                NVL (
-                                                                                                   Refundbilldetl.Rfn_Disamt,
-                                                                                                   0))
-                                                                                             * -1
-                                                                                                Discount,
-                                                                                             INITCAP (
-                                                                                                Dac_Desc)
-                                                                                                Dac_Desc,
-                                                                                             Discountauthority.Da_Code,
-                                                                                             INITCAP (
-                                                                                                Pattype.Ptc_Desc)
-                                                                                                Ptc_Desc,
-                                                                                             SUM (
-                                                                                                NVL (
-                                                                                                   refundbillmast.RFN_TOTTAX,
-                                                                                                   0)
-                                                                                                + NVL (
-                                                                                                     Refundbillmast.Rfn_Totcess,
-                                                                                                     0))
-                                                                                             * -1
-                                                                                                Tax
-                                                                                        FROM Billdetl,
-                                                                                             Billmast,
-                                                                                             Patient,
-                                                                                             Refundbilldetl,
-                                                                                             Refundbillmast,
-                                                                                             Discountauthority,
-                                                                                             Pattype
-                                                                                       WHERE Billdetl.Bmc_Slno =
-                                                                                                Refundbilldetl.Bmc_Slno
-                                                                                             AND Billdetl.Bmc_Cnt =
-                                                                                                    Refundbilldetl.Bmc_Cnt
-                                                                                             AND Refundbillmast.Rfc_Slno =
-                                                                                                    Refundbilldetl.Rfc_Slno
-                                                                                             AND Billdetl.Da_Code =
-                                                                                                    Discountauthority.Da_Code(+)
-                                                                                             AND Billmast.Pt_No =
-                                                                                                    Patient.Pt_No
-                                                                                             AND Billmast.Bmc_Slno =
-                                                                                                    Billdetl.Bmc_Slno
-                                                                                             AND Patient.Pt_Code =
-                                                                                                    Pattype.Pt_Code(+)
-                                                                                             AND Billmast.Bmc_Cacr IN
-                                                                                                    ('C',
-                                                                                                     'R')
-                                                                                             AND Refundbillmast.Rfc_Cacr IN
-                                                                                                    ('C',
-                                                                                                     'R')
-                                                                                             AND NVL (
-                                                                                                    Refundbillmast.Rfc_Cancel,
-                                                                                                    'N') =
-                                                                                                    'N'
-                                                                                             AND NVL (
-                                                                                                    Billdetl.Bmc_Cancel,
-                                                                                                    'N') =
-                                                                                                    'N'
-                                                                                             AND Refundbillmast.RFC_RETCNCODE
-                                                                                                    IS NOT NULL
-                                                                                             AND Refundbillmast.RFD_RETDATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
-                                                                                             AND Refundbillmast.RFD_RETDATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
-                                                                                             AND refundbillmast.MH_CODE IN
-                                                                                                    (SELECT MH_CODE
-                                                                                                       FROM multihospital)
-                                                                                    GROUP BY Refundbillmast.Rfc_Slno,
-                                                                                             Refundbillmast.Rf_No,
-                                                                                             Refundbillmast.Rfd_Date,
-                                                                                             Billmast.Pt_No,
-                                                                                             INITCAP (
-                                                                                                Patient.Ptc_Ptname),
-                                                                                             INITCAP (
-                                                                                                Dac_Desc),
-                                                                                             Discountauthority.Da_Code,
-                                                                                             INITCAP (
-                                                                                                Pattype.Ptc_Desc)
+            SELECT Refundbillmast.Rfc_Slno Slno,
+                   Refundbillmast.Rf_No BillNo,
+                   Refundbillmast.Rfd_Date BillDate,
+                   Billmast.Pt_No,
+                   INITCAP (Patient.Ptc_Ptname) Ptname,
+                   MAX (NVL (Refundbillmast.Rfn_Netamt, 0)) * -1 Net,
+                   SUM (NVL (Refundbilldetl.Rfn_Disamt, 0)) * -1 Discount,
+                   INITCAP (Dac_Desc) Dac_Desc,
+                   Discountauthority.Da_Code,
+                   INITCAP (Pattype.Ptc_Desc) Ptc_Desc,
+                   SUM (
+                      NVL (refundbillmast.RFN_TOTTAX, 0)
+                      + NVL (Refundbillmast.Rfn_Totcess, 0))
+                   * -1
+                      Tax
+              FROM Billdetl,
+                   Billmast,
+                   Patient,
+                   Refundbilldetl,
+                   Refundbillmast,
+                   Discountauthority,
+                   Pattype
+             WHERE     Billdetl.Bmc_Slno = Refundbilldetl.Bmc_Slno
+                   AND Billdetl.Bmc_Cnt = Refundbilldetl.Bmc_Cnt
+                   AND Refundbillmast.Rfc_Slno = Refundbilldetl.Rfc_Slno
+                   AND Billdetl.Da_Code = Discountauthority.Da_Code(+)
+                   AND Billmast.Pt_No = Patient.Pt_No
+                   AND Billmast.Bmc_Slno = Billdetl.Bmc_Slno
+                   AND Patient.Pt_Code = Pattype.Pt_Code(+)
+                   AND Billmast.Bmc_Cacr IN ('C', 'R')
+                   AND Refundbillmast.Rfc_Cacr IN ('C', 'R')
+                   AND NVL (Refundbillmast.Rfc_Cancel, 'N') = 'N'
+                   AND NVL (Billdetl.Bmc_Cancel, 'N') = 'N'
+                   AND Refundbillmast.RFC_RETCNCODE IS NOT NULL
+                   AND Refundbillmast.RFD_RETDATE >=
+                          TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Refundbillmast.RFD_RETDATE <=
+                          TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND refundbillmast.MH_CODE IN
+                          (SELECT MH_CODE FROM multihospital)
+          GROUP BY Refundbillmast.Rfc_Slno,
+                   Refundbillmast.Rf_No,
+                   Refundbillmast.Rfd_Date,
+                   Billmast.Pt_No,
+                   INITCAP (Patient.Ptc_Ptname),
+                   INITCAP (Dac_Desc),
+                   Discountauthority.Da_Code,
+                   INITCAP (Pattype.Ptc_Desc)
           UNION ALL      /*--corrected by basil for centralized collection--*/
-                                               /*--Pharmacy Direct Billing--*/
-                                                                                                SELECT Pbillmast.Bmc_Slno
-                                                                                                          Slno,
-                                                                                                       Bm_No
-                                                                                                          BillNo,
-                                                                                                       Bmd_Date
-                                                                                                          BillDate,
-                                                                                                       Pbillmast.Pt_No,
-                                                                                                       TRIM (
-                                                                                                          INITCAP (
-                                                                                                             Hoc_Ptname))
-                                                                                                          Ptname,
-                                                                                                       NVL (
-                                                                                                          PBILLMAST.BMN_NETAMT,
-                                                                                                          0)
-                                                                                                       + NVL (
-                                                                                                            PBILLMAST.BMN_SALETAXCH,
-                                                                                                            0)
-                                                                                                       + NVL (
-                                                                                                            PBILLMAST.BMN_CESSCH,
-                                                                                                            0)
-                                                                                                       + NVL (
-                                                                                                            PBILLMAST.BMN_SALETAXCR,
-                                                                                                            0)
-                                                                                                       + NVL (
-                                                                                                            PBILLMAST.BMN_CESSCR,
-                                                                                                            0)
-                                                                                                          Net,
-                                                                                                       NVL (
-                                                                                                          Pbillmast.Bmn_Disamt,
-                                                                                                          0)
-                                                                                                          Discount,
-                                                                                                       INITCAP (
-                                                                                                          Dac_Desc)
-                                                                                                          Dac_Desc,
-                                                                                                       Discountauthority.Da_Code,
-                                                                                                       INITCAP (
-                                                                                                          Pattype.Ptc_Desc)
-                                                                                                          Ptc_Desc,
-                                                                                                       (NVL (
-                                                                                                           BMN_SALETAXCH,
-                                                                                                           0)
-                                                                                                        + NVL (
-                                                                                                             BMN_SALETAXCR,
-                                                                                                             0)
-                                                                                                        + NVL (
-                                                                                                             BMN_CESSCH,
-                                                                                                             0)
-                                                                                                        + NVL (
-                                                                                                             BMN_CESSCR,
-                                                                                                             0))
-                                                                                                          Tax
-                                                                                                  FROM Pbillmast,
-                                                                                                       Discountauthority,
-                                                                                                       Patient,
-                                                                                                       Pattype
-                                                                                                 WHERE Pbillmast.Da_Code =
-                                                                                                          Discountauthority.Da_Code(+)
-                                                                                                       AND Pbillmast.Pt_No =
-                                                                                                              Patient.Pt_No(+)
-                                                                                                       AND Patient.Pt_Code =
-                                                                                                              Pattype.Pt_Code(+)
-                                                                                                       AND Pbillmast.Bmc_Cacr IN
-                                                                                                              ('C',
-                                                                                                               'R')
-                                                                                                       AND NVL (
-                                                                                                              Pbillmast.Bmc_Cancel,
-                                                                                                              'N') =
-                                                                                                              'N'
-                                                                                                       AND NVL (
-                                                                                                              Pbillmast.Bmn_Disamt,
-                                                                                                              0) <>
-                                                                                                              0
-                                                                                                       AND pbillmast.BMC_COLLCNCODE
-                                                                                                              IS NULL
-                                                                                                       AND Pbillmast.Bmd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
-                                                                                                       AND Pbillmast.Bmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
-                                                                                                       AND pbillmast.MH_CODE IN
-                                                                                                              (SELECT MH_CODE
-                                                                                                                 FROM multihospital)
+          /*--Pharmacy Direct Billing--*/
+          SELECT Pbillmast.Bmc_Slno Slno,
+                 Bm_No BillNo,
+                 Bmd_Date BillDate,
+                 Pbillmast.Pt_No,
+                 TRIM (INITCAP (Hoc_Ptname)) Ptname,
+                   NVL (PBILLMAST.BMN_NETAMT, 0)
+                 + NVL (PBILLMAST.BMN_SALETAXCH, 0)
+                 + NVL (PBILLMAST.BMN_CESSCH, 0)
+                 + NVL (PBILLMAST.BMN_SALETAXCR, 0)
+                 + NVL (PBILLMAST.BMN_CESSCR, 0)
+                    Net,
+                 NVL (Pbillmast.Bmn_Disamt, 0) Discount,
+                 INITCAP (Dac_Desc) Dac_Desc,
+                 Discountauthority.Da_Code,
+                 INITCAP (Pattype.Ptc_Desc) Ptc_Desc,
+                 (  NVL (BMN_SALETAXCH, 0)
+                  + NVL (BMN_SALETAXCR, 0)
+                  + NVL (BMN_CESSCH, 0)
+                  + NVL (BMN_CESSCR, 0))
+                    Tax
+            FROM Pbillmast,
+                 Discountauthority,
+                 Patient,
+                 Pattype
+           WHERE     Pbillmast.Da_Code = Discountauthority.Da_Code(+)
+                 AND Pbillmast.Pt_No = Patient.Pt_No(+)
+                 AND Patient.Pt_Code = Pattype.Pt_Code(+)
+                 AND Pbillmast.Bmc_Cacr IN ('C', 'R')
+                 AND NVL (Pbillmast.Bmc_Cancel, 'N') = 'N'
+                 AND NVL (Pbillmast.Bmn_Disamt, 0) <> 0
+                 AND pbillmast.BMC_COLLCNCODE IS NULL
+                 AND Pbillmast.Bmd_Date >=
+                        TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                 AND Pbillmast.Bmd_Date <=
+                        TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                 AND pbillmast.MH_CODE IN (SELECT MH_CODE FROM multihospital)
           UNION ALL          /*--added by basil for centralized collection--*/
-                                               /*--Pharmacy Direct Billing--*/
-                                                                                            SELECT Pbillmast.Bmc_Slno
-                                                                                                      Slno,
-                                                                                                   Bm_No
-                                                                                                      BillNo,
-                                                                                                   Bmd_Date
-                                                                                                      BillDate,
-                                                                                                   Pbillmast.Pt_No,
-                                                                                                   TRIM (
-                                                                                                      INITCAP (
-                                                                                                         Hoc_Ptname))
-                                                                                                      Ptname,
-                                                                                                   NVL (
-                                                                                                      PBILLMAST.BMN_NETAMT,
-                                                                                                      0)
-                                                                                                   + NVL (
-                                                                                                        PBILLMAST.BMN_SALETAXCH,
-                                                                                                        0)
-                                                                                                   + NVL (
-                                                                                                        PBILLMAST.BMN_CESSCH,
-                                                                                                        0)
-                                                                                                   + NVL (
-                                                                                                        PBILLMAST.BMN_SALETAXCR,
-                                                                                                        0)
-                                                                                                   + NVL (
-                                                                                                        PBILLMAST.BMN_CESSCR,
-                                                                                                        0)
-                                                                                                      Net,
-                                                                                                   NVL (
-                                                                                                      Pbillmast.Bmn_Disamt,
-                                                                                                      0)
-                                                                                                      Discount,
-                                                                                                   INITCAP (
-                                                                                                      Dac_Desc)
-                                                                                                      Dac_Desc,
-                                                                                                   Discountauthority.Da_Code,
-                                                                                                   INITCAP (
-                                                                                                      Pattype.Ptc_Desc)
-                                                                                                      Ptc_Desc,
-                                                                                                   (NVL (
-                                                                                                       BMN_SALETAXCH,
-                                                                                                       0)
-                                                                                                    + NVL (
-                                                                                                         BMN_SALETAXCR,
-                                                                                                         0)
-                                                                                                    + NVL (
-                                                                                                         BMN_CESSCH,
-                                                                                                         0)
-                                                                                                    + NVL (
-                                                                                                         BMN_CESSCR,
-                                                                                                         0))
-                                                                                                      Tax
-                                                                                              FROM Pbillmast,
-                                                                                                   Discountauthority,
-                                                                                                   Patient,
-                                                                                                   Pattype
-                                                                                             WHERE Pbillmast.Da_Code =
-                                                                                                      Discountauthority.Da_Code(+)
-                                                                                                   AND Pbillmast.Pt_No =
-                                                                                                          Patient.Pt_No(+)
-                                                                                                   AND Patient.Pt_Code =
-                                                                                                          Pattype.Pt_Code(+)
-                                                                                                   AND Pbillmast.Bmc_Cacr IN
-                                                                                                          ('C',
-                                                                                                           'R')
-                                                                                                   AND NVL (
-                                                                                                          Pbillmast.Bmc_Cancel,
-                                                                                                          'N') =
-                                                                                                          'N'
-                                                                                                   AND NVL (
-                                                                                                          Pbillmast.Bmn_Disamt,
-                                                                                                          0) <>
-                                                                                                          0
-                                                                                                   AND pbillmast.BMC_COLLCNCODE
-                                                                                                          IS NOT NULL
-                                                                                                   AND Pbillmast.BMD_COLLDATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
-                                                                                                   AND Pbillmast.BMD_COLLDATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
-                                                                                                   AND pbillmast.MH_CODE IN
-                                                                                                          (SELECT MH_CODE
-                                                                                                             FROM multihospital)
+          /*--Pharmacy Direct Billing--*/
+          SELECT Pbillmast.Bmc_Slno Slno,
+                 Bm_No BillNo,
+                 Bmd_Date BillDate,
+                 Pbillmast.Pt_No,
+                 TRIM (INITCAP (Hoc_Ptname)) Ptname,
+                   NVL (PBILLMAST.BMN_NETAMT, 0)
+                 + NVL (PBILLMAST.BMN_SALETAXCH, 0)
+                 + NVL (PBILLMAST.BMN_CESSCH, 0)
+                 + NVL (PBILLMAST.BMN_SALETAXCR, 0)
+                 + NVL (PBILLMAST.BMN_CESSCR, 0)
+                    Net,
+                 NVL (Pbillmast.Bmn_Disamt, 0) Discount,
+                 INITCAP (Dac_Desc) Dac_Desc,
+                 Discountauthority.Da_Code,
+                 INITCAP (Pattype.Ptc_Desc) Ptc_Desc,
+                 (  NVL (BMN_SALETAXCH, 0)
+                  + NVL (BMN_SALETAXCR, 0)
+                  + NVL (BMN_CESSCH, 0)
+                  + NVL (BMN_CESSCR, 0))
+                    Tax
+            FROM Pbillmast,
+                 Discountauthority,
+                 Patient,
+                 Pattype
+           WHERE     Pbillmast.Da_Code = Discountauthority.Da_Code(+)
+                 AND Pbillmast.Pt_No = Patient.Pt_No(+)
+                 AND Patient.Pt_Code = Pattype.Pt_Code(+)
+                 AND Pbillmast.Bmc_Cacr IN ('C', 'R')
+                 AND NVL (Pbillmast.Bmc_Cancel, 'N') = 'N'
+                 AND NVL (Pbillmast.Bmn_Disamt, 0) <> 0
+                 AND pbillmast.BMC_COLLCNCODE IS NOT NULL
+                 AND Pbillmast.BMD_COLLDATE >=
+                        TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                 AND Pbillmast.BMD_COLLDATE <=
+                        TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                 AND pbillmast.MH_CODE IN (SELECT MH_CODE FROM multihospital)
           UNION ALL          /*--added by basil for centralized collection--*/
-                                                /*--Pharmacy Direct Return--*/
-                                                                                           SELECT DISTINCT
-                                                                                                  (Mretmast.Mrc_Slno)
-                                                                                                     Slno,
-                                                                                                  Mretmast.Mr_No
-                                                                                                     BillNo,
-                                                                                                  Mretmast.Mrd_Date
-                                                                                                     BillDate,
-                                                                                                  Mretmast.Pt_No,
-                                                                                                  TRIM (
-                                                                                                     INITCAP (
-                                                                                                        Pbillmast.Hoc_Ptname))
-                                                                                                     Ptname,
-                                                                                                  MAX (
-                                                                                                     NVL (
-                                                                                                        MRETMAST.MRN_NETAMT,
-                                                                                                        0)
-                                                                                                     + NVL (
-                                                                                                          MRETMAST.MRN_SALETAXCH,
-                                                                                                          0)
-                                                                                                     + NVL (
-                                                                                                          MRETMAST.MRN_CESSCH,
-                                                                                                          0)
-                                                                                                     + NVL (
-                                                                                                          MRETMAST.MRN_SALETAXCR,
-                                                                                                          0)
-                                                                                                     + NVL (
-                                                                                                          MRETMAST.MRN_CESSCR,
-                                                                                                          0))
-                                                                                                  * -1
-                                                                                                     Net,
-                                                                                                  SUM (
-                                                                                                     NVL (
-                                                                                                        Mretdetl.Mrn_Disamt,
-                                                                                                        0))
-                                                                                                  * -1
-                                                                                                     Discount,
-                                                                                                  INITCAP (
-                                                                                                     Dac_Desc)
-                                                                                                     Dac_Desc,
-                                                                                                  Discountauthority.Da_Code,
-                                                                                                  INITCAP (
-                                                                                                     Pattype.Ptc_Desc)
-                                                                                                     Ptc_Desc,
-                                                                                                  SUM (
-                                                                                                     NVL (
-                                                                                                        MRN_SALETAXCH,
-                                                                                                        0)
-                                                                                                     + NVL (
-                                                                                                          MRN_SALETAXCR,
-                                                                                                          0)
-                                                                                                     + NVL (
-                                                                                                          MRN_CESSCH,
-                                                                                                          0)
-                                                                                                     + NVL (
-                                                                                                          MRN_CESSCR,
-                                                                                                          0))
-                                                                                                  * -1
-                                                                                                     Tax
-                                                                                             FROM Mretmast,
-                                                                                                  Mretdetl,
-                                                                                                  Pbillmast,
-                                                                                                  Pbilldetl,
-                                                                                                  Discountauthority,
-                                                                                                  Patient,
-                                                                                                  Pattype
-                                                                                            WHERE Mretmast.Mrc_Slno =
-                                                                                                     Mretdetl.Mrc_Slno
-                                                                                                  AND Mretdetl.Bmc_Slno =
-                                                                                                         Pbillmast.Bmc_Slno
-                                                                                                  AND Pbilldetl.Bmc_Slno =
-                                                                                                         Mretdetl.Bmc_Slno
-                                                                                                  AND Pbilldetl.It_Code =
-                                                                                                         Mretdetl.It_Code
-                                                                                                  AND Pbilldetl.Itc_Docno =
-                                                                                                         Mretdetl.Itc_Docno
-                                                                                                  AND Pbilldetl.Itc_Doctype =
-                                                                                                         Mretdetl.Itc_Doctype
-                                                                                                  AND Pbilldetl.Itc_Slno =
-                                                                                                         Mretdetl.Itc_Slno
-                                                                                                  AND Pbillmast.Da_Code =
-                                                                                                         Discountauthority.Da_Code(+)
-                                                                                                  AND Pbillmast.Pt_No =
-                                                                                                         Patient.Pt_No(+)
-                                                                                                  AND Patient.Pt_Code =
-                                                                                                         Pattype.Pt_Code(+)
-                                                                                                  AND Mretmast.Mrc_Cacr IN
-                                                                                                         ('C',
-                                                                                                          'R')
-                                                                                                  AND NVL (
-                                                                                                         Mretmast.Mrc_Cancel,
-                                                                                                         'N') =
-                                                                                                         'N'
-                                                                                                  AND Mretmast.MRC_RETCNCODE
-                                                                                                         IS NULL
-                                                                                                  AND Mretmast.Mrd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
-                                                                                                  AND Mretmast.Mrd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
-                                                                                                  AND MRETMAST.MH_CODE IN
-                                                                                                         (SELECT MH_CODE
-                                                                                                            FROM multihospital)
-                                                                                         GROUP BY (Mretmast.Mrc_Slno),
-                                                                                                  Mretmast.Mr_No,
-                                                                                                  Mretmast.Mrd_Date,
-                                                                                                  Mretmast.Pt_No,
-                                                                                                  TRIM (
-                                                                                                     INITCAP (
-                                                                                                        Pbillmast.Hoc_Ptname)),
-                                                                                                  INITCAP (
-                                                                                                     Dac_Desc),
-                                                                                                  Discountauthority.Da_Code,
-                                                                                                  INITCAP (
-                                                                                                     Pattype.Ptc_Desc) /*--added by basil for centralized collection--*/
+            /*--Pharmacy Direct Return--*/
+            SELECT DISTINCT
+                   (Mretmast.Mrc_Slno) Slno,
+                   Mretmast.Mr_No BillNo,
+                   Mretmast.Mrd_Date BillDate,
+                   Mretmast.Pt_No,
+                   TRIM (INITCAP (Pbillmast.Hoc_Ptname)) Ptname,
+                   MAX (
+                        NVL (MRETMAST.MRN_NETAMT, 0)
+                      + NVL (MRETMAST.MRN_SALETAXCH, 0)
+                      + NVL (MRETMAST.MRN_CESSCH, 0)
+                      + NVL (MRETMAST.MRN_SALETAXCR, 0)
+                      + NVL (MRETMAST.MRN_CESSCR, 0))
+                   * -1
+                      Net,
+                   SUM (NVL (Mretdetl.Mrn_Disamt, 0)) * -1 Discount,
+                   INITCAP (Dac_Desc) Dac_Desc,
+                   Discountauthority.Da_Code,
+                   INITCAP (Pattype.Ptc_Desc) Ptc_Desc,
+                   SUM (
+                        NVL (MRN_SALETAXCH, 0)
+                      + NVL (MRN_SALETAXCR, 0)
+                      + NVL (MRN_CESSCH, 0)
+                      + NVL (MRN_CESSCR, 0))
+                   * -1
+                      Tax
+              FROM Mretmast,
+                   Mretdetl,
+                   Pbillmast,
+                   Pbilldetl,
+                   Discountauthority,
+                   Patient,
+                   Pattype
+             WHERE     Mretmast.Mrc_Slno = Mretdetl.Mrc_Slno
+                   AND Mretdetl.Bmc_Slno = Pbillmast.Bmc_Slno
+                   AND Pbilldetl.Bmc_Slno = Mretdetl.Bmc_Slno
+                   AND Pbilldetl.It_Code = Mretdetl.It_Code
+                   AND Pbilldetl.Itc_Docno = Mretdetl.Itc_Docno
+                   AND Pbilldetl.Itc_Doctype = Mretdetl.Itc_Doctype
+                   AND Pbilldetl.Itc_Slno = Mretdetl.Itc_Slno
+                   AND Pbillmast.Da_Code = Discountauthority.Da_Code(+)
+                   AND Pbillmast.Pt_No = Patient.Pt_No(+)
+                   AND Patient.Pt_Code = Pattype.Pt_Code(+)
+                   AND Mretmast.Mrc_Cacr IN ('C', 'R')
+                   AND NVL (Mretmast.Mrc_Cancel, 'N') = 'N'
+                   AND Mretmast.MRC_RETCNCODE IS NULL
+                   AND Mretmast.Mrd_Date >=
+                          TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Mretmast.Mrd_Date <=
+                          TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND MRETMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+          GROUP BY (Mretmast.Mrc_Slno),
+                   Mretmast.Mr_No,
+                   Mretmast.Mrd_Date,
+                   Mretmast.Pt_No,
+                   TRIM (INITCAP (Pbillmast.Hoc_Ptname)),
+                   INITCAP (Dac_Desc),
+                   Discountauthority.Da_Code,
+                   INITCAP (Pattype.Ptc_Desc) /*--added by basil for centralized collection--*/
           UNION ALL                             /*--Pharmacy Direct Return--*/
-                                         SELECT DISTINCT
-                                                (Mretmast.Mrc_Slno) Slno,
-                                                Mretmast.Mr_No BillNo,
-                                                Mretmast.Mrd_Date BillDate,
-                                                Mretmast.Pt_No,
-                                                TRIM (
-                                                   INITCAP (
-                                                      Pbillmast.Hoc_Ptname))
-                                                   Ptname,
-                                                MAX (
-                                                   NVL (MRETMAST.MRN_NETAMT, 0)
-                                                   + NVL (
-                                                        MRETMAST.MRN_SALETAXCH,
-                                                        0)
-                                                   + NVL (MRETMAST.MRN_CESSCH,
-                                                          0)
-                                                   + NVL (
-                                                        MRETMAST.MRN_SALETAXCR,
-                                                        0)
-                                                   + NVL (MRETMAST.MRN_CESSCR,
-                                                          0))
-                                                * -1
-                                                   Net,
-                                                SUM (
-                                                   NVL (Mretdetl.Mrn_Disamt, 0))
-                                                * -1
-                                                   Discount,
-                                                INITCAP (Dac_Desc) Dac_Desc,
-                                                Discountauthority.Da_Code,
-                                                INITCAP (Pattype.Ptc_Desc)
-                                                   Ptc_Desc,
-                                                SUM (
-                                                     NVL (MRN_SALETAXCH, 0)
-                                                   + NVL (MRN_SALETAXCR, 0)
-                                                   + NVL (MRN_CESSCH, 0)
-                                                   + NVL (MRN_CESSCR, 0))
-                                                * -1
-                                                   Tax
-                                           FROM Mretmast,
-                                                Mretdetl,
-                                                Pbillmast,
-                                                Pbilldetl,
-                                                Discountauthority,
-                                                Patient,
-                                                Pattype
-                                          WHERE Mretmast.Mrc_Slno =
-                                                   Mretdetl.Mrc_Slno
-                                                AND Mretdetl.Bmc_Slno =
-                                                       Pbillmast.Bmc_Slno
-                                                AND Pbilldetl.Bmc_Slno =
-                                                       Mretdetl.Bmc_Slno
-                                                AND Pbilldetl.It_Code =
-                                                       Mretdetl.It_Code
-                                                AND Pbilldetl.Itc_Docno =
-                                                       Mretdetl.Itc_Docno
-                                                AND Pbilldetl.Itc_Doctype =
-                                                       Mretdetl.Itc_Doctype
-                                                AND Pbilldetl.Itc_Slno =
-                                                       Mretdetl.Itc_Slno
-                                                AND Pbillmast.Da_Code =
-                                                       Discountauthority.Da_Code(+)
-                                                AND Pbillmast.Pt_No =
-                                                       Patient.Pt_No(+)
-                                                AND Patient.Pt_Code =
-                                                       Pattype.Pt_Code(+)
-                                                AND Mretmast.Mrc_Cacr IN
-                                                       ('C', 'R')
-                                                AND NVL (Mretmast.Mrc_Cancel,
-                                                         'N') = 'N'
-                                                AND Mretmast.MRC_RETCNCODE
-                                                       IS NOT NULL
-                                                AND Mretmast.MRD_RETDATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
-                                                AND Mretmast.MRD_RETDATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
-                                                AND MRETMAST.MH_CODE IN
-                                                       (SELECT MH_CODE
-                                                          FROM multihospital)
-                                       GROUP BY (Mretmast.Mrc_Slno),
-                                                Mretmast.Mr_No,
-                                                Mretmast.Mrd_Date,
-                                                Mretmast.Pt_No,
-                                                TRIM (
-                                                   INITCAP (
-                                                      Pbillmast.Hoc_Ptname)),
-                                                INITCAP (Dac_Desc),
-                                                Discountauthority.Da_Code,
-                                                INITCAP (Pattype.Ptc_Desc))
+            SELECT DISTINCT
+                   (Mretmast.Mrc_Slno) Slno,
+                   Mretmast.Mr_No BillNo,
+                   Mretmast.Mrd_Date BillDate,
+                   Mretmast.Pt_No,
+                   TRIM (INITCAP (Pbillmast.Hoc_Ptname)) Ptname,
+                   MAX (
+                        NVL (MRETMAST.MRN_NETAMT, 0)
+                      + NVL (MRETMAST.MRN_SALETAXCH, 0)
+                      + NVL (MRETMAST.MRN_CESSCH, 0)
+                      + NVL (MRETMAST.MRN_SALETAXCR, 0)
+                      + NVL (MRETMAST.MRN_CESSCR, 0))
+                   * -1
+                      Net,
+                   SUM (NVL (Mretdetl.Mrn_Disamt, 0)) * -1 Discount,
+                   INITCAP (Dac_Desc) Dac_Desc,
+                   Discountauthority.Da_Code,
+                   INITCAP (Pattype.Ptc_Desc) Ptc_Desc,
+                   SUM (
+                        NVL (MRN_SALETAXCH, 0)
+                      + NVL (MRN_SALETAXCR, 0)
+                      + NVL (MRN_CESSCH, 0)
+                      + NVL (MRN_CESSCR, 0))
+                   * -1
+                      Tax
+              FROM Mretmast,
+                   Mretdetl,
+                   Pbillmast,
+                   Pbilldetl,
+                   Discountauthority,
+                   Patient,
+                   Pattype
+             WHERE     Mretmast.Mrc_Slno = Mretdetl.Mrc_Slno
+                   AND Mretdetl.Bmc_Slno = Pbillmast.Bmc_Slno
+                   AND Pbilldetl.Bmc_Slno = Mretdetl.Bmc_Slno
+                   AND Pbilldetl.It_Code = Mretdetl.It_Code
+                   AND Pbilldetl.Itc_Docno = Mretdetl.Itc_Docno
+                   AND Pbilldetl.Itc_Doctype = Mretdetl.Itc_Doctype
+                   AND Pbilldetl.Itc_Slno = Mretdetl.Itc_Slno
+                   AND Pbillmast.Da_Code = Discountauthority.Da_Code(+)
+                   AND Pbillmast.Pt_No = Patient.Pt_No(+)
+                   AND Patient.Pt_Code = Pattype.Pt_Code(+)
+                   AND Mretmast.Mrc_Cacr IN ('C', 'R')
+                   AND NVL (Mretmast.Mrc_Cancel, 'N') = 'N'
+                   AND Mretmast.MRC_RETCNCODE IS NOT NULL
+                   AND Mretmast.MRD_RETDATE >=
+                          TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Mretmast.MRD_RETDATE <=
+                          TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND MRETMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+          GROUP BY (Mretmast.Mrc_Slno),
+                   Mretmast.Mr_No,
+                   Mretmast.Mrd_Date,
+                   Mretmast.Pt_No,
+                   TRIM (INITCAP (Pbillmast.Hoc_Ptname)),
+                   INITCAP (Dac_Desc),
+                   Discountauthority.Da_Code,
+                   INITCAP (Pattype.Ptc_Desc))
 GROUP BY Ptc_Desc
 ORDER BY 1`;
-  const result = await conn_ora.execute(
-    sql,
-    {
-      fromDate: bind.from,
-      toDate: bind.to,
-    },
-    {outFormat: oracledb.OUT_FORMAT_OBJECT},
-  );
-  return result.rows;
-};
-
-const get_qmt_CreditInsuranceBill = async (conn_ora, bind) => {
-  const sql = `WITH PARAMS
-                  AS (SELECT TO_DATE (:fromDate, 'DD/MM/YYYY HH24:MI:SS') FROM_DT,TO_DATE (:toDate, 'DD/MM/YYYY HH24:MI:SS') TO_DT FROM DUAL),
-                  MH AS (SELECT MH_CODE FROM multihospital),
-                  CUS AS (SELECT CU_CODE, CUC_NAME FROM CUSTOMER),
-                  USR AS (SELECT US_CODE, USC_NAME FROM USERS)
-               SELECT PTC_NAME,
-                        PT_NO,
-                        BILLNO,
-                        SUM (TAX) TAX,
-                        SUM (AMT) AMT,
-                        CUC_NAME,
-                        USC_NAME
-                  FROM (
-                        SELECT   R.PTC_NAME,
-                                 R.PT_NO,
-                                 R.RP_NO BILLNO,
-                                 SUM (NVL (R.RPN_TOTTAX, 0)) TAX,
-                                 SUM (NVL (R.RPN_CREDIT, 0)) AMT,
-                                 C.CUC_NAME,
-                                 U.USC_NAME
-                           FROM RECEIPTMAST R JOIN CUS C ON C.CU_CODE = R.CU_CODE
-                                 JOIN USR U ON U.US_CODE = R.US_CODE
-                                 JOIN MH ON MH.MH_CODE = R.MH_CODE
-                                 CROSS JOIN PARAMS
-                           WHERE     R.RPC_CACR = 'R'
-                                 AND NVL (R.RPC_CANCEL, 'N') <> 'C'
-                                 AND NVL (R.RPN_CREDIT, 0) <> 0
-                                 AND ( (R.RPC_COLLCNCODE IS NULL
-                                       AND R.RPD_DATE BETWEEN FROM_DT AND TO_DT)
-                                       OR (R.RPC_COLLCNCODE IS NOT NULL
-                                          AND R.RPD_COLLDATE BETWEEN FROM_DT AND TO_DT))
-                        GROUP BY R.PTC_NAME,
-                                 R.PT_NO,
-                                 R.RP_NO,
-                                 C.CUC_NAME,
-                                 U.USC_NAME
-                        UNION ALL
-                           /* ================= BILLMAST (MERGED) ================= */
-                           SELECT B.PTC_NAME,
-                                 B.PT_NO,
-                                 B.BM_NO,
-                                 SUM (NVL (B.BMN_TOTTAX, 0) + NVL (B.BMN_TOTCESS, 0)),
-                                 SUM (NVL (B.BMN_CREDIT, 0)),
-                                 C.CUC_NAME,
-                                 U.USC_NAME
-                           FROM BILLMAST B
-                                 JOIN CUS C
-                                    ON C.CU_CODE = B.CU_CODE
-                                 JOIN USR U
-                                    ON U.US_CODE = B.US_CODE
-                                 JOIN MH
-                                    ON MH.MH_CODE = B.MH_CODE
-                                 CROSS JOIN PARAMS
-                           WHERE B.BMC_CACR = 'R' AND NVL (B.BMC_CANCEL, 'N') <> 'C'
-                                 AND ( (B.BMC_COLLCNCODE IS NULL
-                                       AND B.BMD_DATE BETWEEN FROM_DT AND TO_DT)
-                                       OR (B.BMC_COLLCNCODE IS NOT NULL
-                                          AND B.BMD_COLLDATE BETWEEN FROM_DT AND TO_DT))
-                        GROUP BY B.PTC_NAME,
-                                 B.PT_NO,
-                                 B.BM_NO,
-                                 C.CUC_NAME,
-                                 U.USC_NAME
-                        UNION ALL
-                           /* ================= PBILLMAST (MERGED) ================= */
-                           SELECT P.HOC_PTNAME,
-                                 P.PT_NO,
-                                 P.BM_NO,
-                                 SUM (
-                                       NVL (P.BMN_SALETAXCH, 0)
-                                    + NVL (P.BMN_SALETAXCR, 0)
-                                    + NVL (P.BMN_CESSCH, 0)
-                                    + NVL (P.BMN_CESSCR, 0)),
-                                 SUM (
-                                       NVL (P.BMN_CREDIT, 0)
-                                    + NVL (P.BMN_SALETAXCR, 0)
-                                    + NVL (P.BMN_CESSCR, 0)
-                                    + NVL (P.BMN_COPAYDED_CREDIT, 0)),
-                                 C.CUC_NAME,
-                                 U.USC_NAME
-                           FROM PBILLMAST P
-                                 JOIN CUS C
-                                    ON C.CU_CODE = P.CU_CODE
-                                 JOIN USR U
-                                    ON U.US_CODE = P.US_CODE
-                                 JOIN MH
-                                    ON MH.MH_CODE = P.MH_CODE
-                                 CROSS JOIN PARAMS
-                           WHERE     P.BMC_CACR = 'R'
-                                 AND NVL (P.BMC_CANCEL, 'N') IN ('N', 'P')
-                                 AND NVL (P.BMN_CREDIT, 0) <> 0
-                                 AND ( (P.BMC_COLLCNCODE IS NULL
-                                       AND P.BMD_DATE BETWEEN FROM_DT AND TO_DT)
-                                       OR (P.BMC_COLLCNCODE IS NOT NULL
-                                          AND P.BMD_COLLDATE BETWEEN FROM_DT AND TO_DT))
-                        GROUP BY P.HOC_PTNAME,
-                                 P.PT_NO,
-                                 P.BM_NO,
-                                 C.CUC_NAME,
-                                 U.USC_NAME
-                        UNION ALL
-                           /* ================= DISBILL ================= */
-                           SELECT NULL,
-                                 D.PT_NO,
-                                 D.DM_NO,
-                                 SUM (
-                                       NVL (D.DMN_SALESTAXCH, 0)
-                                    + NVL (D.DMN_SALESTAXCR, 0)
-                                    + NVL (D.DMN_CESSCH, 0)
-                                    + NVL (D.DMN_CESSCR, 0)),
-                                 SUM (
-                                    NVL (D.DMN_FINALCREDIT, 0) + NVL (D.DMN_COPAYDED_CREDIT, 0)),
-                                 C.CUC_NAME,
-                                 U.USC_NAME
-                           FROM DISBILLMAST D
-                                 JOIN CUS C
-                                    ON C.CU_CODE = D.CU_CODE
-                                 JOIN USR U
-                                    ON U.US_CODE = D.US_CODE
-                                 JOIN MH
-                                    ON MH.MH_CODE = D.MH_CODE
-                                 CROSS JOIN PARAMS
-                           WHERE     D.DMC_CACR = 'R'
-                                 AND NVL (D.DMC_CANCEL, 'N') = 'N'
-                                 AND D.DMD_DATE BETWEEN FROM_DT AND TO_DT
-                        GROUP BY D.PT_NO,
-                                 D.DM_NO,
-                                 C.CUC_NAME,
-                                 U.USC_NAME
-                        UNION ALL
-                           /* ================= OPBILL ================= */
-                           SELECT NULL,
-                                 O.PT_NO,
-                                 O.OP_NO,
-                                 SUM (NVL (O.OPN_TOTTAX, 0)),
-                                 SUM (NVL (O.OPN_CREDIT, 0) + NVL (O.OPN_COPAYDED_CREDIT, 0)),
-                                 C.CUC_NAME,
-                                 U.USC_NAME
-                           FROM OPBILLMAST O
-                                 JOIN CUS C
-                                    ON C.CU_CODE = O.CU_CODE
-                                 JOIN USR U
-                                    ON U.US_CODE = O.US_CODE
-                                 JOIN MH
-                                    ON MH.MH_CODE = O.MH_CODE
-                                 CROSS JOIN PARAMS
-                           WHERE     O.OPC_CACR IN ('C', 'R')
-                                 AND NVL (O.OPN_CANCEL, 'N') = 'N'
-                                 AND O.OPD_DATE BETWEEN FROM_DT AND TO_DT
-                                 AND (NVL (O.OPN_CREDIT, 0) + NVL (O.OPN_SALETAXCR, 0)) <> 0
-                        GROUP BY O.PT_NO,
-                                 O.OP_NO,
-                                 C.CUC_NAME,
-                                 U.USC_NAME
-                        UNION ALL
-                           SELECT R.PTC_NAME,
-                                 R.PT_NO,
-                                 RR.RF_NO BILLNO,
-                                 SUM (NVL (RR.RFN_TOTTAX, 0)) * -1 TAX,
-                                 SUM (NVL (RR.RPN_RTCREDIT, 0)) * -1 AMT,
-                                 C.CUC_NAME,
-                                 U.USC_NAME
-                           FROM Refundreceiptmast RR
-                                 JOIN RECEIPTMAST R
-                                    ON R.RPC_SLNO = RR.RPC_SLNO
-                                 JOIN CUS C
-                                    ON C.CU_CODE = RR.RFC_CU_CODE
-                                 JOIN USR U
-                                    ON U.US_CODE = RR.US_CODE
-                                 JOIN MH
-                                    ON MH.MH_CODE = RR.MH_CODE
-                                 CROSS JOIN PARAMS
-                           WHERE     RR.Rfc_Cacr = 'R'
-                                 AND NVL (RR.Rfc_Cancel, 'N') <> 'C'
-                                 AND NVL (RR.RPN_RTCREDIT, 0) > 0
-                                 AND RR.Roc_Slno IS NULL
-                                 AND RR.Rfd_Date BETWEEN PARAMS.FROM_DT AND PARAMS.TO_DT
-                        GROUP BY R.PTC_NAME,
-                                 R.PT_NO,
-                                 RR.RF_NO,
-                                 C.CUC_NAME,
-                                 U.USC_NAME
-                        UNION ALL
-                           /* ================= BILL REFUND ================= */
-                           SELECT B.PTC_NAME,
-                                 B.PT_NO,
-                                 B.BM_NO,
-                                 SUM (NVL (R.RFN_TOTTAX, 0) + NVL (R.Rfn_Totcess, 0)) * -1,
-                                 SUM (NVL (R.BMN_RTCREDIT, 0)) * -1,
-                                 C.CUC_NAME,
-                                 U.USC_NAME
-                           FROM refundbillmast R
-                                 JOIN BILLMAST B
-                                    ON B.BMC_SLNO = R.BMC_SLNO
-                                 JOIN CUS C
-                                    ON C.CU_CODE = R.RFC_CU_CODE
-                                 JOIN USR U
-                                    ON U.US_CODE = R.US_CODE
-                                 JOIN MH
-                                    ON MH.MH_CODE = R.MH_CODE
-                                 CROSS JOIN PARAMS
-                           WHERE     R.Rfc_Cacr = 'R'
-                                 AND NVL (R.Rfc_Cancel, 'N') <> 'C'
-                                 AND NVL (R.BMN_RTCREDIT, 0) > 0
-                                 AND R.Roc_Slno IS NULL
-                                 AND ( (R.RFC_RETCNCODE IS NULL
-                                       AND R.Rfd_Date BETWEEN PARAMS.FROM_DT AND PARAMS.TO_DT)
-                                       OR (R.RFC_RETCNCODE IS NOT NULL
-                                          AND R.RFD_RETDATE BETWEEN PARAMS.FROM_DT
-                                                               AND PARAMS.TO_DT))
-                        GROUP BY B.PTC_NAME,
-                                 B.PT_NO,
-                                 B.BM_NO,
-                                 C.CUC_NAME,
-                                 U.USC_NAME
-                        UNION ALL
-                           /* ================= MRET ================= */
-                           SELECT M.HOC_PTNAME,
-                                 M.PT_NO,
-                                 M.MR_NO,
-                                 SUM (
-                                       NVL (M.MRN_SALETAXCH, 0)
-                                    + NVL (M.MRN_SALETAXCR, 0)
-                                    + NVL (M.MRN_CESSCH, 0)
-                                    + NVL (M.MRN_CESSCR, 0))
-                                 * -1,
-                                 SUM (
-                                       NVL (M.BMN_RTCREDIT, 0)
-                                    + NVL (M.MRN_SALETAXCR, 0)
-                                    + NVL (M.MRN_CESSCR, 0))
-                                 * -1,
-                                 C.CUC_NAME,
-                                 U.USC_NAME
-                           FROM MRETMAST M
-                                 JOIN CUS C
-                                    ON C.CU_CODE = M.CU_CODE
-                                 JOIN USR U
-                                    ON U.US_CODE = M.US_CODE
-                                 JOIN MH
-                                    ON MH.MH_CODE = M.MH_CODE
-                                 CROSS JOIN PARAMS
-                           WHERE     M.MRC_CACR = 'R'
-                                 AND NVL (M.MRC_CANCEL, 'N') <> 'Y'
-                                 AND NVL (M.BMN_RTCREDIT, 0) > 0
-                                 AND ( (M.MRC_RETCNCODE IS NULL
-                                       AND M.MRD_DATE BETWEEN PARAMS.FROM_DT AND PARAMS.TO_DT)
-                                       OR (M.MRC_RETCNCODE IS NOT NULL
-                                          AND M.MRD_RETDATE BETWEEN PARAMS.FROM_DT
-                                                               AND PARAMS.TO_DT))
-                        GROUP BY M.HOC_PTNAME,
-                                 M.PT_NO,
-                                 M.MR_NO,
-                                 C.CUC_NAME,
-                                 U.USC_NAME
-                        UNION ALL
-                           /* ================= IP REFUND ================= */
-                           SELECT IPA.PTC_PTNAME,
-                                 IPA.PT_NO,
-                                 IPR.RI_NO,
-                                 SUM (NVL (IPR.RIN_TOTTAX, 0)) * -1,
-                                 SUM (NVL (IPR.RIN_CREDIT, 0)) * -1,
-                                 C.CUC_NAME,
-                                 U.USC_NAME
-                           FROM Iprefundmast IPR
-                                 JOIN IPADMISS IPA
-                                    ON IPA.DMC_SLNO = IPR.DMC_SLNO
-                                 JOIN CUS C
-                                    ON C.CU_CODE = IPR.CU_CODE
-                                 JOIN USR U
-                                    ON U.US_CODE = IPR.US_CODE
-                                 JOIN MH
-                                    ON MH.MH_CODE = IPR.MH_CODE
-                                 CROSS JOIN PARAMS
-                           WHERE     IPR.Ric_Cacr = 'R'
-                                 AND NVL (IPR.Ric_Cancel, 'N') = 'N'
-                                 AND IPR.Rid_Date BETWEEN PARAMS.FROM_DT AND PARAMS.TO_DT
-                        GROUP BY IPA.PTC_PTNAME,
-                                 IPA.PT_NO,
-                                 IPR.RI_NO,
-                                 C.CUC_NAME,
-                                 U.USC_NAME) A
-               GROUP BY PTC_NAME,
-                        PT_NO,
-                        BILLNO,
-                        CUC_NAME,
-                        USC_NAME`;
-  const result = await conn_ora.execute(
-    sql,
-    {
-      fromDate: bind.from,
-      toDate: bind.to,
-    },
-    {outFormat: oracledb.OUT_FORMAT_OBJECT},
-  );
-  return result.rows;
-};
-
-const get_qmt_CreditInsuranceBillCollection = async (conn_ora, bind) => {
-  const sql = `SELECT BillNo,
-       Cash,
-       Cheque,
-       DD,
-       Card,
-       Bankamt,
-       Bank,
-       Customer,
-       UserName
-  FROM (/* ===== COLLECTION ===== */
-        SELECT X.Rc_no BillNo,
-               NVL (X.Rcn_cash, 0) Cash,
-               NVL (X.Rcn_chk, 0) Cheque,
-               NVL (X.Rcn_dd, 0) DD,
-               NVL (X.Rcn_Card, 0) Card,
-               NVL (X.RCN_NEFT, 0) Bankamt,
-               INITCAP (X.Rcc_Bank) Bank,
-               INITCAP (Y.Cuc_name) Customer,
-               INITCAP (Z.Usc_name) UserName
-          FROM Recpcollectionmast X
-               JOIN Customer Y
-                  ON X.Cu_code = Y.Cu_code
-               LEFT JOIN Users Z
-                  ON X.Us_code = Z.Us_code
-               JOIN multihospital mh
-                  ON mh.MH_CODE = X.MH_CODE
-         WHERE NVL (X.Rcc_cancel, 'N') = 'N'
-               AND X.Rcd_date BETWEEN TO_DATE (:fromDate,
-                                               'DD/MM/YYYY HH24:MI:SS')
-                                  AND TO_DATE (:toDate,
-                                               'DD/MM/YYYY HH24:MI:SS')
-        UNION ALL
-        /* ===== REFUND ===== */
-        SELECT X.Rc_no,
-               NVL (X.Rfn_Cash, 0),
-               NVL (X.Rfn_Chk, 0),
-               NVL (X.Rfn_Dd, 0),
-               NVL (X.Rfn_Card, 0),
-               0,
-               INITCAP (X.Rcc_Bank),
-               INITCAP (Y.Cuc_name),
-               INITCAP (Z.Usc_name)
-          FROM Recpcollectionmast X
-               JOIN Customer Y
-                  ON X.Cu_code = Y.Cu_code
-               LEFT JOIN Users Z
-                  ON X.Us_code = Z.Us_code
-               JOIN multihospital mh
-                  ON mh.MH_CODE = X.MH_CODE
-         WHERE NVL (X.Rcc_cancel, 'N') = 'N'
-               AND X.Rfd_Date BETWEEN TO_DATE (:fromDate,
-                                               'DD/MM/YYYY HH24:MI:SS')
-                                  AND TO_DATE (:toDate,
-                                               'DD/MM/YYYY HH24:MI:SS')) A`;
   const result = await conn_ora.execute(
     sql,
     {
@@ -5757,6 +5075,4 @@ module.exports = {
   getWriteoffamnt,
   getTypeDiscount,
   getPerttyCash,
-  get_qmt_CreditInsuranceBill,
-  get_qmt_CreditInsuranceBillCollection,
 };

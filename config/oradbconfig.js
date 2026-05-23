@@ -26,10 +26,10 @@ async function initializePools() {
         poolMin: 4,
         poolMax: 10,
         poolIncrement: 2,
-        poolTimeout: 120,
+        poolTimeout: 60,
         queueTimeout: 60000,
         stmtCacheSize: 30,
-        poolPingInterval: 60,
+        poolPingInterval: 30,
         callTimeout: 180000,
       });
       console.log("TMC Oracle pool initialized");
