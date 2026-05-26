@@ -75,6 +75,8 @@ async function initializePools() {
   return initPromise;
 }
 
+// Get connection
+
 async function getTmcConnection() {
   if (!poolTMC) await initializePools();
   return poolTMC.getConnection();
@@ -90,6 +92,8 @@ async function getKmcConnection() {
   return poolKMC.getConnection();
 }
 
+// Close pool connection
+
 async function closeConnection() {
   try {
     if (poolTMC) await poolTMC.close(10);
@@ -101,6 +105,8 @@ async function closeConnection() {
   }
 }
 
+// close single connection
+
 const oracleConnectionClose = async (conn_ora) => {
   try {
     if (conn_ora) {
@@ -111,14 +117,139 @@ const oracleConnectionClose = async (conn_ora) => {
   }
 };
 
+// safe pool restart
+
+async function restartPools() {
+  console.log("♻️ Starting Oracle pool restart...");
+
+  try {
+    // Prevent restart if busy
+    if (poolTMC?.connectionsInUse > 0) {
+      console.log("⚠️ Skipping restart, connections still in use");
+      return;
+    }
+
+    // Create new pools
+    const newTMC = await oracledb.createPool({
+      user: process.env.ORA_USER,
+      password: process.env.ORAC_PASS,
+      connectString: process.env.ORA_CONN_STRING,
+      poolMin: 4,
+      poolMax: 10,
+      poolIncrement: 2,
+      poolTimeout: 60,
+      queueTimeout: 60000,
+      stmtCacheSize: 30,
+      poolPingInterval: 30,
+      callTimeout: 180000,
+    });
+
+    const newTMCCRON = await oracledb.createPool({
+      user: process.env.ORA_USER,
+      password: process.env.ORAC_PASS,
+      connectString: process.env.ORA_CONN_STRING,
+      poolMin: 2,
+      poolMax: 10,
+      poolIncrement: 2,
+      queueTimeout: 60000,
+      stmtCacheSize: 30,
+      poolPingInterval: 60,
+      poolTimeout: 60,
+      callTimeout: 120000,
+    });
+
+    const newKMC = await oracledb.createPool({
+      user: process.env.KMC_ORA_USER,
+      password: process.env.KMC_ORAC_PASS,
+      connectString: process.env.KMC_ORA_CONN_STRING,
+      poolMin: 1,
+      poolMax: 2,
+      poolIncrement: 1,
+      poolTimeout: 60,
+      queueTimeout: 60000,
+      stmtCacheSize: 30,
+      poolPingInterval: 60,
+      callTimeout: 120000,
+    });
+
+    // Swap pools
+    const oldTMC = poolTMC;
+    const oldTMCCRON = poolTMCCRON;
+    const oldKMC = poolKMC;
+
+    poolTMC = newTMC;
+    poolTMCCRON = newTMCCRON;
+    poolKMC = newKMC;
+
+    console.log("🔄 Pools swapped successfully");
+
+    // Close old pools
+    if (oldTMC) await oldTMC.close(10);
+    if (oldTMCCRON) await oldTMCCRON.close(10);
+    if (oldKMC) await oldKMC.close(10);
+
+    console.log("✅ Old pools closed");
+  } catch (err) {
+    console.error("❌ Pool restart failed:", err);
+  }
+}
+
+// scheduled restart  at 2 am
+
+function scheduleNightlyRestart() {
+  const now = new Date();
+  const nextRun = new Date();
+
+  nextRun.setHours(2, 0, 0, 0);
+
+  if (nextRun <= now) {
+    nextRun.setDate(nextRun.getDate() + 1);
+  }
+
+  const delay = nextRun - now;
+
+  console.log(`⏰ Next pool restart in ${Math.round(delay / 60000)} minutes`);
+
+  setTimeout(() => {
+    restartPools();
+    // Repeat every 24 hours
+    setInterval(restartPools, 24 * 60 * 60 * 1000);
+  }, delay);
+}
+
+// function scheduleTestRestart() {
+//   console.log("⏰ Running pool restart every 2 minutes (TEST MODE)");
+
+//   setInterval(
+//     async () => {
+//       console.log("♻️ Triggering test pool restart...");
+//       await restartPools();
+//     },
+//     2 * 60 * 1000,
+//   ); // 2 minutes
+// }
+
+/**
+ * Pool stats logging
+ */
 setInterval(() => {
-  console.log("Oracle Pool Stats", {
-    open: poolTMC?.connectionsOpen,
-    inUse: poolTMC?.connectionsInUse,
-    open_cron: poolTMCCRON?.connectionsOpen,
-    inUse_cron: poolTMCCRON?.connectionsInUse,
+  console.log("📊 Oracle Pool Stats", {
+    TMC_open: poolTMC?.connectionsOpen,
+    TMC_inUse: poolTMC?.connectionsInUse,
+    CRON_open: poolTMCCRON?.connectionsOpen,
+    CRON_inUse: poolTMCCRON?.connectionsInUse,
+    KMC_open: poolKMC?.connectionsOpen,
+    KMC_inUse: poolKMC?.connectionsInUse,
   });
-}, 3000);
+}, 5000);
+
+/**
+ * Initialize + Start Scheduler
+ */
+initializePools().then(() => {
+  scheduleNightlyRestart();
+  // scheduleTestRestart();
+});
 
 module.exports = {
   oracledb,
@@ -129,110 +260,3 @@ module.exports = {
   closeConnection,
   oracleConnectionClose,
 };
-
-// // Create a pool for KMC Oracle connection
-// const oraKmcConnection = async () => {
-//   try {
-//     return await oracledb.createPool({
-//       user: process.env.KMC_ORA_USER,
-//       password: process.env.KMC_ORAC_PASS,
-//       connectString: process.env.KMC_ORA_CONN_STRING,
-//       poolMin: 1,
-//       poolMax: 4,
-//     });
-//   } catch (err) {
-//     console.error("Error creating Oracle pool (KMC):", err);
-//     throw err;
-//   }
-// };
-
-// // Get a connection from the KMC pool
-// const oraKmcPool = async () => {
-//   try {
-//     const pool = await oraKmcConnection();
-//     return await pool.getConnection();
-//   } catch (err) {
-//     console.error("Error getting connection from KMC pool:", err);
-//     throw err;
-//   }
-// };
-
-// // Create a pool for TMC Oracle connection
-// const oraConnection = async () => {
-//   try {
-//     return await oracledb.createPool({
-//       user: process.env.ORA_USER,
-//       password: process.env.ORAC_PASS,
-//       connectString: process.env.ORA_CONN_STRING,
-//       poolMin: 1,
-//       poolMax: 4,
-//     });
-//   } catch (err) {
-//     console.error("Error creating Oracle pool (TMC):", err);
-//     throw err;
-//   }
-// };
-
-// // Get a connection from the TMC pool
-// const oraPool = async () => {
-//   try {
-//     const pool = await oraConnection();
-//     return await pool.getConnection();
-//   } catch (err) {
-//     console.error("Error getting connection from TMC pool:", err);
-//     throw err;
-//   }
-// };
-
-// // Close an Oracle DB connection
-// const connectionClose = async (connection) => {
-//   if (connection) {
-//     try {
-//       await connection.close();
-//     } catch (err) {
-//       console.error("Error closing Oracle connection:", err.message);
-//     }
-//   }
-// };
-
-// module.exports = {
-//   oracledb,
-//   oraKmcConnection,
-//   oraKmcPool,
-//   oraConnection,
-//   oraPool,
-//   connectionClose,
-// };
-
-// const oracledb = require('oracledb');
-
-// const oraConnection = async () => {
-//     return await oracledb.createPool({
-//         user: process.env.ORA_USER,
-//         password: process.env.ORAC_PASS,
-//         connectString: process.env.ORA_CONN_STRING,
-//         poolMin: 1,
-//         poolMax: 4,
-//     });
-
-// }
-
-// const oraPool = async () => {
-//     let oraclePool = await oraConnection()
-//     return await oraclePool.getConnection()
-// }
-
-// const connectionClose = async (connection) => {
-//     (await connection()).close(
-//         function (err) {
-//             if (err)
-//                 console.error(err.message);
-//         });
-// }
-
-// module.exports = {
-//     oraConnection,
-//     oraPool,
-//     oracledb,
-//     connectionClose
-// }
