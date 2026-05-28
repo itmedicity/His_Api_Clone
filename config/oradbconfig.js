@@ -196,26 +196,26 @@ async function restartPools() {
 
 // scheduled restart  at 2 am
 
-function scheduleNightlyRestart() {
-  const now = new Date();
-  const nextRun = new Date();
+// function scheduleNightlyRestart() {
+//   const now = new Date();
+//   const nextRun = new Date();
 
-  nextRun.setHours(2, 0, 0, 0);
+//   nextRun.setHours(2, 0, 0, 0);
 
-  if (nextRun <= now) {
-    nextRun.setDate(nextRun.getDate() + 1);
-  }
+//   if (nextRun <= now) {
+//     nextRun.setDate(nextRun.getDate() + 1);
+//   }
 
-  const delay = nextRun - now;
+//   const delay = nextRun - now;
 
-  console.log(`⏰ Next pool restart in ${Math.round(delay / 60000)} minutes`);
+//   console.log(`⏰ Next pool restart in ${Math.round(delay / 60000)} minutes`);
 
-  setTimeout(() => {
-    restartPools();
-    // Repeat every 24 hours
-    setInterval(restartPools, 24 * 60 * 60 * 1000);
-  }, delay);
-}
+//   setTimeout(() => {
+//     restartPools();
+//     // Repeat every 24 hours
+//     setInterval(restartPools, 24 * 60 * 60 * 1000);
+//   }, delay);
+// }
 
 // function scheduleTestRestart() {
 //   console.log("⏰ Running pool restart every 2 minutes (TEST MODE)");
@@ -229,6 +229,18 @@ function scheduleNightlyRestart() {
 //   ); // 2 minutes
 // }
 
+function scheduleEvery3HoursRestart() {
+  console.log("⏰ Pool restart scheduled every 3 hours");
+
+  setInterval(
+    async () => {
+      console.log("♻️ Running 3-hour pool restart...");
+      await restartPools();
+    },
+    3 * 60 * 60 * 1000,
+  ); // 3 hours
+}
+
 /**
  * Pool stats logging
  */
@@ -238,8 +250,8 @@ setInterval(() => {
     TMC_inUse: poolTMC?.connectionsInUse,
     CRON_open: poolTMCCRON?.connectionsOpen,
     CRON_inUse: poolTMCCRON?.connectionsInUse,
-    KMC_open: poolKMC?.connectionsOpen,
-    KMC_inUse: poolKMC?.connectionsInUse,
+    // KMC_open: poolKMC?.connectionsOpen,
+    // KMC_inUse: poolKMC?.connectionsInUse,
   });
 }, 5000);
 
@@ -247,7 +259,8 @@ setInterval(() => {
  * Initialize + Start Scheduler
  */
 initializePools().then(() => {
-  scheduleNightlyRestart();
+  scheduleEvery3HoursRestart();
+  // scheduleNightlyRestart();
   // scheduleTestRestart();
 });
 
