@@ -1,5 +1,5 @@
 const {getTmcConnection, oracleConnectionClose} = require("../../../../config/oradbconfig");
-const {insertIntoGTT, controllerHelper} = require("../../../../utls/controller-helperFun");
+const {insertIntoGTT, controllerHelper, getGttPatientList} = require("../../../../utls/controller-helperFun");
 const {getIpNumberFromPreviousDayCollection} = require("../../misReportTmch/misReportTMCH/collectionTmch.service");
 const qmtService = require("./tmch.service");
 const groupedService = require("../tssh/tssh.service");
@@ -257,7 +257,10 @@ const getCeditInsuranceBillCollection = async (req, res) => {
     const ipListMap = [{data: iplist, status: 1}];
     const ipLists = ipListMap.flatMap(({data, status}) => (data || []).map((ip) => ({ip, status})));
     // console.log(ipLists);
-    // await insertIntoGTT(conn, ipLists);
+    await insertIntoGTT(conn, ipLists);
+
+    // const patientList = await getGttPatientList(conn);
+    // console.log(patientList);
 
     const result = await qmtService.get_CreditInsuranceBillCollection(conn, body);
     // console.log(result);
@@ -301,7 +304,9 @@ const getCreditInsuranceBillDetail = async (req, res) => {
     const ipListMap = [{data: iplist, status: 1}];
     const ipLists = ipListMap.flatMap(({data, status}) => (data || []).map((ip) => ({ip, status})));
     // console.log(ipLists);
-    // await insertIntoGTT(conn, ipLists);
+    await insertIntoGTT(conn, ipLists);
+    // const patientList = await getGttPatientList(conn);
+    // console.log(patientList);
 
     const result = await qmtService.get_CreditInsuranceBillDetail(conn, body);
     // console.log(result);s
@@ -312,6 +317,7 @@ const getCreditInsuranceBillDetail = async (req, res) => {
         data: [],
       });
     }
+
     return res.status(200).json({
       success: 1,
       message: "Success",

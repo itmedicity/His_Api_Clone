@@ -137,4 +137,9 @@ const insertIntoGTT = async (conn, data = []) => {
   );
 };
 
-module.exports = {controllerHelper, controllerGETHelper, insertIntoGTT};
+const getGttPatientList = async (conn) => {
+  const result = await conn.execute(`SELECT * FROM MEDIWARE.GTT_EXCLUDE_IP`);
+  return result.rows;
+};
+
+module.exports = {controllerHelper, controllerGETHelper, insertIntoGTT, getGttPatientList};
