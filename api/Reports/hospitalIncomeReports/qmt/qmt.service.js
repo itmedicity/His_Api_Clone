@@ -5712,6 +5712,421 @@ const get_qmt_CreditInsuranceBillCollection = async (conn_ora, bind) => {
   return result.rows;
 };
 
+const get_qmt_Unsettled_Amount = async (conn_ora, bind) => {
+  const sql = `SELECT INITCAP (Ptname) Ptname,
+         ptno,
+         billno,
+         SUM (NVL (Amt, 0)) Amt,
+         SUM (NVL (Taxamt, 0)) Taxamt,
+         INITCAP (Customer) Customer,
+         INITCAP (DocName) DocName,
+         TYPE TYPE,
+         INITCAP (UserName) Username
+    FROM (  SELECT 'IP' TYPE,
+                   Ptc_ptname Ptname,
+                   Disbillmast.Pt_no Ptno,
+                   Dm_no Billno,
+                   SUM (NVL (DMN_FINALPTPAYABLE, 0)) Amt,
+                   SUM (
+                        NVL (DMN_SALESTAXCH, 0)
+                      + NVL (DMN_SALESTAXCR, 0)
+                      + NVL (DMN_CESSCH, 0)
+                      + NVL (DMN_CESSCR, 0))
+                      Taxamt,
+                   DECODE (Dmc_cacr, 'R', Cuc_name, '') Customer,
+                   Usc_name UserName,
+                   Doc_name DocName
+              FROM Disbillmast,
+                   Patient,
+                   Customer,
+                   Users,
+                   Doctor
+             WHERE     Disbillmast.Pt_no = Patient.Pt_no
+                   AND Disbillmast.Cu_code = Customer.Cu_code(+)
+                   AND Disbillmast.Us_code = Users.Us_code
+                   AND Disbillmast.Do_code = Doctor.Do_code
+                   AND Dmc_cacr IN ('C', 'R')
+                   AND NVL (Disbillmast.Dmc_cancel, 'N') = 'N'
+                   AND NVL (Dmn_ptpayable, 0) <> 0
+                   AND Disbillmast.Dmd_date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Disbillmast.Dmd_date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+          GROUP BY Ptc_ptname,
+                   Disbillmast.Pt_no,
+                   Dm_no,
+                   DECODE (Dmc_cacr, 'R', Cuc_name, ''),
+                   Usc_name,
+                   Doc_name
+          UNION ALL
+            SELECT 'IP' TYPE,
+                   Ptc_ptname Ptname,
+                   Disbillmast.Pt_no Ptno,
+                   Dm_no Billno,
+                   SUM (
+                      (  NVL (Ipreceipt.irn_amount, 0)
+                       + NVL (Ipreceipt.irn_cheque, 0)
+                       + NVL (Ipreceipt.irn_card, 0)
+                       + NVL (Ipreceipt.irn_NEFT, 0))
+                      - (  NVL (Ipreceipt.irn_balance, 0)
+                         + NVL (Ipreceipt.IRN_REFCHEQ, 0)
+                         + NVL (Ipreceipt.irn_refcard, 0))
+                      + NVL (Ipreceipt.irn_discount, 0))
+                   * -1
+                      Amt,
+                   SUM (0) Taxamt,
+                   DECODE (Dmc_cacr, 'R', Cuc_name, '') Customer,
+                   Usc_name UserName,
+                   Doc_name DocName
+              FROM ipreceipt,
+                   Disbillmast,
+                   Patient,
+                   Customer,
+                   Users,
+                   Doctor
+             WHERE     Disbillmast.Pt_no = Patient.Pt_no
+                   AND ipreceipt.Us_code = Users.Us_code
+                   AND Disbillmast.Do_code = Doctor.Do_code
+                   AND Disbillmast.Cu_code = Customer.Cu_code(+)
+                   AND Ipreceipt.Dmc_slno = Disbillmast.Dmc_slno
+                   AND Disbillmast.Dmd_date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Disbillmast.Dmd_date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND Ipreceipt.Dmc_type IN ('C', 'R')
+                   AND IRD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND IRD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND ipreceipt.IPC_MHCODE IN
+                          (SELECT MH_CODE FROM multihospital)
+                   AND Irc_cancel IS NULL
+          GROUP BY Ptc_ptname,
+                   Disbillmast.Pt_no,
+                   Dm_no,
+                   DECODE (Dmc_cacr, 'R', Cuc_name, ''),
+                   Usc_name,
+                   Doc_name
+          UNION ALL
+            SELECT 'BIL' TYPE,
+                   Ptc_ptname Ptname,
+                   billmast.Pt_no Ptno,
+                   bm_no Billno,
+                   SUM (NVL (billmast.bmn_netamt, 0)) Amt,
+                   SUM (0) Taxamt,
+                   DECODE (bmc_cacr, 'R', Cuc_name, '') Customer,
+                   Usc_name UserName,
+                   Doc_name DocName
+              FROM billmast,
+                   doctor,
+                   patient,
+                   customer,
+                   users
+             WHERE     billmast.do_code = doctor.do_code(+)
+                   AND billmast.pt_no = patient.pt_no(+)
+                   AND billmast.cu_code = customer.cu_code(+)
+                   AND billmast.Us_code = Users.Us_code
+                   AND billmast.bmc_cacr IN ('C', 'R')
+                   AND billmast.RPN_PTPAYABLE > 0
+                   AND billmast.bmd_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND billmast.bmd_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND billmast.mh_code IN (SELECT MH_CODE FROM multihospital)
+                   AND NVL (billmast.bmc_cancel, 'N') <> 'C'
+                   AND TRUNC (billmast.bmd_DATE) <>
+                          TRUNC (NVL (BMD_COLLDATE, SYSDATE + 1))
+          GROUP BY Ptc_ptname,
+                   billmast.Pt_no,
+                   bm_no,
+                   DECODE (bmc_cacr, 'R', Cuc_name, ''),
+                   Usc_name,
+                   Doc_name
+          UNION ALL
+            SELECT 'BIL' TYPE,
+                   Ptc_ptname Ptname,
+                   billmast.Pt_no Ptno,
+                   rf_no Billno,
+                   SUM (NVL (refundbillmast.rfn_netamt, 0)) * -1 Amt,
+                   SUM (0) Taxamt,
+                   DECODE (rfc_cacr, 'R', Cuc_name, '') Customer,
+                   Usc_name UserName,
+                   Doc_name DocName
+              FROM refundbillmast,
+                   BILLMAST,
+                   doctor,
+                   patient,
+                   customer,
+                   users
+             WHERE     BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                   AND refundbillmast.bmc_slno = BILLMAST.bmc_slno
+                   AND refundbillmast.Rfc_cacr IN ('C', 'R')
+                   AND billmast.do_code = doctor.do_code(+)
+                   AND refundbillmast.us_code = users.us_code(+)
+                   AND billmast.cu_code = customer.cu_code(+)
+                   AND Billmast.Pt_No = Patient.Pt_No(+)
+                   AND NVL (refundbillmast.Rfc_Cancel, 'N') <> 'C'
+                   AND TRUNC (refundbillmast.rfd_DATE) <>
+                          TRUNC (NVL (RFD_RETDATE, SYSDATE + 1))
+                   AND refundbillmast.RPN_RTPTPAYABLE > 0
+                   AND NVL (refundbillmast.ROC_SLNO, 'N') = 'N'
+                   AND refundbillmast.rfd_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND refundbillmast.rfd_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+          GROUP BY Ptc_ptname,
+                   billmast.Pt_no,
+                   rf_no,
+                   DECODE (rfc_cacr, 'R', Cuc_name, ''),
+                   Usc_name,
+                   Doc_name
+          UNION ALL
+            SELECT 'REG' TYPE,
+                   Ptc_ptname Ptname,
+                   receiptmast.Pt_no Ptno,
+                   rp_no Billno,
+                   SUM (NVL (receiptmast.rpn_netamt, 0)) Amt,
+                   SUM (0) Taxamt,
+                   DECODE (rpc_cacr, 'R', Cuc_name, '') Customer,
+                   Usc_name UserName,
+                   Doc_name DocName
+              FROM receiptmast,
+                   doctor,
+                   patient,
+                   customer,
+                   users
+             WHERE     receiptmast.do_code = doctor.do_code(+)
+                   AND receiptmast.pt_no = patient.pt_no(+)
+                   AND receiptmast.cu_code = customer.cu_code(+)
+                   AND receiptmast.RPC_CACR IN ('C', 'R')
+                   AND receiptmast.RpD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND receiptmast.Rpd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND receiptmast.Us_code = Users.Us_code
+                   AND receiptmast.mh_code IN (SELECT MH_CODE FROM multihospital)
+                   AND NVL (receiptmast.rpc_cancel, 'N') <> 'C'
+                   AND TRUNC (receiptmast.RpD_DATE) <>
+                          TRUNC (NVL (RPD_COLLDATE, SYSDATE + 1))
+                   AND RPN_PTPAYABLE > 0
+          GROUP BY Ptc_ptname,
+                   receiptmast.Pt_no,
+                   rp_no,
+                   DECODE (rpc_cacr, 'R', Cuc_name, ''),
+                   Usc_name,
+                   Doc_name
+          UNION ALL
+            SELECT 'REG' TYPE,
+                   Ptc_ptname Ptname,
+                   receiptmast.Pt_no Ptno,
+                   rf_no Billno,
+                   SUM (NVL (refundreceiptmast.rfn_netamt, 0)) * -1 Amt,
+                   SUM (0) Taxamt,
+                   DECODE (rfc_cacr, 'R', Cuc_name, '') Customer,
+                   Usc_name UserName,
+                   Doc_name DocName
+              FROM refundreceiptmast,
+                   receiptmast,
+                   doctor,
+                   patient,
+                   customer,
+                   users
+             WHERE refundreceiptmast.MH_CODE IN
+                      (SELECT MH_CODE FROM multihospital)
+                   AND refundreceiptmast.rpc_slno = receiptmast.rpc_slno
+                   AND refundreceiptmast.Rfc_cacr IN ('C', 'R')
+                   AND receiptmast.do_code = doctor.do_code(+)
+                   AND refundreceiptmast.us_code = users.us_code(+)
+                   AND receiptmast.cu_code = customer.cu_code(+)
+                   AND Receiptmast.Pt_No = Patient.Pt_No(+)
+                   AND NVL (refundreceiptmast.ROC_SLNO, 'N') = 'N'
+                   AND NVL (refundreceiptmast.RFC_CANCEL, 'N') <> 'C'
+                   AND TRUNC (refundreceiptmast.RfD_DATE) <>
+                          TRUNC (NVL (RFD_RETDATE, SYSDATE + 1))
+                   AND refundreceiptmast.RPN_RTPTPAYABLE > 0
+                   AND refundreceiptmast.RfD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND refundreceiptmast.Rfd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND NVL (refundreceiptmast.rfc_cancel, 'N') = 'P'
+          GROUP BY Ptc_ptname,
+                   receiptmast.Pt_no,
+                   rf_no,
+                   DECODE (rfc_cacr, 'R', Cuc_name, ''),
+                   Usc_name,
+                   Doc_name
+          UNION ALL
+            SELECT MIN (bmc_ipop) TYPE,
+                   Ptc_ptname Ptname,
+                   pbillmast.Pt_no Ptno,
+                   bm_no Billno,
+                   SUM (NVL (pbillmast.RPN_FINALPTPAYABLE, 0)) Amt,
+                   SUM (NVL (BMN_SALETAXCH, 0) + NVL (BMN_CESSCH, 0)) Taxamt,
+                   DECODE (bmc_cacr, 'R', Cuc_name, '') Customer,
+                   Usc_name UserName,
+                   Doc_name DocName
+              FROM pbillmast,
+                   doctor,
+                   patient,
+                   customer,
+                   users
+             WHERE     pbillmast.do_code = doctor.do_code(+)
+                   AND pbillmast.pt_no = patient.pt_no(+)
+                   AND pbillmast.cu_code = customer.cu_code(+)
+                   AND pbillmast.Us_code = Users.Us_code
+                   AND pbillmast.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                   AND pbillmast.Bmc_cacr IN ('C', 'R')
+                   AND NVL (PBILLMAST.Bmc_cancel, 'N') <> 'Y'
+                   AND TRUNC (pbillmast.bmd_DATE) <>
+                          TRUNC (NVL (BMD_COLLDATE, SYSDATE + 1))
+                   AND pbillmast.RPN_PTPAYABLE > 0
+                   AND pbillmast.Bmd_date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                   AND pbillmast.Bmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+          GROUP BY Ptc_ptname,
+                   pbillmast.Pt_no,
+                   bm_no,
+                   DECODE (bmc_cacr, 'R', Cuc_name, ''),
+                   Usc_name,
+                   Doc_name
+          UNION ALL
+          SELECT mrc_ipop TYPE,
+                 PBILLMAST.HOC_PTNAME Ptname,
+                 PBILLMAST.Pt_no Ptno,
+                 mretmast.mr_no Billno,
+                 (NVL (RPN_FINALRTPTPAYABLE, 0)) * -1 Amt,
+                 (  NVL (mretmast.MRN_CESSCH, 0)
+                  + NVL (mretmast.MRN_CESSCH, 0)
+                  + NVL (MRETmast.MRN_SALETAXCH, 0)
+                  + NVL (Mretmast.MRN_SALETAXCR, 0))
+                 * -1
+                    Taxamt,
+                 DECODE (mretmast.mrc_cacr, 'R', Cuc_name, '') Customer,
+                 Usc_name UserName,
+                 Doc_name DocName
+            FROM (  SELECT Mretdetl.Mrc_Slno, MAX (Mretdetl.Bmc_Slno) Bmc_Slno
+                      FROM Mretdetl
+                  GROUP BY Mretdetl.Mrc_Slno) Mretdetl,
+                 mretmast,
+                 PBILLMAST,
+                 doctor,
+                 customer,
+                 users
+           WHERE     PBILLMAST.do_code = doctor.do_code(+)
+                 AND MRETDETL.mrc_slno = mretmast.mrc_slno
+                 AND PBILLMAST.us_code = users.us_code(+)
+                 AND PBILLMAST.cu_code = customer.cu_code(+)
+                 AND PBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
+                 AND MRETDETL.Bmc_slno = PBILLMAST.Bmc_slno
+                 AND mretmast.Mrc_cacr IN ('C', 'R')
+                 AND NVL (PBILLMAST.Bmc_cancel, 'N') <> 'Y'
+                 AND NVL (mretmast.MRC_CANCEL, 'N') <> 'Y'
+                 AND TRUNC (mretmast.Mrd_date) <>
+                        TRUNC (NVL (mretmast.MRD_RETDATE, SYSDATE + 1))
+                 AND mretmast.RPN_RTPTPAYABLE > 0
+                 AND mretmast.Mrd_date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                 AND mretmast.Mrd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')) A
+GROUP BY Ptname,
+         ptno,
+         billno,
+         Customer,
+         DocName,
+         TYPE,
+         UserName
+  HAVING SUM (NVL (Amt, 0)) <> 0
+ORDER BY 3, 1`;
+  const result = await conn_ora.execute(
+    sql,
+    {
+      fromDate: bind.from,
+      toDate: bind.to,
+    },
+    {outFormat: oracledb.OUT_FORMAT_OBJECT},
+  );
+  return result.rows;
+};
+
+const get_qmt_AdvanceCollection = async (conn_ora, bind) => {
+  const sql = `WITH CTE_MH AS (SELECT MH_CODE FROM MULTIHOSPITAL)
+                     SELECT INITCAP (p.PTC_PTNAME) AS PTNAME,
+                              oa.PT_NO AS PTNO,
+                              oa.AR_NO AS BILLNO,
+                              SUM (NVL (oa.ARN_AMOUNT, 0)) AS AMT,
+                              INITCAP (u.USC_NAME) AS USERNAME
+                        FROM OPADVANCE oa
+                              JOIN PATIENT p
+                                 ON p.PT_NO = oa.PT_NO
+                              JOIN USERS u
+                                 ON u.US_CODE = oa.US_CODE
+                              JOIN CTE_MH mh
+                                 ON mh.MH_CODE = oa.MH_CODE
+                        WHERE     NVL (oa.ARC_CANCEL, 'N') = 'N'
+                              AND oa.ARD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                              AND oa.ARD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                     GROUP BY p.PTC_PTNAME,
+                              oa.PT_NO,
+                              oa.AR_NO,
+                              u.USC_NAME
+                     UNION ALL
+                     SELECT INITCAP (p.PTC_PTNAME) AS PTNAME,
+                              ph.PT_NO AS PTNO,
+                              ph.AR_NO AS BILLNO,
+                              SUM (NVL (ph.ARN_AMOUNT, 0)) AS AMT,
+                              INITCAP (u.USC_NAME) AS USERNAME
+                        FROM PHADVANCEENTRY ph
+                              JOIN PATIENT p
+                                 ON p.PT_NO = ph.PT_NO
+                              JOIN USERS u
+                                 ON u.US_CODE = ph.US_CODE
+                              JOIN CTE_MH mh
+                                 ON mh.MH_CODE = ph.ARC_MHCODE
+                        WHERE     NVL (ph.ARC_CANCEL, 'N') = 'N'
+                              AND ph.ARD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                              AND ph.ARD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                     GROUP BY p.PTC_PTNAME,
+                              ph.PT_NO,
+                              ph.AR_NO,
+                              u.USC_NAME
+                     UNION ALL
+                     SELECT INITCAP (p.PTC_PTNAME) AS PTNAME,
+                              p.PT_NO AS PTNO,
+                              ia.AR_NO AS BILLNO,
+                              SUM (NVL (ia.ARN_AMOUNT, 0)) AS AMT,
+                              INITCAP (u.USC_NAME) AS USERNAME
+                        FROM IPADVANCE ia
+                              JOIN IPADMISS ip
+                                 ON ip.IP_NO = ia.IP_NO
+                              JOIN PATIENT p
+                                 ON p.PT_NO = ip.PT_NO
+                              JOIN USERS u
+                                 ON u.US_CODE = ia.US_CODE
+                              JOIN CTE_MH mh
+                                 ON mh.MH_CODE = ia.IAC_MHCODE
+                        WHERE     NVL (ia.ARC_CANCEL, 'N') = 'N'
+                              AND ia.ARD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                              AND ia.ARD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                     GROUP BY p.PTC_PTNAME,
+                              p.PT_NO,
+                              ia.AR_NO,
+                              u.USC_NAME
+                     UNION ALL
+                     SELECT INITCAP (p.PTC_PTNAME) AS PTNAME,
+                              ae.PT_NO AS PTNO,
+                              ae.AR_NO AS BILLNO,
+                              SUM (NVL (ae.ARN_AMOUNT, 0)) AS AMT,
+                              INITCAP (u.USC_NAME) AS USERNAME
+                        FROM ADVANCEENTRY ae
+                              JOIN PATIENT p
+                                 ON p.PT_NO = ae.PT_NO
+                              JOIN USERS u
+                                 ON u.US_CODE = ae.US_CODE
+                              JOIN CTE_MH mh
+                                 ON mh.MH_CODE = ae.ARC_MHCODE
+                        WHERE     NVL (ae.ARC_CANCEL, 'N') = 'N'
+                              AND ae.ARD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                              AND ae.ARD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                     GROUP BY p.PTC_PTNAME,
+                              ae.PT_NO,
+                              ae.AR_NO,
+                              u.USC_NAME
+                     ORDER BY 2, 1`;
+  const result = await conn_ora.execute(
+    sql,
+    {
+      fromDate: bind.from,
+      toDate: bind.to,
+    },
+    {outFormat: oracledb.OUT_FORMAT_OBJECT},
+  );
+  return result.rows;
+};
+
 module.exports = {
   getMisincexpmast,
   getMisincexpgroup,
@@ -5759,4 +6174,6 @@ module.exports = {
   getPerttyCash,
   get_qmt_CreditInsuranceBill,
   get_qmt_CreditInsuranceBillCollection,
+  get_qmt_Unsettled_Amount,
+  get_qmt_AdvanceCollection,
 };
