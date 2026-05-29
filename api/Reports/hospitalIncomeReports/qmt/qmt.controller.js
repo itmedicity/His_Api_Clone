@@ -157,5 +157,7 @@ const getQmtReport = async (req, res) => {
 
 const getTsshCeditInsuranceBillCollection = controllerHelper(qmtService.get_qmt_CreditInsuranceBillCollection, "get_CreditInsuranceBillCollection");
 const getTsshCreditInsuranceBillDetail = controllerHelper(qmtService.get_qmt_CreditInsuranceBill, "get_CreditInsuranceBillDetail");
+const getQmtUnsettledAmount = controllerHelper(qmtService.get_qmt_Unsettled_Amount, "get_Qmt_Unsettled_Amount");
+const getQmtAdvanceCollection = controllerHelper(qmtService.get_qmt_AdvanceCollection, "get_Qmt_AdvanceCollection");
 
-module.exports = {getQmtReport, getTsshCeditInsuranceBillCollection, getTsshCreditInsuranceBillDetail};
+module.exports = {getQmtReport, getTsshCeditInsuranceBillCollection, getTsshCreditInsuranceBillDetail, getQmtUnsettledAmount, getQmtAdvanceCollection};
