@@ -4835,6 +4835,186 @@ const get_CreditInsuranceBillDetail = async (conn_ora, bind) => {
   return result.rows;
 };
 
+const get_UnsettledAmount_TMCH = async (conn_ora, bind) => {
+  const sql = `WITH date_params
+                    AS (SELECT TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss') AS from_date,  TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss') AS TO_DATE FROM DUAL),
+                    MH AS (SELECT MH_CODE FROM multihospital),
+                    EXCLUDE_IP AS (SELECT IP_NO FROM GTT_EXCLUDE_IP WHERE STATUS = 1)
+                SELECT 
+                        PT.PTC_PTNAME,
+                        DT.PT_NO,
+                        DT.DM_NO,
+                        SUM (Tax) AS Tax,
+                        SUM (Payable) AS Amt, 
+                        CU.CUC_NAME,
+                        DO.DOC_NAME,
+                        US.USC_NAME
+                  FROM (/* DISBILLMAST */
+                        SELECT 
+                                DM.PT_NO,
+                                DM.DM_NO,
+                                SUM (NVL (dm.DMN_SALESTAXCH, 0) + NVL (dm.DMN_SALESTAXCR, 0) + NVL (dm.DMN_CESSCH, 0) + NVL (dm.DMN_CESSCR, 0)) AS Tax,
+                                SUM (NVL (dm.DMN_FINALPTPAYABLE, 0)) AS Payable,
+                                DM.CU_CODE,
+                                DM.DO_CODE,
+                                DM.US_CODE
+                          FROM DISBILLMAST dm
+                              JOIN MH ON MH.MH_CODE = dm.MH_CODE
+                              LEFT JOIN EXCLUDE_IP ex ON ex.IP_NO = dm.IP_NO
+                              CROSS JOIN date_params dp
+                        WHERE  dm.DMC_CACR IN ('C', 'R')
+                              AND NVL (dm.DMC_CANCEL, 'N') = 'N'
+                              AND NVL (dm.DMN_FINALPTPAYABLE, 0) <> 0
+                              AND dm.DMD_DATE BETWEEN dp.from_date AND dp.TO_DATE
+                              AND ex.IP_NO IS NULL
+                              GROUP BY DM.PT_NO,DM.DM_NO,DM.CU_CODE,DM.DO_CODE,DM.US_CODE
+                        UNION ALL
+                        /* IPRECEIPT */
+                        SELECT 
+                                DM.PT_NO,
+                                DM.DM_NO,
+                                -1 * SUM ( NVL (dm.DMN_SALESTAXCH, 0) + NVL (dm.DMN_SALESTAXCR, 0)  + NVL (dm.DMN_CESSCH, 0) + NVL (dm.DMN_CESSCR, 0)) AS Tax,
+                                -1 * SUM ( (  NVL (ir.IRN_AMOUNT, 0) + NVL (ir.IRN_CHEQUE, 0) + NVL (ir.IRN_CARD, 0) + NVL (ir.IRN_NEFT, 0)) - (  NVL (ir.IRN_BALANCE, 0) + NVL (ir.IRN_REFCHEQ, 0) + NVL (ir.IRN_REFCARD, 0)) + NVL (ir.IRN_DISCOUNT, 0)) AS Payable, 
+                                DM.CU_CODE,
+                                DM.DO_CODE,
+                                DM.US_CODE
+                          FROM IPRECEIPT ir
+                              JOIN DISBILLMAST dm ON ir.DMC_SLNO = dm.DMC_SLNO
+                              JOIN MH ON MH.MH_CODE = ir.IPC_MHCODE
+                              LEFT JOIN EXCLUDE_IP ex ON ex.IP_NO = dm.IP_NO
+                              CROSS JOIN date_params dp
+                        WHERE     ir.DMC_TYPE IN ('C', 'R')
+                              AND ir.IRC_CANCEL IS NULL
+                              AND ir.IRD_DATE BETWEEN dp.from_date AND dp.TO_DATE
+                              AND dm.DMD_DATE BETWEEN dp.from_date AND dp.TO_DATE
+                              AND ex.IP_NO IS NULL
+                              AND ( (  NVL (ir.IRN_AMOUNT, 0)
+                                      + NVL (ir.IRN_CHEQUE, 0)
+                                      + NVL (ir.IRN_CARD, 0)
+                                      + NVL (ir.IRN_NEFT, 0))
+                                    - (  NVL (ir.IRN_BALANCE, 0)
+                                      + NVL (ir.IRN_REFCHEQ, 0)
+                                      + NVL (ir.IRN_REFCARD, 0))
+                                    + NVL (ir.IRN_DISCOUNT, 0)) <> 0
+                        GROUP BY DM.PT_NO,DM.DM_NO,DM.CU_CODE,DM.DO_CODE,DM.US_CODE            
+                        UNION ALL
+                        /* OPBILLMAST */
+                        SELECT 
+                            OB.PT_NO,
+                            OB.OP_NO,
+                            SUM (NVL (ob.OPN_SALETAXCH, 0) + NVL (ob.OPN_SALETAXCR, 0)) AS Tax,
+                            SUM (NVL (ob.RPN_PTPAYABLE, 0)) AS Payable,
+                            OB.CU_CODE,
+                            OB.DO_CODE,
+                            OB.US_CODE
+                          FROM OPBILLMAST ob
+                              JOIN MH ON MH.MH_CODE = ob.MH_CODE
+                              CROSS JOIN date_params dp
+                        WHERE  ob.OPC_CACR IN ('C', 'R')
+                              AND NVL (ob.OPN_CANCEL, 'N') <> 'C'
+                              AND ob.RPN_PTPAYABLE > 0
+                              AND ob.OPD_DATE BETWEEN dp.from_date AND dp.TO_DATE
+                   GROUP BY OB.PT_NO,OB.OP_NO,OB.CU_CODE,OB.DO_CODE,OB.US_CODE
+                   ) DT
+                   JOIN PATIENT PT ON PT.PT_NO = DT.PT_NO
+                   JOIN DOCTOR DO ON DO.DO_CODE = DT.DO_CODE
+                   JOIN USERS US ON US.US_CODE = DT.US_CODE
+                   LEFT JOIN CUSTOMER CU ON CU.CU_CODE = DT.CU_CODE
+                   GROUP BY DT.PT_NO,DT.DM_NO,PT.PTC_PTNAME,CU.CUC_NAME,DO.DOC_NAME,US.USC_NAME`;
+  const result = await conn_ora.execute(
+    sql,
+    {
+      fromDate: bind.from,
+      toDate: bind.to,
+    },
+    {outFormat: oracledb.OUT_FORMAT_OBJECT},
+  );
+  return result.rows;
+};
+
+const getAdvanceCollection = async (conn_ora, bind) => {
+  const sql = `WITH date_params
+                     AS (SELECT TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss') AS from_date, TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss') AS TO_DATE FROM DUAL),
+                     MH AS (SELECT MH_CODE FROM multihospital),
+                     EXCLUDE_IP AS (SELECT IP_NO FROM GTT_EXCLUDE_IP WHERE STATUS = 1)
+                  SELECT 
+                     AD.PT_NO,
+                     PT.PTC_PTNAME,
+                     AD.AR_NO,
+                     SUM (Amt) AS Amt, 
+                     SUM (Tax) AS Tax,
+                     US.USC_NAME
+                  FROM (
+                        SELECT 
+                              OA.PT_NO,
+                              OA.AR_NO,
+                              SUM (NVL (oa.ARN_AMOUNT, 0)) AS Amt, 
+                              0 AS Tax,
+                              OA.US_CODE
+                           FROM OPADVANCE oa
+                                 JOIN MH ON MH.MH_CODE = oa.MH_CODE
+                                 LEFT JOIN EXCLUDE_IP ex ON ex.IP_NO = oa.IP_NO
+                                 CROSS JOIN date_params dp
+                           WHERE  NVL (oa.ARC_CANCEL, 'N') = 'N'
+                                 AND oa.ARD_DATE BETWEEN dp.from_date AND dp.TO_DATE
+                                 AND ex.IP_NO IS NULL
+                           GROUP BY OA.PT_NO,OA.AR_NO,OA.US_CODE
+                        UNION ALL
+                        SELECT 
+                              PA.PT_NO,
+                              PA.AR_NO,
+                              SUM (NVL (pa.ARN_AMOUNT, 0)) AS Amt, 
+                              0 AS Tax,
+                              PA.US_CODE
+                           FROM PHADVANCEENTRY pa
+                                 JOIN MH ON MH.MH_CODE = pa.ARC_MHCODE
+                                 CROSS JOIN date_params dp
+                           WHERE NVL (pa.ARC_CANCEL, 'N') = 'N'
+                                 AND pa.ARD_DATE BETWEEN dp.from_date AND dp.TO_DATE
+                        GROUP BY PA.PT_NO,PA.AR_NO,PA.US_CODE
+                        UNION ALL
+                        SELECT 
+                                 IA.IP_NO,
+                                 IA.AR_NO,
+                                 SUM (NVL (ia.ARN_AMOUNT, 0)) AS Amt, 
+                                 0 AS Tax,
+                                 IA.US_CODE
+                           FROM IPADVANCE ia
+                                 JOIN MH ON MH.MH_CODE = ia.IAC_MHCODE
+                                 LEFT JOIN EXCLUDE_IP ex ON ex.IP_NO = ia.IP_NO
+                                 CROSS JOIN date_params dp
+                           WHERE NVL (ia.ARC_CANCEL, 'N') = 'N'
+                                 AND ia.ARD_DATE BETWEEN dp.from_date AND dp.TO_DATE
+                                 AND ex.IP_NO IS NULL
+                        GROUP BY IA.IP_NO,IA.AR_NO,IA.US_CODE
+                        UNION ALL
+                        SELECT 
+                                 AE.PT_NO,
+                                 AE.AR_NO,
+                                 SUM (NVL (ae.ARN_AMOUNT, 0)) AS Amt, 
+                                 0 AS Tax,
+                                 AE.US_CODE
+                           FROM ADVANCEENTRY ae
+                                 JOIN MH ON MH.MH_CODE = ae.ARC_MHCODE
+                                 CROSS JOIN date_params dp
+                           WHERE NVL (ae.ARC_CANCEL, 'N') = 'N'
+                                 AND ae.ARD_DATE BETWEEN dp.from_date AND dp.TO_DATE
+                        GROUP BY AE.PT_NO,AE.AR_NO,AE.US_CODE
+                        ) AD
+                        JOIN PATIENT PT ON PT.PT_NO  = AD.PT_NO
+                        JOIN USERS US ON US.US_CODE = AD.US_CODE
+                        GROUP BY AD.PT_NO,AD.AR_NO, AD.US_CODE,PT.PTC_PTNAME,US.USC_NAME`;
+  const result = await conn_ora.execute(
+    sql,
+    {
+      fromDate: bind.from,
+      toDate: bind.to,
+    },
+    {outFormat: oracledb.OUT_FORMAT_OBJECT},
+  );
+  return result.rows;
+};
+
 module.exports = {
   getMisincexpmast,
   getMisincexpgroup,
@@ -4885,4 +5065,6 @@ module.exports = {
   getPharmacyCollection_four_Grouped,
   get_CreditInsuranceBillCollection,
   get_CreditInsuranceBillDetail,
+  get_UnsettledAmount_TMCH,
+  getAdvanceCollection,
 };

@@ -3190,6 +3190,149 @@ GROUP BY PtName,
   return result.rows;
 };
 
+const get_UnsettledAmount_TSSH = async (conn_ora, bind) => {
+  const sql = `WITH date_params AS (SELECT TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss') AS from_date, TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss') AS TO_DATE FROM DUAL),
+     MH AS (SELECT MH_CODE FROM multihospital),
+     EXCLUDE_IP AS (SELECT DISTINCT IP_NO FROM GTT_EXCLUDE_IP WHERE STATUS = 1)
+SELECT 
+        PT.PTC_PTNAME,
+        A.PT_NO,
+        A.DM_NO,
+        SUM (A.Tax) AS Tax,
+        SUM (A.Payable) AS Amt,
+        CU.CUC_NAME,
+        DO.DOC_NAME,
+        US.USC_NAME
+  FROM (            
+        SELECT 
+                DM.PT_NO,
+                DM.DM_NO,
+                SUM ( 
+                  CASE
+                     WHEN NVL (dm.DMC_CANCEL, 'N') = 'N'
+                        THEN NVL (dm.DMN_SALESTAXCH, 0) + NVL (dm.DMN_SALESTAXCR, 0) + NVL (dm.DMN_CESSCH, 0) + NVL (dm.DMN_CESSCR, 0)
+                     ELSE 0
+                  END) AS Tax,
+                  SUM (NVL (dm.DMN_FINALPTPAYABLE, 0)) AS Payable,
+                  DM.CU_CODE,
+                  DM.DO_CODE,
+                  DM.US_CODE
+          FROM DISBILLMAST dm
+               JOIN MH ON MH.MH_CODE = dm.MH_CODE
+               JOIN EXCLUDE_IP ex ON ex.IP_NO = dm.IP_NO
+               CROSS JOIN date_params dp
+         WHERE  dm.DMC_CACR IN ('C', 'R')
+               AND NVL (dm.DMC_CANCEL, 'N') = 'N'
+               AND NVL (dm.DMN_FINALPTPAYABLE, 0) <> 0
+               AND dm.DMD_DATE BETWEEN dp.from_date AND dp.TO_DATE
+        GROUP BY DM.PT_NO,DM.DM_NO,DM.CU_CODE,DM.DO_CODE,DM.US_CODE
+        UNION ALL
+        SELECT 
+            IR.PT_NO,
+            IR.IR_NO,
+            SUM (
+                  CASE
+                     WHEN NVL (dm.DMC_CANCEL, 'N') = 'N'
+                     THEN NVL (dm.DMN_SALESTAXCH, 0)  + NVL (dm.DMN_SALESTAXCR, 0) + NVL (dm.DMN_CESSCH, 0) + NVL (dm.DMN_CESSCR, 0)
+                     ELSE 0
+                  END) * -1 AS Tax,
+            SUM ((NVL (ir.IRN_AMOUNT, 0)  + NVL (ir.IRN_CHEQUE, 0) + NVL (ir.IRN_CARD, 0)  + NVL (ir.IRN_NEFT, 0)) - (  NVL (ir.IRN_BALANCE, 0) + NVL (ir.IRN_REFCHEQ, 0) + NVL (ir.IRN_REFCARD, 0))  + NVL (ir.IRN_DISCOUNT, 0)) * -1 AS Payable,
+            DM.CU_CODE,
+            DM.DO_CODE,
+            DM.US_CODE
+          FROM IPRECEIPT ir
+               JOIN DISBILLMAST dm ON dm.DMC_SLNO = ir.DMC_SLNO
+               JOIN MH ON MH.MH_CODE = ir.IPC_MHCODE
+               JOIN EXCLUDE_IP ex ON ex.IP_NO = dm.IP_NO
+               CROSS JOIN date_params dp
+         WHERE ir.DMC_TYPE IN ('C', 'R')
+               AND ir.IRC_CANCEL IS NULL
+               AND ir.IRD_DATE BETWEEN dp.from_date AND dp.TO_DATE
+               AND dm.DMD_DATE BETWEEN dp.from_date AND dp.TO_DATE
+               AND ( (  NVL (ir.IRN_AMOUNT, 0) + NVL (ir.IRN_CHEQUE, 0) + NVL (ir.IRN_CARD, 0)  + NVL (ir.IRN_NEFT, 0)) - (  NVL (ir.IRN_BALANCE, 0)  + NVL (ir.IRN_REFCHEQ, 0) + NVL (ir.IRN_REFCARD, 0)) + NVL (ir.IRN_DISCOUNT, 0)) <> 0
+         GROUP BY IR.PT_NO,IR.IR_NO,DM.CU_CODE,DM.DO_CODE,DM.US_CODE  
+        ) A JOIN PATIENT PT ON PT.PT_NO = A.PT_NO
+        LEFT JOIN CUSTOMER CU ON CU.CU_CODE = A.CU_CODE
+        JOIN DOCTOR DO ON DO.DO_CODE = A.DO_CODE
+        JOIN USERS US ON US.US_CODE = A.US_CODE
+        GROUP BY A.PT_NO,A.DM_NO,PT.PTC_PTNAME,CU.CUC_NAME,DO.DOC_NAME,US.USC_NAME`;
+  const result = await conn_ora.execute(
+    sql,
+    {
+      fromDate: bind.from,
+      toDate: bind.to,
+    },
+    {outFormat: oracledb.OUT_FORMAT_OBJECT},
+  );
+  return result.rows;
+};
+
+const get_AdvanceCollection_TSSH = async (conn_ora, bind) => {
+  const sql = `WITH date_params AS (SELECT TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss') AS from_date, TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss') AS TO_DATE FROM DUAL),
+     MH AS (SELECT MH_CODE FROM multihospital),
+     EXCLUDE_IP AS (SELECT DISTINCT IP_NO FROM GTT_EXCLUDE_IP WHERE STATUS = 1)
+SELECT 
+    PT.PTC_PTNAME,
+    A.PT_NO,
+    A.AR_NO,
+    US.USC_NAME,
+    SUM (Amt) AS Amt, 
+    SUM (Tax) AS Tax
+  FROM (          
+        SELECT 
+            OP.PT_NO,
+            OP.AR_NO,
+            OP.US_CODE,
+            SUM (NVL (op.ARN_AMOUNT, 0)) AS Amt, 
+            0 AS Tax
+          FROM OPADVANCE op
+               JOIN MH ON MH.MH_CODE = op.MH_CODE
+               JOIN EXCLUDE_IP ex ON ex.IP_NO = op.IP_NO
+               CROSS JOIN date_params dp
+         WHERE NVL (op.ARC_CANCEL, 'N') = 'N'
+               AND op.ARD_DATE BETWEEN dp.from_date AND dp.TO_DATE
+               GROUP BY OP.PT_NO,OP.AR_NO,OP.US_CODE
+        UNION ALL
+        SELECT 
+            IP.IP_NO,
+            IP.AR_NO,
+            IP.US_CODE,
+            SUM (NVL (ip.ARN_AMOUNT, 0)) AS Amt, 
+            0 AS Tax
+          FROM IPADVANCE ip
+               JOIN MH ON MH.MH_CODE = ip.IAC_MHCODE
+               JOIN EXCLUDE_IP ex ON ex.IP_NO = ip.IP_NO
+               CROSS JOIN date_params dp
+         WHERE NVL (ip.ARC_CANCEL, 'N') = 'N'
+               AND ip.ARD_DATE BETWEEN dp.from_date AND dp.TO_DATE
+               GROUP BY IP.IP_NO,IP.AR_NO,IP.US_CODE
+        UNION ALL
+        SELECT 
+            AE.PT_NO,
+            AE.AR_NO,
+            AE.US_CODE,
+            SUM (NVL (ae.ARN_AMOUNT, 0)) AS Amt, 
+            0 AS Tax
+          FROM ADVANCEENTRY ae
+               JOIN MH ON MH.MH_CODE = ae.ARC_MHCODE
+               CROSS JOIN date_params dp
+         WHERE NVL (ae.ARC_CANCEL, 'N') = 'N'
+               AND ae.ARD_DATE BETWEEN dp.from_date AND dp.TO_DATE
+               GROUP BY AE.PT_NO,AE.AR_NO,AE.US_CODE 
+            ) A JOIN PATIENT PT ON PT.PT_NO = A.PT_NO
+            JOIN USERS US ON US.US_CODE = A.US_CODE
+            GROUP BY A.PT_NO,A.AR_NO,PT.PTC_PTNAME,US.USC_NAME`;
+  const result = await conn_ora.execute(
+    sql,
+    {
+      fromDate: bind.from,
+      toDate: bind.to,
+    },
+    {outFormat: oracledb.OUT_FORMAT_OBJECT},
+  );
+  return result.rows;
+};
+
 module.exports = {
   getMisincexpmast,
   getMisincexpgroup,
@@ -3237,4 +3380,6 @@ module.exports = {
   getPerttyCash,
   get_CreditInsuranceBillCollection,
   get_CreditInsuranceBill,
+  get_UnsettledAmount_TSSH,
+  get_AdvanceCollection_TSSH,
 };

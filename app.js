@@ -136,7 +136,7 @@ const getQMT = require("./api/Reports/hospitalIncomeReports/qmt/qmt.route");
 const getTMCH = require("./api/Reports/hospitalIncomeReports/tmch/tmch.route");
 const getTSSH = require("./api/Reports/hospitalIncomeReports/tssh/tssh.route");
 
-app.use(express.json({ limit: '50mb' }));
+app.use(express.json({limit: "50mb"}));
 
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
@@ -240,10 +240,13 @@ app.use("/api/getMisReportsTmch", getMisReportsTMCH);
 app.use("/api/getMisReportsTssh", getMisReportsTSSH);
 
 // *  LATEST VERSION  V-5.1.0  -- NEW REPORT API FROM -> APRIL - 2026
+// START HERE
 
 app.use("/api/getQmt", getQMT); // <---------- qmt
 app.use("/api/getTmch", getTMCH); // <---------- tmch
 app.use("/api/getTssh", getTSSH); // <---------- tssh
+
+// END HERE
 
 app.listen(process.env.APP_PORT, (val) => {
   console.log(`Server Up and Running ${process.env.APP_PORT}`);
