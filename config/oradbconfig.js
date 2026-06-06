@@ -272,4 +272,5 @@ module.exports = {
   getTmcCronConnection,
   closeConnection,
   oracleConnectionClose,
+  restartPools,
 };
