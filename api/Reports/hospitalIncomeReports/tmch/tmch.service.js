@@ -1673,119 +1673,76 @@ const getCollectionPortion_three = async (conn_ora, bind) => {
   const sql = `WITH date_params AS ( SELECT TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss') AS from_date, TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss') AS TO_DATE FROM DUAL),
      MH AS (SELECT MH_CODE FROM multihospital),
      EXCLUDE_IP AS (SELECT IP_NO FROM GTT_EXCLUDE_IP WHERE STATUS = 4)
-SELECT SUM (Amt) AS Amt, SUM (Tax) AS Tax
-  FROM (
-        SELECT SUM (
-                    NVL (rcm.RCN_CASH, 0)
-                  + NVL (rcm.RCN_CHK, 0)
-                  + NVL (rcm.RCN_DD, 0)
-                  + NVL (rcm.RCN_CARD, 0)
-                  + NVL (rcm.RCN_NEFT, 0))
-                  AS Amt,
-               0 AS Tax
-          FROM RECPCOLLECTIONMAST rcm
-               JOIN MH
-                  ON MH.MH_CODE = rcm.MH_CODE
-               CROSS JOIN date_params dp
-         WHERE rcm.RCD_DATE BETWEEN dp.from_date AND dp.TO_DATE
-               AND rcm.RCC_CANCEL IS NULL
-               AND EXISTS
-                      (SELECT 1
-                         FROM RECPCOLLECTIONDETL rcd
-                        WHERE rcd.RCC_SLNO = rcm.RCC_SLNO
-                              AND rcd.RCD_DATE BETWEEN dp.from_date
-                                                   AND dp.TO_DATE
-                              AND rcd.MODULES <> 'IPC')
-        HAVING SUM (
-                    NVL (rcm.RCN_CASH, 0)
-                  + NVL (rcm.RCN_CHK, 0)
-                  + NVL (rcm.RCN_DD, 0)
-                  + NVL (rcm.RCN_CARD, 0)
-                  + NVL (rcm.RCN_NEFT, 0)) > 0
-        UNION ALL
-        SELECT SUM (
-                    NVL (rcm.RCN_CASH, 0)
-                  + NVL (rcm.RCN_CHK, 0)
-                  + NVL (rcm.RCN_DD, 0)
-                  + NVL (rcm.RCN_CARD, 0)
-                  + NVL (rcm.RCN_NEFT, 0))
-                  AS Amt,
-               0 AS Tax
-          FROM RECPCOLLECTIONMAST rcm
-               JOIN MH
-                  ON MH.MH_CODE = rcm.MH_CODE
-               CROSS JOIN date_params dp
-         WHERE rcm.RCD_DATE BETWEEN dp.from_date AND dp.TO_DATE
-               AND rcm.RCC_CANCEL IS NULL
-               AND EXISTS
-                      (SELECT 1
-                         FROM    RECPCOLLECTIONDETL rcd
-                              LEFT JOIN
-                                 EXCLUDE_IP ex
-                              ON ex.IP_NO = rcd.IP_NO
-                        WHERE rcd.RCC_SLNO = rcm.RCC_SLNO
-                              AND rcd.RCD_DATE BETWEEN dp.from_date
-                                                   AND dp.TO_DATE
-                              AND rcd.MODULES = 'IPC'
-                              AND ex.IP_NO IS NULL)
-        HAVING SUM (
-                    NVL (rcm.RCN_CASH, 0)
-                  + NVL (rcm.RCN_CHK, 0)
-                  + NVL (rcm.RCN_DD, 0)
-                  + NVL (rcm.RCN_CARD, 0)
-                  + NVL (rcm.RCN_NEFT, 0)) > 0
-        UNION ALL
-        SELECT -1
-               * SUM (
-                      NVL (rcm.RFN_CASH, 0)
-                    + NVL (rcm.RFN_CHK, 0)
-                    + NVL (rcm.RFN_DD, 0)
-                    + NVL (rcm.RFN_CARD, 0))
-                  AS Amt,
-               0 AS Tax
-          FROM RECPCOLLECTIONMAST rcm
-               JOIN MH
-                  ON MH.MH_CODE = rcm.MH_CODE
-               CROSS JOIN date_params dp
-         WHERE rcm.RFD_DATE BETWEEN dp.from_date AND dp.TO_DATE
-               AND NVL (rcm.RCC_CANCEL, 'N') = 'N'
-               AND EXISTS
-                      (SELECT 1
-                         FROM    RECPCOLLECTIONDETL rcd
-                              LEFT JOIN
-                                 EXCLUDE_IP ex
-                              ON ex.IP_NO = rcd.IP_NO
-                        WHERE rcd.RCC_SLNO = rcm.RCC_SLNO
-                              AND rcd.RCD_DATE BETWEEN dp.from_date
-                                                   AND dp.TO_DATE
-                              AND ex.IP_NO IS NULL)
-        UNION ALL
-        SELECT SUM (
-                    NVL (rcm.RCN_CASH, 0)
-                  + NVL (rcm.RCN_CHK, 0)
-                  + NVL (rcm.RCN_DD, 0)
-                  + NVL (rcm.RCN_CARD, 0)
-                  + NVL (rcm.RCN_NEFT, 0))
-                  AS Amt,
-               0 AS Tax
-          FROM RECPCOLLECTIONMAST rcm
-               JOIN MH
-                  ON MH.MH_CODE = rcm.MH_CODE
-               CROSS JOIN date_params dp
-         WHERE rcm.RCD_DATE BETWEEN dp.from_date AND dp.TO_DATE
-               AND rcm.RCC_CANCEL IS NULL
-               AND NOT EXISTS
-                          (SELECT 1
-                             FROM RECPCOLLECTIONDETL rcd
-                            WHERE rcd.RCC_SLNO = rcm.RCC_SLNO
-                                  AND rcd.RCD_DATE BETWEEN dp.from_date
-                                                       AND dp.TO_DATE)
-        HAVING SUM (
-                    NVL (rcm.RCN_CASH, 0)
-                  + NVL (rcm.RCN_CHK, 0)
-                  + NVL (rcm.RCN_DD, 0)
-                  + NVL (rcm.RCN_CARD, 0)
-                  + NVL (rcm.RCN_NEFT, 0)) > 0)`;
+SELECT 
+    SUM (Amt) AS Amt, 
+    SUM (Tax) AS Tax
+FROM (
+         SELECT 
+                            SUM (NVL (rcm.RCN_CASH, 0) + NVL (rcm.RCN_CHK, 0)+ NVL (rcm.RCN_DD, 0) + NVL (rcm.RCN_CARD, 0) + NVL (rcm.RCN_NEFT, 0)) AS Amt,
+                            0 AS Tax,
+                            RCM.RCC_SLNO,
+                            RCM.RC_NO
+                      FROM RECPCOLLECTIONMAST rcm
+                           JOIN MH ON MH.MH_CODE = rcm.MH_CODE
+                           CROSS JOIN date_params dp
+                     WHERE rcm.RCD_DATE BETWEEN dp.from_date AND dp.TO_DATE
+                           AND rcm.RCC_CANCEL IS NULL
+                           AND EXISTS (SELECT 1 FROM RECPCOLLECTIONDETL rcd WHERE rcd.RCC_SLNO = rcm.RCC_SLNO AND rcd.RCD_DATE BETWEEN dp.from_date AND dp.TO_DATE AND rcd.MODULES <> 'IPC')
+                    HAVING SUM ( NVL (rcm.RCN_CASH, 0) + NVL (rcm.RCN_CHK, 0) + NVL (rcm.RCN_DD, 0)  + NVL (rcm.RCN_CARD, 0)  + NVL (rcm.RCN_NEFT, 0)) > 0
+                    GROUP BY rcm.RCN_CASH,rcm.RCN_CHK,rcm.RCN_DD,rcm.RCN_CARD,rcm.RCN_NEFT,RCM.RCC_SLNO,RCM.RC_NO
+                    UNION 
+                    SELECT 
+                        SUM ( NVL (rcm.RCN_CASH, 0) + NVL (rcm.RCN_CHK, 0) + NVL (rcm.RCN_DD, 0) + NVL (rcm.RCN_CARD, 0) + NVL (rcm.RCN_NEFT, 0)) AS Amt,
+                        0 AS Tax,
+                        RCM.RCC_SLNO,
+                        RCM.RC_NO
+                    FROM RECPCOLLECTIONMAST rcm
+                           JOIN MH ON MH.MH_CODE = rcm.MH_CODE
+                           CROSS JOIN date_params dp
+                    WHERE rcm.RCD_DATE BETWEEN dp.from_date AND dp.TO_DATE
+                           AND rcm.RCC_CANCEL IS NULL
+                           AND EXISTS (
+                                SELECT 1 FROM RECPCOLLECTIONDETL rcd 
+                                LEFT JOIN EXCLUDE_IP ex ON ex.IP_NO = rcd.IP_NO 
+                                WHERE rcd.RCC_SLNO = rcm.RCC_SLNO 
+                                    AND rcd.RCD_DATE BETWEEN dp.from_date 
+                                    AND dp.TO_DATE
+                                    AND rcd.MODULES = 'IPC' 
+                                    AND ex.IP_NO IS NULL)
+                    HAVING SUM (NVL (rcm.RCN_CASH, 0)  + NVL (rcm.RCN_CHK, 0) + NVL (rcm.RCN_DD, 0) + NVL (rcm.RCN_CARD, 0) + NVL (rcm.RCN_NEFT, 0)) > 0
+                    GROUP BY rcm.RCN_CASH,rcm.RCN_CHK,rcm.RCN_DD,rcm.RCN_CARD,rcm.RCN_NEFT,RCM.RCC_SLNO,RCM.RC_NO
+                    UNION
+                    SELECT 
+                        -1 * SUM ( NVL (rcm.RFN_CASH, 0) + NVL (rcm.RFN_CHK, 0) + NVL (rcm.RFN_DD, 0) + NVL (rcm.RFN_CARD, 0)) AS Amt,
+                        0 AS Tax,
+                        RCM.RCC_SLNO,
+                        RCM.RC_NO
+                    FROM RECPCOLLECTIONMAST rcm
+                           JOIN MH ON MH.MH_CODE = rcm.MH_CODE
+                           CROSS JOIN date_params dp
+                    WHERE rcm.RFD_DATE BETWEEN dp.from_date AND dp.TO_DATE
+                           AND NVL (rcm.RCC_CANCEL, 'N') = 'N'
+                           AND EXISTS (
+                                SELECT 1 FROM    RECPCOLLECTIONDETL rcd 
+                                LEFT JOIN EXCLUDE_IP ex ON ex.IP_NO = rcd.IP_NO
+                                WHERE rcd.RCC_SLNO = rcm.RCC_SLNO
+                                AND rcd.RCD_DATE BETWEEN dp.from_date AND dp.TO_DATE AND ex.IP_NO IS NULL)
+                    GROUP BY rcm.RCN_CASH,rcm.RCN_CHK,rcm.RCN_DD,rcm.RCN_CARD,rcm.RCN_NEFT,RCM.RCC_SLNO,RCM.RC_NO
+                    UNION
+                    SELECT 
+                        SUM (NVL (rcm.RCN_CASH, 0) + NVL (rcm.RCN_CHK, 0) + NVL (rcm.RCN_DD, 0) + NVL (rcm.RCN_CARD, 0) + NVL (rcm.RCN_NEFT, 0)) AS Amt,
+                        0 AS Tax,
+                        RCM.RCC_SLNO,
+                        RCM.RC_NO
+                      FROM RECPCOLLECTIONMAST rcm
+                           JOIN MH ON MH.MH_CODE = rcm.MH_CODE
+                           CROSS JOIN date_params dp
+                     WHERE rcm.RCD_DATE BETWEEN dp.from_date AND dp.TO_DATE
+                           AND rcm.RCC_CANCEL IS NULL
+                           AND NOT EXISTS (SELECT 1 FROM RECPCOLLECTIONDETL rcd WHERE rcd.RCC_SLNO = rcm.RCC_SLNO AND rcd.RCD_DATE BETWEEN dp.from_date AND dp.TO_DATE)
+                    HAVING SUM (NVL (rcm.RCN_CASH, 0) + NVL (rcm.RCN_CHK, 0) + NVL (rcm.RCN_DD, 0) + NVL (rcm.RCN_CARD, 0) + NVL (rcm.RCN_NEFT, 0)) > 0 
+                    GROUP BY rcm.RCN_CASH,rcm.RCN_CHK,rcm.RCN_DD,rcm.RCN_CARD,rcm.RCN_NEFT,RCM.RCC_SLNO,RCM.RC_NO
+     ) A `;
   const result = await conn_ora.execute(
     sql,
     {
@@ -1796,6 +1753,134 @@ SELECT SUM (Amt) AS Amt, SUM (Tax) AS Tax
   );
   return result.rows;
 };
+
+// const getCollectionPortion_three = async (conn_ora, bind) => {
+//   const sql = `WITH date_params AS ( SELECT TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss') AS from_date, TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss') AS TO_DATE FROM DUAL),
+//      MH AS (SELECT MH_CODE FROM multihospital),
+//      EXCLUDE_IP AS (SELECT IP_NO FROM GTT_EXCLUDE_IP WHERE STATUS = 4)
+// SELECT SUM (Amt) AS Amt, SUM (Tax) AS Tax
+//   FROM (
+//         SELECT SUM (
+//                     NVL (rcm.RCN_CASH, 0)
+//                   + NVL (rcm.RCN_CHK, 0)
+//                   + NVL (rcm.RCN_DD, 0)
+//                   + NVL (rcm.RCN_CARD, 0)
+//                   + NVL (rcm.RCN_NEFT, 0))
+//                   AS Amt,
+//                0 AS Tax
+//           FROM RECPCOLLECTIONMAST rcm
+//                JOIN MH
+//                   ON MH.MH_CODE = rcm.MH_CODE
+//                CROSS JOIN date_params dp
+//          WHERE rcm.RCD_DATE BETWEEN dp.from_date AND dp.TO_DATE
+//                AND rcm.RCC_CANCEL IS NULL
+//                AND EXISTS
+//                       (SELECT 1
+//                          FROM RECPCOLLECTIONDETL rcd
+//                         WHERE rcd.RCC_SLNO = rcm.RCC_SLNO
+//                               AND rcd.RCD_DATE BETWEEN dp.from_date
+//                                                    AND dp.TO_DATE
+//                               AND rcd.MODULES <> 'IPC')
+//         HAVING SUM (
+//                     NVL (rcm.RCN_CASH, 0)
+//                   + NVL (rcm.RCN_CHK, 0)
+//                   + NVL (rcm.RCN_DD, 0)
+//                   + NVL (rcm.RCN_CARD, 0)
+//                   + NVL (rcm.RCN_NEFT, 0)) > 0
+//         UNION ALL
+//         SELECT SUM (
+//                     NVL (rcm.RCN_CASH, 0)
+//                   + NVL (rcm.RCN_CHK, 0)
+//                   + NVL (rcm.RCN_DD, 0)
+//                   + NVL (rcm.RCN_CARD, 0)
+//                   + NVL (rcm.RCN_NEFT, 0))
+//                   AS Amt,
+//                0 AS Tax
+//           FROM RECPCOLLECTIONMAST rcm
+//                JOIN MH
+//                   ON MH.MH_CODE = rcm.MH_CODE
+//                CROSS JOIN date_params dp
+//          WHERE rcm.RCD_DATE BETWEEN dp.from_date AND dp.TO_DATE
+//                AND rcm.RCC_CANCEL IS NULL
+//                AND EXISTS
+//                       (SELECT 1
+//                          FROM    RECPCOLLECTIONDETL rcd
+//                               LEFT JOIN
+//                                  EXCLUDE_IP ex
+//                               ON ex.IP_NO = rcd.IP_NO
+//                         WHERE rcd.RCC_SLNO = rcm.RCC_SLNO
+//                               AND rcd.RCD_DATE BETWEEN dp.from_date
+//                                                    AND dp.TO_DATE
+//                               AND rcd.MODULES = 'IPC'
+//                               AND ex.IP_NO IS NULL)
+//         HAVING SUM (
+//                     NVL (rcm.RCN_CASH, 0)
+//                   + NVL (rcm.RCN_CHK, 0)
+//                   + NVL (rcm.RCN_DD, 0)
+//                   + NVL (rcm.RCN_CARD, 0)
+//                   + NVL (rcm.RCN_NEFT, 0)) > 0
+//         UNION ALL
+//         SELECT -1
+//                * SUM (
+//                       NVL (rcm.RFN_CASH, 0)
+//                     + NVL (rcm.RFN_CHK, 0)
+//                     + NVL (rcm.RFN_DD, 0)
+//                     + NVL (rcm.RFN_CARD, 0))
+//                   AS Amt,
+//                0 AS Tax
+//           FROM RECPCOLLECTIONMAST rcm
+//                JOIN MH
+//                   ON MH.MH_CODE = rcm.MH_CODE
+//                CROSS JOIN date_params dp
+//          WHERE rcm.RFD_DATE BETWEEN dp.from_date AND dp.TO_DATE
+//                AND NVL (rcm.RCC_CANCEL, 'N') = 'N'
+//                AND EXISTS
+//                       (SELECT 1
+//                          FROM    RECPCOLLECTIONDETL rcd
+//                               LEFT JOIN
+//                                  EXCLUDE_IP ex
+//                               ON ex.IP_NO = rcd.IP_NO
+//                         WHERE rcd.RCC_SLNO = rcm.RCC_SLNO
+//                               AND rcd.RCD_DATE BETWEEN dp.from_date
+//                                                    AND dp.TO_DATE
+//                               AND ex.IP_NO IS NULL)
+//         UNION ALL
+//         SELECT SUM (
+//                     NVL (rcm.RCN_CASH, 0)
+//                   + NVL (rcm.RCN_CHK, 0)
+//                   + NVL (rcm.RCN_DD, 0)
+//                   + NVL (rcm.RCN_CARD, 0)
+//                   + NVL (rcm.RCN_NEFT, 0))
+//                   AS Amt,
+//                0 AS Tax
+//           FROM RECPCOLLECTIONMAST rcm
+//                JOIN MH
+//                   ON MH.MH_CODE = rcm.MH_CODE
+//                CROSS JOIN date_params dp
+//          WHERE rcm.RCD_DATE BETWEEN dp.from_date AND dp.TO_DATE
+//                AND rcm.RCC_CANCEL IS NULL
+//                AND NOT EXISTS
+//                           (SELECT 1
+//                              FROM RECPCOLLECTIONDETL rcd
+//                             WHERE rcd.RCC_SLNO = rcm.RCC_SLNO
+//                                   AND rcd.RCD_DATE BETWEEN dp.from_date
+//                                                        AND dp.TO_DATE)
+//         HAVING SUM (
+//                     NVL (rcm.RCN_CASH, 0)
+//                   + NVL (rcm.RCN_CHK, 0)
+//                   + NVL (rcm.RCN_DD, 0)
+//                   + NVL (rcm.RCN_CARD, 0)
+//                   + NVL (rcm.RCN_NEFT, 0)) > 0)`;
+//   const result = await conn_ora.execute(
+//     sql,
+//     {
+//       fromDate: bind.from,
+//       toDate: bind.to,
+//     },
+//     {outFormat: oracledb.OUT_FORMAT_OBJECT},
+//   );
+//   return result.rows;
+// };
 // INCLUDED
 const getIpRefundDetlSection_five = async (conn_ora, bind) => {
   const sql = `WITH date_params AS (SELECT TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss') AS from_date, TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss') AS TO_DATE FROM DUAL),
@@ -4538,6 +4623,7 @@ const get_CreditInsuranceBillCollection = async (conn_ora, bind) => {
                   LEFT JOIN GTT_FILTER G  ON G.IP_NO = R.IP_NO
             WHERE B.Rcd_date BETWEEN TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss') AND TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                   AND (R.IP_NO IS NULL OR G.IP_NO IS NULL)
+                  GROUP BY B.Rc_no, B.Rcn_cash, B.Rcn_chk, B.Rcn_dd, B.Rcn_card, B.Rcn_bank, B.Bank, B.Customer, B.UserName
             UNION ALL
             SELECT B.Rc_no BillNo,
                   B.Rfn_cash Cash,
@@ -4552,7 +4638,8 @@ const get_CreditInsuranceBillCollection = async (conn_ora, bind) => {
                   LEFT JOIN R_FILTER R ON R.RCC_SLNO = B.RCC_SLNO
                   LEFT JOIN GTT_FILTER G ON G.IP_NO = R.IP_NO
             WHERE B.Rfd_Date BETWEEN TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss') AND TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
-                  AND (R.IP_NO IS NULL OR G.IP_NO IS NULL)`;
+                  AND (R.IP_NO IS NULL OR G.IP_NO IS NULL)
+                  GROUP BY B.Rc_no, B.Rfn_cash, B.Rfn_chk, B.Rfn_dd, B.Rfn_card, B.Bank, B.Customer, B.UserName`;
   const result = await conn_ora.execute(
     sql,
     {
