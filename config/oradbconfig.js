@@ -237,8 +237,8 @@ function scheduleEvery3HoursRestart() {
       console.log("♻️ Running 3-hour pool restart...");
       await restartPools();
     },
-    3 * 60 * 60 * 1000,
-  ); // 3 hours
+    1 * 60 * 60 * 1000,
+  ); // 1 hour
 }
 
 /**
