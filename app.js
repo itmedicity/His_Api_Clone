@@ -2,7 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const app = express();
 const {mysqlExecute} = require("./cron-jobs/CronLogger");
-const {initializePools, closeConnection} = require("./config/oradbconfig");
+const {initializePools, closeConnection, restartPools} = require("./config/oradbconfig");
 
 (async () => {
   try {
@@ -245,6 +245,18 @@ app.use("/api/getMisReportsTssh", getMisReportsTSSH);
 app.use("/api/getQmt", getQMT); // <---------- qmt
 app.use("/api/getTmch", getTMCH); // <---------- tmch
 app.use("/api/getTssh", getTSSH); // <---------- tssh
+
+// RESTART POOL FUNCTION
+app.use("/api/restartPools", async (req, res) => {
+  try {
+    console.log("♻️ Triggering pool restart...");
+    await restartPools();
+    res.status(200).json({message: "Pools restarted successfully"});
+  } catch (error) {
+    console.error("Error restarting pools:", error);
+    res.status(500).json({error: "Error restarting pools"});
+  }
+});
 
 // END HERE
 
