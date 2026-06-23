@@ -24,7 +24,10 @@ const {
     getGroupedPatientList,
     getTmcIncomeReport,
     getTsshIncomeReport,
-    getIpNumberTsshGrouped
+    getIpNumberTsshGrouped,
+    getPatientDetailsByBillNo,
+    updateDataUsingMrdNumber,
+    updateDataUsingBillNumber
 } = require('./admissionList.service');
 
 module.exports = {
@@ -567,6 +570,72 @@ module.exports = {
             }
             return res.status(200).json({
                 success: 1,
+                data: results,
+            });
+        })
+    },
+
+    getPatientDetailsByBillNo: (req, res) => {
+        const body = req.body;
+        getPatientDetailsByBillNo(body, (err, results) => {
+
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err.message
+                });
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Result",
+                });
+            }
+            return res.status(200).json({
+                success: 1,
+                data: results,
+            });
+        })
+    },
+    updateDataUsingMrdNumber: (req, res) => {
+        const body = req.body;
+        updateDataUsingMrdNumber(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err.message
+                });
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Result",
+                });
+            }
+            return res.status(200).json({
+                succ: 1,
+                data: results,
+            });
+        })
+    },
+    updateDataUsingBillNumber: (req, res) => {
+        const body = req.body;
+
+        updateDataUsingBillNumber(body, (err, results) => {
+            if (err) {
+                return res.status(200).json({
+                    success: 0,
+                    message: err.message
+                });
+            }
+            if (Object.keys(results).length === 0) {
+                return res.status(200).json({
+                    success: 2,
+                    message: "No Result",
+                });
+            }
+            return res.status(200).json({
+                succ: 1,
                 data: results,
             });
         })
