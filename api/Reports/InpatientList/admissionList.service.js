@@ -1,7 +1,6 @@
 // @ts-ignore
-const {oracledb, getTmcConnection} = require("../../../config/oradbconfig");
-const {query, transaction} = require("../../../config/mysqldbconfig");
-
+const { oracledb, getTmcConnection } = require("../../../config/oradbconfig");
+const { query, transaction } = require("../../../config/mysqldbconfig");
 module.exports = {
   /**
    * @description ORACLE UPDATION : IP ADMISSION
@@ -21,13 +20,13 @@ module.exports = {
                     WHERE IPD_DATE   >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss') 
                     AND IPD_DATE   <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss') 
                     AND IPC_PTFLAG = 'N'`;
-      const {rows} = await conn_ora.execute(
+      const { rows } = await conn_ora.execute(
         sql,
         {
           fromDate: data.from,
           toDate: data.to,
         },
-        {outFormat: oracledb.OUT_FORMAT_OBJECT},
+        { outFormat: oracledb.OUT_FORMAT_OBJECT },
       );
       return rows;
     } catch (error) {
@@ -102,7 +101,7 @@ module.exports = {
     let conn_ora;
     try {
       conn_ora = await getTmcConnection();
-      const {rows} = await conn_ora.execute(
+      const { rows } = await conn_ora.execute(
         ` SELECT 
                     PT_NO,
                     PTC_PTNAME,
@@ -110,12 +109,13 @@ module.exports = {
                     PTN_YEARAGE,
                     PTC_LOADD1,
                     PTC_LOADD2,
-                    PTC_MOBILE
+                    PTC_MOBILE,
+                    PTC_EMAIL
                 FROM PATIENT WHERE PT_NO = :ptno  AND PTC_PTFLAG = 'N'`,
         {
           ptno: ptno,
         },
-        {outFormat: oracledb.OUT_FORMAT_OBJECT},
+        { outFormat: oracledb.OUT_FORMAT_OBJECT },
       );
       return rows;
     } catch (error) {
@@ -160,13 +160,13 @@ module.exports = {
                         AND DMD_DATE > TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss') 
                         AND IPD_DATE < TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
 
-      const {rows} = await conn_ora.execute(
+      const { rows } = await conn_ora.execute(
         sql,
         {
           fromDate: data.from,
           toDate: data.to,
         },
-        {outFormat: oracledb.OUT_FORMAT_OBJECT},
+        { outFormat: oracledb.OUT_FORMAT_OBJECT },
       );
       return rows;
     } catch (error) {
@@ -188,13 +188,13 @@ module.exports = {
                     WHERE  DMD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND DMD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND IPADMISS.IPC_PTFLAG = 'N'`;
-      const {rows} = await conn_ora.execute(
+      const { rows } = await conn_ora.execute(
         sql,
         {
           fromDate: data.from,
           toDate: data.to,
         },
-        {outFormat: oracledb.OUT_FORMAT_OBJECT},
+        { outFormat: oracledb.OUT_FORMAT_OBJECT },
       );
       return rows;
     } catch (error) {
@@ -286,7 +286,7 @@ module.exports = {
     let conn_ora;
     try {
       conn_ora = await getTmcConnection();
-      const {rows} = await conn_ora.execute(
+      const { rows } = await conn_ora.execute(
         `SELECT
                  IP_NO ,IPD_DISC
                   FROM IPADMISS
@@ -294,7 +294,7 @@ module.exports = {
         {
           ptno: data,
         },
-        {outFormat: oracledb.OUT_FORMAT_OBJECT},
+        { outFormat: oracledb.OUT_FORMAT_OBJECT },
       );
       return rows;
     } catch (error) {
@@ -325,7 +325,7 @@ module.exports = {
           fromDate: fromDate,
           toDate: toDate,
         },
-        {outFormat: oracledb.OUT_FORMAT_OBJECT},
+        { outFormat: oracledb.OUT_FORMAT_OBJECT },
       );
       return result.rows;
     } catch (error) {
@@ -566,4 +566,285 @@ module.exports = {
       [data.to, data.to, data.to, data.from, data.to],
     );
   },
-};
+
+
+
+
+
+
+
+
+  getPatientDetailsByBillNo: async (data) => {
+    let conn_ora;
+    try {
+      conn_ora = await getTmcConnection();
+      const { rows } = await conn_ora.execute(
+        `SELECT
+          B.ptc_name,
+          B.pt_no,
+          B.ptc_sex,
+          B.ptn_yearage,
+          B.bmc_mobileno,
+          B.bmc_email,
+          B.bmc_loadd1,
+          B.bmc_loadd2,
+          B.bmc_slno
+     FROM billmast B
+     WHERE B.ou_code='0005'
+     AND B.bm_no = :billno
+     AND TRUNC(B.bmd_date) = TO_DATE(:billdate)`,
+        {
+          billno: data.billNumber,
+          billdate: data.billDate
+        },
+        { outFormat: oracledb.OUT_FORMAT_OBJECT },
+      );
+      return rows;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    } finally {
+      await conn_ora.close();
+    }
+  },
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  // getPatientDetailsByBillNo: async (data, callBack) => {
+
+  //   let pool_ora = await oraConnection();
+  //   let conn_ora = await pool_ora.getConnection();
+  //   try {
+  //     const result = await conn_ora.execute(
+  //       `SELECT
+  //         B.ptc_name,
+  //         B.pt_no,
+  //         B.ptc_sex,
+  //         B.ptn_yearage,
+  //         B.bmc_mobileno,
+  //         B.bmc_email,
+  //         B.bmc_loadd1,
+  //         B.bmc_loadd2,
+  //         B.bmc_slno
+  //    FROM billmast B
+  //    WHERE B.ou_code='0005'
+  //    AND B.bm_no = :billno
+  //    AND TRUNC(B.bmd_date) = TO_DATE(:billdate)`,
+
+  //       {
+  //         billno: data.billNumber,
+  //         billdate: data.billDate
+  //       },
+  //       { resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT }
+  //     );
+  //     await result.resultSet?.getRows((err, rows) => {
+  //       // console.log("err:::", err);
+
+  //       callBack(err, rows);
+  //     });
+  //   } catch (error) {
+  //     // console.log(error);
+  //   } finally {
+  //     if (conn_ora) {
+  //       await conn_ora.close();
+  //       await pool_ora.close();
+  //     }
+  //   }
+  // },
+
+  // updateDataUsingMrdNumber: async (data, callBack) => {
+  //   let conn_ora = null;
+
+  //   try {
+  //     const pool_ora = await oraConnection();
+  //     conn_ora = await pool_ora.getConnection();
+  //     const result = await conn_ora.execute(
+  //       `UPDATE PATIENT
+  //      SET PTC_EMAIL = :email,
+  //          PTC_MOBILE = :mobile
+  //      WHERE PT_NO = :mrdNo`,
+  //       {
+  //         email: data.newEmail,
+  //         mobile: data.mobileNumber,
+  //         mrdNo: data.mrdNo
+  //       },
+  //       {
+  //         autoCommit: true
+  //       }
+  //     );
+
+  //     return callBack(null, result);
+  //   } catch (error) {
+  //     console.error("Oracle Update Error:", error);
+  //     return callBack(error);
+  //   } finally {
+  //     if (conn_ora) {
+  //       try {
+  //         await conn_ora.close();
+  //       } catch (closeError) {
+  //         console.error("Error closing Oracle connection:", closeError);
+  //       }
+  //     }
+  //   }
+  // },
+
+
+
+
+
+  // updateDataUsingBillNumber: async (data) => {
+  //   return transaction(
+  //     `ellider`,
+  //     data.map((val) => ({
+  //       sql: `UPDATE BILLMAST SET
+  //        BMC_MOBILENO = ?,
+  //        BMC_EMAIL = ?
+  //        WHERE BMC_SLNO = ?`,
+  //       values: [data.mobileNumber, data.newEmail, data.bmc_slno],
+  //     })),
+  //   );
+  // },
+
+
+  // updateDataUsingBillNumber: async (data) => {
+  //   return query("ellider", `UPDATE BILLMAST SET
+  //        BMC_MOBILENO = ?,
+  //        BMC_EMAIL = ?
+  //         WHERE BMC_SLNO = ?`, [data.mobileNumber, data.newEmail, data.bmc_slno],);
+  // },
+
+  updateDataUsingBillNumber: async (data) => {
+    let conn_ora;
+    try {
+      conn_ora = await getTmcConnection();
+
+      const result = await conn_ora.execute(
+        `UPDATE BILLMAST SET
+         BMC_MOBILENO = :mobile,
+         BMC_EMAIL = :email
+          WHERE BMC_SLNO = :bmc_slno`,
+        {
+          mobile: data.mobileNumber,
+          email: data.newEmail,
+          bmc_slno: data.bmc_slno,
+        },
+        {
+          autoCommit: true,
+        }
+      );
+
+      return result;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    } finally {
+      if (conn_ora) {
+        await conn_ora.close();
+      }
+    }
+  },
+
+
+  updateDataUsingMrdNumber: async (data) => {
+    let conn_ora;
+    try {
+      conn_ora = await getTmcConnection();
+
+      const result = await conn_ora.execute(
+        `UPDATE PATIENT
+       SET PTC_EMAIL = :email,
+           PTC_MOBILE = :mobile
+       WHERE PT_NO = :mrdNo`,
+        {
+          email: data.newEmail,
+          mobile: data.mobileNumber,
+          mrdNo: data.mrdNo
+        },
+        {
+          autoCommit: true,
+        }
+      );
+
+      return result;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    } finally {
+      if (conn_ora) {
+        await conn_ora.close();
+      }
+    }
+  }
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//   updateDataUsingBillNumber: async (data, callBack) => {
+//     let conn_ora = null;
+
+//     try {
+//       const pool_ora = await oraConnection();
+//       conn_ora = await pool_ora.getConnection();
+//       const result = await conn_ora.execute(
+
+//         `UPDATE BILLMAST SET
+//          BMC_MOBILENO = :mobile,
+//          BMC_EMAIL = :email
+//          WHERE BMC_SLNO = :bmc_slno`,
+//         {
+//           mobile: data.mobileNumber,
+//           email: data.newEmail,
+//           bmc_slno: data.bmc_slno,
+//         },
+//         {
+//           autoCommit: true
+//         }
+//       );
+
+//       return callBack(null, result);
+//     } catch (error) {
+//       console.error("Oracle Update Error:", error);
+//       return callBack(error);
+//     } finally {
+//       if (conn_ora) {
+//         try {
+//           await conn_ora.close();
+//         } catch (closeError) {
+//           console.error("Error closing Oracle connection:", closeError);
+//         }
+//       }
+//     }
+//   },
+// };
