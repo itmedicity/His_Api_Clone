@@ -1,3 +1,4 @@
+const {getTmcConnection, oracleConnectionClose} = require("../../../../../config/oradbconfig");
 const {
   bedIncome,
   nsIncome,
@@ -21,466 +22,665 @@ const {
   pharmacyIncomePart4,
 } = require("../incomePart/income.service");
 
-module.exports = {
-  bedIncome: async (req, res) => {
-    try {
-      const body = req.body;
-      const data = await bedIncome(body);
-      if (Array.isArray(data) && data.length > 0) {
-        return res.status(200).json({
-          success: 2,
-          message: "No Result",
-          data: [],
-        });
-      }
-      return res.status(200).json({
-        success: 1,
-        message: "bedIncome",
-        data: data,
-      });
-    } catch (error) {
-      return res.status(200).json({
-        success: 0,
-        message: error.message,
-      });
-    }
-  },
-  nsIncome: async (req, res) => {
-    try {
-      const body = req.body;
-      const data = await nsIncome(body);
-      if (Array.isArray(data) && data.length === 0) {
-        return res.status(200).json({
-          success: 2,
-          message: "No Result",
-          data: [],
-        });
-      }
-      return res.status(200).json({
-        success: 1,
-        message: "nsIncome",
-        data: data,
-      });
-    } catch (error) {
-      return res.status(200).json({
-        success: 0,
-        message: error.message,
-      });
-    }
-  },
-  roomRentIncome: async (req, res) => {
-    try {
-      const body = req.body;
-      const data = await roomRentIncome(body);
-      if (Array.isArray(data) && data.length === 0) {
-        return res.status(200).json({
-          success: 2,
-          message: "No Result",
-          data: [],
-        });
-      }
-      return res.status(200).json({
-        success: 1,
-        message: "roomRentIncome",
-        data: data,
-      });
-    } catch (error) {
-      return res.status(200).json({
-        success: 0,
-        message: error.message,
-      });
-    }
-  },
-  otherIncome: async (req, res) => {
-    try {
-      const body = req.body;
-      const data = await otherIncome(body);
-      if (Array.isArray(data) && data.length === 0) {
-        return res.status(200).json({
-          success: 2,
-          message: "No Result",
-          data: [],
-        });
-      }
-      return res.status(200).json({
-        success: 1,
-        message: "otherIncome",
-        data: data,
-      });
-    } catch (error) {
-      return res.status(200).json({
-        success: 0,
-        message: error.message,
-      });
-    }
-  },
-  consultingIncome: async (req, res) => {
-    try {
-      const body = req.body;
-      const data = await consultingIncome(body);
-      if (Array.isArray(data) && data.length === 0) {
-        return res.status(200).json({
-          success: 2,
-          message: "No Result",
-          data: [],
-        });
-      }
-      return res.status(200).json({
-        success: 1,
-        message: "consultingIncome",
-        data: data,
-      });
-    } catch (error) {
-      return res.status(200).json({
-        success: 0,
-        message: error.message,
-      });
-    }
-  },
-  anesthetiaIncome: async (req, res) => {
-    try {
-      const body = req.body;
-      const data = await anesthetiaIncome(body);
-      if (Array.isArray(data) && data.length === 0) {
-        return res.status(200).json({
-          success: 2,
-          message: "No Result",
-          data: [],
-        });
-      }
-      return res.status(200).json({
-        success: 1,
-        message: "anesthetiaIncome",
-        data: data,
-      });
-    } catch (error) {
-      return res.status(200).json({
-        success: 0,
-        message: error.message,
-      });
-    }
-  },
-  surgeonIncome: async (req, res) => {
-    try {
-      const body = req.body;
-      const data = await surgeonIncome(body);
-      if (Array.isArray(data) && data.length === 0) {
-        return res.status(200).json({
-          success: 2,
-          message: "No Result",
-          data: [],
-        });
-      }
+const bedIncomes = async (req, res) => {
+  const body = req.body;
+  let conn;
+  try {
+    conn = await getTmcConnection();
+    const result = await bedIncome(conn, body);
 
+    if (!result || (Array.isArray(result) && result.length === 0)) {
       return res.status(200).json({
-        success: 1,
-        message: "surgeonIncome",
-        data: data,
-      });
-    } catch (error) {
-      return res.status(200).json({
-        success: 0,
-        message: error.message,
+        success: 2,
+        message: "No Result",
+        data: [],
       });
     }
-  },
-  theaterIncome: async (req, res) => {
-    try {
-      const body = req.body;
-      const data = await theaterIncome(body);
-      if (Array.isArray(data) && data.length === 0) {
-        return res.status(200).json({
-          success: 2,
-          message: "No Result",
-          data: [],
-        });
-      }
+    return res.status(200).json({
+      success: 1,
+      message: "Success",
+      data: result,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: 0,
+      message: error.message || "Internal Server Error",
+    });
+  } finally {
+    if (conn) {
+      await conn.commit();
+      await oracleConnectionClose(conn);
+    }
+  }
+};
+
+const nsIncomes = async (req, res) => {
+  const body = req.body;
+  let conn;
+  try {
+    conn = await getTmcConnection();
+    const result = await nsIncome(conn, body);
+
+    if (!result || (Array.isArray(result) && result.length === 0)) {
       return res.status(200).json({
-        success: 1,
-        message: "theaterIncome",
-        data: data,
-      });
-    } catch (error) {
-      return res.status(200).json({
-        success: 0,
-        message: error.message,
+        success: 2,
+        message: "No Result",
+        data: [],
       });
     }
-  },
-  cardiologyIncome: async (req, res) => {
-    try {
-      const body = req.body;
-      const data = await cardiologyIncome(body);
-      if (Array.isArray(data) && data.length === 0) {
-        return res.status(200).json({
-          success: 2,
-          message: "No Result",
-          data: [],
-        });
-      }
+    return res.status(200).json({
+      success: 1,
+      message: "Success",
+      data: result,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: 0,
+      message: error.message || "Internal Server Error",
+    });
+  } finally {
+    if (conn) {
+      await conn.commit();
+      await oracleConnectionClose(conn);
+    }
+  }
+};
+
+const roomRentIncomes = async (req, res) => {
+  const body = req.body;
+  let conn;
+  try {
+    conn = await getTmcConnection();
+    const result = await roomRentIncome(conn, body);
+
+    if (!result || (Array.isArray(result) && result.length === 0)) {
       return res.status(200).json({
-        success: 1,
-        message: "cardiologyIncome",
-        data: data,
-      });
-    } catch (error) {
-      return res.status(200).json({
-        success: 0,
-        message: error.message,
+        success: 2,
+        message: "No Result",
+        data: [],
       });
     }
-  },
-  disPosibleItemIncome: async (req, res) => {
-    try {
-      const body = req.body;
-      const data = await disPosibleItemIncome(body);
-      if (Array.isArray(data) && data.length === 0) {
-        return res.status(200).json({
-          success: 2,
-          message: "No Result",
-          data: [],
-        });
-      }
+    return res.status(200).json({
+      success: 1,
+      message: "Success",
+      data: result,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: 0,
+      message: error.message || "Internal Server Error",
+    });
+  } finally {
+    if (conn) {
+      await conn.commit();
+      await oracleConnectionClose(conn);
+    }
+  }
+};
+
+const otherIncomes = async (req, res) => {
+  const body = req.body;
+  let conn;
+  try {
+    conn = await getTmcConnection();
+    const result = await otherIncome(conn, body);
+
+    if (!result || (Array.isArray(result) && result.length === 0)) {
       return res.status(200).json({
-        success: 1,
-        message: "disPosibleItemIncome",
-        data: data,
-      });
-    } catch (error) {
-      return res.status(200).json({
-        success: 0,
-        message: error.message,
+        success: 2,
+        message: "No Result",
+        data: [],
       });
     }
-  },
-  icuIncome: async (req, res) => {
-    try {
-      const body = req.body;
-      const data = await icuIncome(body);
-      if (Array.isArray(data) && data.length === 0) {
-        return res.status(200).json({
-          success: 2,
-          message: "No Result",
-          data: [],
-        });
-      }
+    return res.status(200).json({
+      success: 1,
+      message: "Success",
+      data: result,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: 0,
+      message: error.message || "Internal Server Error",
+    });
+  } finally {
+    if (conn) {
+      await conn.commit();
+      await oracleConnectionClose(conn);
+    }
+  }
+};
+
+const consultingIncomes = async (req, res) => {
+  const body = req.body;
+  let conn;
+  try {
+    conn = await getTmcConnection();
+    const result = await consultingIncome(conn, body);
+
+    if (!result || (Array.isArray(result) && result.length === 0)) {
       return res.status(200).json({
-        success: 1,
-        message: "icuIncome",
-        data: data,
-      });
-    } catch (error) {
-      return res.status(200).json({
-        success: 0,
-        message: error.message,
+        success: 2,
+        message: "No Result",
+        data: [],
       });
     }
-  },
-  icuprocedureIncome: async (req, res) => {
-    try {
-      const body = req.body;
-      const data = await icuprocedureIncome(body);
-      if (Array.isArray(data) && data.length === 0) {
-        return res.status(200).json({
-          success: 2,
-          message: "No Result",
-          data: [],
-        });
-      }
+    return res.status(200).json({
+      success: 1,
+      message: "Success",
+      data: result,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: 0,
+      message: error.message || "Internal Server Error",
+    });
+  } finally {
+    if (conn) {
+      await conn.commit();
+      await oracleConnectionClose(conn);
+    }
+  }
+};
+
+const anesthetiaIncomes = async (req, res) => {
+  const body = req.body;
+  let conn;
+  try {
+    conn = await getTmcConnection();
+    const result = await anesthetiaIncome(conn, body);
+
+    if (!result || (Array.isArray(result) && result.length === 0)) {
       return res.status(200).json({
-        success: 1,
-        message: "icuprocedureIncome",
-        data: data,
-      });
-    } catch (error) {
-      return res.status(200).json({
-        success: 0,
-        message: error.message,
+        success: 2,
+        message: "No Result",
+        data: [],
       });
     }
-  },
-  radiologyIncome: async (req, res) => {
-    try {
-      const body = req.body;
-      const data = await radiologyIncome(body);
-      if (Array.isArray(data) && data.length === 0) {
-        return res.status(200).json({
-          success: 2,
-          message: "No Result",
-          data: [],
-        });
-      }
+    return res.status(200).json({
+      success: 1,
+      message: "Success",
+      data: result,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: 0,
+      message: error.message || "Internal Server Error",
+    });
+  } finally {
+    if (conn) {
+      await conn.commit();
+      await oracleConnectionClose(conn);
+    }
+  }
+};
+
+const surgeonIncomes = async (req, res) => {
+  const body = req.body;
+  let conn;
+  try {
+    conn = await getTmcConnection();
+    const result = await surgeonIncome(conn, body);
+
+    if (!result || (Array.isArray(result) && result.length === 0)) {
       return res.status(200).json({
-        success: 1,
-        message: "radiologyIncome",
-        data: data,
-      });
-    } catch (error) {
-      return res.status(200).json({
-        success: 0,
-        message: error.message,
+        success: 2,
+        message: "No Result",
+        data: [],
       });
     }
-  },
-  laboratoryIncome: async (req, res) => {
-    try {
-      const body = req.body;
-      const data = await laboratoryIncome(body);
-      if (Array.isArray(data) && data.length === 0) {
-        return res.status(200).json({
-          success: 2,
-          message: "No Result",
-          data: [],
-        });
-      }
+    return res.status(200).json({
+      success: 1,
+      message: "Success",
+      data: result,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: 0,
+      message: error.message || "Internal Server Error",
+    });
+  } finally {
+    if (conn) {
+      await conn.commit();
+      await oracleConnectionClose(conn);
+    }
+  }
+};
+
+const theaterIncomes = async (req, res) => {
+  const body = req.body;
+  let conn;
+  try {
+    conn = await getTmcConnection();
+    const result = await theaterIncome(conn, body);
+
+    if (!result || (Array.isArray(result) && result.length === 0)) {
       return res.status(200).json({
-        success: 1,
-        message: "laboratoryIncome",
-        data: data,
-      });
-    } catch (error) {
-      return res.status(200).json({
-        success: 0,
-        message: error.message,
+        success: 2,
+        message: "No Result",
+        data: [],
       });
     }
-  },
-  mriIncome: async (req, res) => {
-    try {
-      const body = req.body;
-      const data = await mriIncome(body);
-      if (Array.isArray(data) && data.length === 0) {
-        return res.status(200).json({
-          success: 2,
-          message: "No Result",
-          data: [],
-        });
-      }
+    return res.status(200).json({
+      success: 1,
+      message: "Success",
+      data: result,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: 0,
+      message: error.message || "Internal Server Error",
+    });
+  } finally {
+    if (conn) {
+      await conn.commit();
+      await oracleConnectionClose(conn);
+    }
+  }
+};
+
+const cardiologyIncomes = async (req, res) => {
+  const body = req.body;
+  let conn;
+  try {
+    conn = await getTmcConnection();
+    const result = await cardiologyIncome(conn, body);
+
+    if (!result || (Array.isArray(result) && result.length === 0)) {
       return res.status(200).json({
-        success: 1,
-        message: "mriIncome",
-        data: data,
-      });
-    } catch (error) {
-      return res.status(200).json({
-        success: 0,
-        message: error.message,
+        success: 2,
+        message: "No Result",
+        data: [],
       });
     }
-  },
-  dietIncome: async (req, res) => {
-    try {
-      const body = req.body;
-      const data = await dietIncome(body);
-      if (Array.isArray(data) && data.length === 0) {
-        return res.status(200).json({
-          success: 2,
-          message: "No Result",
-          data: [],
-        });
-      }
+    return res.status(200).json({
+      success: 1,
+      message: "Success",
+      data: result,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: 0,
+      message: error.message || "Internal Server Error",
+    });
+  } finally {
+    if (conn) {
+      await conn.commit();
+      await oracleConnectionClose(conn);
+    }
+  }
+};
+
+const disPosibleItemIncomes = async (req, res) => {
+  const body = req.body;
+  let conn;
+  try {
+    conn = await getTmcConnection();
+    const result = await disPosibleItemIncome(conn, body);
+
+    if (!result || (Array.isArray(result) && result.length === 0)) {
       return res.status(200).json({
-        success: 1,
-        message: "dietIncome",
-        data: data,
-      });
-    } catch (error) {
-      return res.status(200).json({
-        success: 0,
-        message: error.message,
+        success: 2,
+        message: "No Result",
+        data: [],
       });
     }
-  },
-  pharmacyIncomePart1: async (req, res) => {
-    try {
-      const body = req.body;
-      const data = await pharmacyIncomePart1(body);
-      if (Array.isArray(data) && data.length === 0) {
-        return res.status(200).json({
-          success: 2,
-          message: "No Result",
-          data: [],
-        });
-      }
+    return res.status(200).json({
+      success: 1,
+      message: "Success",
+      data: result,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: 0,
+      message: error.message || "Internal Server Error",
+    });
+  } finally {
+    if (conn) {
+      await conn.commit();
+      await oracleConnectionClose(conn);
+    }
+  }
+};
+
+const icuIncomes = async (req, res) => {
+  const body = req.body;
+  let conn;
+  try {
+    conn = await getTmcConnection();
+    const result = await icuIncome(conn, body);
+
+    if (!result || (Array.isArray(result) && result.length === 0)) {
       return res.status(200).json({
-        success: 1,
-        message: "pharmacyIncomePart1",
-        data: data,
-      });
-    } catch (error) {
-      return res.status(200).json({
-        success: 0,
-        message: error.message,
+        success: 2,
+        message: "No Result",
+        data: [],
       });
     }
-  },
-  pharmacyIncomePart2: async (req, res) => {
-    try {
-      const body = req.body;
-      const data = await pharmacyIncomePart2(body);
-      if (Array.isArray(data) && data.length === 0) {
-        return res.status(200).json({
-          success: 2,
-          message: "No Result",
-          data: [],
-        });
-      }
+    return res.status(200).json({
+      success: 1,
+      message: "Success",
+      data: result,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: 0,
+      message: error.message || "Internal Server Error",
+    });
+  } finally {
+    if (conn) {
+      await conn.commit();
+      await oracleConnectionClose(conn);
+    }
+  }
+};
+
+const icuprocedureIncomes = async (req, res) => {
+  const body = req.body;
+  let conn;
+  try {
+    conn = await getTmcConnection();
+    const result = await icuprocedureIncome(conn, body);
+
+    if (!result || (Array.isArray(result) && result.length === 0)) {
       return res.status(200).json({
-        success: 1,
-        message: "pharmacyIncomePart2",
-        data: data,
-      });
-    } catch (error) {
-      return res.status(200).json({
-        success: 0,
-        message: error.message,
+        success: 2,
+        message: "No Result",
+        data: [],
       });
     }
-  },
-  pharmacyIncomePart3: async (req, res) => {
-    try {
-      const body = req.body;
-      const data = await pharmacyIncomePart3(body);
-      if (Array.isArray(data) && data.length === 0) {
-        return res.status(200).json({
-          success: 2,
-          message: "No Result",
-          data: [],
-        });
-      }
+    return res.status(200).json({
+      success: 1,
+      message: "Success",
+      data: result,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: 0,
+      message: error.message || "Internal Server Error",
+    });
+  } finally {
+    if (conn) {
+      await conn.commit();
+      await oracleConnectionClose(conn);
+    }
+  }
+};
+
+const radiologyIncomes = async (req, res) => {
+  const body = req.body;
+  let conn;
+  try {
+    conn = await getTmcConnection();
+    const result = await radiologyIncome(conn, body);
+
+    if (!result || (Array.isArray(result) && result.length === 0)) {
       return res.status(200).json({
-        success: 1,
-        message: "pharmacyIncomePart3",
-        data: data,
-      });
-    } catch (error) {
-      return res.status(200).json({
-        success: 0,
-        message: error.message,
+        success: 2,
+        message: "No Result",
+        data: [],
       });
     }
-  },
-  pharmacyIncomePart4: async (req, res) => {
-    try {
-      const body = req.body;
-      const data = await pharmacyIncomePart4(body);
-      if (Array.isArray(data) && data.length === 0) {
-        return res.status(200).json({
-          success: 2,
-          message: "No Result",
-          data: [],
-        });
-      }
+    return res.status(200).json({
+      success: 1,
+      message: "Success",
+      data: result,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: 0,
+      message: error.message || "Internal Server Error",
+    });
+  } finally {
+    if (conn) {
+      await conn.commit();
+      await oracleConnectionClose(conn);
+    }
+  }
+};
+
+const laboratoryIncomes = async (req, res) => {
+  const body = req.body;
+  let conn;
+  try {
+    conn = await getTmcConnection();
+    const result = await laboratoryIncome(conn, body);
+
+    if (!result || (Array.isArray(result) && result.length === 0)) {
       return res.status(200).json({
-        success: 1,
-        message: "pharmacyIncomePart4",
-        data: data,
-      });
-    } catch (error) {
-      return res.status(200).json({
-        success: 0,
-        message: error.message,
+        success: 2,
+        message: "No Result",
+        data: [],
       });
     }
-  },
+    return res.status(200).json({
+      success: 1,
+      message: "Success",
+      data: result,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: 0,
+      message: error.message || "Internal Server Error",
+    });
+  } finally {
+    if (conn) {
+      await conn.commit();
+      await oracleConnectionClose(conn);
+    }
+  }
+};
+
+const mriIncomes = async (req, res) => {
+  const body = req.body;
+  let conn;
+  try {
+    conn = await getTmcConnection();
+    const result = await mriIncome(conn, body);
+
+    if (!result || (Array.isArray(result) && result.length === 0)) {
+      return res.status(200).json({
+        success: 2,
+        message: "No Result",
+        data: [],
+      });
+    }
+    return res.status(200).json({
+      success: 1,
+      message: "Success",
+      data: result,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: 0,
+      message: error.message || "Internal Server Error",
+    });
+  } finally {
+    if (conn) {
+      await conn.commit();
+      await oracleConnectionClose(conn);
+    }
+  }
+};
+
+const dietIncomes = async (req, res) => {
+  const body = req.body;
+  let conn;
+  try {
+    conn = await getTmcConnection();
+    const result = await dietIncome(conn, body);
+
+    if (!result || (Array.isArray(result) && result.length === 0)) {
+      return res.status(200).json({
+        success: 2,
+        message: "No Result",
+        data: [],
+      });
+    }
+    return res.status(200).json({
+      success: 1,
+      message: "Success",
+      data: result,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: 0,
+      message: error.message || "Internal Server Error",
+    });
+  } finally {
+    if (conn) {
+      await conn.commit();
+      await oracleConnectionClose(conn);
+    }
+  }
+};
+
+const pharmacyIncomesPart1 = async (req, res) => {
+  const body = req.body;
+  let conn;
+  try {
+    conn = await getTmcConnection();
+    const result = await pharmacyIncomePart1(conn, body);
+
+    if (!result || (Array.isArray(result) && result.length === 0)) {
+      return res.status(200).json({
+        success: 2,
+        message: "No Result",
+        data: [],
+      });
+    }
+    return res.status(200).json({
+      success: 1,
+      message: "Success",
+      data: result,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: 0,
+      message: error.message || "Internal Server Error",
+    });
+  } finally {
+    if (conn) {
+      await conn.commit();
+      await oracleConnectionClose(conn);
+    }
+  }
+};
+
+const pharmacyIncomesPart2 = async (req, res) => {
+  const body = req.body;
+  let conn;
+  try {
+    conn = await getTmcConnection();
+    const result = await pharmacyIncomePart2(conn, body);
+
+    if (!result || (Array.isArray(result) && result.length === 0)) {
+      return res.status(200).json({
+        success: 2,
+        message: "No Result",
+        data: [],
+      });
+    }
+    return res.status(200).json({
+      success: 1,
+      message: "Success",
+      data: result,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: 0,
+      message: error.message || "Internal Server Error",
+    });
+  } finally {
+    if (conn) {
+      await conn.commit();
+      await oracleConnectionClose(conn);
+    }
+  }
+};
+
+const pharmacyIncomesPart3 = async (req, res) => {
+  const body = req.body;
+  let conn;
+  try {
+    conn = await getTmcConnection();
+    const result = await pharmacyIncomePart3(conn, body);
+
+    if (!result || (Array.isArray(result) && result.length === 0)) {
+      return res.status(200).json({
+        success: 2,
+        message: "No Result",
+        data: [],
+      });
+    }
+    return res.status(200).json({
+      success: 1,
+      message: "Success",
+      data: result,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: 0,
+      message: error.message || "Internal Server Error",
+    });
+  } finally {
+    if (conn) {
+      await conn.commit();
+      await oracleConnectionClose(conn);
+    }
+  }
+};
+
+const pharmacyIncomesPart4 = async (req, res) => {
+  const body = req.body;
+  let conn;
+  try {
+    conn = await getTmcConnection();
+    const result = await pharmacyIncomePart4(conn, body);
+
+    if (!result || (Array.isArray(result) && result.length === 0)) {
+      return res.status(200).json({
+        success: 2,
+        message: "No Result",
+        data: [],
+      });
+    }
+    return res.status(200).json({
+      success: 1,
+      message: "Success",
+      data: result,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: 0,
+      message: error.message || "Internal Server Error",
+    });
+  } finally {
+    if (conn) {
+      await conn.commit();
+      await oracleConnectionClose(conn);
+    }
+  }
+};
+
+module.exports = {
+  bedIncomes,
+  nsIncomes,
+  roomRentIncomes,
+  otherIncomes,
+  consultingIncomes,
+  anesthetiaIncomes,
+  surgeonIncomes,
+  theaterIncomes,
+  cardiologyIncomes,
+  disPosibleItemIncomes,
+  icuIncomes,
+  icuprocedureIncomes,
+  radiologyIncomes,
+  laboratoryIncomes,
+  mriIncomes,
+  dietIncomes,
+  pharmacyIncomesPart1,
+  pharmacyIncomesPart2,
+  pharmacyIncomesPart3,
+  pharmacyIncomesPart4,
 };
