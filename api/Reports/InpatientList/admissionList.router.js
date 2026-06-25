@@ -1,4 +1,4 @@
-const {checkToken} = require("../../../auth/jwtValidation");
+const { checkToken } = require("../../../auth/jwtValidation");
 const {
   getIpAdmissionList,
   insertTsshPat,
@@ -26,6 +26,9 @@ const {
   getTsshIncomeReport,
   getIpNumberTsshGrouped,
   getDischargedIpInfoFromTMCH,
+  getPatientDetailsByBillNo,
+  updateDataUsingMrdNumber,
+  updateDataUsingBillNumber
 } = require("./admissionList.controller");
 
 const router = require("express").Router();
@@ -66,5 +69,8 @@ router.get("/getIpadmissChecks/:id", getIpadmissChecks);
 router.post("/getTmcIncome", checkToken, getTmcIncomeReport);
 router.post("/getTsshIncome", checkToken, getTsshIncomeReport);
 // router.post('/getTsshIncome', checkToken, getTsshIncomeReport);
+router.post('/getPatientDetailsByBillNo', checkToken, getPatientDetailsByBillNo);
+router.post('/updateDataUsingMrdNumber', checkToken, updateDataUsingMrdNumber);
+router.post('/updateDataUsingBillNumber', checkToken, updateDataUsingBillNumber);
 
 module.exports = router;
