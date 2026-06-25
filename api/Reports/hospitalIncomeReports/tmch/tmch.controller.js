@@ -431,4 +431,49 @@ const getAdvanceCollection_TMCH = async (req, res) => {
   }
 };
 
-module.exports = {getTmchReport, getCeditInsuranceBillCollection, getCreditInsuranceBillDetail, getUnsettledAmountDetails, getAdvanceCollection_TMCH};
+const getProcedureDetails_TMCH = async (req, res) => {
+  let conn;
+  try {
+    const body = req.body;
+    // console.log(body);
+    conn = await getTmcConnection();
+    await conn.commit();
+
+    const iplist = body.ipList?.patientNo;
+    const ipListMap = [{data: iplist, status: 1}];
+    const ipLists = ipListMap.flatMap(({data, status}) => (data || []).map((ip) => ({ip, status})));
+    // console.log(ipLists);
+    await insertIntoGTT(conn, ipLists);
+    // const patientList = await getGttPatientList(conn);
+    // console.log(patientList);
+
+    const result = await qmtService.getProcedureDetl_TMCH(conn, body);
+    // console.log(result);s
+    if (!result || (Array.isArray(result) && result.length === 0)) {
+      return res.status(200).json({
+        success: 2,
+        message: "No Result",
+        data: [],
+      });
+    }
+
+    return res.status(200).json({
+      success: 1,
+      message: "Success",
+      data: result,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      success: 0,
+      message: error.message || "Internal Server Error",
+    });
+  } finally {
+    if (conn) {
+      await conn.commit();
+      await oracleConnectionClose(conn);
+    }
+  }
+};
+
+module.exports = {getTmchReport, getCeditInsuranceBillCollection, getCreditInsuranceBillDetail, getUnsettledAmountDetails, getAdvanceCollection_TMCH, getProcedureDetails_TMCH};

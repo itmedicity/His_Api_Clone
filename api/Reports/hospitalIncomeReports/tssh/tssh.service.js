@@ -3333,6 +3333,681 @@ SELECT
   return result.rows;
 };
 
+const get_ProcedureDetails_TSSH = async (conn_ora, bind) => {
+  const sql = `WITH                                                     /* Date Parameters */
+    DATE_PARAMS
+     AS (SELECT TO_DATE (:fromDate, 'DD/MM/YYYY HH24:MI:SS') FROM_DT,
+                TO_DATE (:toDate, 'DD/MM/YYYY HH24:MI:SS') TO_DT
+           FROM DUAL),
+     /* Active IP List */
+     EXCLUDE_IPS
+     AS (SELECT                                             /*+ MATERIALIZE */
+               IP_NO
+           FROM MEDIWARE.GTT_EXCLUDE_IP
+          WHERE STATUS = 1),
+     /* Allowed Hospitals */
+     MH AS (SELECT                                          /*+ MATERIALIZE */
+                  MH_CODE FROM MULTIHOSPITAL),
+     /* Revenue Category Mapping */
+     REV_CAT
+     AS (SELECT                                             /*+ MATERIALIZE */
+               MID.PC_CODE, PC.PCC_DESC,MIG.DG_DESC
+           FROM MISINCEXPDTL MID
+                JOIN MISINCEXPGROUP MIG
+                   ON MIG.DG_GRCODE = MID.DG_GRCODE
+                JOIN PROCATEGORY PC
+                   ON PC.PC_CODE = MID.PC_CODE
+          WHERE MID.DG_TYPE = 'R'),
+     /* Filter DISBILLMAST once */
+     BASE_DISBILL
+     AS (SELECT/*+ MATERIALIZE */
+               DMC_SLNO, MH_CODE, IP_NO
+           FROM DISBILLMAST D, DATE_PARAMS P
+          WHERE     NVL (D.DMC_CANCEL, 'N') = 'N'
+                AND D.DMC_CACR <> 'M'
+                AND D.DMD_DATE BETWEEN P.FROM_DT AND P.TO_DT
+                AND EXISTS
+                       (SELECT 1
+                          FROM EXCLUDE_IPS E
+                         WHERE E.IP_NO = D.IP_NO)
+                AND EXISTS
+                       (SELECT 1
+                          FROM MH M
+                         WHERE M.MH_CODE = D.MH_CODE)),
+     BASE_REFUND
+     AS (SELECT                                             /*+ MATERIALIZE */
+               RIC_SLNO, IP_NO, MH_CODE
+           FROM IPREFUNDMAST R, DATE_PARAMS P
+          WHERE     R.RIC_CACR IN ('C', 'R')
+                AND NVL (R.RIC_CANCEL, 'N') = 'N'
+                AND R.RID_DATE BETWEEN P.FROM_DT AND P.TO_DT
+                AND EXISTS
+                       (SELECT 1
+                          FROM EXCLUDE_IPS E
+                         WHERE E.IP_NO = R.IP_NO)
+                AND EXISTS
+                       (SELECT 1
+                          FROM MH M
+                         WHERE M.MH_CODE = R.MH_CODE)),
+     TAX_SURGERY
+     AS (  SELECT SR_SLNO, SUM (NVL (SRN_TOTTAX, 0)) TAXAMT
+             FROM PATSURGERYRESOURCESDETL
+         GROUP BY SR_SLNO)
+  SELECT INITCAP (REVNUE.PCC_DESC) PCC_DESC,
+         REVNUE.CODE,
+         SUM (REVNUE.AMT) AMT,
+         SUM (REVNUE.TAXAMT) TAXAMT,
+         REV_CAT.DG_DESC
+    FROM (                                               /* SERVICE CHARGES */
+          SELECT   RC.PCC_DESC,
+                   RC.PC_CODE CODE,
+                   SUM (
+                      NVL (PS.SVN_QTY * PS.SVN_RATE, 0) - NVL (PS.SVN_DISAMT, 0))
+                      AMT,
+                   SUM (NVL (PS.SVN_TOTTAX, 0)) TAXAMT
+              FROM BASE_DISBILL BD
+                   JOIN PATSERVICE PS
+                      ON PS.DMC_SLNO = BD.DMC_SLNO
+                   JOIN PRODESCRIPTION PD
+                      ON PD.PD_CODE = PS.PD_CODE
+                   JOIN PROGROUP PG
+                      ON PG.PG_CODE = PD.PG_CODE
+                   JOIN REV_CAT RC
+                      ON RC.PC_CODE = PG.PC_CODE
+             WHERE NVL (PS.SVC_CANCEL, 'N') = 'N'
+          GROUP BY RC.PCC_DESC, RC.PC_CODE
+          UNION ALL
+            /* VISIT CHARGES */
+            SELECT RC.PCC_DESC,
+                   RC.PC_CODE CODE,
+                   SUM (NVL (PV.VSN_RATE, 0) - NVL (PV.VSN_DISAMT, 0)) AMT,
+                   SUM (NVL (PV.VSN_TOTTAX, 0)) TAXAMT
+              FROM BASE_DISBILL BD
+                   JOIN PATVISIT PV
+                      ON PV.DMC_SLNO = BD.DMC_SLNO
+                   JOIN IPPARAM IP
+                      ON IP.MH_CODE = BD.MH_CODE
+                   JOIN REV_CAT RC
+                      ON RC.PC_CODE = IP.IPC_VSCODE
+             WHERE NVL (PV.VSC_CANCEL, 'N') = 'N'
+          GROUP BY RC.PCC_DESC, RC.PC_CODE
+          UNION ALL
+            /* ROOM RENT */
+            SELECT RC.PCC_DESC,
+                   RC.PC_CODE CODE,
+                   SUM (
+                      NVL (RD.RDN_AMOUNT * RD.RDN_DAYS, 0)
+                      - NVL (RD.RDN_DISAMT, 0))
+                      AMT,
+                   SUM (NVL (RD.RDN_TOTTAX, 0)) TAXAMT
+              FROM BASE_DISBILL BD
+                   JOIN DISRMRENTDETL RD
+                      ON RD.DMC_SLNO = BD.DMC_SLNO
+                   JOIN REV_CAT RC
+                      ON RC.PC_CODE = RD.PC_CODE
+          GROUP BY RC.PCC_DESC, RC.PC_CODE
+          UNION ALL
+            SELECT RC.PCC_DESC,
+                   RC.PC_CODE CODE,
+                   SUM (NVL (DR.DRN_NURDAYS, 0) * NVL (DR.DRN_NURAMT, 0)) AMT,
+                   0 TAXAMT
+              FROM BASE_DISBILL BD
+                   JOIN DISROOMDETL DR
+                      ON DR.DMC_SLNO = BD.DMC_SLNO
+                   JOIN IPPARAM IP
+                      ON IP.MH_CODE = BD.MH_CODE
+                   JOIN REV_CAT RC
+                      ON RC.PC_CODE = IP.IPC_NUCODE
+             WHERE NVL (DR.DMC_CANCEL, 'N') = 'N'
+          GROUP BY RC.PCC_DESC, RC.PC_CODE
+          UNION ALL
+            SELECT RC.PCC_DESC,
+                   RC.PC_CODE CODE,
+                   SUM (NVL (RD.RIN_NETAMT, 0)) * -1 AMT,
+                   SUM (NVL (RD.RIN_TOTTAX, 0)) * -1 TAXAMT
+              FROM BASE_REFUND BR
+                   JOIN IPREFUNDITEMDETL RD
+                      ON RD.RIC_SLNO = BR.RIC_SLNO
+                   JOIN REV_CAT RC
+                      ON RC.PC_CODE = RD.PC_CODE
+             WHERE RD.RIC_TYPE <> 'PHY'
+          GROUP BY RC.PCC_DESC, RC.PC_CODE
+          UNION ALL
+            SELECT RC.PCC_DESC,
+                   RC.PC_CODE CODE,
+                   SUM (NVL (PS.SRN_OPERATION, 0) - NVL (PS.SRN_OPERDIS, 0)) AMT,
+                   SUM (NVL (PS.SRN_OPERTOTTAX, 0)) TAXAMT
+              FROM BASE_DISBILL BD
+                   JOIN PATSURGERY PS
+                      ON PS.DMC_SLNO = BD.DMC_SLNO
+                   JOIN IPPARAM IP
+                      ON IP.MH_CODE = BD.MH_CODE
+                   JOIN REV_CAT RC
+                      ON RC.PC_CODE = IP.IPC_OPER
+             WHERE     NVL (PS.SRC_CANCEL, 'N') = 'N'
+                   AND NVL (PS.SRN_OPERATION, 0) > 0
+                   AND RC.PC_CODE IN (SELECT PC_CODE
+                                        FROM MISINCEXPDTL
+                                       WHERE DG_GRCODE = 2 AND DG_TYPE = 'R')
+          GROUP BY RC.PCC_DESC, RC.PC_CODE
+          UNION ALL
+            SELECT RC.PCC_DESC,
+                   RC.PC_CODE CODE,
+                   SUM (NVL (PS.SRN_THEATER, 0) - NVL (PS.SRN_THEARDIS, 0)) AMT,
+                   SUM (NVL (PS.SRN_THEATTOTTAX, 0)) TAXAMT
+              FROM BASE_DISBILL BD
+                   JOIN PATSURGERY PS
+                      ON PS.DMC_SLNO = BD.DMC_SLNO
+                   JOIN IPPARAM IP
+                      ON IP.MH_CODE = BD.MH_CODE
+                   JOIN REV_CAT RC
+                      ON RC.PC_CODE = IP.IPC_THER
+             WHERE NVL (PS.SRC_CANCEL, 'N') = 'N' AND NVL (PS.SRN_THEATER, 0) > 0
+          GROUP BY RC.PCC_DESC, RC.PC_CODE
+          UNION ALL
+            SELECT RC.PCC_DESC,
+                   RC.PC_CODE CODE,
+                   SUM (NVL (PS.SRN_1STASST, 0)) AMT,
+                   SUM (NVL (PRD.SRN_TOTTAX, 0)) TAXAMT
+              FROM BASE_DISBILL BD
+                   JOIN PATSURGERY PS
+                      ON PS.DMC_SLNO = BD.DMC_SLNO
+                   JOIN PATSURGERYRESOURCESDETL PRD
+                      ON PRD.SR_SLNO = PS.SR_SLNO
+                   JOIN IPPARAM IP
+                      ON IP.MH_CODE = BD.MH_CODE
+                   JOIN REV_CAT RC
+                      ON RC.PC_CODE = IP.IPC_1STASST
+             WHERE NVL (PS.SRC_CANCEL, 'N') = 'N' AND NVL (PS.SRN_1STASST, 0) > 0
+          GROUP BY RC.PCC_DESC, RC.PC_CODE
+          UNION ALL
+            SELECT RC.PCC_DESC,
+                   RC.PC_CODE CODE,
+                   SUM (NVL (PS.SRN_3RDASST, 0)) AMT,
+                   SUM (NVL (TS.TAXAMT, 0)) TAXAMT
+              FROM BASE_DISBILL BD
+                   JOIN PATSURGERY PS
+                      ON PS.DMC_SLNO = BD.DMC_SLNO
+                   JOIN TAX_SURGERY TS
+                      ON TS.SR_SLNO = PS.SR_SLNO
+                   JOIN IPPARAM IP
+                      ON IP.MH_CODE = BD.MH_CODE
+                   JOIN REV_CAT RC
+                      ON RC.PC_CODE = IP.IPC_3RDASST
+             WHERE NVL (PS.SRC_CANCEL, 'N') = 'N' AND NVL (PS.SRN_3RDASST, 0) > 0
+          GROUP BY RC.PCC_DESC, RC.PC_CODE
+          UNION ALL
+            SELECT RC.PCC_DESC,
+                   RC.PC_CODE CODE,
+                   SUM (NVL (PS.SRN_GUEST, 0)) AMT,
+                   SUM (NVL (TS.TAXAMT, 0)) TAXAMT
+              FROM BASE_DISBILL BD
+                   JOIN PATSURGERY PS
+                      ON PS.DMC_SLNO = BD.DMC_SLNO
+                   JOIN TAX_SURGERY TS
+                      ON TS.SR_SLNO = PS.SR_SLNO
+                   JOIN IPPARAM IP
+                      ON IP.MH_CODE = BD.MH_CODE
+                   JOIN REV_CAT RC
+                      ON RC.PC_CODE = IP.IPC_GUEST
+             WHERE NVL (PS.SRC_CANCEL, 'N') = 'N' AND NVL (PS.SRN_GUEST, 0) > 0
+          GROUP BY RC.PCC_DESC, RC.PC_CODE
+          UNION ALL
+            SELECT RC.PCC_DESC,
+                   RC.PC_CODE CODE,
+                   SUM (NVL (PS.SRN_ANTEST, 0) - NVL (PS.SRN_ANTDIS, 0)) AMT,
+                   SUM (NVL (TS.TAXAMT, 0)) TAXAMT
+              FROM BASE_DISBILL BD
+                   JOIN PATSURGERY PS
+                      ON PS.DMC_SLNO = BD.DMC_SLNO
+                   JOIN TAX_SURGERY TS
+                      ON TS.SR_SLNO = PS.SR_SLNO
+                   JOIN IPPARAM IP
+                      ON IP.MH_CODE = BD.MH_CODE
+                   JOIN REV_CAT RC
+                      ON RC.PC_CODE = IP.IPC_ANEST
+             WHERE NVL (PS.SRC_CANCEL, 'N') = 'N' AND NVL (PS.SRN_ANTEST, 0) > 0
+          GROUP BY RC.PCC_DESC, RC.PC_CODE
+          UNION ALL
+            SELECT RC.PCC_DESC,
+                   RC.PC_CODE CODE,
+                   SUM (NVL (PS.SRN_ANTEST2, 0)) AMT,
+                   SUM (NVL (TS.TAXAMT, 0)) TAXAMT
+              FROM BASE_DISBILL BD
+                   JOIN PATSURGERY PS
+                      ON PS.DMC_SLNO = BD.DMC_SLNO
+                   JOIN TAX_SURGERY TS
+                      ON TS.SR_SLNO = PS.SR_SLNO
+                   JOIN IPPARAM IP
+                      ON IP.MH_CODE = BD.MH_CODE
+                   JOIN REV_CAT RC
+                      ON RC.PC_CODE = IP.IPC_ANEST2
+             WHERE NVL (PS.SRC_CANCEL, 'N') = 'N' AND NVL (PS.SRN_ANTEST2, 0) > 0
+          GROUP BY RC.PCC_DESC, RC.PC_CODE
+          UNION ALL
+            SELECT RC.PCC_DESC,
+                   RC.PC_CODE CODE,
+                   SUM (NVL (PSO.PDN_AMOUNT, 0)) AMT,
+                   SUM (NVL (PSO.PSN_TOTTAX, 0)) TAXAMT
+              FROM BASE_DISBILL BD
+                   JOIN PATSURGERY PS
+                      ON PS.DMC_SLNO = BD.DMC_SLNO
+                   JOIN PATSUROTHER PSO
+                      ON PSO.SR_SLNO = PS.SR_SLNO
+                   JOIN PRODESCRIPTION PD
+                      ON PD.PD_CODE = PSO.PD_CODE
+                   JOIN PROGROUP PG
+                      ON PG.PG_CODE = PD.PG_CODE
+                   JOIN REV_CAT RC
+                      ON RC.PC_CODE = PG.PC_CODE
+             WHERE NVL (PS.SRC_CANCEL, 'N') = 'N'
+                   AND NVL (PSO.SRC_CANCEL, 'N') = 'N'
+          GROUP BY RC.PCC_DESC, RC.PC_CODE
+          UNION ALL
+            SELECT RC.PCC_DESC,
+                   RC.PC_CODE CODE,
+                   SUM (NVL (PSD.SRN_AMOUNT, 0) - NVL (PSD.SRN_DISCOUNT, 0)) AMT,
+                   SUM (NVL (PSD.PSN_TOTTAX, 0)) TAXAMT
+              FROM BASE_DISBILL BD
+                   JOIN PATSURGERY PS
+                      ON PS.DMC_SLNO = BD.DMC_SLNO
+                   JOIN PATSURDETL PSD
+                      ON PSD.SR_SLNO = PS.SR_SLNO
+                   JOIN REV_CAT RC
+                      ON RC.PC_CODE = PSD.PC_CODE
+             WHERE NVL (PS.SRC_CANCEL, 'N') = 'N'
+                   AND NVL (PSD.SRC_CANCEL, 'N') = 'N'
+          GROUP BY RC.PCC_DESC, RC.PC_CODE
+          UNION ALL
+            SELECT RC.PCC_DESC,
+                   RC.PC_CODE CODE,
+                   SUM (NVL (PS.SRN_OPERATION, 0) - NVL (PS.SRN_OPERDIS, 0)) AMT,
+                   SUM (NVL (PS.SRN_OPERTOTTAX, 0)) TAXAMT
+              FROM OPBILLMAST OPB
+                   JOIN PATSURGERY PS
+                      ON PS.OPERATION_OPSLNO = OPB.OPC_SLNO
+                   JOIN OPPARAM OPP
+                      ON 1 = 1
+                   JOIN REV_CAT RC
+                      ON RC.PC_CODE = OPP.OPC_OPER
+                   JOIN DATE_PARAMS DP
+                      ON 1 = 1
+             WHERE     NVL (PS.SRC_CANCEL, 'N') = 'N'
+                   AND NVL (OPB.OPN_CANCEL, 'N') = 'N'
+                   AND OPB.OPC_CACR <> 'M'
+                   AND NVL (PS.SRN_OPERATION, 0) > 0
+                   AND OPB.OPD_DATE BETWEEN DP.FROM_DT AND DP.TO_DT
+                   AND EXISTS
+                          (SELECT 1
+                             FROM EXCLUDE_IPS E
+                            WHERE E.IP_NO = PS.IP_NO)
+                   AND EXISTS
+                          (SELECT 1
+                             FROM MH M
+                            WHERE M.MH_CODE = OPB.MH_CODE)
+          GROUP BY RC.PCC_DESC, RC.PC_CODE
+          UNION ALL
+            SELECT RC.PCC_DESC,
+                   RC.PC_CODE CODE,
+                   SUM (NVL (PS.SRN_THEATER, 0) - NVL (PS.SRN_THEARDIS, 0)) AMT,
+                   SUM (NVL (PS.SRN_THEATTOTTAX, 0)) TAXAMT
+              FROM OPBILLMAST OPB
+                   JOIN PATSURGERY PS
+                      ON PS.THEATER_OPSLNO = OPB.OPC_SLNO
+                   JOIN OPPARAM OPP
+                      ON 1 = 1
+                   JOIN REV_CAT RC
+                      ON RC.PC_CODE = OPP.OPC_THER
+                   JOIN DATE_PARAMS DP
+                      ON 1 = 1
+             WHERE     NVL (PS.SRC_CANCEL, 'N') = 'N'
+                   AND NVL (OPB.OPN_CANCEL, 'N') = 'N'
+                   AND OPB.OPC_CACR <> 'M'
+                   AND NVL (PS.SRN_THEATER, 0) > 0
+                   AND OPB.OPD_DATE BETWEEN DP.FROM_DT AND DP.TO_DT
+                   AND EXISTS
+                          (SELECT 1
+                             FROM EXCLUDE_IPS E
+                            WHERE E.IP_NO = PS.IP_NO)
+                   AND EXISTS
+                          (SELECT 1
+                             FROM MH M
+                            WHERE M.MH_CODE = OPB.MH_CODE)
+          GROUP BY RC.PCC_DESC, RC.PC_CODE
+          UNION ALL
+            SELECT RC.PCC_DESC,
+                   RC.PC_CODE CODE,
+                   SUM (NVL (PS.SRN_CHIEF, 0)) AMT,
+                   SUM (NVL (TS.TAXAMT, 0)) TAXAMT
+              FROM OPBILLMAST OPB
+                   JOIN PATSURGERY PS
+                      ON PS.CHIEF_OPSLNO = OPB.OPC_SLNO
+                   JOIN TAX_SURGERY TS
+                      ON TS.SR_SLNO = PS.SR_SLNO
+                   JOIN OPPARAM OPP
+                      ON 1 = 1
+                   JOIN REV_CAT RC
+                      ON RC.PC_CODE = OPP.OPC_CHIEF
+                   JOIN DATE_PARAMS DP
+                      ON 1 = 1
+             WHERE     NVL (PS.SRC_CANCEL, 'N') = 'N'
+                   AND NVL (OPB.OPN_CANCEL, 'N') = 'N'
+                   AND OPB.OPC_CACR <> 'M'
+                   AND NVL (PS.SRN_CHIEF, 0) > 0
+                   AND OPB.OPD_DATE BETWEEN DP.FROM_DT AND DP.TO_DT
+                   AND EXISTS
+                          (SELECT 1
+                             FROM EXCLUDE_IPS E
+                            WHERE E.IP_NO = PS.IP_NO)
+                   AND EXISTS
+                          (SELECT 1
+                             FROM MH M
+                            WHERE M.MH_CODE = OPB.MH_CODE)
+          GROUP BY RC.PCC_DESC, RC.PC_CODE
+          UNION ALL
+            SELECT RC.PCC_DESC,
+                   RC.PC_CODE CODE,
+                   SUM (NVL (PS.SRN_1STASST, 0)) AMT,
+                   SUM (NVL (TS.TAXAMT, 0)) TAXAMT
+              FROM OPBILLMAST OPB
+                   JOIN PATSURGERY PS
+                      ON PS.D1STASST_OPSLNO = OPB.OPC_SLNO
+                   JOIN TAX_SURGERY TS
+                      ON TS.SR_SLNO = PS.SR_SLNO
+                   JOIN OPPARAM OPP
+                      ON 1 = 1
+                   JOIN REV_CAT RC
+                      ON RC.PC_CODE = OPP.OPC_1STASST
+                   JOIN DATE_PARAMS DP
+                      ON 1 = 1
+             WHERE     NVL (PS.SRC_CANCEL, 'N') = 'N'
+                   AND NVL (OPB.OPN_CANCEL, 'N') = 'N'
+                   AND OPB.OPC_CACR <> 'M'
+                   AND NVL (PS.SRN_1STASST, 0) > 0
+                   AND OPB.OPD_DATE BETWEEN DP.FROM_DT AND DP.TO_DT
+                   AND EXISTS
+                          (SELECT 1
+                             FROM EXCLUDE_IPS E
+                            WHERE E.IP_NO = PS.IP_NO)
+                   AND EXISTS
+                          (SELECT 1
+                             FROM MH M
+                            WHERE M.MH_CODE = OPB.MH_CODE)
+          GROUP BY RC.PCC_DESC, RC.PC_CODE
+          UNION ALL
+            SELECT RC.PCC_DESC,
+                   RC.PC_CODE CODE,
+                   SUM (NVL (PS.SRN_2NDASST, 0)) AMT,
+                   SUM (NVL (TS.TAXAMT, 0)) TAXAMT
+              FROM OPBILLMAST OPB
+                   JOIN PATSURGERY PS
+                      ON PS.D2NDASST_OPSLNO = OPB.OPC_SLNO
+                   JOIN TAX_SURGERY TS
+                      ON TS.SR_SLNO = PS.SR_SLNO
+                   JOIN OPPARAM OPP
+                      ON 1 = 1
+                   JOIN REV_CAT RC
+                      ON RC.PC_CODE = OPP.OPC_2NDASST
+                   JOIN DATE_PARAMS DP
+                      ON 1 = 1
+             WHERE     NVL (PS.SRC_CANCEL, 'N') = 'N'
+                   AND NVL (OPB.OPN_CANCEL, 'N') = 'N'
+                   AND OPB.OPC_CACR <> 'M'
+                   AND NVL (PS.SRN_2NDASST, 0) > 0
+                   AND OPB.OPD_DATE BETWEEN DP.FROM_DT AND DP.TO_DT
+                   AND EXISTS
+                          (SELECT 1
+                             FROM EXCLUDE_IPS E
+                            WHERE E.IP_NO = PS.IP_NO)
+                   AND EXISTS
+                          (SELECT 1
+                             FROM MH M
+                            WHERE M.MH_CODE = OPB.MH_CODE)
+          GROUP BY RC.PCC_DESC, RC.PC_CODE
+          UNION ALL
+            SELECT RC.PCC_DESC,
+                   RC.PC_CODE CODE,
+                   SUM (NVL (PS.SRN_3RDASST, 0)) AMT,
+                   SUM (NVL (TS.TAXAMT, 0)) TAXAMT
+              FROM OPBILLMAST OPB
+                   JOIN PATSURGERY PS
+                      ON PS.D3RDASST_OPSLNO = OPB.OPC_SLNO
+                   JOIN TAX_SURGERY TS
+                      ON TS.SR_SLNO = PS.SR_SLNO
+                   JOIN OPPARAM OPP
+                      ON 1 = 1
+                   JOIN REV_CAT RC
+                      ON RC.PC_CODE = OPP.OPC_3RDASST
+                   JOIN DATE_PARAMS DP
+                      ON 1 = 1
+             WHERE     NVL (PS.SRC_CANCEL, 'N') = 'N'
+                   AND NVL (OPB.OPN_CANCEL, 'N') = 'N'
+                   AND OPB.OPC_CACR <> 'M'
+                   AND NVL (PS.SRN_3RDASST, 0) > 0
+                   AND OPB.OPD_DATE BETWEEN DP.FROM_DT AND DP.TO_DT
+                   AND EXISTS
+                          (SELECT 1
+                             FROM EXCLUDE_IPS E
+                            WHERE E.IP_NO = PS.IP_NO)
+                   AND EXISTS
+                          (SELECT 1
+                             FROM MH M
+                            WHERE M.MH_CODE = OPB.MH_CODE)
+          GROUP BY RC.PCC_DESC, RC.PC_CODE
+          UNION ALL
+            SELECT RC.PCC_DESC,
+                   RC.PC_CODE CODE,
+                   SUM (NVL (PS.SRN_GUEST, 0)) AMT,
+                   SUM (NVL (TS.TAXAMT, 0)) TAXAMT
+              FROM OPBILLMAST OPB
+                   JOIN PATSURGERY PS
+                      ON PS.GUEST_OPSLNO = OPB.OPC_SLNO
+                   JOIN TAX_SURGERY TS
+                      ON TS.SR_SLNO = PS.SR_SLNO
+                   JOIN OPPARAM OPP
+                      ON 1 = 1
+                   JOIN REV_CAT RC
+                      ON RC.PC_CODE = OPP.OPC_GUEST
+                   JOIN DATE_PARAMS DP
+                      ON 1 = 1
+             WHERE     NVL (PS.SRC_CANCEL, 'N') = 'N'
+                   AND NVL (OPB.OPN_CANCEL, 'N') = 'N'
+                   AND OPB.OPC_CACR <> 'M'
+                   AND NVL (PS.SRN_GUEST, 0) > 0
+                   AND OPB.OPD_DATE BETWEEN DP.FROM_DT AND DP.TO_DT
+                   AND EXISTS
+                          (SELECT 1
+                             FROM EXCLUDE_IPS E
+                            WHERE E.IP_NO = PS.IP_NO)
+                   AND EXISTS
+                          (SELECT 1
+                             FROM MH M
+                            WHERE M.MH_CODE = OPB.MH_CODE)
+          GROUP BY RC.PCC_DESC, RC.PC_CODE
+          UNION ALL
+            SELECT RC.PCC_DESC,
+                   RC.PC_CODE CODE,
+                   SUM (NVL (PS.SRN_ANTEST, 0) - NVL (PS.SRN_ANTDIS, 0)) AMT,
+                   SUM (NVL (TS.TAXAMT, 0)) TAXAMT
+              FROM OPBILLMAST OPB
+                   JOIN PATSURGERY PS
+                      ON PS.ANTEST_OPSLNO = OPB.OPC_SLNO
+                   JOIN TAX_SURGERY TS
+                      ON TS.SR_SLNO = PS.SR_SLNO
+                   JOIN OPPARAM OPP
+                      ON 1 = 1
+                   JOIN REV_CAT RC
+                      ON RC.PC_CODE = OPP.OPC_ANEST
+                   JOIN DATE_PARAMS DP
+                      ON 1 = 1
+             WHERE     NVL (PS.SRC_CANCEL, 'N') = 'N'
+                   AND NVL (OPB.OPN_CANCEL, 'N') = 'N'
+                   AND OPB.OPC_CACR <> 'M'
+                   AND NVL (PS.SRN_ANTEST, 0) > 0
+                   AND OPB.OPD_DATE BETWEEN DP.FROM_DT AND DP.TO_DT
+                   AND EXISTS
+                          (SELECT 1
+                             FROM EXCLUDE_IPS E
+                            WHERE E.IP_NO = PS.IP_NO)
+                   AND EXISTS
+                          (SELECT 1
+                             FROM MH M
+                            WHERE M.MH_CODE = OPB.MH_CODE)
+          GROUP BY RC.PCC_DESC, RC.PC_CODE
+          UNION ALL
+            SELECT RC.PCC_DESC,
+                   RC.PC_CODE CODE,
+                   SUM (NVL (PS.SRN_ANTEST2, 0)) AMT,
+                   SUM (NVL (TS.TAXAMT, 0)) TAXAMT
+              FROM OPBILLMAST OPB
+                   JOIN PATSURGERY PS
+                      ON PS.ANTEST2_OPSLNO = OPB.OPC_SLNO
+                   JOIN TAX_SURGERY TS
+                      ON TS.SR_SLNO = PS.SR_SLNO
+                   JOIN OPPARAM OPP
+                      ON 1 = 1
+                   JOIN REV_CAT RC
+                      ON RC.PC_CODE = OPP.OPC_ANEST2
+                   JOIN DATE_PARAMS DP
+                      ON 1 = 1
+             WHERE     NVL (PS.SRC_CANCEL, 'N') = 'N'
+                   AND NVL (OPB.OPN_CANCEL, 'N') = 'N'
+                   AND OPB.OPC_CACR <> 'M'
+                   AND NVL (PS.SRN_ANTEST2, 0) > 0
+                   AND OPB.OPD_DATE BETWEEN DP.FROM_DT AND DP.TO_DT
+                   AND EXISTS
+                          (SELECT 1
+                             FROM EXCLUDE_IPS E
+                            WHERE E.IP_NO = PS.IP_NO)
+                   AND EXISTS
+                          (SELECT 1
+                             FROM MH M
+                            WHERE M.MH_CODE = OPB.MH_CODE)
+          GROUP BY RC.PCC_DESC, RC.PC_CODE
+          UNION ALL
+            SELECT RC.PCC_DESC,
+                   RC.PC_CODE CODE,
+                   SUM (NVL (PSO.PDN_AMOUNT, 0)) AMT,
+                   SUM (NVL (PSO.PSN_TOTTAX, 0)) TAXAMT
+              FROM OPBILLMAST OPB
+                   JOIN PATSUROTHER PSO
+                      ON PSO.OPC_SLNO = OPB.OPC_SLNO
+                   JOIN PATSURGERY PS
+                      ON PS.SR_SLNO = PSO.SR_SLNO
+                   JOIN PRODESCRIPTION PD
+                      ON PD.PD_CODE = PSO.PD_CODE
+                   JOIN PROGROUP PG
+                      ON PG.PG_CODE = PD.PG_CODE
+                   JOIN REV_CAT RC
+                      ON RC.PC_CODE = PG.PC_CODE
+                   JOIN DATE_PARAMS DP
+                      ON 1 = 1
+             WHERE     NVL (PS.SRC_CANCEL, 'N') = 'N'
+                   AND NVL (PSO.SRC_CANCEL, 'N') = 'N'
+                   AND NVL (OPB.OPN_CANCEL, 'N') = 'N'
+                   AND OPB.OPC_CACR <> 'M'
+                   AND OPB.OPD_DATE BETWEEN DP.FROM_DT AND DP.TO_DT
+                   AND EXISTS
+                          (SELECT 1
+                             FROM EXCLUDE_IPS E
+                            WHERE E.IP_NO = PS.IP_NO)
+                   AND EXISTS
+                          (SELECT 1
+                             FROM MH M
+                            WHERE M.MH_CODE = OPB.MH_CODE)
+          GROUP BY RC.PCC_DESC, RC.PC_CODE
+          UNION ALL
+            SELECT RC.PCC_DESC,
+                   RC.PC_CODE CODE,
+                   SUM (NVL (PSD.SRN_AMOUNT, 0) - NVL (PSD.SRN_DISCOUNT, 0)) AMT,
+                   SUM (NVL (PSD.PSN_TOTTAX, 0)) TAXAMT
+              FROM OPBILLMAST OPB
+                   JOIN PATSURDETL PSD
+                      ON PSD.OPC_SLNO = OPB.OPC_SLNO
+                   JOIN PATSURGERY PS
+                      ON PS.SR_SLNO = PSD.SR_SLNO
+                   JOIN REV_CAT RC
+                      ON RC.PC_CODE = PSD.PC_CODE
+                   JOIN DATE_PARAMS DP
+                      ON 1 = 1
+             WHERE     NVL (PS.SRC_CANCEL, 'N') = 'N'
+                   AND NVL (PSD.SRC_CANCEL, 'N') = 'N'
+                   AND NVL (OPB.OPN_CANCEL, 'N') = 'N'
+                   AND OPB.OPC_CACR <> 'M'
+                   AND OPB.OPD_DATE BETWEEN DP.FROM_DT AND DP.TO_DT
+                   AND EXISTS
+                          (SELECT 1
+                             FROM EXCLUDE_IPS E
+                            WHERE E.IP_NO = PS.IP_NO)
+                   AND EXISTS
+                          (SELECT 1
+                             FROM MH M
+                            WHERE M.MH_CODE = OPB.MH_CODE)
+          GROUP BY RC.PCC_DESC, RC.PC_CODE
+          UNION ALL
+            SELECT RC.PCC_DESC,
+                   RC.PC_CODE CODE,
+                   SUM (
+                      (NVL (BDTL.PDN_RATE, 0) * NVL (BDTL.PDN_QTY, 0))
+                      - NVL (BDTL.BMN_DISAMT, 0))
+                      AMT,
+                   SUM (NVL (BDTL.BDN_TOTTAX, 0)) TAXAMT
+              FROM BASE_DISBILL D
+                   JOIN BILLMAST BM
+                      ON BM.DMC_SLNO = D.DMC_SLNO
+                   JOIN BILLDETL BDTL
+                      ON BDTL.BMC_SLNO = BM.BMC_SLNO
+                   JOIN PRODESCRIPTION PD
+                      ON PD.PD_CODE = BDTL.PD_CODE
+                   JOIN PROGROUP PG
+                      ON PG.PG_CODE = PD.PG_CODE
+                   JOIN REV_CAT RC
+                      ON RC.PC_CODE = PG.PC_CODE
+             WHERE BM.BMC_CACR = 'I' AND NVL (BM.BMC_CANCEL, 'N') = 'N'
+          GROUP BY RC.PCC_DESC, RC.PC_CODE
+          UNION ALL
+            SELECT RC.PCC_DESC,
+                   RC.PC_CODE CODE,
+                   SUM (NVL (RBD.RFN_NETAMT, 0)) * -1 AMT,
+                   SUM (NVL (RBD.RFN_TOTTAX, 0)) * -1 TAXAMT
+              FROM BASE_DISBILL D
+                   JOIN BILLMAST BM
+                      ON BM.DMC_SLNO = D.DMC_SLNO
+                   JOIN REFUNDBILLDETL RBD
+                      ON RBD.BMC_SLNO = BM.BMC_SLNO
+                   JOIN REFUNDBILLMAST RBM
+                      ON RBM.RFC_SLNO = RBD.RFC_SLNO
+                   JOIN PRODESCRIPTION PD
+                      ON PD.PD_CODE = RBD.PD_CODE
+                   JOIN PROGROUP PG
+                      ON PG.PG_CODE = PD.PG_CODE
+                   JOIN REV_CAT RC
+                      ON RC.PC_CODE = PG.PC_CODE
+             WHERE NVL (RBD.RFC_CANCEL, 'N') = 'N' AND RBM.RFC_CACR = 'I'
+          GROUP BY RC.PCC_DESC, RC.PC_CODE
+          UNION ALL
+            SELECT RC.PCC_DESC,
+                   RC.PC_CODE CODE,
+                   SUM (NVL (DBD.DSN_PACKAGEADJAMT, 0)) AMT,
+                   0 TAXAMT
+              FROM BASE_DISBILL BD
+                   JOIN DISBILLDETL DBD
+                      ON DBD.DMC_SLNO = BD.DMC_SLNO
+                   JOIN REV_CAT RC
+                      ON RC.PC_CODE = DBD.PC_CODE
+          GROUP BY RC.PCC_DESC, RC.PC_CODE) REVNUE JOIN REV_CAT ON REV_CAT.PC_CODE = REVNUE.CODE
+GROUP BY REVNUE.PCC_DESC, REVNUE.CODE,REV_CAT.DG_DESC`;
+  const result = await conn_ora.execute(
+    sql,
+    {
+      fromDate: bind.from,
+      toDate: bind.to,
+    },
+    {outFormat: oracledb.OUT_FORMAT_OBJECT},
+  );
+  return result.rows;
+};
+
 module.exports = {
   getMisincexpmast,
   getMisincexpgroup,
@@ -3382,4 +4057,5 @@ module.exports = {
   get_CreditInsuranceBill,
   get_UnsettledAmount_TSSH,
   get_AdvanceCollection_TSSH,
+  get_ProcedureDetails_TSSH,
 };
