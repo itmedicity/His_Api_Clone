@@ -124,10 +124,10 @@ async function restartPools() {
 
   try {
     // Prevent restart if busy
-    if (poolTMC?.connectionsInUse > 0) {
-      console.log("⚠️ Skipping restart, connections still in use");
-      return;
-    }
+    // if (poolTMC?.connectionsInUse > 0) {
+    //   console.log("⚠️ Skipping restart, connections still in use");
+    //   return;
+    // }
 
     // Create new pools
     const newTMC = await oracledb.createPool({
@@ -144,49 +144,49 @@ async function restartPools() {
       callTimeout: 180000,
     });
 
-    const newTMCCRON = await oracledb.createPool({
-      user: process.env.ORA_USER,
-      password: process.env.ORAC_PASS,
-      connectString: process.env.ORA_CONN_STRING,
-      poolMin: 2,
-      poolMax: 10,
-      poolIncrement: 2,
-      queueTimeout: 60000,
-      stmtCacheSize: 30,
-      poolPingInterval: 60,
-      poolTimeout: 60,
-      callTimeout: 120000,
-    });
+    // const newTMCCRON = await oracledb.createPool({
+    //   user: process.env.ORA_USER,
+    //   password: process.env.ORAC_PASS,
+    //   connectString: process.env.ORA_CONN_STRING,
+    //   poolMin: 2,
+    //   poolMax: 10,
+    //   poolIncrement: 2,
+    //   queueTimeout: 60000,
+    //   stmtCacheSize: 30,
+    //   poolPingInterval: 60,
+    //   poolTimeout: 60,
+    //   callTimeout: 120000,
+    // });
 
-    const newKMC = await oracledb.createPool({
-      user: process.env.KMC_ORA_USER,
-      password: process.env.KMC_ORAC_PASS,
-      connectString: process.env.KMC_ORA_CONN_STRING,
-      poolMin: 1,
-      poolMax: 2,
-      poolIncrement: 1,
-      poolTimeout: 60,
-      queueTimeout: 60000,
-      stmtCacheSize: 30,
-      poolPingInterval: 60,
-      callTimeout: 120000,
-    });
+    // const newKMC = await oracledb.createPool({
+    //   user: process.env.KMC_ORA_USER,
+    //   password: process.env.KMC_ORAC_PASS,
+    //   connectString: process.env.KMC_ORA_CONN_STRING,
+    //   poolMin: 1,
+    //   poolMax: 2,
+    //   poolIncrement: 1,
+    //   poolTimeout: 60,
+    //   queueTimeout: 60000,
+    //   stmtCacheSize: 30,
+    //   poolPingInterval: 60,
+    //   callTimeout: 120000,
+    // });
 
     // Swap pools
     const oldTMC = poolTMC;
-    const oldTMCCRON = poolTMCCRON;
-    const oldKMC = poolKMC;
+    // const oldTMCCRON = poolTMCCRON;
+    // const oldKMC = poolKMC;
 
     poolTMC = newTMC;
-    poolTMCCRON = newTMCCRON;
-    poolKMC = newKMC;
+    // poolTMCCRON = newTMCCRON;
+    // poolKMC = newKMC;
 
     console.log("🔄 Pools swapped successfully");
 
     // Close old pools
     if (oldTMC) await oldTMC.close(10);
-    if (oldTMCCRON) await oldTMCCRON.close(10);
-    if (oldKMC) await oldKMC.close(10);
+    // if (oldTMCCRON) await oldTMCCRON.close(10);
+    // if (oldKMC) await oldKMC.close(10);
 
     console.log("✅ Old pools closed");
   } catch (err) {
@@ -230,11 +230,11 @@ async function restartPools() {
 // }
 
 function scheduleEvery3HoursRestart() {
-  console.log("⏰ Pool restart scheduled every 3 hours");
+  console.log("⏰ Pool restart scheduled every 1 hours");
 
   setInterval(
     async () => {
-      console.log("♻️ Running 3-hour pool restart...");
+      console.log("♻️ Running 1-hour pool restart...");
       await restartPools();
     },
     1 * 60 * 60 * 1000,
