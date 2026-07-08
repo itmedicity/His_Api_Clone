@@ -1,5 +1,5 @@
 // @ts-nocheck
-const {oracledb, getTmcConnection} = require("../../../../../config/oradbconfig");
+const {oracledb, getTmcConnection, oracleConnectionClose} = require("../../../../../config/oradbconfig");
 
 module.exports = {
   // BED INCOME
@@ -1027,7 +1027,7 @@ module.exports = {
       console.log(error);
       throw error;
     } finally {
-      if (conn_ora) await conn_ora.close();
+      if (conn_ora) await oracleConnectionClose(conn_ora);
     }
   },
   nsIncome: async (data) => {
@@ -2049,7 +2049,7 @@ module.exports = {
       console.log(error);
       throw error;
     } finally {
-      if (conn_ora) await conn_ora.close();
+      await oracleConnectionClose(conn_ora);
     }
   },
   roomRentIncome: async (data) => {
@@ -3189,7 +3189,7 @@ module.exports = {
       console.log(error);
       throw error;
     } finally {
-      if (conn_ora) await conn_ora.close();
+      await oracleConnectionClose(conn_ora);
     }
   },
   otherIncome: async (data) => {
@@ -4249,7 +4249,7 @@ module.exports = {
       console.log(error);
       throw error;
     } finally {
-      if (conn_ora) await conn_ora.close();
+      await oracleConnectionClose(conn_ora);
     }
   },
   consultingIncome: async (data) => {
@@ -5285,7 +5285,7 @@ module.exports = {
       console.log(error);
       throw error;
     } finally {
-      if (conn_ora) await conn_ora.close();
+      await oracleConnectionClose(conn_ora);
     }
   },
   anesthetiaIncome: async (data) => {
@@ -6322,7 +6322,7 @@ module.exports = {
       console.log(error);
       throw error;
     } finally {
-      if (conn_ora) await conn_ora.close();
+      await oracleConnectionClose(conn_ora);
     }
   },
   surgeonIncome: async (data) => {
@@ -7391,7 +7391,7 @@ module.exports = {
       console.log(error);
       throw error;
     } finally {
-      if (conn_ora) await conn_ora.close();
+      await oracleConnectionClose(conn_ora);
     }
   },
   theaterIncome: async (data) => {
@@ -8429,7 +8429,7 @@ module.exports = {
       console.log(error);
       throw error;
     } finally {
-      if (conn_ora) await conn_ora.close();
+      await oracleConnectionClose(conn_ora);
     }
   },
   cardiologyIncome: async (data) => {
@@ -9465,7 +9465,7 @@ module.exports = {
       console.log(error);
       throw error;
     } finally {
-      if (conn_ora) await conn_ora.close();
+      await oracleConnectionClose(conn_ora);
     }
   },
   disPosibleItemIncome: async (data) => {
@@ -10503,7 +10503,7 @@ module.exports = {
       console.log(error);
       throw error;
     } finally {
-      if (conn_ora) await conn_ora.close();
+      await oracleConnectionClose(conn_ora);
     }
   },
   icuIncome: async (data) => {
@@ -11539,7 +11539,7 @@ module.exports = {
       console.log(error);
       throw error;
     } finally {
-      if (conn_ora) await conn_ora.close();
+      await oracleConnectionClose(conn_ora);
     }
   },
   icuprocedureIncome: async (data) => {
@@ -12576,7 +12576,7 @@ module.exports = {
       console.log(error);
       throw error;
     } finally {
-      if (conn_ora) await conn_ora.close();
+      await oracleConnectionClose(conn_ora);
     }
   },
   radiologyIncome: async (data) => {
@@ -13612,7 +13612,7 @@ module.exports = {
       console.log(error);
       throw error;
     } finally {
-      if (conn_ora) await conn_ora.close();
+      await oracleConnectionClose(conn_ora);
     }
   },
   laboratoryIncome: async (data) => {
@@ -14648,7 +14648,7 @@ module.exports = {
       console.log(error);
       throw error;
     } finally {
-      if (conn_ora) await conn_ora.close();
+      await oracleConnectionClose(conn_ora);
     }
   },
   mriIncome: async (data) => {
@@ -15723,7 +15723,7 @@ module.exports = {
       console.log(error);
       throw error;
     } finally {
-      if (conn_ora) await conn_ora.close();
+      await oracleConnectionClose(conn_ora);
     }
   },
   dietIncome: async (data) => {
@@ -16760,7 +16760,7 @@ module.exports = {
       console.log(error);
       throw error;
     } finally {
-      if (conn_ora) await conn_ora.close();
+      await oracleConnectionClose(conn_ora);
     }
   },
   pharmacyIncomePart1: async (data) => {
@@ -16932,7 +16932,7 @@ module.exports = {
       console.log(error);
       throw error;
     } finally {
-      if (conn_ora) await conn_ora.close();
+      await oracleConnectionClose(conn_ora);
     }
   },
   pharmacyIncomePart2: async (data) => {
@@ -17042,7 +17042,7 @@ module.exports = {
       console.log(error);
       throw error;
     } finally {
-      if (conn_ora) await conn_ora.close();
+      await oracleConnectionClose(conn_ora);
     }
   },
   pharmacyIncomePart3: async (data) => {
@@ -17085,7 +17085,7 @@ module.exports = {
       console.log(error);
       throw error;
     } finally {
-      if (conn_ora) await conn_ora.close();
+      await oracleConnectionClose(conn_ora);
     }
   },
   pharmacyIncomePart4: async (data) => {
@@ -17194,7 +17194,7 @@ module.exports = {
       console.log(error);
       throw error;
     } finally {
-      if (conn_ora) await conn_ora.close();
+      await oracleConnectionClose(conn_ora);
     }
   },
 };

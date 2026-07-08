@@ -1,8 +1,7 @@
 const {pools} = require("../../config/mysqldbconfig");
-const {getTmcConnection, oracledb} = require("../../config/oradbconfig");
+const {oracledb} = require("../../config/oradbconfig");
 module.exports = {
   getOpCountDayWise: async (callBack) => {
-    let conn_ora = await getTmcConnection();
     const sql = `SELECT 
                           DAYS, 
                           COUNT(VS_NO) COUNT,
@@ -22,7 +21,7 @@ module.exports = {
                       GROUP BY DAYS,YEARS  
                       ORDER BY DAYS`;
     try {
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       const dayCountFromOra = result.rows;
       dayCountFromOra &&
         dayCountFromOra.map((value, index) => {
@@ -33,15 +32,10 @@ module.exports = {
       return callBack(null, result);
     } catch (error) {
       return callBack(error);
-    } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-      }
     }
   },
 
   getOpCountMonthWise: async (callBack) => {
-    let conn_ora = await getTmcConnection();
     const sql = `SELECT 
                           MONTHS, 
                           COUNT(VS_NO) COUNT,
@@ -61,7 +55,7 @@ module.exports = {
                       GROUP BY MONTHS,YEARS  
                       ORDER BY MONTHS`;
     try {
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       const monthCountFromOra = result.rows;
       monthCountFromOra &&
         monthCountFromOra.map((value, index) => {
@@ -72,15 +66,10 @@ module.exports = {
       return callBack(null, result);
     } catch (error) {
       return callBack(error);
-    } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-      }
     }
   },
 
   getOpCountYearWise: async (callBack) => {
-    let conn_ora = await getTmcConnection();
     // const fromDate = data.from;
     // const toDate = data.to;
     const sql = `SELECT 
@@ -102,7 +91,7 @@ module.exports = {
                       GROUP BY YEARS,DAYS 
                       ORDER BY YEARS`;
     try {
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       const yearCountFromOra = result.rows;
       yearCountFromOra &&
         yearCountFromOra.map((value, index) => {
@@ -113,15 +102,10 @@ module.exports = {
       return callBack(null, result);
     } catch (error) {
       return callBack(error);
-    } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-      }
     }
   },
 
   getOpCountDeptDayWise: async (callBack) => {
-    let conn_ora = await getTmcConnection();
     // const fromDate = data.from;
     // const toDate = data.to;
 
@@ -156,7 +140,7 @@ module.exports = {
                            GROUP BY DAYS,DP_CODE,SP_CODE,DPC_DESC,SPC_DESC,YEARS
                            ORDER BY DAYS`;
     try {
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       const dayCountFromOra = result.rows;
       dayCountFromOra &&
         dayCountFromOra.map((value, index) => {
@@ -171,14 +155,9 @@ module.exports = {
       return callBack(null, result);
     } catch (error) {
       return callBack(error);
-    } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-      }
     }
   },
   getOpCountDeptMonthWise: async (callBack) => {
-    let conn_ora = await getTmcConnection();
     // const fromDate = data.from;
     // const toDate = data.to;
 
@@ -213,7 +192,7 @@ module.exports = {
                            GROUP BY MONTHS,DP_CODE,SP_CODE,DPC_DESC,SPC_DESC,YEARS
                            ORDER BY MONTHS`;
     try {
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       const monthCountFromOra = result.rows;
       monthCountFromOra &&
         monthCountFromOra.map((value, index) => {
@@ -229,15 +208,10 @@ module.exports = {
       return callBack(null, result);
     } catch (error) {
       return callBack(error);
-    } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-      }
     }
   },
 
   getOpCountDeptYearWise: async (callBack) => {
-    let conn_ora = await getTmcConnection();
     // const fromDate = data.from;
     // const toDate = data.to;
 
@@ -270,7 +244,7 @@ module.exports = {
                            GROUP BY YEARS,DP_CODE,SP_CODE,DPC_DESC,SPC_DESC
                            ORDER BY YEARS`;
     try {
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       const yearCountFromOra = result.rows;
       yearCountFromOra &&
         yearCountFromOra.map((value, index) => {
@@ -286,15 +260,10 @@ module.exports = {
       return callBack(null, result);
     } catch (error) {
       return callBack(error);
-    } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-      }
     }
   },
 
   getOpDoctorDayWise: async (callBack) => {
-    let conn_ora = await getTmcConnection();
     const sql = `SELECT   
                            DAYS,
                            DO_CODE,
@@ -320,7 +289,7 @@ module.exports = {
                        GROUP BY DAYS,DOC_NAME,DO_CODE,YEARS
                        ORDER BY DAYS`;
     try {
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       const dayCountFromOra = result.rows;
       dayCountFromOra &&
         dayCountFromOra.map((value, index) => {
@@ -335,15 +304,10 @@ module.exports = {
       return callBack(null, result);
     } catch (error) {
       return callBack(error);
-    } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-      }
     }
   },
 
   getOpDoctorMonthWise: async (callBack) => {
-    let conn_ora = await getTmcConnection();
     const sql = `SELECT   
                            MONTHS,
                            DO_CODE,
@@ -369,7 +333,7 @@ module.exports = {
                            GROUP BY MONTHS,DOC_NAME,DO_CODE,YEARS
                            ORDER BY MONTHS`;
     try {
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       const monthCountFromOra = result.rows;
       monthCountFromOra &&
         monthCountFromOra.map((value, index) => {
@@ -384,15 +348,10 @@ module.exports = {
       return callBack(null, result);
     } catch (error) {
       return callBack(error);
-    } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-      }
     }
   },
 
   getOpDoctorYearWise: async (callBack) => {
-    let conn_ora = await getTmcConnection();
     const sql = `SELECT   
                            YEARS,
                            DO_CODE,
@@ -416,7 +375,7 @@ module.exports = {
                        GROUP BY YEARS,DOC_NAME,DO_CODE
                        ORDER BY YEARS,DOC_NAME`;
     try {
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       const yearCountFromOra = result.rows;
       yearCountFromOra &&
         yearCountFromOra.map((value, index) => {
@@ -427,15 +386,10 @@ module.exports = {
       return callBack(null, result);
     } catch (error) {
       return callBack(error);
-    } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-      }
     }
   },
 
   getOpGenderDayWise: async (callBack) => {
-    let conn_ora = await getTmcConnection();
     const sql = `SELECT
                           DAYS,
                           PTC_SEX,
@@ -481,7 +435,7 @@ module.exports = {
                     GROUP BY DAYS ,PTC_SEX, YEARS
                     ORDER BY DAYS`;
     try {
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       const dayCountFromOra = result.rows;
       dayCountFromOra &&
         dayCountFromOra.map((value, index) => {
@@ -492,15 +446,10 @@ module.exports = {
       return callBack(null, result);
     } catch (error) {
       return callBack(error);
-    } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-      }
     }
   },
 
   getOpGenderMonthWise: async (callBack) => {
-    let conn_ora = await getTmcConnection();
     const sql = `SELECT
                            MONTHS,
                            PTC_SEX,
@@ -546,7 +495,7 @@ module.exports = {
                      GROUP BY MONTHS,PTC_SEX,YEARS
                      ORDER BY MONTHS`;
     try {
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       const monthCountFromOra = result.rows;
       monthCountFromOra &&
         monthCountFromOra.map((value, index) => {
@@ -557,14 +506,9 @@ module.exports = {
       return callBack(null, result);
     } catch (error) {
       return callBack(error);
-    } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-      }
     }
   },
   getOpGenderYearWise: async (callBack) => {
-    let conn_ora = await getTmcConnection();
     const sql = `SELECT
                            YEARS,
                            PTC_SEX,
@@ -606,7 +550,7 @@ module.exports = {
                         GROUP BY PTC_SEX,YEARS
                         ORDER BY YEARS`;
     try {
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       const yearCountFromOra = result.rows;
 
       yearCountFromOra &&
@@ -618,15 +562,10 @@ module.exports = {
       return callBack(null, result);
     } catch (error) {
       return callBack(error);
-    } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-      }
     }
   },
 
   getOpRegionDayWise: async (callBack) => {
-    let conn_ora = await getTmcConnection();
     const sql = ` SELECT         
                            DAYS,
                            RG_CODE,
@@ -652,7 +591,7 @@ module.exports = {
                         GROUP BY DAYS,RGC_DESC,RG_CODE,YEARS
                         ORDER BY DAYS,RGC_DESC`;
     try {
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       const dayCountFromOra = result.rows;
       dayCountFromOra &&
         dayCountFromOra.map((value, index) => {
@@ -667,15 +606,10 @@ module.exports = {
       return callBack(null, result);
     } catch (error) {
       return callBack(error);
-    } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-      }
     }
   },
 
   getOpRegionMonthWise: async (callBack) => {
-    let conn_ora = await getTmcConnection();
     const sql = ` SELECT         
                            MONTHS,
                            RG_CODE,
@@ -701,7 +635,7 @@ module.exports = {
                         GROUP BY MONTHS,RGC_DESC,RG_CODE,YEARS
                         ORDER BY MONTHS,RGC_DESC`;
     try {
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       const monthCountFromOra = result.rows;
       monthCountFromOra &&
         monthCountFromOra.map((value, index) => {
@@ -716,15 +650,10 @@ module.exports = {
       return callBack(null, result);
     } catch (error) {
       return callBack(error);
-    } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-      }
     }
   },
 
   getOpRegionYearWise: async (callBack) => {
-    let conn_ora = await getTmcConnection();
     const sql = ` SELECT         
                            YEARS,
                            RG_CODE,
@@ -748,7 +677,7 @@ module.exports = {
                         GROUP BY YEARS,RGC_DESC,RG_CODE
                         ORDER BY YEARS,RGC_DESC`;
     try {
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       const yearCountFromOra = result.rows;
       yearCountFromOra &&
         yearCountFromOra.map((value, index) => {
@@ -759,10 +688,6 @@ module.exports = {
       return callBack(null, result);
     } catch (error) {
       return callBack(error);
-    } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-      }
     }
   },
 };

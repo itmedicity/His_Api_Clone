@@ -1,15 +1,11 @@
-const {getTmcConnection} = require("../../../../config/oradbconfig");
 const {collectionReports001} = require("./collectionTmc.service");
 
 const getCollectionReports = async (req, res) => {
   const {fromDate, toDate} = req.body;
-
-  let ora_conn;
   try {
-    ora_conn = await getTmcConnection();
     const bind = {fromDate: fromDate, toDate: toDate};
 
-    const collection_One = await collectionReports001(ora_conn, bind);
+    const collection_One = await collectionReports001(bind);
 
     const results = {
       collection_one: collection_one,
@@ -26,14 +22,6 @@ const getCollectionReports = async (req, res) => {
       success: 0,
       message: error.message,
     });
-  } finally {
-    if (ora_conn) {
-      try {
-        await ora_conn.close();
-      } catch (closeErr) {
-        console.error("Error closing Oracle connection:", closeErr);
-      }
-    }
   }
 };
 

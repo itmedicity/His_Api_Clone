@@ -3,9 +3,8 @@ const {oracledb, getTmcConnection} = require("../../../../../config/oradbconfig"
 
 module.exports = {
   proIncomePart1: async (data) => {
-    let conn_ora = await getTmcConnection();
     try {
-      const result = await conn_ora.execute(
+      const result = await executeTmc(
         `SELECT 
                     Misincexpgroup.Dg_desc,
                     Misincexpgroup.Dg_grcode AS Code,
@@ -471,14 +470,11 @@ module.exports = {
     } catch (error) {
       console.log(error);
       throw error;
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
   proIncomePart2: async (data) => {
-    let conn_ora = await getTmcConnection();
     try {
-      const result = await conn_ora.execute(
+      const result = await executeTmc(
         `SELECT 
                     Misincexpgroup.Dg_desc,
                     Misincexpgroup.Dg_grcode AS Code,
@@ -596,14 +592,11 @@ module.exports = {
     } catch (error) {
       console.log(error);
       throw error;
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
   proIncomePart3: async (data) => {
-    let conn_ora = await getTmcConnection();
     try {
-      const result = await conn_ora.execute(
+      const result = await executeTmc(
         `SELECT MISINCEXPGROUP.DG_DESC,
                      MISINCEXPGROUP.DG_GRCODE AS CODE,
                      SUM ( (BILLDETL.PDN_RATE * PDN_QTY) - NVL (BILLDETL.BMN_DISAMT, 0)) AMT,
@@ -713,14 +706,11 @@ module.exports = {
     } catch (error) {
       console.log(error);
       throw error;
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
   proIncomePart4: async (data) => {
-    let conn_ora = await getTmcConnection();
     try {
-      const result = await conn_ora.execute(
+      const result = await executeTmc(
         `SELECT 
                 Misincexpgroup.Dg_desc,
                 Misincexpgroup.Dg_grcode AS Code,
@@ -897,14 +887,11 @@ module.exports = {
     } catch (error) {
       console.log(error);
       throw error;
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
   theaterIncome: async (data) => {
-    let conn_ora = await getTmcConnection();
     try {
-      const result = await conn_ora.execute(
+      const result = await executeTmc(
         `SELECT 
                 Misincexpgroup.Dg_desc,
                 Misincexpgroup.Dg_grcode AS Code,
@@ -1239,8 +1226,6 @@ module.exports = {
     } catch (error) {
       console.log(error);
       throw error;
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
 };

@@ -1,11 +1,11 @@
 // @ts-ignore
+const {executeTmc} = require("../../../../config/oracleExecutor");
 const {oracledb, getTmcConnection} = require("../../../../config/oradbconfig");
 
 module.exports = {
   gstreportsPartOne: async (data, callBack) => {
-    let conn_ora = await getTmcConnection();
     try {
-      const result = await conn_ora.execute(
+      const result = await executeTmc(
         `SELECT 
                         OUCODE,CODE,BILL,BILLDATE,CACR,QTY,LOOSE,PRATE,MRP,ACTMRP,AMT,DIS,
                         TAXCODE,TAXPER,TAXAMT,OUTLET.OUC_DESC,MEDDESC.ITC_DESC,TAX.TXC_DESC
@@ -80,14 +80,11 @@ module.exports = {
       callBack(null, result.rows);
     } catch (error) {
       console.log(error);
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
   gstreportsPartTwo: async (data, callBack) => {
-    let conn_ora = await getTmcConnection();
     try {
-      const result = await conn_ora.execute(
+      const result = await executeTmc(
         `SELECT 
                         OUCODE,CODE,BILL,BILLDATE,CACR,QTY,LOOSE,PRATE,MRP,ACTMRP,AMT,DIS,TAXCODE,
                         TAXPER,TAXAMT,OUTLET.OUC_DESC,MEDDESC.ITC_DESC,TAX.TXC_DESC
@@ -131,14 +128,11 @@ module.exports = {
       callBack(null, result.rows);
     } catch (error) {
       console.log(error);
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
   gstreportsPartThree: async (data, callBack) => {
-    let conn_ora = await getTmcConnection();
     try {
-      const result = await conn_ora.execute(
+      const result = await executeTmc(
         `SELECT 
                     OUCODE,CODE,BILL,BILLDATE,CACR,QTY,LOOSE,PRATE,MRP,ACTMRP,AMT,DIS,
                     TAXCODE,TAXPER,TAXAMT,OUTLET.OUC_DESC,MEDDESC.ITC_DESC,TAX.TXC_DESC
@@ -213,14 +207,11 @@ module.exports = {
       callBack(null, result.rows);
     } catch (error) {
       console.log(error);
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
   gstreportsPartFour: async (data, callBack) => {
-    let conn_ora = await getTmcConnection();
     try {
-      const result = await conn_ora.execute(
+      const result = await executeTmc(
         `SELECT 
                     OUCODE,CODE,BILL,BILLDATE,CACR,QTY,LOOSE,PRATE,MRP,ACTMRP,AMT,DIS,
                     TAXCODE,TAXPER,TAXAMT,OUTLET.OUC_DESC,MEDDESC.ITC_DESC,TAX.TXC_DESC
@@ -264,14 +255,11 @@ module.exports = {
       callBack(null, result.rows);
     } catch (error) {
       console.log(error);
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
   gstreportsPartFive: async (data, callBack) => {
-    let conn_ora = await getTmcConnection();
     try {
-      const result = await conn_ora.execute(
+      const result = await executeTmc(
         `SELECT 
                     PBILLDETL.OU_CODE OUCODE,
                     PBILLDETL.IT_CODE CODE,
@@ -309,8 +297,6 @@ module.exports = {
       callBack(null, result.rows);
     } catch (error) {
       console.log(error);
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
 };

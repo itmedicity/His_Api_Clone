@@ -1,11 +1,11 @@
 // @ts-ignore
+const {executeTmc} = require("../../../../../config/oracleExecutor");
 const {oracledb, getTmcConnection} = require("../../../../../config/oradbconfig");
 
 module.exports = {
   pharmacySalePart1: async (data) => {
-    let conn_ora = await getTmcConnection();
     try {
-      const result = await conn_ora.execute(
+      const result = await executeTmc(
         `SELECT 
                     SUM (A.Billamt) Amt,
                     SUM (A.GrossAmt) GrossAmt,
@@ -63,14 +63,11 @@ module.exports = {
     } catch (error) {
       console.log(error);
       throw error;
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
   phamracyReturnPart1: async (data) => {
-    let conn_ora = await getTmcConnection();
     try {
-      const result = await conn_ora.execute(
+      const result = await executeTmc(
         `SELECT 
                     SUM (NVL (Mretdetl.MRN_AMOUNT, 0) - NVL (MRN_DISAMT, 0)) * -1 Amt,
                     SUM (NVL (Mretdetl.MRN_AMOUNT, 0)) * -1 GrossAmt,
@@ -99,14 +96,11 @@ module.exports = {
     } catch (error) {
       console.log(error);
       throw error;
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
   phamracySalePart2: async (data) => {
-    let conn_ora = await getTmcConnection();
     try {
-      const result = await conn_ora.execute(
+      const result = await executeTmc(
         `SELECT 
             SUM (A.Billamt) Amt,
             SUM (A.GrossAmt) GrossAmt,
@@ -163,14 +157,11 @@ module.exports = {
     } catch (error) {
       console.log(error);
       throw error;
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
   phamracyReturnPart2: async (data) => {
-    let conn_ora = await getTmcConnection();
     try {
-      const result = await conn_ora.execute(
+      const result = await executeTmc(
         `SELECT 
                     SUM (NVL (Pbilldetl.Bdn_amount, 0)) Amt,
                     SUM (NVL (Pbilldetl.Bdn_amount, 0) + NVL (Pbilldetl.Bmn_disamt, 0)) GrossAmt,
@@ -199,14 +190,11 @@ module.exports = {
     } catch (error) {
       console.log(error);
       throw error;
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
   phamracySalePart3: async (data) => {
-    let conn_ora = await getTmcConnection();
     try {
-      const result = await conn_ora.execute(
+      const result = await executeTmc(
         ` SELECT 
                 SUM (NVL (Pbilldetl.Bdn_amount, 0)) Amt,
                 SUM (NVL (Pbilldetl.Bdn_amount, 0) + NVL (Pbilldetl.Bmn_disamt, 0)) GrossAmt,
@@ -236,14 +224,11 @@ module.exports = {
     } catch (error) {
       console.log(error);
       throw error;
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
   phamracyReturnPart3: async (data) => {
-    let conn_ora = await getTmcConnection();
     try {
-      const result = await conn_ora.execute(
+      const result = await executeTmc(
         `SELECT 
             SUM (NVL (Iprefunditemdetl.Rin_Netamt, 0)) * -1 Amt,
             SUM (NVL (Iprefunditemdetl.Rin_Netamt, 0) + NVL (Iprefunditemdetl.Rin_Disamt, 0)) * -1 GrossAmt,
@@ -271,8 +256,6 @@ module.exports = {
     } catch (error) {
       console.log(error);
       throw error;
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
 };

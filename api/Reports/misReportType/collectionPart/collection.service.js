@@ -1,12 +1,12 @@
 // @ts-ignore
+const {executeTmc} = require("../../../../config/oracleExecutor");
 const {oracledb, getTmcConnection} = require("../../../../config/oradbconfig");
 
 module.exports = {
   //Advance Collection (C)
   advanceCollection: async (data) => {
-    let conn_ora = await getTmcConnection();
     try {
-      const result = await conn_ora.execute(
+      const result = await executeTmc(
         `SELECT SUM (NVL (ARN_AMOUNT, 0)) Amt, 0 tax
                         FROM OPADVANCE 
                         LEFT JOIN PATIENT ON PATIENT.PT_NO = OPADVANCE.PT_NO
@@ -53,15 +53,12 @@ module.exports = {
     } catch (error) {
       console.log(error);
       throw error;
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
   // Advance Refund (B)
   advanceRefund: async (data) => {
-    let conn_ora = await getTmcConnection();
     try {
-      const result = await conn_ora.execute(
+      const result = await executeTmc(
         `        SELECT SUM (NVL (REFUNDOPADVANCE.RFN_AMT, 0)) Amt, 0 tax
                 FROM REFUNDOPADVANCE 
                 JOIN OPADVANCE ON OPADVANCE.AR_SLNO = REFUNDOPADVANCE.AR_SLNO
@@ -123,15 +120,12 @@ module.exports = {
     } catch (error) {
       console.log(error);
       throw error;
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
   //Advance Settled
   advanceSettled: async (data) => {
-    let conn_ora = await getTmcConnection();
     try {
-      const result = await conn_ora.execute(
+      const result = await executeTmc(
         `            SELECT SUM (NVL (Opn_advance, 0)) Amt, 0 tax
                     FROM Opbillmast
                     LEFT JOIN PATIENT ON PATIENT.PT_NO = OPBILLMAST.PT_NO 
@@ -199,15 +193,12 @@ module.exports = {
     } catch (error) {
       console.log(error);
       throw error;
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
   //Collection Against Sales (A) Total Value
   collectionAgainstSalePart1: async (data) => {
-    let conn_ora = await getTmcConnection();
     try {
-      const result = await conn_ora.execute(
+      const result = await executeTmc(
         `
 SELECT SUM (
             NVL (receiptmast.RPN_CASH, 0)
@@ -363,13 +354,10 @@ SELECT SUM (
     } catch (error) {
       console.log(error);
       throw error;
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
   //Collection Against Sales (A) negative value
   collectionAgainstSalePart2: async (data) => {
-    let conn_ora = await getTmcConnection();
     try {
       const result = await conn_ora.execute(
         `                SELECT 
@@ -515,15 +503,12 @@ SELECT SUM (
     } catch (error) {
       console.log(error);
       throw error;
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
   // Complimentary
   complimentory: async (data) => {
-    let conn_ora = await getTmcConnection();
     try {
-      const result = await conn_ora.execute(
+      const result = await executeTmc(
         `SELECT 
                         SUM (NVL (Opbillmast.OPN_NETAMT, 0) + NVL (OPBILLMAST.OPN_SALETAXCH, 0) + NVL (OPBILLMAST.OPN_SALETAXCR, 0)) AS Amt,
                         SUM (NVL (opbillmast.OPN_TOTTAX, 0)) Tax
@@ -558,15 +543,12 @@ SELECT SUM (
     } catch (error) {
       console.log(error);
       throw error;
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
   // CreditInsurance Bill Collection(D)
   creditInsuranceBillCollection: async (data) => {
-    let conn_ora = await getTmcConnection();
     try {
-      const result = await conn_ora.execute(
+      const result = await executeTmc(
         `SELECT 
                 SUM ( NVL (RECPCOLLECTIONMAST.RCN_CASH, 0) + NVL (RECPCOLLECTIONMAST.RCN_CHK, 0) + NVL (RECPCOLLECTIONMAST.RCN_DD, 0) + NVL (RECPCOLLECTIONMAST.RCN_Card, 0)  + NVL (RECPCOLLECTIONMAST.RCN_NEFT, 0)) Amt,
                 0 tax
@@ -601,15 +583,12 @@ SELECT SUM (
     } catch (error) {
       console.log(error);
       throw error;
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
   //	Credit/Insurance Bill
   creditInsuranceBill: async (data) => {
-    let conn_ora = await getTmcConnection();
     try {
-      const result = await conn_ora.execute(
+      const result = await executeTmc(
         `SELECT 
                         SUM (NVL (RPN_CREDIT, 0)) AS Amt,
                         SUM (NVL (receiptmast.RPN_TOTTAX, 0)) Tax
@@ -723,15 +702,12 @@ SELECT SUM (
     } catch (error) {
       console.log(error);
       throw error;
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
   //Ip Consolidate Discount
   ipConsolidatedDiscount: async (data) => {
-    let conn_ora = await getTmcConnection();
     try {
-      const result = await conn_ora.execute(
+      const result = await executeTmc(
         `SELECT SUM (NVL (irn_discount, 0)) Discount
                 FROM Disbillmast 
                 JOIN IPRECEIPT ON IPRECEIPT.DMC_SLNO =  DISBILLMAST.DMC_SLNO
@@ -757,15 +733,12 @@ SELECT SUM (
     } catch (error) {
       console.log(error);
       throw error;
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
   // IP Previous Day's  Discount
   ipPreviousDayDiscount: async (data) => {
-    let conn_ora = await getTmcConnection();
     try {
-      const result = await conn_ora.execute(
+      const result = await executeTmc(
         `SELECT SUM (NVL (Irn_Discount, 0)) Discount
                 FROM ipreceipt
                 JOIN Disbillmast ON Ipreceipt.Dmc_slno = Disbillmast.Dmc_slno
@@ -787,15 +760,12 @@ SELECT SUM (
     } catch (error) {
       console.log(error);
       throw error;
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
   // IP Previous Day's Collectoion(E)
   ipPreviousDayCollection: async (data) => {
-    let conn_ora = await getTmcConnection();
     try {
-      const result = await conn_ora.execute(
+      const result = await executeTmc(
         `SELECT 
             SUM ((NVL (Ipreceipt.irn_amount, 0) + NVL (Ipreceipt.irn_cheque, 0) + NVL (Ipreceipt.irn_card, 0)  + NVL (Ipreceipt.irn_neft, 0)) - (NVL (Ipreceipt.irn_balance, 0) + NVL (Ipreceipt.IRN_REFCHEQ, 0) + NVL (Ipreceipt.irn_refcard, 0))  + NVL (Ipreceipt.irn_discount, 0))  Amt,
             0 tax
@@ -819,15 +789,12 @@ SELECT SUM (
     } catch (err) {
       console.log(err);
       throw err;
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
   // UnSettled Amount
   unsettledAmount: async (data) => {
-    let conn_ora = await getTmcConnection();
     try {
-      const result = await conn_ora.execute(
+      const result = await executeTmc(
         `SELECT 
                 SUM (NVL (Payable, 0)) Amt, 
                 SUM (tax) tax
@@ -869,44 +836,30 @@ SELECT SUM (
     } catch (error) {
       console.log(error);
       throw error;
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
   // MIS GROUP & CATEGORY
   misGroupMast: async () => {
-    let conn_ora = await getTmcConnection();
     try {
-      const result = await conn_ora.execute(`SELECT * FROM MISINCEXPMAST`, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
-
-      // callBack(null, );
+      const result = await executeTmc(`SELECT * FROM MISINCEXPMAST`, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       return result.rows;
     } catch (err) {
       console.log(err);
       throw err;
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
   misGroup: async () => {
-    let conn_ora = await getTmcConnection();
     try {
-      const result = await conn_ora.execute(`SELECT * FROM Misincexpgroup`, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
-
-      // callBack(null, );
+      const result = await executeTmc(`SELECT * FROM Misincexpgroup`, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       return result.rows;
     } catch (err) {
       console.log(err);
       throw err;
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
   creditInsuranceBillRefund: async (data) => {
-    let conn_ora = await getTmcConnection();
-
     try {
-      const result = await conn_ora.execute(
+      const result = await executeTmc(
         `SELECT 
                 SUM (NVL (Refundreceiptmast.RPN_RTCREDIT, 0)) * -1 AS Amt,
                 SUM (NVL (Refundreceiptmast.RFN_TOTTAX, 0)) * -1 tax
@@ -1019,8 +972,6 @@ SELECT SUM (
     } catch (error) {
       console.log(error);
       throw error;
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
 };

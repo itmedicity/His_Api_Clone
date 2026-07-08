@@ -1,11 +1,11 @@
 // @ts-ignore
+const {executeTmc} = require("../../../../config/oracleExecutor");
 const {oracledb, getTmcConnection} = require("../../../../config/oradbconfig");
 
 module.exports = {
   patientTypeDiscount: async (data, callBack) => {
-    let conn_ora = await getTmcConnection();
     try {
-      const result = await conn_ora.execute(
+      const result = await executeTmc(
         `SELECT Ptc_Desc, SUM (Discount) Discount, SUM (tax) tax
                        FROM (  SELECT Receiptmast.Rpc_Slno Slno,
                                       Receiptmast.Rp_No BillNo,
@@ -2484,8 +2484,6 @@ module.exports = {
       callBack(null, result.rows);
     } catch (error) {
       console.log(error);
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
 };

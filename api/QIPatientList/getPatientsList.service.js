@@ -1,9 +1,9 @@
-const {getTmcConnection, oracledb} = require("../../config/oradbconfig");
+const {executeTmc} = require("../../config/oracleExecutor");
+const {oracledb} = require("../../config/oradbconfig");
 module.exports = {
   GetElliderPatientList: async (data) => {
-    let conn_ora = await getTmcConnection();
     try {
-      const result = await conn_ora.execute(
+      const result = await executeTmc(
         `SELECT
                        VISITDETL.PT_NO,PATIENT.PTC_PTNAME,PATIENT.PTC_SEX,PATIENT.PTN_DAYAGE,PATIENT.PTN_MONTHAGE,PATIENT.PTN_YEARAGE,
                        PATIENT.PTC_LOADD1,PATIENT.PTC_LOADD2,PATIENT.PTC_LOADD3,PATIENT.PTC_LOADD4,PATIENT.PTC_MOBILE, VISITMAST.VSD_DATE,
@@ -31,19 +31,12 @@ module.exports = {
     } catch (error) {
       console.log(error);
       throw error;
-      // return callBack(error);
-    } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-        // await pool_ora.close();
-      }
     }
   },
 
   GetEndoscopyIPInfo: async (id) => {
-    let conn_ora = await getTmcConnection();
     try {
-      const result = await conn_ora.execute(
+      const result = await executeTmc(
         `SELECT
                        IP_NO,IPD_DATE,PT_NO,PTC_PTNAME,PTC_TYPE,PTC_SEX,PTN_YEARAGE,PTN_MONTHAGE,PTN_DAYAGE,
                        PTC_LOADD1,PTC_LOADD2,PTC_LOADD3,PTC_LOADD4,PTC_MOBILE,IPADMISS.BD_CODE,BDC_NO,IPADMISS.DO_CODE,
@@ -64,18 +57,12 @@ module.exports = {
     } catch (error) {
       console.log(error);
       throw error;
-      // return callBack(error);
-    } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-      }
     }
   },
 
   GetInitialAssessmentDetails: async (data) => {
-    let conn_ora = await getTmcConnection();
     try {
-      const result = await conn_ora.execute(
+      const result = await executeTmc(
         `SELECT
                       VISITMAST.VSC_SLNO,VISITMAST.VSD_DATE,VISITDETL.PT_NO,PATIENT.PTC_PTNAME,PATIENT.PTC_MOBILE,
                       MIN(NURSE_ASSESSMENT.ENT_DATE) AS ASSESS_START_DATE,MAX(NURSE_ASSESSMENT.EDT_DATE) AS ASSESS_END_DATE,
@@ -117,22 +104,15 @@ module.exports = {
         {outFormat: oracledb.OUT_FORMAT_OBJECT},
       );
       return result.rows;
-      // return callBack(null, hisData);
     } catch (error) {
       console.log(error);
       throw error;
-      // return callBack(error);
-    } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-      }
     }
   },
 
   GetEndoscopyPatientsQI: async (data) => {
-    let conn_ora = await getTmcConnection();
     try {
-      const result = await conn_ora.execute(
+      const result = await executeTmc(
         `SELECT
                        NURSE_ASSESSMENT.VSC_SLNO,
                        VISITMAST.VSD_DATE,
@@ -164,18 +144,12 @@ module.exports = {
     } catch (error) {
       console.log(error);
       throw error;
-      // return callBack(error);
-    } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-      }
     }
   },
 
   GetIPPatientList: async (data) => {
-    let conn_ora = await getTmcConnection();
     try {
-      const result = await conn_ora.execute(
+      const result = await executeTmc(
         `SELECT
                        IP_NO,IPD_DATE,PT_NO,PTC_PTNAME,PTC_TYPE,PTC_SEX,PTN_YEARAGE,PTN_MONTHAGE,PTN_DAYAGE,PTC_LOADD1,
                        PTC_LOADD2,PTC_MOBILE,IPADMISS.BD_CODE,BDC_NO,IPADMISS.DO_CODE,IPD_DISC,IPC_STATUS,DOC_NAME
@@ -196,15 +170,9 @@ module.exports = {
         {outFormat: oracledb.OUT_FORMAT_OBJECT},
       );
       return result.rows;
-      // return callBack(null, hisData);
     } catch (error) {
       console.log(error);
       throw error;
-      // return callBack(error);
-    } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-      }
     }
   },
 };

@@ -1,10 +1,10 @@
 const {pools, query} = require("../../config/mysqldbconfig");
 const {oracledb, getTmcConnection, getTmcCronConnection} = require("../../config/oradbconfig");
 const {getCompanySlno, getSchemaByCompanyAndModule} = require("../../cron-jobs/CronLogger");
+const {executeTmc} = require("../../config/oracleExecutor");
 module.exports = {
   //using
   getOutlet: async () => {
-    let conn_ora = await getTmcConnection();
     const sql = `SELECT 
                            OU_CODE,
                            OUC_DESC,
@@ -15,26 +15,15 @@ module.exports = {
                            OUC_STATUS='Y'
                      ORDER BY OUC_DESC`;
     try {
-      const result = await conn_ora.execute(sql, [], {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(sql, [], {outFormat: oracledb.OUT_FORMAT_OBJECT});
       return result.rows;
-      // callBack(null, result.rows);
-      // const outletFromOra = await result.resultSet?.getRows();
-      // console.log(outletFromOra);
-      // return callBack(null, outletFromOra)
     } catch (error) {
-      // return callBack(error);
       console.log(error);
       throw error;
-    } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-        ////await pool_ora.close();
-      }
     }
   },
   //using
   getNursingStation: async () => {
-    let conn_ora = await getTmcConnection();
     const sql = `SELECT 
                         NS_CODE,
                         NSC_DESC,
@@ -45,23 +34,15 @@ module.exports = {
                         NSC_STATUS='Y'
                     ORDER BY NSC_DESC`;
     try {
-      const result = await conn_ora.execute(sql, [], {outFormat: oracledb.OUT_FORMAT_OBJECT});
-      // callBack(null, result.rows);
+      const result = await executeTmc(sql, [], {outFormat: oracledb.OUT_FORMAT_OBJECT});
       return result.rows;
     } catch (error) {
-      // return callBack(error);
       console.log(error);
       throw error;
-    } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-        ////await pool_ora.close();
-      }
     }
   },
 
   getRoomType: async () => {
-    let conn_ora = await getTmcConnection();
     const sql = `SELECT 
                            RT_CODE,
                            RTC_DESC,
@@ -72,23 +53,15 @@ module.exports = {
                            RTC_STATUS='Y'
                      ORDER BY RTC_DESC`;
     try {
-      const result = await conn_ora.execute(sql, [], {outFormat: oracledb.OUT_FORMAT_OBJECT});
-      // callBack(null, result.rows);
+      const result = await executeTmc(sql, [], {outFormat: oracledb.OUT_FORMAT_OBJECT});
       return result.rows;
     } catch (error) {
-      // return callBack(error);
       console.log(error);
       throw error;
-    } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-        //await pool_ora.close();
-      }
     }
   },
 
   getRoomCategory: async () => {
-    let conn_ora = await getTmcConnection();
     const sql = `SELECT 
                            RC_CODE,
                            RCC_DESC,
@@ -99,20 +72,15 @@ module.exports = {
                            RCC_STATUS='Y'
                      ORDER BY RCC_DESC      `;
     try {
-      const result = await conn_ora.execute(sql, [], {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(sql, [], {outFormat: oracledb.OUT_FORMAT_OBJECT});
       return result.rows;
     } catch (error) {
       console.log(error);
       throw error;
-    } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-      }
     }
   },
 
   getRoomDetails: async () => {
-    let conn_ora = await getTmcConnection();
     const sql = `SELECT 
                            RM_CODE,
                            RMC_DESC,
@@ -123,23 +91,15 @@ module.exports = {
                            RMC_STATUS='Y'
                      ORDER BY RMC_DESC`;
     try {
-      const result = await conn_ora.execute(sql, [], {outFormat: oracledb.OUT_FORMAT_OBJECT});
-      // callBack(null, result.rows);
+      const result = await executeTmc(sql, [], {outFormat: oracledb.OUT_FORMAT_OBJECT});
       return result.rows;
     } catch (error) {
       console.log(error);
       throw error;
-      // return callBack(error);
-    } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-        //await pool_ora.close();
-      }
     }
   },
   //using
   getInpatientDetails: async (data) => {
-    let conn_ora = await getTmcConnection();
     const sql = `
                 SELECT  IPADMISS.IP_NO, 
                             IPADMISS.IPD_DATE, 
@@ -258,7 +218,7 @@ module.exports = {
                         and ipadmiss.rc_code=roomtype.rc_code ORDER BY bdc_no
            `;
     try {
-      const result = await conn_ora.execute(
+      const result = await executeTmc(
         sql,
         {
           NS_CODE: data.NS_CODE,
@@ -270,17 +230,10 @@ module.exports = {
     } catch (error) {
       console.log(error);
       throw error;
-    } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-        //await pool_ora.close();
-      }
     }
   },
-
   //not using
   getPatientDetails: async () => {
-    let conn_ora = await getTmcConnection();
     const sql = `SELECT 
                            PT_NO,                 
                            PTD_DATE,             
@@ -446,22 +399,15 @@ module.exports = {
                            PTC_PTFLAG='N'
                        ORDER BY PTD_DATE`;
     try {
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
-      // callBack(null, result.rows);
+      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       return result.rows;
     } catch (error) {
       console.log(error);
       throw error;
-    } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-        //await pool_ora.close();
-      }
     }
   },
   //using
   getNursingBed: async (data) => {
-    let conn_ora = await getTmcConnection();
     const sql = `SELECT 
          N.NS_CODE,  
          N.NSC_DESC,
@@ -491,29 +437,21 @@ module.exports = {
      GROUP BY N.NS_CODE,N.NSC_DESC,N.NSC_STATUS,BD.BDC_NO,BD.BDC_OCCUP,BD.BD_CODE,BD.BDC_VIPBED,R.RTC_DESC,C.RCC_DESC,R.ICU,BD.RT_CODE,BD.BDC_STATUS,BD.HKD_CLEANINGREQ,BD.RM_CODE,BD.BDC_MHCODE,R.RC_CODE,R.RTC_STATUS,R.ICU,R.RTC_MHCODE
      ORDER BY BD.BDC_NO `;
     try {
-      const result = await conn_ora.execute(
+      const result = await executeTmc(
         sql,
         {
           NS_CODE: data.NS_CODE,
         },
         {outFormat: oracledb.OUT_FORMAT_OBJECT},
       );
-      // callBack(null, result.rows);
       return result.rows;
     } catch (error) {
       console.log(error);
       throw error;
-      // return callBack(error);
-    } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-        //await pool_ora.close();
-      }
     }
   },
   //using
   getCurrentPatient: async (data) => {
-    let conn_ora = await getTmcConnection();
     const sql = `SELECT 
                            IP_NO,                      
                            IPD_DATE,                   
@@ -663,7 +601,7 @@ module.exports = {
                        AND IPADMISS.BD_CODE =:BD_CODE
                        ORDER BY IPADMISS.IP_NO`;
     try {
-      const result = await conn_ora.execute(
+      const result = await executeTmc(
         sql,
         {
           NS_CODE: data.NS_CODE,
@@ -671,21 +609,14 @@ module.exports = {
         },
         {outFormat: oracledb.OUT_FORMAT_OBJECT},
       );
-      // callBack(null, result.rows);
       return result.rows;
     } catch (error) {
       console.log(error);
       throw error;
-    } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-        //await pool_ora.close();
-      }
     }
   },
   //using
   getDisChargedPatient: async (data) => {
-    let conn_ora = await getTmcConnection();
     const sql = `
         SELECT Row_Number( ) Over (Partition By 1 Order By  Ipadmiss.ipd_disc,Nurstation.nsc_alias) "Slno", 
        Ipadmiss.ipd_date"Admission_Date", 
@@ -721,7 +652,7 @@ module.exports = {
           Nvl(Disbillmast.Dmc_cancel,'N') ='N' and  
           Trunc(Ipadmiss.ipd_disc)  between to_date(:FROM_DATE,'dd/MM/yyyy hh24:mi:ss') and to_date(:TO_DATE,'dd/MM/yyyy hh24:mi:ss')`;
     try {
-      const result = await conn_ora.execute(
+      const result = await executeTmc(
         sql,
         {
           TO_DATE: data.TO_DATE,
@@ -729,25 +660,15 @@ module.exports = {
         },
         {outFormat: oracledb.OUT_FORMAT_OBJECT},
       );
-      // callBack(null, result.rows);
       return result.rows;
     } catch (error) {
-      // return callBack(error);
       console.log(error);
       throw error;
-    } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-        //await pool_ora.close();
-      }
     }
   },
 
   getInpatientFollowUp: async (data) => {
-    let conn_ora;
     try {
-      conn_ora = await getTmcCronConnection();
-
       const companySlno = await getCompanySlno();
       if (isNaN(Number(companySlno))) {
         return new Error(`Invalid company_slno: ${companySlno}`);
@@ -762,27 +683,15 @@ module.exports = {
                     JOIN ${SCHEMA_NAME}.DISCHARGESUMMARY D ON DS.DS_SLNO = D.DS_SLNO AND D.DSC_APPROVAL = 'Y'
                     WHERE DS.IP_NO = :IP_NO
                       AND DS.DSC_HEAD = 'DSC_FOLLOWUP'`;
-
-        // console.log(sql)
-      const result = await conn_ora.execute(sql, {IP_NO: data.IP_NO}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
-      // console.log(result)
-      // callBack(null, result.rows);
+      const result = await executeTmc(sql, {IP_NO: data.IP_NO}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       return result.rows;
-      // result.resultSet.getRows((err, rows) => {
-      //   callBack(err, rows);
-      //   result.resultSet.close(() => {});
-      // });
     } catch (error) {
-      // callBack(error);
       console.log(error);
       throw error;
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
 
   getPatientByIpNumber: async (data) => {
-    let conn_ora = await getTmcConnection();
     const sql = `
         select ipadmiss.IP_NO,
                     ipadmiss.IPD_DATE,
@@ -817,7 +726,7 @@ module.exports = {
                LEFT JOIN department ON speciality.DP_CODE=department.DP_CODE
                     WHERE ipadmiss.ip_no=:IP_NO and ipc_ptflag='N' `;
     try {
-      const result = await conn_ora.execute(
+      const result = await executeTmc(
         sql,
         {
           IP_NO: data.ipnumber,
@@ -825,23 +734,13 @@ module.exports = {
         {outFormat: oracledb.OUT_FORMAT_OBJECT},
       );
       return result.rows;
-      // callBack(null, result.rows);
     } catch (error) {
       console.log(error);
       throw error;
-      // return callBack(error);
-    } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-        //await pool_ora.close();
-      }
     }
   },
   getPatientDetail: async (data) => {
-    let conn_ora = await getTmcConnection();
-
     const column = data.type === 1 ? "IPD_DATE" : "IPD_DISC";
-
     const sql = `
             SELECT 
                 IP.IP_NO,
@@ -880,7 +779,7 @@ module.exports = {
         `;
 
     try {
-      const result = await conn_ora.execute(
+      const result = await executeTmc(
         sql,
         {
           FROM_DATE: data.fromDate,
@@ -889,17 +788,12 @@ module.exports = {
         {outFormat: oracledb.OUT_FORMAT_OBJECT},
       );
       return result.rows;
-      // callBack(null, result.rows);
     } catch (error) {
       console.log(error);
       throw error;
-      // return callBack(error);
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
   getBedMasterDetail: async (data) => {
-    let conn_ora = await getTmcConnection();
     const sql = `
         SELECT
             B.BD_CODE,
@@ -947,7 +841,7 @@ module.exports = {
 `;
 
     try {
-      const result = await conn_ora.execute(
+      const result = await executeTmc(
         sql,
         {
           TO_DATE: data.lastUpdteDate,
@@ -955,21 +849,13 @@ module.exports = {
         {outFormat: oracledb.OUT_FORMAT_OBJECT},
       );
       return result.rows;
-      // callBack(null, result.rows);
     } catch (error) {
       console.log(error);
       throw error;
-      // return callBack(error);
-    } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-        //await pool_ora.close();
-      }
     }
   },
 
   getPatientDetailFromNursingStation: async (data) => {
-    let conn_ora = await getTmcConnection();
     const sql = `
         SELECT ipadmiss.IP_NO,
        ipadmiss.IPD_DATE,
@@ -1039,7 +925,7 @@ GROUP BY ipadmiss.IP_NO,
 `;
 
     try {
-      const result = await conn_ora.execute(
+      const result = await executeTmc(
         sql,
         {
           NS_CODE: data.NS_CODE,
@@ -1047,24 +933,14 @@ GROUP BY ipadmiss.IP_NO,
         {outFormat: oracledb.OUT_FORMAT_OBJECT},
       );
       return result.rows;
-      // callBack(null, result.rows);
     } catch (error) {
       console.log(error);
       throw error;
-      // return callBack(error);
-    } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-        //await pool_ora.close();
-      }
     }
   },
 
   getRoomDetailEllider: async (data, callBack) => {
-    let conn_ora;
     try {
-      conn_ora = await getTmcConnection();
-
       if (!data || data.length === 0) {
         return callBack(null, []); // no codes to query
       }
@@ -1085,7 +961,7 @@ GROUP BY ipadmiss.IP_NO,
                 RT_CODE IN (${codes})
         `;
 
-      const result = await conn_ora.execute(sql, [], {
+      const result = await executeTmc(sql, [], {
         outFormat: oracledb.OUT_FORMAT_OBJECT,
       });
 
@@ -1093,15 +969,11 @@ GROUP BY ipadmiss.IP_NO,
     } catch (error) {
       console.log("Oracle Error:", error);
       callBack(error);
-    } finally {
-      if (conn_ora) await conn_ora.close();
-      // if (pool_ora) //await pool_ora.close();
     }
   },
   getRoomCategoryDetailEllider: async (data, callBack) => {
-    let conn_ora;
     try {
-      conn_ora = await getTmcConnection();
+      // conn_ora = await getTmcConnection();
 
       if (!data || data.length === 0) {
         return callBack(null, []); // no codes to query
@@ -1121,7 +993,7 @@ GROUP BY ipadmiss.IP_NO,
                 RC_CODE IN (${codes})
         `;
 
-      const result = await conn_ora.execute(sql, [], {
+      const result = await executeTmc(sql, [], {
         outFormat: oracledb.OUT_FORMAT_OBJECT,
       });
 
@@ -1129,15 +1001,12 @@ GROUP BY ipadmiss.IP_NO,
     } catch (error) {
       console.log("Oracle Error:", error);
       callBack(error);
-    } finally {
-      if (conn_ora) await conn_ora.close();
-      // if (pool_ora) //await pool_ora.close();
     }
   },
   getRoomMasterDetailEllider: async (data, callBack) => {
-    let conn_ora;
+    // let conn_ora;
     try {
-      conn_ora = await getTmcConnection();
+      // conn_ora = await getTmcConnection();
 
       if (!data || data.length === 0) {
         return callBack(null, []); // no codes to query
@@ -1158,7 +1027,7 @@ GROUP BY ipadmiss.IP_NO,
                 RM_CODE IN (${codes})
         `;
 
-      const result = await conn_ora.execute(sql, [], {
+      const result = await executeTmc(sql, [], {
         outFormat: oracledb.OUT_FORMAT_OBJECT,
       });
 
@@ -1166,16 +1035,12 @@ GROUP BY ipadmiss.IP_NO,
     } catch (error) {
       console.log("Oracle Error:", error);
       callBack(error);
-    } finally {
-      if (conn_ora) await conn_ora.close();
-      // if (pool_ora) await pool_ora.close();
     }
   },
   getNsDetailEllider: async (data, callBack) => {
-    let conn_ora;
+    // let conn_ora;
     try {
-      conn_ora = await getTmcConnection();
-
+      // conn_ora = await getTmcConnection();
       if (!data || data.length === 0) {
         return callBack(null, []); // no codes to query
       }
@@ -1193,7 +1058,7 @@ GROUP BY ipadmiss.IP_NO,
                 NS_CODE IN (${codes})
         `;
 
-      const result = await conn_ora.execute(sql, [], {
+      const result = await executeTmc(sql, [], {
         outFormat: oracledb.OUT_FORMAT_OBJECT,
       });
 
@@ -1201,9 +1066,6 @@ GROUP BY ipadmiss.IP_NO,
     } catch (error) {
       console.log("Oracle Error:", error);
       callBack(error);
-    } finally {
-      if (conn_ora) await conn_ora.close();
-      // if (pool_ora) await pool_ora.close();
     }
   },
   getBedDetailEllider: (data, callBack) => {
@@ -1241,12 +1103,6 @@ GROUP BY ipadmiss.IP_NO,
             ) VALUES ?`,
         [data],
       );
-      // pools.meliora.query((error, results, fields) => {
-      //   if (error) {
-      //     return callBack(error);
-      //   }
-      //   return callBack(null, {insertId: results.insertId});
-      // });
     } catch (err) {
       console.log(err);
       throw err;
