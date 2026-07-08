@@ -1,5 +1,6 @@
 const {format, parseISO} = require("date-fns");
 const {getTmcConnection, oracledb} = require("../../config/oradbconfig");
+const {executeTmc} = require("../../config/oracleExecutor");
 
 module.exports = {
   getPurchaseMastDatas: async (data) => {
@@ -10,7 +11,6 @@ module.exports = {
     const FROM_DATE = from ? format(from, "dd/MM/yyyy HH:mm:ss") : null;
     const TO_DATE = to ? format(to, "dd/MM/yyyy HH:mm:ss") : null;
 
-    let conn_ora = await getTmcConnection();
     const sql = `
                SELECT 
     PU_NO AS "GRN NO",
@@ -181,7 +181,7 @@ LEFT JOIN MEDDESC ON MEDDESC.IT_CODE = PUR.PU_ITEM
 `;
 
     try {
-      const result = await conn_ora.execute(
+      const result = await executeTmc(
         sql,
         {
           FROM_DATE: FROM_DATE,
@@ -194,9 +194,6 @@ LEFT JOIN MEDDESC ON MEDDESC.IT_CODE = PUR.PU_ITEM
     } catch (error) {
       console.log(error);
       throw error;
-      // return callBack(error);
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
 
@@ -209,7 +206,6 @@ LEFT JOIN MEDDESC ON MEDDESC.IT_CODE = PUR.PU_ITEM
     const FROM_DATE = from ? format(from, "dd/MM/yyyy HH:mm:ss") : null;
     const TO_DATE = to ? format(to, "dd/MM/yyyy HH:mm:ss") : null;
 
-    let conn_ora = await getTmcConnection();
     const sql = `
           SELECT 
     PU_NO AS "GRN NO",
@@ -370,7 +366,7 @@ LEFT JOIN MEDDESC ON MEDDESC.IT_CODE = PUR.PU_ITEM
 JOIN SUPPLIER SU ON SU.SU_CODE = PUR.SU_CODE
 `;
     try {
-      const result = await conn_ora.execute(
+      const result = await executeTmc(
         sql,
         {
           FROM_DATE: FROM_DATE,
@@ -384,13 +380,10 @@ JOIN SUPPLIER SU ON SU.SU_CODE = PUR.SU_CODE
       // return callBack(error);
       console.log(error);
       throw error;
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
 
   getpendingApprovalQtn: async () => {
-    let conn_ora = await getTmcConnection();
     const sql = `
              SELECT 
                    QM.QU_NO "QUOTATION #",
@@ -410,21 +403,16 @@ JOIN SUPPLIER SU ON SU.SU_CODE = PUR.SU_CODE
 
             `;
     try {
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
-      // callBack(null, result.rows);
+      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       return result.rows;
     } catch (error) {
-      // return callBack(error);
       console.log(error);
       throw error;
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
   getPurchaseDetails: async (data) => {
-    let conn_ora = await getTmcConnection();
     try {
-      const result = await conn_ora.execute(
+      const result = await executeTmc(
         ` 
                                SELECT 
                     QD.QU_NO "QUOTATION #",
@@ -460,16 +448,12 @@ JOIN SUPPLIER SU ON SU.SU_CODE = PUR.SU_CODE
     } catch (error) {
       console.log(error);
       throw error;
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
   getItemDetails: async (data) => {
-    let conn_ora = await getTmcConnection();
     try {
-      const result = await conn_ora.execute(
-        ` 
-                   SELECT 
+      const result = await executeTmc(
+        ` SELECT 
                   PD.PUD_DATE "PURCHASE DATE",
                   PD.SU_CODE,
                   SP.SUC_NAME "SUPPLIER",
@@ -516,8 +500,6 @@ JOIN SUPPLIER SU ON SU.SU_CODE = PUR.SU_CODE
     } catch (error) {
       console.log(error);
       throw error;
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
 };

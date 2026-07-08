@@ -1,10 +1,10 @@
 const {pools} = require("../../config/mysqldbconfig");
-const {getTmcConnection, oracledb} = require("../../config/oradbconfig");
+const {oracledb} = require("../../config/oradbconfig");
+const {executeTmc} = require("../../config/oracleExecutor");
 module.exports = {
   GetElliderCensusCount: async (data) => {
-    let conn_ora = await getTmcConnection();
     try {
-      const result = await conn_ora.execute(
+      const result = await executeTmc(
         ` SELECT NS_CODE, SUM(AD) AD,SUM(DC) DC,SUM(DT) DT,SUM(ACTIVE) ACTIVE,SUM(NIP) NIP,SUM(NDIS) NDIS,SUM(DAMA) DAMA,SUM(LAMA) LAMA FROM (
             SELECT 
                   B.NS_CODE,COUNT(IP.IP_NO) AD,0 DC,0 DT,0 ACTIVE,0 NIP,0 NDIS,0 DAMA,0 LAMA 
@@ -88,8 +88,6 @@ module.exports = {
     } catch (error) {
       console.log(error);
       throw error;
-    } finally {
-      await conn_ora.close();
     }
   },
 };

@@ -1,7 +1,9 @@
 const {oracledb} = require("../../../../config/oradbconfig");
+const {executeTmc} = require("../../../../config/oracleExecutor");
+
 const getMisincexpmast = async (conn_ora) => {
   const sql = `SELECT * FROM MISINCEXPMAST`;
-  const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+  const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
   return result.rows;
 };
 
@@ -35,14 +37,15 @@ const getUngroupedRoomDetl = async (conn_ora, bind) => {
                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                 GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                 ORDER BY Dg_desc`;
-  const result = await conn_ora.execute(
-    sql,
-    {
-      fromDate: bind.from,
-      toDate: bind.to,
-    },
-    {outFormat: oracledb.OUT_FORMAT_OBJECT},
-  );
+  //   const result = await conn_ora.execute(
+  //     sql,
+  //     {
+  //       fromDate: bind.from,
+  //       toDate: bind.to,
+  //     },
+  //     {outFormat: oracledb.OUT_FORMAT_OBJECT},
+  //   );
+  const result = await executeTmc(sql, {fromDate: bind.from, toDate: bind.to}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
   return result.rows;
 };
 
@@ -368,15 +371,16 @@ const getTheaterIncome = async (conn_ora, bind) => {
                     GROUP BY Misincexpgroup.Dg_Grcode, Misincexpgroup.Dg_Desc
                     ORDER BY Dg_desc`;
   //   console.log(sql);
-  const result = await conn_ora.execute(
-    sql,
-    {
-      fromDate: bind.from,
-      toDate: bind.to,
-    },
-    {outFormat: oracledb.OUT_FORMAT_OBJECT},
-  );
-  //   console.log(result.rows);
+  //   const result = await conn_ora.execute(
+  //     sql,
+  //     {
+  //       fromDate: bind.from,
+  //       toDate: bind.to,
+  //     },
+  //     {outFormat: oracledb.OUT_FORMAT_OBJECT},
+  //   );
+
+  const result = await executeTmc(sql, {fromDate: bind.from, toDate: bind.to}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
   return result.rows;
 };
 
@@ -405,14 +409,15 @@ const getConsultingIncome = async (conn_ora, bind) => {
                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                 GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                 ORDER BY Dg_desc`;
-  const result = await conn_ora.execute(
-    sql,
-    {
-      fromDate: bind.from,
-      toDate: bind.to,
-    },
-    {outFormat: oracledb.OUT_FORMAT_OBJECT},
-  );
+  //   const result = await conn_ora.execute(
+  //     sql,
+  //     {
+  //       fromDate: bind.from,
+  //       toDate: bind.to,
+  //     },
+  //     {outFormat: oracledb.OUT_FORMAT_OBJECT},
+  //   );
+  const result = await executeTmc(sql, {fromDate: bind.from, toDate: bind.to}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
   return result.rows;
 };
 
@@ -443,14 +448,15 @@ const getIpRefundDetl = async (conn_ora, bind) => {
                     AND IPREFUNDMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
             GROUP BY Misincexpgroup.Dg_Grcode, Misincexpgroup.Dg_Desc
             ORDER BY Dg_Desc`;
-  const result = await conn_ora.execute(
-    sql,
-    {
-      fromDate: bind.from,
-      toDate: bind.to,
-    },
-    {outFormat: oracledb.OUT_FORMAT_OBJECT},
-  );
+  //   const result = await conn_ora.execute(
+  //     sql,
+  //     {
+  //       fromDate: bind.from,
+  //       toDate: bind.to,
+  //     },
+  //     {outFormat: oracledb.OUT_FORMAT_OBJECT},
+  //   );
+  const result = await executeTmc(sql, {fromDate: bind.from, toDate: bind.to}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
   return result.rows;
 };
 
@@ -498,14 +504,15 @@ const getIpincomeSection_one = async (conn_ora, bind) => {
                     AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
             GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
             ORDER BY Dg_desc`;
-  const result = await conn_ora.execute(
-    sql,
-    {
-      fromDate: bind.from,
-      toDate: bind.to,
-    },
-    {outFormat: oracledb.OUT_FORMAT_OBJECT},
-  );
+  //   const result = await conn_ora.execute(
+  //     sql,
+  //     {
+  //       fromDate: bind.from,
+  //       toDate: bind.to,
+  //     },
+  //     {outFormat: oracledb.OUT_FORMAT_OBJECT},
+  //   );
+  const result = await executeTmc(sql, {fromDate: bind.from, toDate: bind.to}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
   return result.rows;
 };
 
@@ -536,20 +543,22 @@ const getIpincomeSection_two = async (conn_ora, bind) => {
          AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
 GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
 ORDER BY Dg_desc`;
-  const result = await conn_ora.execute(
-    sql,
-    {
-      fromDate: bind.from,
-      toDate: bind.to,
-    },
-    {outFormat: oracledb.OUT_FORMAT_OBJECT},
-  );
+  // const result = await conn_ora.execute(
+  //   sql,
+  //   {
+  //     fromDate: bind.from,
+  //     toDate: bind.to,
+  //   },
+  //   {outFormat: oracledb.OUT_FORMAT_OBJECT},
+  // );
+  const result = await executeTmc(sql, {fromDate: bind.from, toDate: bind.to}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
   return result.rows;
 };
 
 const getMisincexpgroup = async (conn_ora) => {
   const sql = `SELECT * FROM Misincexpgroup`;
-  const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+  // const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+  const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
   return result.rows;
 };
 
@@ -841,14 +850,15 @@ const getTheaterIncome_two = async (conn_ora, bind) => {
                 GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                 ORDER BY Dg_desc`;
 
-  const result = await conn_ora.execute(
-    sql,
-    {
-      fromDate: bind.from,
-      toDate: bind.to,
-    },
-    {outFormat: oracledb.OUT_FORMAT_OBJECT},
-  );
+  //   const result = await conn_ora.execute(
+  //     sql,
+  //     {
+  //       fromDate: bind.from,
+  //       toDate: bind.to,
+  //     },
+  //     {outFormat: oracledb.OUT_FORMAT_OBJECT},
+  //   );
+  const result = await executeTmc(sql, {fromDate: bind.from, toDate: bind.to}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
   return result.rows;
 };
 
@@ -924,14 +934,15 @@ const getPharmacyCollection_One = async (conn_ora, bind) => {
                AND MRETDETL.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                AND Mretdetl.Mrd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')) A`;
 
-  const result = await conn_ora.execute(
-    sql,
-    {
-      fromDate: bind.from,
-      toDate: bind.to,
-    },
-    {outFormat: oracledb.OUT_FORMAT_OBJECT},
-  );
+  //   const result = await conn_ora.execute(
+  //     sql,
+  //     {
+  //       fromDate: bind.from,
+  //       toDate: bind.to,
+  //       },
+  //       {outFormat: oracledb.OUT_FORMAT_OBJECT},
+  //    );
+  const result = await executeTmc(sql, {fromDate: bind.from, toDate: bind.to}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
   return result.rows;
 };
 
@@ -953,14 +964,15 @@ const getIpRefundDetl_one = async (conn_ora, bind) => {
                     AND Iprefundmast.Rid_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND IPREFUNDMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                     AND Iprefundmast.Rid_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
-  const result = await conn_ora.execute(
-    sql,
-    {
-      fromDate: bind.from,
-      toDate: bind.to,
-    },
-    {outFormat: oracledb.OUT_FORMAT_OBJECT},
-  );
+  // const result = await conn_ora.execute(
+  //   sql,
+  //   {
+  //     fromDate: bind.from,
+  //     toDate: bind.to,
+  //   },
+  //   {outFormat: oracledb.OUT_FORMAT_OBJECT},
+  // );
+  const result = await executeTmc(sql, {fromDate: bind.from, toDate: bind.to}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
   return result.rows;
 };
 
@@ -1004,14 +1016,15 @@ const getIpincomeSection_three = async (conn_ora, bind) => {
                         AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                 GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
                 ORDER BY Dg_desc`;
-  const result = await conn_ora.execute(
-    sql,
-    {
-      fromDate: bind.from,
-      toDate: bind.to,
-    },
-    {outFormat: oracledb.OUT_FORMAT_OBJECT},
-  );
+  // const result = await conn_ora.execute(
+  //   sql,
+  //   {
+  //     fromDate: bind.from,
+  //     toDate: bind.to,
+  //   },
+  //   {outFormat: oracledb.OUT_FORMAT_OBJECT},
+  // );
+  const result = await executeTmc(sql, {fromDate: bind.from, toDate: bind.to}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
   return result.rows;
 };
 
@@ -1047,14 +1060,15 @@ const getProcedureIncomeSection_one = async (conn_ora, bind) => {
          AND billmast.mh_code IN (SELECT MH_CODE FROM multihospital)
 GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
 ORDER BY Dg_desc`;
-  const result = await conn_ora.execute(
-    sql,
-    {
-      fromDate: bind.from,
-      toDate: bind.to,
-    },
-    {outFormat: oracledb.OUT_FORMAT_OBJECT},
-  );
+  // const result = await conn_ora.execute(
+  //   sql,
+  //   {
+  //     fromDate: bind.from,
+  //     toDate: bind.to,
+  //   },
+  //   {outFormat: oracledb.OUT_FORMAT_OBJECT},
+  // );
+  const result = await executeTmc(sql, {fromDate: bind.from, toDate: bind.to}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
   return result.rows;
 };
 
@@ -1079,14 +1093,15 @@ const getPharamcyReturnSection_one = async (conn_ora, bind) => {
        AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
        AND Opbillmast.OPD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
        AND Opbillmast.OPD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
-  const result = await conn_ora.execute(
-    sql,
-    {
-      fromDate: bind.from,
-      toDate: bind.to,
-    },
-    {outFormat: oracledb.OUT_FORMAT_OBJECT},
-  );
+  // const result = await conn_ora.execute(
+  //   sql,
+  //   {
+  //     fromDate: bind.from,
+  //     toDate: bind.to,
+  //   },
+  //   {outFormat: oracledb.OUT_FORMAT_OBJECT},
+  // );
+  const result = await executeTmc(sql, {fromDate: bind.from, toDate: bind.to}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
   return result.rows;
 };
 
@@ -1135,14 +1150,15 @@ const getReceiptmasterSection_one = async (conn_ora, bind) => {
                     0)) <> 0
 GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
 ORDER BY Dg_desc`;
-  const result = await conn_ora.execute(
-    sql,
-    {
-      fromDate: bind.from,
-      toDate: bind.to,
-    },
-    {outFormat: oracledb.OUT_FORMAT_OBJECT},
-  );
+  // const result = await conn_ora.execute(
+  //   sql,
+  //   {
+  //     fromDate: bind.from,
+  //     toDate: bind.to,
+  //   },
+  //   {outFormat: oracledb.OUT_FORMAT_OBJECT},
+  // );
+  const result = await executeTmc(sql, {fromDate: bind.from, toDate: bind.to}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
   return result.rows;
 };
 
@@ -1163,14 +1179,15 @@ const getPharmacyCollection_Two = async (conn_ora, bind) => {
        AND Opbillmast.Opd_date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
        AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
        AND Opbillmast.Opd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
-  const result = await conn_ora.execute(
-    sql,
-    {
-      fromDate: bind.from,
-      toDate: bind.to,
-    },
-    {outFormat: oracledb.OUT_FORMAT_OBJECT},
-  );
+  // const result = await conn_ora.execute(
+  //   sql,
+  //   {
+  //     fromDate: bind.from,
+  //     toDate: bind.to,
+  //   },
+  //   {outFormat: oracledb.OUT_FORMAT_OBJECT},
+  // );
+  const result = await executeTmc(sql, {fromDate: bind.from, toDate: bind.to}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
   return result.rows;
 };
 
@@ -1213,14 +1230,15 @@ const getIpRefundReceiptDetlSection_Two = async (conn_ora, bind) => {
          AND Opbillmast.Opd_date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
 GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
 ORDER BY Dg_desc`;
-  const result = await conn_ora.execute(
-    sql,
-    {
-      fromDate: bind.from,
-      toDate: bind.to,
-    },
-    {outFormat: oracledb.OUT_FORMAT_OBJECT},
-  );
+  // const result = await conn_ora.execute(
+  //   sql,
+  //   {
+  //     fromDate: bind.from,
+  //     toDate: bind.to,
+  //   },
+  //   {outFormat: oracledb.OUT_FORMAT_OBJECT},
+  // );
+  const result = await executeTmc(sql, {fromDate: bind.from, toDate: bind.to}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
   return result.rows;
 };
 
@@ -1295,14 +1313,15 @@ const getPharamcyCollection_three = async (conn_ora, bind) => {
                AND Mretmast.MRD_RETDATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss') 
                AND MRETDETL.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                AND Mretmast.Mrd_RETDate <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss') ) A`;
-  const result = await conn_ora.execute(
-    sql,
-    {
-      fromDate: bind.from,
-      toDate: bind.to,
-    },
-    {outFormat: oracledb.OUT_FORMAT_OBJECT},
-  );
+  // const result = await conn_ora.execute(
+  //   sql,
+  //   {
+  //     fromDate: bind.from,
+  //     toDate: bind.to,
+  //   },
+  //   {outFormat: oracledb.OUT_FORMAT_OBJECT},
+  // );
+  const result = await executeTmc(sql, {fromDate: bind.from, toDate: bind.to}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
   return result.rows;
 };
 
@@ -1355,14 +1374,25 @@ const getIpincomeSection_four = async (conn_ora, bind) => {
          AND billmast.mh_code IN (SELECT MH_CODE FROM multihospital)
          AND Billmast.Bmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
 GROUP BY Misincexpgroup.DG_GRCODE, Misincexpgroup.DG_DESC`;
-  const result = await conn_ora.execute(
-    sql,
-    {
-      fromDate: bind.from,
-      toDate: bind.to,
-    },
-    {outFormat: oracledb.OUT_FORMAT_OBJECT},
-  );
+  //   const result = await conn_ora.execute(
+  //     sql,
+  //     {
+  //       fromDate: bind.from,
+  //       toDate: bind.to,
+  //     },
+  //     {outFormat: oracledb.OUT_FORMAT_OBJECT},
+  //   );
+  //   return result.rows;
+  // };
+  // const result = await conn_ora.execute(
+  //   sql,
+  //   {
+  //     fromDate: bind.from,
+  //     toDate: bind.to,
+  //   },
+  //   {outFormat: oracledb.OUT_FORMAT_OBJECT},
+  // );
+  const result = await executeTmc(sql, {fromDate: bind.from, toDate: bind.to}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
   return result.rows;
 };
 
@@ -1383,14 +1413,25 @@ const getPharmacyReturnSection_three = async (conn_ora, bind) => {
        AND Disbillmast.Dmd_date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
        AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
        AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
-  const result = await conn_ora.execute(
-    sql,
-    {
-      fromDate: bind.from,
-      toDate: bind.to,
-    },
-    {outFormat: oracledb.OUT_FORMAT_OBJECT},
-  );
+  //   const result = await conn_ora.execute(
+  //     sql,
+  //     {
+  //       fromDate: bind.from,
+  //       toDate: bind.to,
+  //     },
+  //     {outFormat: oracledb.OUT_FORMAT_OBJECT},
+  //   );
+  //   return result.rows;
+  // };
+  // const result = await conn_ora.execute(
+  //   sql,
+  //   {
+  //     fromDate: bind.from,
+  //     toDate: bind.to,
+  //   },
+  //   {outFormat: oracledb.OUT_FORMAT_OBJECT},
+  // );
+  const result = await executeTmc(sql, {fromDate: bind.from, toDate: bind.to}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
   return result.rows;
 };
 
@@ -1444,14 +1485,15 @@ const getProcedureIncomeSecition_two = async (conn_ora, bind) => {
          AND Billmast.BMD_COLLDATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
 GROUP BY Misincexpgroup.DG_GRCODE, Misincexpgroup.DG_DESC
 ORDER BY Dg_desc`;
-  const result = await conn_ora.execute(
-    sql,
-    {
-      fromDate: bind.from,
-      toDate: bind.to,
-    },
-    {outFormat: oracledb.OUT_FORMAT_OBJECT},
-  );
+  //   const result = await conn_ora.execute(
+  //     sql,
+  //     {
+  //       fromDate: bind.from,
+  //       toDate: bind.to,
+  //     },
+  //     {outFormat: oracledb.OUT_FORMAT_OBJECT},
+  //   );
+  const result = await executeTmc(sql, {fromDate: bind.from, toDate: bind.to}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
   return result.rows;
 };
 
@@ -1472,14 +1514,15 @@ const getPharmacyCollection_four = async (conn_ora, bind) => {
        AND Disbillmast.Dmd_date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
        AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
        AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
-  const result = await conn_ora.execute(
-    sql,
-    {
-      fromDate: bind.from,
-      toDate: bind.to,
-    },
-    {outFormat: oracledb.OUT_FORMAT_OBJECT},
-  );
+  // const result = await conn_ora.execute(
+  //   sql,
+  //   {
+  //     fromDate: bind.from,
+  //     toDate: bind.to,
+  //   },
+  //   {outFormat: oracledb.OUT_FORMAT_OBJECT},
+  // );
+  const result = await executeTmc(sql, {fromDate: bind.from, toDate: bind.to}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
   return result.rows;
 };
 
@@ -1514,14 +1557,15 @@ const getIpRefundDetlSection_three = async (conn_ora, bind) => {
          AND REFUNDRECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
 GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
 ORDER BY Dg_desc`;
-  const result = await conn_ora.execute(
-    sql,
-    {
-      fromDate: bind.from,
-      toDate: bind.to,
-    },
-    {outFormat: oracledb.OUT_FORMAT_OBJECT},
-  );
+  // const result = await conn_ora.execute(
+  //   sql,
+  //   {
+  //     fromDate: bind.from,
+  //     toDate: bind.to,
+  //   },
+  //   {outFormat: oracledb.OUT_FORMAT_OBJECT},
+  // );
+  const result = await executeTmc(sql, {fromDate: bind.from, toDate: bind.to}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
   return result.rows;
 };
 
@@ -1557,14 +1601,15 @@ const getIpincomeSection_five = async (conn_ora, bind) => {
          AND Disbillmast.dmd_date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
 GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
 ORDER BY Dg_desc`;
-  const result = await conn_ora.execute(
-    sql,
-    {
-      fromDate: bind.from,
-      toDate: bind.to,
-    },
-    {outFormat: oracledb.OUT_FORMAT_OBJECT},
-  );
+  //   const result = await conn_ora.execute(
+  //     sql,
+  //     {
+  //       fromDate: bind.from,
+  //       toDate: bind.to,
+  //     },
+  //     {outFormat: oracledb.OUT_FORMAT_OBJECT},
+  //   );
+  const result = await executeTmc(sql, {fromDate: bind.from, toDate: bind.to}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
   return result.rows;
 };
 
@@ -1605,14 +1650,15 @@ const getIpRefundDetlSection_four = async (conn_ora, bind) => {
          AND billmast.mh_code IN (SELECT MH_CODE FROM multihospital)
 GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
 ORDER BY Dg_desc`;
-  const result = await conn_ora.execute(
-    sql,
-    {
-      fromDate: bind.from,
-      toDate: bind.to,
-    },
-    {outFormat: oracledb.OUT_FORMAT_OBJECT},
-  );
+  // const result = await conn_ora.execute(
+  //   sql,
+  //   {
+  //     fromDate: bind.from,
+  //     toDate: bind.to,
+  //   },
+  //   {outFormat: oracledb.OUT_FORMAT_OBJECT},
+  // );
+  const result = await executeTmc(sql, {fromDate: bind.from, toDate: bind.to}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
   return result.rows;
 };
 
@@ -1725,14 +1771,15 @@ const getCollectionPortion_one = async (conn_ora, bind) => {
                     AND Pbillmast.BMD_COLLDATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND Pbillmast.BMD_COLLDATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND pbillmast.MH_CODE IN (SELECT MH_CODE FROM multihospital)`;
-  const result = await conn_ora.execute(
-    sql,
-    {
-      fromDate: bind.from,
-      toDate: bind.to,
-    },
-    {outFormat: oracledb.OUT_FORMAT_OBJECT},
-  );
+  // const result = await conn_ora.execute(
+  //   sql,
+  //   {
+  //     fromDate: bind.from,
+  //     toDate: bind.to,
+  //   },
+  //   {outFormat: oracledb.OUT_FORMAT_OBJECT},
+  // );
+  const result = await executeTmc(sql, {fromDate: bind.from, toDate: bind.to}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
   return result.rows;
 };
 
@@ -1967,14 +2014,15 @@ const getCollectionPortion_two = async (conn_ora, bind) => {
                  AND OPBILLMAST.OPD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                  AND OPBILLMAST.OPD_DATE < TRUNC (TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss'))
         GROUP BY 'OP')`;
-  const result = await conn_ora.execute(
-    sql,
-    {
-      fromDate: bind.from,
-      toDate: bind.to,
-    },
-    {outFormat: oracledb.OUT_FORMAT_OBJECT},
-  );
+  // const result = await conn_ora.execute(
+  //   sql,
+  //   {
+  //     fromDate: bind.from,
+  //     toDate: bind.to,
+  //   },
+  //   {outFormat: oracledb.OUT_FORMAT_OBJECT},
+  // );
+  const result = await executeTmc(sql, {fromDate: bind.from, toDate: bind.to}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
   return result.rows;
 };
 
@@ -2031,14 +2079,15 @@ const getPerttyCash = async (conn_ora, bind) => {
                AND Phpettycash.Pcd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                AND PHPETTYCASH.PCC_MHCODE IN
                       (SELECT MH_CODE FROM multihospital))`;
-  const result = await conn_ora.execute(
-    sql,
-    {
-      fromDate: bind.from,
-      toDate: bind.to,
-    },
-    {outFormat: oracledb.OUT_FORMAT_OBJECT},
-  );
+  // const result = await conn_ora.execute(
+  //   sql,
+  //   {
+  //     fromDate: bind.from,
+  //     toDate: bind.to,
+  //   },
+  //   {outFormat: oracledb.OUT_FORMAT_OBJECT},
+  // );
+  const result = await executeTmc(sql, {fromDate: bind.from, toDate: bind.to}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
   return result.rows;
 };
 
@@ -2075,14 +2124,15 @@ SELECT (  SUM (NVL (Recpcollectionmast.Rfn_Cash, 0))
        AND RECPCOLLECTIONMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
        AND Recpcollectionmast.Rfd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
        AND NVL (Rcc_Cancel, 'N') = 'N'`;
-  const result = await conn_ora.execute(
-    sql,
-    {
-      fromDate: bind.from,
-      toDate: bind.to,
-    },
-    {outFormat: oracledb.OUT_FORMAT_OBJECT},
-  );
+  // const result = await conn_ora.execute(
+  //   sql,
+  //   {
+  //     fromDate: bind.from,
+  //     toDate: bind.to,
+  //   },
+  //   {outFormat: oracledb.OUT_FORMAT_OBJECT},
+  // );
+  const result = await executeTmc(sql, {fromDate: bind.from, toDate: bind.to}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
   return result.rows;
 };
 
@@ -2257,14 +2307,15 @@ SELECT SUM (
        AND Mretmast.MRD_RETDATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
        AND Mretmast.MRD_RETDATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
        AND MRETMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)`;
-  const result = await conn_ora.execute(
-    sql,
-    {
-      fromDate: bind.from,
-      toDate: bind.to,
-    },
-    {outFormat: oracledb.OUT_FORMAT_OBJECT},
-  );
+  // const result = await conn_ora.execute(
+  //   sql,
+  //   {
+  //     fromDate: bind.from,
+  //     toDate: bind.to,
+  //   },
+  //   {outFormat: oracledb.OUT_FORMAT_OBJECT},
+  // );
+  const result = await executeTmc(sql, {fromDate: bind.from, toDate: bind.to}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
   return result.rows;
 };
 
@@ -2292,14 +2343,15 @@ const getCollectionPortion_four = async (conn_ora, bind) => {
                 AND DMD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                 AND DMD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
-  const result = await conn_ora.execute(
-    sql,
-    {
-      fromDate: bind.from,
-      toDate: bind.to,
-    },
-    {outFormat: oracledb.OUT_FORMAT_OBJECT},
-  );
+  // const result = await conn_ora.execute(
+  //   sql,
+  //   {
+  //     fromDate: bind.from,
+  //     toDate: bind.to,
+  //   },
+  //   {outFormat: oracledb.OUT_FORMAT_OBJECT},
+  // );
+  const result = await executeTmc(sql, {fromDate: bind.from, toDate: bind.to}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
   return result.rows;
 };
 
@@ -2319,14 +2371,15 @@ const getDiscount = async (conn_ora, bind) => {
                     AND RECPCOLLECTIONMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                     AND NVL (Rcc_Cancel, 'N') = 'N'
                 HAVING SUM (NVL (RECPCOLLECTIONMAST.RCN_DISCOUNT, 0)) > 0`;
-  const result = await conn_ora.execute(
-    sql,
-    {
-      fromDate: bind.from,
-      toDate: bind.to,
-    },
-    {outFormat: oracledb.OUT_FORMAT_OBJECT},
-  );
+  // const result = await conn_ora.execute(
+  //   sql,
+  //   {
+  //     fromDate: bind.from,
+  //     toDate: bind.to,
+  //   },
+  //   {outFormat: oracledb.OUT_FORMAT_OBJECT},
+  // );
+  const result = await executeTmc(sql, {fromDate: bind.from, toDate: bind.to}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
   return result.rows;
 };
 
@@ -2371,14 +2424,15 @@ const getIpincomeSection_six = async (conn_ora, bind) => {
                     AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
             GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
             ORDER BY Dg_desc`;
-  const result = await conn_ora.execute(
-    sql,
-    {
-      fromDate: bind.from,
-      toDate: bind.to,
-    },
-    {outFormat: oracledb.OUT_FORMAT_OBJECT},
-  );
+  // const result = await conn_ora.execute(
+  //   sql,
+  //   {
+  //     fromDate: bind.from,
+  //     toDate: bind.to,
+  //   },
+  //   {outFormat: oracledb.OUT_FORMAT_OBJECT},
+  // );
+  const result = await executeTmc(sql, {fromDate: bind.from, toDate: bind.to}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
   return result.rows;
 };
 
@@ -2392,14 +2446,15 @@ const getDiscount_one = async (conn_ora, bind) => {
                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                 AND IRD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                 AND NVL (Irc_cancel, 'N') = 'N'`;
-  const result = await conn_ora.execute(
-    sql,
-    {
-      fromDate: bind.from,
-      toDate: bind.to,
-    },
-    {outFormat: oracledb.OUT_FORMAT_OBJECT},
-  );
+  // const result = await conn_ora.execute(
+  //   sql,
+  //   {
+  //     fromDate: bind.from,
+  //     toDate: bind.to,
+  //   },
+  //   {outFormat: oracledb.OUT_FORMAT_OBJECT},
+  // );
+  const result = await executeTmc(sql, {fromDate: bind.from, toDate: bind.to}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
   return result.rows;
 };
 
@@ -2431,14 +2486,15 @@ const getCollectionPortion_five = async (conn_ora, bind) => {
                     AND ARD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND ARD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND ADVANCEENTRY.ARC_MHCODE IN (SELECT MH_CODE FROM multihospital)`;
-  const result = await conn_ora.execute(
-    sql,
-    {
-      fromDate: bind.from,
-      toDate: bind.to,
-    },
-    {outFormat: oracledb.OUT_FORMAT_OBJECT},
-  );
+  // const result = await conn_ora.execute(
+  //   sql,
+  //   {
+  //     fromDate: bind.from,
+  //     toDate: bind.to,
+  //   },
+  //   {outFormat: oracledb.OUT_FORMAT_OBJECT},
+  // );
+  const result = await executeTmc(sql, {fromDate: bind.from, toDate: bind.to}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
   return result.rows;
 };
 
@@ -2488,14 +2544,15 @@ const getCollectionPortion_six = async (conn_ora, bind) => {
                     AND BILLMAST.BMC_COLLCNCODE IS NOT NULL
                     AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                     AND BMD_COLLDATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
-  const result = await conn_ora.execute(
-    sql,
-    {
-      fromDate: bind.from,
-      toDate: bind.to,
-    },
-    {outFormat: oracledb.OUT_FORMAT_OBJECT},
-  );
+  // const result = await conn_ora.execute(
+  //   sql,
+  //   {
+  //     fromDate: bind.from,
+  //     toDate: bind.to,
+  //   },
+  //   {outFormat: oracledb.OUT_FORMAT_OBJECT},
+  // );
+  const result = await executeTmc(sql, {fromDate: bind.from, toDate: bind.to}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
   return result.rows;
 };
 
@@ -2609,14 +2666,15 @@ const getIpRefundDetlSection_six = async (conn_ora, bind) => {
                     AND Mretmast.MRD_RETDATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND Mretmast.MRD_RETDATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND MRETMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)`;
-  const result = await conn_ora.execute(
-    sql,
-    {
-      fromDate: bind.from,
-      toDate: bind.to,
-    },
-    {outFormat: oracledb.OUT_FORMAT_OBJECT},
-  );
+  // const result = await conn_ora.execute(
+  //   sql,
+  //   {
+  //     fromDate: bind.from,
+  //     toDate: bind.to,
+  //   },
+  //   {outFormat: oracledb.OUT_FORMAT_OBJECT},
+  // );
+  const result = await executeTmc(sql, {fromDate: bind.from, toDate: bind.to}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
   return result.rows;
 };
 
@@ -2660,14 +2718,15 @@ const getAdvanceRefund = async (conn_ora, bind) => {
                     AND ADVANCERETURN.RAC_MHCODE IN (SELECT MH_CODE FROM multihospital)
                     AND ADVANCERETURN.RAD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                 HAVING SUM (NVL (ADVANCERETURN.RAN_AMT, 0)) > 0`;
-  const result = await conn_ora.execute(
-    sql,
-    {
-      fromDate: bind.from,
-      toDate: bind.to,
-    },
-    {outFormat: oracledb.OUT_FORMAT_OBJECT},
-  );
+  // const result = await conn_ora.execute(
+  //   sql,
+  //   {
+  //     fromDate: bind.from,
+  //     toDate: bind.to,
+  //   },
+  //   {outFormat: oracledb.OUT_FORMAT_OBJECT},
+  // );
+  const result = await executeTmc(sql, {fromDate: bind.from, toDate: bind.to}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
   return result.rows;
 };
 
@@ -2784,14 +2843,15 @@ const getCollectionPortion_seven = async (conn_ora, bind) => {
                     AND receiptmast.RPD_COLLDATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND receiptmast.RPD_COLLDATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)`;
-  const result = await conn_ora.execute(
-    sql,
-    {
-      fromDate: bind.from,
-      toDate: bind.to,
-    },
-    {outFormat: oracledb.OUT_FORMAT_OBJECT},
-  );
+  // const result = await conn_ora.execute(
+  //   sql,
+  //   {
+  //     fromDate: bind.from,
+  //     toDate: bind.to,
+  //   },
+  //   {outFormat: oracledb.OUT_FORMAT_OBJECT},
+  // );
+  const result = await executeTmc(sql, {fromDate: bind.from, toDate: bind.to}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
   return result.rows;
 };
 
@@ -2965,14 +3025,15 @@ const getCollectionPortion_eight = async (conn_ora, bind) => {
                             AND Rpn_Rtptpayable > 0
                             AND Mretmast.Mrd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                             AND Mretmast.Mrd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')) A`;
-  const result = await conn_ora.execute(
-    sql,
-    {
-      fromDate: bind.from,
-      toDate: bind.to,
-    },
-    {outFormat: oracledb.OUT_FORMAT_OBJECT},
-  );
+  // const result = await conn_ora.execute(
+  //   sql,
+  //   {
+  //     fromDate: bind.from,
+  //     toDate: bind.to,
+  //   },
+  //   {outFormat: oracledb.OUT_FORMAT_OBJECT},
+  // );
+  const result = await executeTmc(sql, {fromDate: bind.from, toDate: bind.to}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
   return result.rows;
 };
 
@@ -3018,14 +3079,15 @@ const getIpRefundDetlSection_seven = async (conn_ora, bind) => {
                     AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
             GROUP BY Misincexpgroup.Dg_grcode, Misincexpgroup.Dg_desc
             ORDER BY Dg_desc`;
-  const result = await conn_ora.execute(
-    sql,
-    {
-      fromDate: bind.from,
-      toDate: bind.to,
-    },
-    {outFormat: oracledb.OUT_FORMAT_OBJECT},
-  );
+  // const result = await conn_ora.execute(
+  //   sql,
+  //   {
+  //     fromDate: bind.from,
+  //     toDate: bind.to,
+  //   },
+  //   {outFormat: oracledb.OUT_FORMAT_OBJECT},
+  // );
+  const result = await executeTmc(sql, {fromDate: bind.from, toDate: bind.to}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
   return result.rows;
 };
 
@@ -3047,14 +3109,15 @@ const getWriteoffamnt = async (conn_ora, bind) => {
                     AND RECPCOLLECTIONMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                     AND NVL (RECPCOLLECTIONMAST.Rcc_Cancel, 'N') = 'N'
                 HAVING SUM (NVL (recpcollectiondetl.RCN_DISPUT, 0)) > 0`;
-  const result = await conn_ora.execute(
-    sql,
-    {
-      fromDate: bind.from,
-      toDate: bind.to,
-    },
-    {outFormat: oracledb.OUT_FORMAT_OBJECT},
-  );
+  // const result = await conn_ora.execute(
+  //   sql,
+  //   {
+  //     fromDate: bind.from,
+  //     toDate: bind.to,
+  //   },
+  //   {outFormat: oracledb.OUT_FORMAT_OBJECT},
+  // );
+  const result = await executeTmc(sql, {fromDate: bind.from, toDate: bind.to}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
   return result.rows;
 };
 
@@ -3072,14 +3135,15 @@ const getDiscount_three = async (conn_ora, bind) => {
                     AND Ipreceipt.Ird_date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                     AND NVL (irn_discount, 0) > 0`;
-  const result = await conn_ora.execute(
-    sql,
-    {
-      fromDate: bind.from,
-      toDate: bind.to,
-    },
-    {outFormat: oracledb.OUT_FORMAT_OBJECT},
-  );
+  // const result = await conn_ora.execute(
+  //   sql,
+  //   {
+  //     fromDate: bind.from,
+  //     toDate: bind.to,
+  //   },
+  //   {outFormat: oracledb.OUT_FORMAT_OBJECT},
+  // );
+  const result = await executeTmc(sql, {fromDate: bind.from, toDate: bind.to}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
   return result.rows;
 };
 
@@ -5337,14 +5401,15 @@ const getTypeDiscount = async (conn_ora, bind) => {
                                                 INITCAP (Pattype.Ptc_Desc))
 GROUP BY Ptc_Desc
 ORDER BY 1`;
-  const result = await conn_ora.execute(
-    sql,
-    {
-      fromDate: bind.from,
-      toDate: bind.to,
-    },
-    {outFormat: oracledb.OUT_FORMAT_OBJECT},
-  );
+  // const result = await conn_ora.execute(
+  //   sql,
+  //   {
+  //     fromDate: bind.from,
+  //     toDate: bind.to,
+  //   },
+  //   {outFormat: oracledb.OUT_FORMAT_OBJECT},
+  // );
+  const result = await executeTmc(sql, {fromDate: bind.from, toDate: bind.to}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
   return result.rows;
 };
 
@@ -5635,14 +5700,15 @@ const get_qmt_CreditInsuranceBill = async (conn_ora, bind) => {
                         BILLNO,
                         CUC_NAME,
                         USC_NAME`;
-  const result = await conn_ora.execute(
-    sql,
-    {
-      fromDate: bind.from,
-      toDate: bind.to,
-    },
-    {outFormat: oracledb.OUT_FORMAT_OBJECT},
-  );
+  // const result = await conn_ora.execute(
+  //   sql,
+  //   {
+  //     fromDate: bind.from,
+  //     toDate: bind.to,
+  //   },
+  //   {outFormat: oracledb.OUT_FORMAT_OBJECT},
+  // );
+  const result = await executeTmc(sql, {fromDate: bind.from, toDate: bind.to}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
   return result.rows;
 };
 
@@ -5701,14 +5767,15 @@ const get_qmt_CreditInsuranceBillCollection = async (conn_ora, bind) => {
                                                'DD/MM/YYYY HH24:MI:SS')
                                   AND TO_DATE (:toDate,
                                                'DD/MM/YYYY HH24:MI:SS')) A`;
-  const result = await conn_ora.execute(
-    sql,
-    {
-      fromDate: bind.from,
-      toDate: bind.to,
-    },
-    {outFormat: oracledb.OUT_FORMAT_OBJECT},
-  );
+  // const result = await conn_ora.execute(
+  //   sql,
+  //   {
+  //     fromDate: bind.from,
+  //     toDate: bind.to,
+  //   },
+  //   {outFormat: oracledb.OUT_FORMAT_OBJECT},
+  // );
+  const result = await executeTmc(sql, {fromDate: bind.from, toDate: bind.to}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
   return result.rows;
 };
 
@@ -6021,14 +6088,15 @@ GROUP BY Ptname,
          UserName
   HAVING SUM (NVL (Amt, 0)) <> 0
 ORDER BY 3, 1`;
-  const result = await conn_ora.execute(
-    sql,
-    {
-      fromDate: bind.from,
-      toDate: bind.to,
-    },
-    {outFormat: oracledb.OUT_FORMAT_OBJECT},
-  );
+  // const result = await conn_ora.execute(
+  //   sql,
+  //   {
+  //     fromDate: bind.from,
+  //     toDate: bind.to,
+  //   },
+  //   {outFormat: oracledb.OUT_FORMAT_OBJECT},
+  // );
+  const result = await executeTmc(sql, {fromDate: bind.from, toDate: bind.to}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
   return result.rows;
 };
 
@@ -6116,14 +6184,15 @@ const get_qmt_AdvanceCollection = async (conn_ora, bind) => {
                               ae.AR_NO,
                               u.USC_NAME
                      ORDER BY 2, 1`;
-  const result = await conn_ora.execute(
-    sql,
-    {
-      fromDate: bind.from,
-      toDate: bind.to,
-    },
-    {outFormat: oracledb.OUT_FORMAT_OBJECT},
-  );
+  // const result = await conn_ora.execute(
+  //   sql,
+  //   {
+  //     fromDate: bind.from,
+  //     toDate: bind.to,
+  //   },
+  //   {outFormat: oracledb.OUT_FORMAT_OBJECT},
+  // );
+  const result = await executeTmc(sql, {fromDate: bind.from, toDate: bind.to}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
   return result.rows;
 };
 

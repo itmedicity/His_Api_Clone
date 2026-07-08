@@ -1,10 +1,9 @@
 // @ts-ignore
-const {oracledb, getTmcConnection} = require("../../../config/oradbconfig");
+const {executeTmc} = require("../../../config/oracleExecutor");
+const {oracledb} = require("../../../config/oradbconfig");
 
 module.exports = {
   getAllPharmacySales: async (data) => {
-    let conn_ora = await getTmcConnection();
-    // const ouCode = data.ouCode.join(',');
     try {
       const ouCode = data.ouCode;
       const fromDate = data.from;
@@ -36,19 +35,14 @@ module.exports = {
                        ) MONTHTABLE
                      GROUP BY OU_CODE,IT_CODE,BMD_DATE,ITC_DESC
                      ORDER BY ITC_DESC`;
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       return await result.resultSet?.getRows((err, rows) => rows);
     } catch (error) {
       console.log(error);
       throw error;
-    } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-      }
     }
   },
   getOpCountMonthWise: async (data) => {
-    let conn_ora = await getTmcConnection();
     try {
       const fromDate = data.from;
       const toDate = data.to;
@@ -67,21 +61,14 @@ module.exports = {
                         AND VISITMAST.VSC_CANCEL IS NULL) A 
                     GROUP BY MONTHS  
                     ORDER BY MONTHS`;
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
-      // await result.resultSet?.getRows((err, rows) => {
-      // })
+      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       return result.rows;
     } catch (error) {
       console.log(error);
       throw error;
-    } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-      }
     }
   },
   getIpCountMonthWise: async (data) => {
-    let conn_ora = await getTmcConnection();
     try {
       const fromDate = data.from;
       const toDate = data.to;
@@ -100,19 +87,11 @@ module.exports = {
                         AND IPADMISS.IPC_PTFLAG = 'N' ) A
                     GROUP BY MONTHS  
                     ORDER BY MONTHS `;
-      const result = await conn_ora.execute(sql, {frDate: fromDate, toDate: toDate}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
-      //   await result.resultSet?.getRows((err, rows) => {
-      // });
-      // callBack(null, result.rows);
+      const result = await executeTmc(sql, {frDate: fromDate, toDate: toDate}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       return result.rows;
     } catch (error) {
       console.log(error);
       throw error;
-    } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-        // await pool_ora.close();
-      }
     }
   },
 };

@@ -1,5 +1,5 @@
 // @ts-ignore
-const {oracledb, getTmcConnection} = require("../../../../config/oradbconfig");
+const {oracledb, getTmcConnection, oracleConnectionClose} = require("../../../../config/oradbconfig");
 
 module.exports = {
   pharmacyTmchSalePart1: async (conn_ora, data) => {
@@ -66,18 +66,10 @@ module.exports = {
       console.log(error);
       throw error;
     } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-      }
+      await oracleConnectionClose(conn_ora);
     }
   },
   phamracyTmchReturnPart1: async (conn_ora, data) => {
-    // let conn_ora = await getTmcConnection();
-
-    // const ipNumberList = data.phar.join(",");
-    // const fromDate = data.from;
-    // const toDate = data.to;
-
     const sql = `SELECT 
                         SUM (NVL (Mretdetl.MRN_AMOUNT, 0) - NVL (MRN_DISAMT, 0)) * -1 Amt,
                         SUM (NVL (Mretdetl.MRN_AMOUNT, 0)) * -1 GrossAmt,
@@ -106,27 +98,8 @@ module.exports = {
       {outFormat: oracledb.OUT_FORMAT_OBJECT},
     );
     return result.rows;
-
-    // try {
-    //   // callBack(null, );
-    //   // await result.resultSet?.getRows((err, rows) => {
-    //   // });
-    // } catch (error) {
-    //   console.log(error);
-    //   throw error;
-    // } finally {
-    //   if (conn_ora) {
-    //     await conn_ora.close();
-    //     // await pool_ora.close();
-    //   }
-    // }
   },
   phamracyTmchSalePart2: async (conn_ora, data) => {
-    // let conn_ora = await getTmcConnection();
-
-    // const fromDate = data.from;
-    // const toDate = data.to;
-
     const sql = `SELECT SUM (A.Billamt) Amt,
                             SUM (A.GrossAmt) GrossAmt,
                             SUM (A.Discount) Discount,
@@ -175,27 +148,8 @@ module.exports = {
       {outFormat: oracledb.OUT_FORMAT_OBJECT},
     );
     return result.rows;
-    // try {
-    //   // callBack(null, );
-    //   // await result.resultSet?.getRows((err, rows) => {
-    //   // });
-    // } catch (error) {
-    //   console.log(error);
-    //   throw error;
-    // } finally {
-    //   if (conn_ora) {
-    //     await conn_ora.close();
-    //     // await pool_ora.close();
-    //   }
-    // }
   },
   phamracyTmchReturnPart2: async (conn_ora, data) => {
-    // let conn_ora = await getTmcConnection();
-
-    // const ipNumberList = data.phar.join(",");
-    // const fromDate = data.from;
-    // const toDate = data.to;
-
     const sql = `SELECT SUM (NVL (Pbilldetl.Bdn_amount, 0)) Amt,
                                 SUM (NVL (Pbilldetl.Bdn_amount, 0) + NVL (Pbilldetl.Bmn_disamt, 0))
                                 GrossAmt,
@@ -225,19 +179,6 @@ module.exports = {
       {outFormat: oracledb.OUT_FORMAT_OBJECT},
     );
     return result.rows;
-    // try {
-    //   // await result.resultSet?.getRows((err, rows) => {
-    //   // });
-    //   // callBack(null, );
-    // } catch (error) {
-    //   console.log(error);
-    //   throw error;
-    // } finally {
-    //   if (conn_ora) {
-    //     await conn_ora.close();
-    //     // await pool_ora.close();
-    //   }
-    // }
   },
   phamracyTmchSalePart3: async (conn_ora, data) => {
     // let conn_ora = await getTmcConnection();
@@ -271,27 +212,8 @@ module.exports = {
       {outFormat: oracledb.OUT_FORMAT_OBJECT},
     );
     return result.rows;
-    // AND PBILLMAST.IP_NO NOT IN (${ipNumberList})
-    // try {
-    //   // callBack(null, );
-    //   // await result.resultSet?.getRows((err, rows) => {
-    //   // });
-    // } catch (error) {
-    //   console.log(error);
-    //   throw error;
-    // } finally {
-    //   if (conn_ora) {
-    //     await conn_ora.close();
-    //     // await pool_ora.close();
-    //   }
-    // }
   },
   phamracyTmchReturnPart3: async (conn_ora, data) => {
-    // let conn_ora = await getTmcConnection();
-
-    // const fromDate = data.from;
-    // const toDate = data.to;
-
     const sql = `SELECT SUM (NVL (Iprefunditemdetl.Rin_Netamt, 0)) * -1 Amt,
                                 SUM ( NVL (Iprefunditemdetl.Rin_Netamt, 0)  + NVL (Iprefunditemdetl.Rin_Disamt, 0)) * -1 GrossAmt,
                                 SUM (NVL (Iprefunditemdetl.Rin_Disamt, 0)) * -1 Discount,
@@ -315,18 +237,5 @@ module.exports = {
       {outFormat: oracledb.OUT_FORMAT_OBJECT},
     );
     return result.rows;
-    // try {
-    //   // callBack(null, );
-    //   // await result.resultSet?.getRows((err, rows) => {
-    //   // });
-    // } catch (error) {
-    //   console.log(error);
-    //   throw error;
-    // } finally {
-    //   if (conn_ora) {
-    //     await conn_ora.close();
-    //     // await pool_ora.close();
-    //   }
-    // }
   },
 };

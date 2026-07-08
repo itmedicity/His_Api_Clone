@@ -5,11 +5,6 @@ const {oracledb, getTmcConnection} = require("../../../../config/oradbconfig");
 module.exports = {
   //Advance Collection (C)
   advanceCollectionTssh: async (conn_ora, data) => {
-    // let conn_ora = await getTmcConnection();
-
-    // const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(",")) || null;
-    // const fromDate = data.from;
-    // const toDate = data.to;
     const sql = ` SELECT SUM (NVL (ARN_AMOUNT, 0)) Amt, 0 tax
                             FROM OPADVANCE
                         WHERE NVL (ARC_CANCEL, 'N') = 'N'
@@ -42,21 +37,8 @@ module.exports = {
       {outFormat: oracledb.OUT_FORMAT_OBJECT},
     );
     return result.rows;
-    // try {
-    //   // callBack(null, );
-    // } catch (error) {
-    //   console.log(error);
-    //   throw error;
-    // } finally {
-    //   if (conn_ora) await conn_ora.close();
-    // }
   },
   advanceRefundTssh: async (conn_ora, data) => {
-    // let conn_ora = await getTmcConnection();
-
-    // const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(",")) || null;
-    // const fromDate = data.from;
-    // const toDate = data.to;
     const advanceRefndSql = `SELECT SUM (NVL (REFUNDOPADVANCE.RFN_AMT, 0)) Amt, 0 tax
                 FROM REFUNDOPADVANCE
             WHERE REFUNDOPADVANCE.Rfc_Cancel = 'N'
@@ -106,23 +88,9 @@ module.exports = {
       {outFormat: oracledb.OUT_FORMAT_OBJECT},
     );
     return result.rows;
-    // try {
-    //   // callBack(null, );
-    // } catch (error) {
-    //   console.log(error);
-    //   throw error;
-    // } finally {
-    //   if (conn_ora) await conn_ora.close();
-    // }
   },
   //Advance Settled
   advanceSettledTssh: async (conn_ora, data) => {
-    // let conn_ora = await getTmcConnection();
-
-    // const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(",")) || null;
-    // const fromDate = data.from;
-    // const toDate = data.to;
-
     const advanceSettledSql = `SELECT SUM (NVL (bmn_advamount, 0)) Amt, 0 tax
                                         FROM Pbillmast
                                     WHERE NVL (BMC_CANCEL, 'N') = 'N'
@@ -180,23 +148,9 @@ module.exports = {
       {outFormat: oracledb.OUT_FORMAT_OBJECT},
     );
     return result.rows;
-    // try {
-    //   // callBack(null, );
-    // } catch (error) {
-    //   console.log(error);
-    //   throw error;
-    // } finally {
-    //   if (conn_ora) await conn_ora.close();
-    // }
   },
   //Collection Against Sales (A) Total Value
   collectionAgainstSalePart1Tssh: async (conn_ora, data) => {
-    // let conn_ora = await getTmcConnection();
-
-    // const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(",")) || null;
-    // const fromDate = data.from;
-    // const toDate = data.to;
-
     const sql = ` SELECT 
                             SUM ( NVL (ipreceipt.irn_amount, 0) + NVL (ipreceipt.irn_card, 0) + NVL (ipreceipt.irn_cheque, 0) + NVL (ipreceipt.irn_neft, 0)) - SUM (NVL (irn_balance, 0) + NVL (IRN_REFCHEQ, 0) + NVL (IPRECEIPT.IRN_REFCARD, 0)) Amt
                         FROM IPRECEIPT, Disbillmast
@@ -219,23 +173,9 @@ module.exports = {
       {outFormat: oracledb.OUT_FORMAT_OBJECT},
     );
     return result.rows;
-    // try {
-    //   // callBack(null, );
-    // } catch (error) {
-    //   console.log(error);
-    //   throw error;
-    // } finally {
-    //   if (conn_ora) await conn_ora.close();
-    // }
   },
   //Collection Against Sales (A) negative value
   collectionAgainstSalePart2Tssh: async (conn_ora, data) => {
-    // let conn_ora = await getTmcConnection();
-
-    // const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(",")) || null;
-    // const fromDate = data.from;
-    // const toDate = data.to;
-
     const sql = `SELECT 
                         SUM (NVL (IPRECEIPTrefund.irf_cash, 0) + NVL (IPRECEIPTrefund.irf_card, 0) + NVL (IPRECEIPTrefund.irf_cheque, 0))  * -1 AS Amt,
                         0 tax
@@ -255,22 +195,9 @@ module.exports = {
       {outFormat: oracledb.OUT_FORMAT_OBJECT},
     );
     return result.rows;
-    // try {
-    //   // callBack(null, );
-    // } catch (error) {
-    //   console.log(error);
-    //   throw error;
-    // } finally {
-    //   if (conn_ora) await conn_ora.close();
-    // }
   },
   // Complimentary
   complimentoryTssh: async (conn_ora, data) => {
-    // let conn_ora = await getTmcConnection();
-
-    // const fromDate = data.from;
-    // const toDate = data.to;
-
     const sql = `SELECT SUM (NVL (Opbillmast.OPN_NETAMT, 0)
                                 + NVL (OPBILLMAST.OPN_SALETAXCH, 0)
                                 + NVL (OPBILLMAST.OPN_SALETAXCR, 0)) AS Amt,
@@ -300,23 +227,9 @@ module.exports = {
       {outFormat: oracledb.OUT_FORMAT_OBJECT},
     );
     return result.rows;
-    // try {
-    //   // callBack(null, );
-    // } catch (error) {
-    //   console.log(error);
-    //   throw error;
-    // } finally {
-    //   if (conn_ora) await conn_ora.close();
-    // }
   },
   // CreditInsurance Bill Collection(D)
   creditInsuranceBillCollectionTssh: async (conn_ora, data) => {
-    // let conn_ora = await getTmcConnection();
-    // // console.log(data);
-    // const ipNumberList = (data?.ipNoColl?.length > 0 && data.ipNoColl.join(",")) || null;
-    // const fromDate = data.from;
-    // const toDate = data.to;
-
     const sql = `SELECT 
                             SUM (NVL (RECPCOLLECTIONMAST.RCN_CASH, 0) + NVL (RECPCOLLECTIONMAST.RCN_CHK, 0) + NVL (RECPCOLLECTIONMAST.RCN_DD, 0) + NVL (RECPCOLLECTIONMAST.RCN_Card, 0) + NVL (RECPCOLLECTIONMAST.RCN_NEFT, 0)) Amt,
                             0 tax
@@ -360,23 +273,9 @@ module.exports = {
       {outFormat: oracledb.OUT_FORMAT_OBJECT},
     );
     return result.rows;
-    // try {
-    //   // callBack(null, );
-    // } catch (error) {
-    //   console.log(error);
-    //   throw error;
-    // } finally {
-    //   if (conn_ora) await conn_ora.close();
-    // }
   },
   //	Credit/Insurance Bill
   creditInsuranceBillTssh: async (conn_ora, data) => {
-    // let conn_ora = await getTmcConnection();
-
-    // const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(",")) || null;
-    // const fromDate = data.from;
-    // const toDate = data.to;
-
     const sql = `SELECT 
                                 SUM (NVL (Disbillmast.DMN_FINALCREDIT, 0)) + SUM (NVL (dmn_copayded_credit, 0))  Amt,
                                 SUM ( DECODE ( NVL (Disbillmast.Dmc_Cancel, 'N'), 'N',   NVL (DMN_SALESTAXCH, 0) + NVL (DMN_SALESTAXCR, 0) + NVL (DMN_CESSCH, 0)  + NVL (DMN_CESSCR, 0), 0)) TAX

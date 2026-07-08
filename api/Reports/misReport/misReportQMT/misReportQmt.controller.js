@@ -1,4 +1,4 @@
-const {getTmcConnection} = require("../../../../config/oradbconfig");
+const {getTmcConnection, oracleConnectionClose} = require("../../../../config/oradbconfig");
 const collectionQmtService = require("../collectionPart/collection.service");
 const pharmacyCollectionQmtService = require("../incomePart/pharmacyincome/pharmacy.service");
 const procedureQmtService = require("../incomePart/procedureIncome/proincome.service");
@@ -96,13 +96,7 @@ const getCollectionAndIncomeMisReportQMT = async (req, res) => {
       message: error.message || "Unexpected Error",
     });
   } finally {
-    if (conn) {
-      try {
-        await conn.close();
-      } catch (closeErr) {
-        console.error("Error closing Oracle connection:", closeErr);
-      }
-    }
+    await oracleConnectionClose(conn);
   }
 };
 

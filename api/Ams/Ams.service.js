@@ -1,8 +1,8 @@
 const {query} = require("../../config/mysqldbconfig");
-const {getTmcConnection, oracledb} = require("../../config/oradbconfig");
+const {executeTmc} = require("../../config/oracleExecutor");
+
 module.exports = {
   getAntibiotic: async (data) => {
-    let conn_ora = await getTmcConnection();
     const sql = `select meddesc.it_code,
          meddesc.itc_desc,
          meddesc.itc_alias,
@@ -29,7 +29,7 @@ module.exports = {
          medgencomb.cmc_desc,
          medmanuf.mfc_desc`;
     try {
-      const result = await conn_ora.execute(
+      const result = await executeTmc(
         sql,
         {
           itc_desc: "%" + data.itc_desc + "%",
@@ -40,21 +40,16 @@ module.exports = {
     } catch (error) {
       console.log(error);
       throw error;
-      // return callBack(error);
-    } finally {
-      await conn_ora.close();
     }
   },
 
   getAntibioticItemCode: async () => {
-    return await query("meliora", `SELECT item_code FROM ams_antibiotic_master where status = 1`);
+    return await executeTmc(`SELECT item_code FROM ams_antibiotic_master where status = 1`, {}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
   },
 
   getMicrobiologyTest: async (id) => {
-    let conn_ora = await getTmcConnection();
     try {
-      const result = await conn_ora.execute(
-        `SELECT B.PT_NO "PT_NO",
+      const sql = `SELECT B.PT_NO "PT_NO",
                 B.PTC_NAME,
                 D.DOC_NAME "DOCTOR", 
                 C.MIC_DESC "INVESTIGATION",
@@ -87,20 +82,13 @@ module.exports = {
                 B.PT_NO, B.PTC_NAME, D.DOC_NAME, C.MIC_DESC, SM.SMC_DESC,
                 S.SMC_DESC, R.MRC_LABNO, R.MRC_FLUIDTYPE, W.GRC_DESC,
                 R.GR_CODE1_REMARKS, R.GR_CODE2_REMARKS, R.GR_CODE3_REMARKS,
-                O1.ORC_DESC, O2.ORC_DESC, R.MRC_REMARKS,T.TSD_CHECKDATE`,
-        {mrdNo: id},
-        {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT},
-      );
-
+                O1.ORC_DESC, O2.ORC_DESC, R.MRC_REMARKS,T.TSD_CHECKDATE`;
+      const result = await executeTmc(sql, {mrdNo: id}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
       const hisData = await result.resultSet?.getRows();
-      // return callBack(null, hisData);
       return hisData;
     } catch (error) {
       console.log(error);
       throw error;
-      // return callBack(error);
-    } finally {
-      await conn_ora.close();
     }
   },
 };

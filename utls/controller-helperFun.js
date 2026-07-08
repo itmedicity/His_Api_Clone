@@ -1,4 +1,5 @@
-const {getTmcConnection, oracleConnectionClose, closeConnection, oracledb} = require("../config/oradbconfig");
+const {executeTmc} = require("../config/oracleExecutor");
+const {getTmcConnection, oracleConnectionClose, oracledb} = require("../config/oradbconfig");
 
 // CONTROLLER FUNCTIONIN ip NUMNER UPDATION
 
@@ -180,7 +181,7 @@ const controllerGETHelper = (serviceFun, successMessage) => {
 // };
 
 const getGttPatientList = async (conn) => {
-  const result = await conn.execute(`SELECT * FROM MEDIWARE.GTT_EXCLUDE_IP`);
+  const result = await executeTmc(`SELECT * FROM MEDIWARE.GTT_EXCLUDE_IP`);
   return result.rows;
 };
 

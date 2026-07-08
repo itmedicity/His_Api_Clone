@@ -1,5 +1,5 @@
 // @ts-ignore
-const {oracledb, getTmcConnection} = require("../../../config/oradbconfig");
+const {oracledb, getTmcConnection, oracleConnectionClose} = require("../../../config/oradbconfig");
 const {query, transaction} = require("../../../config/mysqldbconfig");
 
 module.exports = {
@@ -34,7 +34,7 @@ module.exports = {
       console.log(error);
       throw error;
     } finally {
-      await conn_ora.close();
+      await oracleConnectionClose(conn_ora);
     }
   },
   /**
@@ -122,7 +122,7 @@ module.exports = {
       console.log(error);
       throw error;
     } finally {
-      await conn_ora.close();
+      await oracleConnectionClose(conn_ora);
     }
   },
   getTsshPatientList: async (data) => {
@@ -173,7 +173,7 @@ module.exports = {
       console.log(error);
       throw error;
     } finally {
-      await conn_ora.close();
+      await oracleConnectionClose(conn_ora);
     }
   },
   // GET DISCHARGE INFO FROM ORACLE
@@ -201,7 +201,7 @@ module.exports = {
       console.log(error);
       throw error;
     } finally {
-      await conn_ora.close();
+      await oracleConnectionClose(conn_ora);
     }
   },
   /*************  ✨ Windsurf Command ⭐  *************/
@@ -301,7 +301,8 @@ module.exports = {
       console.log(error);
       throw error;
     } finally {
-      await conn_ora.close();
+      // await conn_ora.close();
+      await oracleConnectionClose(conn_ora);
     }
   },
   // GET DISCHARGE INFO FROM ORACLE
@@ -332,7 +333,7 @@ module.exports = {
       console.log(error);
       throw error;
     } finally {
-      await conn_ora.close();
+      await oracleConnectionClose(conn_ora);
     }
   },
   /*************  ✨ Windsurf Command ⭐  *************/

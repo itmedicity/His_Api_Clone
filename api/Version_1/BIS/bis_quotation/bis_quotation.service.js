@@ -1,7 +1,7 @@
+const {executeTmc} = require("../../../../config/oracleExecutor");
 const {getTmcConnection, oracledb} = require("../../../../config/oradbconfig");
 module.exports = {
   getQtnMastDetails: async (data, callBack) => {
-    let conn_ora = await getTmcConnection();
     const sql = `SELECT Q.QU_NO,
             Q.QUD_DATE,
             Q.SU_CODE,
@@ -28,7 +28,7 @@ module.exports = {
             P.STC_DESC,
             Q.QUN_AMOUNT`;
     try {
-      const result = await conn_ora.execute(
+      const result = await executeTmc(
         sql,
         {
           qtnNo: data.qtnNo,
@@ -39,12 +39,9 @@ module.exports = {
       callBack(null, result.rows);
     } catch (error) {
       return callBack(error);
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
   getQtnDetailDetails: async (data, callBack) => {
-    let conn_ora = await getTmcConnection();
     const sql = `SELECT D.IT_CODE,
             M.ITC_DESC,
             D.QUN_RATE,
@@ -70,7 +67,7 @@ module.exports = {
             AND Q.QU_NO=:qtnNo
             AND (Q.QUD_DATE =:qtnDate)`;
     try {
-      const result = await conn_ora.execute(
+      const result = await executeTmc(
         sql,
         {
           qtnNo: data.qtnNo,
@@ -82,16 +79,12 @@ module.exports = {
       callBack(null, result.rows);
     } catch (error) {
       return callBack(error);
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
   getActiveItems: async (data, callBack) => {
     let conn_ora;
     let result;
     try {
-      conn_ora = await getTmcConnection();
-
       const sql = `
             SELECT medstore.st_code, COUNT(medstore.it_code) AS item_count
             FROM meddesc
@@ -102,21 +95,13 @@ module.exports = {
             GROUP BY medstore.st_code
         `;
 
-      result = await conn_ora.execute(sql, {}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
-
+      result = await executeTmc(sql, {}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
       const resultSet = await result.resultSet.getRows();
       callBack(null, resultSet);
     } catch (error) {
       callBack(error);
     } finally {
       await result.resultSet.close();
-      if (conn_ora) {
-        try {
-          await conn_ora.close();
-        } catch (closeError) {
-          console.error("Error closing connection:", closeError);
-        }
-      }
     }
   },
   storeItems: async (data, callBack) => {
@@ -124,58 +109,37 @@ module.exports = {
     let result;
 
     try {
-      conn_ora = await getTmcConnection();
-
       const sql = `
          SELECT ST_CODE,STC_DESC,STC_ALIAS
          FROM STORE
          WHERE STC_STATUS='Y'
         `;
 
-      const result = await conn_ora.execute(sql, {}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
-
+      const result = await executeTmc(sql, {}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
       const resultSet = result.resultSet.getRows();
       callBack(null, resultSet);
     } catch (error) {
       callBack(error);
     } finally {
       await result.resultSet.close();
-      if (conn_ora) {
-        try {
-          await conn_ora.close();
-        } catch (closeError) {
-          console.error("Error closing connection:", closeError);
-        }
-      }
     }
   },
   medstore: async (data, callBack) => {
     let conn_ora;
     let result;
-
     try {
-      conn_ora = await getTmcConnection();
-
       const sql = `
         SELECT MEDSTORE.IT_CODE,MEDSTORE.ST_CODE FROM MEDDESC LEFT JOIN MEDSTORE ON MEDDESC.IT_CODE = MEDSTORE.IT_CODE
         WHERE MEDDESC.ITC_STATUS = 'Y' 
         `;
 
-      result = await conn_ora.execute(sql, {}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
-
+      result = await executeTmc(sql, {}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
       const resultSet = result.resultSet.getRows();
       callBack(null, resultSet);
     } catch (error) {
       callBack(error);
     } finally {
       await result.resultSet.close();
-      if (conn_ora) {
-        try {
-          await conn_ora.close();
-        } catch (closeError) {
-          console.error("Error closing connection:", closeError);
-        }
-      }
     }
   },
 
@@ -185,8 +149,6 @@ module.exports = {
     let result;
 
     try {
-      conn_ora = await getTmcConnection();
-
       const sql = `
       SELECT  meddesc.it_code,
          meddesc.itc_desc,
@@ -229,25 +191,17 @@ GROUP BY MEDDESC.IT_CODE,meddesc.itc_desc,meddesc.itc_alias,medcategory.mc_code,
  
         `;
 
-      result = await conn_ora.execute(sql, {}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
+      result = await executeTmc(sql, {}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
       const rows = await result.resultSet.getRows();
       callBack(null, rows);
     } catch (error) {
       callBack(error);
     } finally {
       await result.resultSet.close();
-      if (conn_ora) {
-        try {
-          await conn_ora.close();
-        } catch (closeError) {
-          console.error("Error closing connection:", closeError);
-        }
-      }
     }
   },
 
   getTotalQtn: async (data, callBack) => {
-    let conn_ora = await getTmcConnection();
     const sql = `SELECT Q.QU_NO,
             Q.QUD_DATE,
             Q.SU_CODE,
@@ -273,7 +227,7 @@ GROUP BY MEDDESC.IT_CODE,meddesc.itc_desc,meddesc.itc_alias,medcategory.mc_code,
             Q.QUN_AMOUNT`;
     let result;
     try {
-      result = await conn_ora.execute(sql, {}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
+      result = await executeTmc(sql, {}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
       await result.resultSet?.getRows((err, rows) => {
         callBack(err, rows);
       });
@@ -281,7 +235,6 @@ GROUP BY MEDDESC.IT_CODE,meddesc.itc_desc,meddesc.itc_alias,medcategory.mc_code,
       return callBack(error);
     } finally {
       await result.resultSet.close();
-      if (conn_ora) await conn_ora.close();
     }
   },
 };

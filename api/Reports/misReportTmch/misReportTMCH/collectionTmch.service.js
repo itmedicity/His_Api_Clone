@@ -1,6 +1,6 @@
 // @ts-ignore
 const {pools, query} = require("../../../../config/mysqldbconfig");
-const {oracledb, getTmcConnection} = require("../../../../config/oradbconfig");
+const {oracledb, getTmcConnection, oracleConnectionClose} = require("../../../../config/oradbconfig");
 
 module.exports = {
   //Advance Collection (C)
@@ -1032,10 +1032,7 @@ module.exports = {
     } catch (error) {
       console.log(error);
     } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-        // await pool_ora.close();
-      }
+      await oracleConnectionClose(conn_ora);
     }
   },
   getDischargedIpInfoMysql: async (from, to) => {

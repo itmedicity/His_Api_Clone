@@ -277,11 +277,8 @@ const getCollectionAndIncomeMisReportTMCH = async (req, res) => {
     });
   } finally {
     if (conn) {
-      try {
-        await conn.close();
-      } catch (closeErr) {
-        console.error("Error closing Oracle connection:", closeErr);
-      }
+      await conn.commit();
+      await oracleConnectionClose(conn);
     }
   }
 };

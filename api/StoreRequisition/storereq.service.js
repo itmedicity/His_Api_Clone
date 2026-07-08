@@ -1,19 +1,17 @@
 const {pools, query, transaction} = require("../../config/mysqldbconfig");
+const {executeTmc, executeMany} = require("../../config/oracleExecutor");
 const {getTmcConnection, oracledb} = require("../../config/oradbconfig");
 
 module.exports = {
   getPharmacyList: async () => {
-    const result = await query("ellider",`select * from medi_ellider.outlet`, []);
+    const result = await query("ellider", `select * from medi_ellider.outlet`, []);
     return result;
   },
 
   searchRequestFromOra: async (data) => {
-    let conn_ora = await getTmcConnection();
-
     try {
-      const result = await conn_ora.execute(
-        `
-        SELECT strmeddetl.IT_CODE,
+      const result = await executeTmc(
+        `SELECT strmeddetl.IT_CODE,
                 MEDCATEGORY.MCC_DESC,
                 meddesc.ITC_ALIAS,
                 meddesc.ITC_DESC,
@@ -42,13 +40,10 @@ module.exports = {
       return result.rows;
     } catch (error) {
       throw error;
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
 
   insertToRolSetting: async (data) => {
-    let conn_ora = await getTmcConnection();
     try {
       const sql = `INSERT INTO rol_setting (OU_CODE,IT_CODE,ITN_NAME,ITN_MAXQTY,ITN_MINQTY,ITN_MINLVL,ITN_MEDLVL,
         ITN_MAXLVL,STATUS) VALUES 
@@ -62,7 +57,6 @@ module.exports = {
                         :ITN_MEDLVL,
                         :ITN_MAXLVL,
                         :STATUS)`;
-
       const options = {
         autoCommit: true,
         bindDefs: {
@@ -77,31 +71,25 @@ module.exports = {
           STATUS: {type: oracledb.STRING, maxSize: 1},
         },
       };
-      const result = await conn_ora.executeMany(sql, data, options);
+      const result = await executeMany(sql, data, options);
       return result;
     } catch (error) {
       throw error;
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
 
   truncateRolSetting: async () => {
-    let conn_ora = await getTmcConnection();
     try {
-      return await conn_ora.execute(`TRUNCATE TABLE rol_setting`, []);
+      return await executeTmc(`TRUNCATE TABLE rol_setting`, []);
     } catch (error) {
       throw error;
-    } finally {
-      await conn_ora.close();
     }
   },
 
   updateReqQntyToOracle: async (data) => {
     oracledb.autoCommit = true;
-    let conn_ora = await getTmcConnection();
     try {
-      const result = await conn_ora.execute(
+      const result = await executeTmc(
         `UPDATE STRMEDDETL S 
                 SET S.SRN_QTY = (SELECT R.ITN_MAXQTY FROM ROL_SETTING R WHERE R.IT_CODE = S.IT_CODE )
                 WHERE S.IT_CODE IN (SELECT R.IT_CODE FROM ROL_SETTING R WHERE R.IT_CODE = S.IT_CODE)
@@ -115,10 +103,6 @@ module.exports = {
       return result;
     } catch (error) {
       throw error;
-    } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-      }
     }
   },
 };

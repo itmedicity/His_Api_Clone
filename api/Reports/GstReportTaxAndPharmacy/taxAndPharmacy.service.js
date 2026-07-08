@@ -1,9 +1,9 @@
 const {pools, query} = require("../../../config/mysqldbconfig");
-const {getTmcConnection, oracledb} = require("../../../config/oradbconfig");
+const {oracledb} = require("../../../config/oradbconfig");
+const {executeTmc} = require("../../../config/oracleExecutor");
 
 module.exports = {
   getGstReportOfPharmacy: async (data) => {
-    let conn_ora = await getTmcConnection();
     const fromDate = data.from;
     const toDate = data.to;
 
@@ -211,7 +211,7 @@ module.exports = {
                             AND A.TAXCODE = TAX.TX_CODE`;
     let result;
     try {
-      result = await conn_ora.execute(
+      result = await executeTmc(
         sql,
         {
           fromDate: fromDate,
@@ -221,18 +221,14 @@ module.exports = {
       );
       const gstReportFromOra = await result.resultSet?.getRows();
       return gstReportFromOra;
-      // return callBack(null, gstReportFromOra);
     } catch (error) {
-      // return callBack(error);
       throw error;
     } finally {
       if (result) await result.resultSet.close();
-      if (conn_ora) await conn_ora.close();
     }
   },
 
   getGstReportPharmacyWise: async (data) => {
-    let conn_ora = await getTmcConnection();
     const fromDate = data.from;
     const toDate = data.to;
     const sql = `SELECT OUCODE,CODE,BILL,BILLDATE,CACR,QTY,LOOSE,PRATE,MRP,ACTMRP,AMT,DIS,TAXCODE,TAXPER,TAXAMT,OUTLET.OUC_DESC,MEDDESC.ITC_DESC,TAX.TXC_DESC
@@ -302,7 +298,7 @@ module.exports = {
                     AND A.TAXCODE = TAX.TX_CODE`;
     let result;
     try {
-      result = await conn_ora.execute(sql, {fromDate: fromDate, toDate: toDate}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
+      result = await executeTmc(sql, {fromDate: fromDate, toDate: toDate}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
       const gstReportFromOra = await result.resultSet?.getRows();
       return gstReportFromOra;
       // return callBack(null, gstReportFromOra);
@@ -311,12 +307,10 @@ module.exports = {
       throw error;
     } finally {
       if (result && result.resultSet) await result.resultSet.close();
-      if (conn_ora) await conn_ora.close();
     }
   },
 
   getInPatientMedReturn: async (data) => {
-    let conn_ora = await getTmcConnection();
     const fromDate = data.from;
     const toDate = data.to;
     const sql = `SELECT OUCODE,CODE,BILL,BILLDATE,CACR,QTY,LOOSE,PRATE,MRP,ACTMRP,AMT,DIS,TAXCODE,TAXPER,TAXAMT,OUTLET.OUC_DESC,MEDDESC.ITC_DESC,TAX.TXC_DESC
@@ -355,20 +349,17 @@ module.exports = {
                                         AND A.CODE = MEDDESC.IT_CODE
                                         AND A.ACTAX = TAX.TX_CODE`;
     try {
-      const result = await conn_ora.execute(sql, {fromDate: fromDate, toDate: toDate}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(sql, {fromDate: fromDate, toDate: toDate}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       const gstReportFromOra = result.rows;
       // return callBack(null, gstReportFromOra);
       return gstReportFromOra;
     } catch (error) {
       // return callBack(error);
       throw error;
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
 
   getInPatientMedSale: async (data) => {
-    let conn_ora = await getTmcConnection();
     const fromDate = data.from;
     const toDate = data.to;
     const sql = ` SELECT OUCODE,CODE,BILL,BILLDATE,CACR,QTY,LOOSE,PRATE,MRP,ACTMRP,AMT,DIS,TAXCODE,TAXPER,TAXAMT,OUTLET.OUC_DESC,MEDDESC.ITC_DESC,TAX.TXC_DESC
@@ -407,20 +398,16 @@ module.exports = {
                     AND A.CODE = MEDDESC.IT_CODE
                     AND A.ACTAX = TAX.TX_CODE`;
     try {
-      const result = await conn_ora.execute(sql, {fromDate: fromDate, toDate: toDate}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(sql, {fromDate: fromDate, toDate: toDate}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       const gstReportFromOra = result.rows;
       return gstReportFromOra;
-      // return callBack(null, gstReportFromOra);
     } catch (error) {
       // return callBack(error);
       throw error;
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
 
   getSumOfAmountTaxDisc: async (data) => {
-    let conn_ora = await getTmcConnection();
     const fromDate = data.from;
     const toDate = data.to;
     const sql = `SELECT sum(AMT)amount,sum(DIS)discount,SUM(TAXAMT)taxamount
@@ -489,20 +476,15 @@ module.exports = {
                     AND A.CODE = MEDDESC.IT_CODE
                     AND A.TAXCODE = TAX.TX_CODE`;
     try {
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       const gstReportFromOra = result.rows;
-      // return callBack(null, gstReportFromOra);
       return gstReportFromOra;
     } catch (error) {
-      // return callBack(error);
       throw error;
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
 
   getInPatientMedReturnSum: async (data) => {
-    let conn_ora = await getTmcConnection();
     const fromDate = data.from;
     const toDate = data.to;
     const sql = ` SELECT  sum(AMT),sum(DIS),SUM(TAXAMT)
@@ -540,20 +522,15 @@ WHERE     Pbillmast.Bmc_Slno = Mretdetl.Bmc_Slno
                     AND A.CODE = MEDDESC.IT_CODE
                     AND A.TAXCODE = TAX.TX_CODE`;
     try {
-      const result = await conn_ora.execute(sql, {fromDate: fromDate, toDate: toDate}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(sql, {fromDate: fromDate, toDate: toDate}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       const gstReportFromOra = result.rows;
-      // return callBack(null, gstReportFromOra);
       return gstReportFromOra;
     } catch (error) {
-      // return callBack(error);
       throw error;
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
 
   getOpCreditPharmSale: async (data) => {
-    let conn_ora = await getTmcConnection();
     const fromDate = data.from;
     const toDate = data.to;
     const sql = `  SELECT 
@@ -586,20 +563,15 @@ AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
 AND Opbillmast.Opd_Date <=
 TO_DATE(:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
     try {
-      const result = await conn_ora.execute(sql, {fromDate: fromDate, toDate: toDate}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(sql, {fromDate: fromDate, toDate: toDate}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       const gstReportFromOra = result.rows;
-      // return callBack(null, gstReportFromOra);
       return gstReportFromOra;
     } catch (error) {
-      // return callBack(error);
       throw error;
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
 
   getGstReportPharmCollection: async (data) => {
-    let conn_ora = await getTmcConnection();
     const fromDate = data.from;
     const toDate = data.to;
     const sql = ` SELECT OUCODE,CODE,BILL,BILLDATE,CACR,QTY,LOOSE,PRATE,MRP,ACTMRP,AMT,DIS,TAXCODE,TAXPER,TAXAMT,OUTLET.OUC_DESC,MEDDESC.ITC_DESC,TAX.TXC_DESC
@@ -670,20 +642,14 @@ TO_DATE(:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
                     AND A.CODE = MEDDESC.IT_CODE
                     AND A.ACTAX = TAX.TX_CODE`;
     try {
-      const result = await conn_ora.execute(sql, {fromDate: fromDate, toDate: toDate}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(sql, {fromDate: fromDate, toDate: toDate}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       const gstReportFromOra = result.rows;
-      // return callBack(null, gstReportFromOra);
       return gstReportFromOra;
     } catch (error) {
-      // return callBack(error);
       throw error;
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   }, // TSSH PHARMACY GST REPORTS
   tsshPharmacyGstRptOne: async (data) => {
-    let conn_ora = await getTmcConnection();
-
     const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(",")) || null;
     const fromDate = data.from;
     const toDate = data.to;
@@ -717,19 +683,15 @@ TO_DATE(:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
                     AND DISBILLMAST.IP_NO IN (${ipNumberList})`;
 
     try {
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       // callBack(null, result.rows);
       return result.rows;
     } catch (error) {
       console.log(error);
       throw error;
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
   tsshPharmacyGstRptTwo: async (data) => {
-    let conn_ora = await getTmcConnection();
-
     const group = data?.group;
     const ipNumberList = group === 1 ? null : (data?.ptno?.length > 0 && data.ptno.join(",")) || null;
     // const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(',')) || null;
@@ -765,19 +727,15 @@ TO_DATE(:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
                             AND Disbillmast.IP_NO IN (${ipNumberList})`;
 
     try {
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       return result.rows;
       // callBack(null, result.rows);
     } catch (error) {
       console.log(error);
       throw error;
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
   tsshPharmacyGstRptthree: async (data) => {
-    let conn_ora = await getTmcConnection();
-
     const group = data?.group;
     const ipNumberList = group === 1 ? null : (data?.ptno?.length > 0 && data.ptno.join(",")) || null;
     const fromDate = data.from;
@@ -812,19 +770,14 @@ TO_DATE(:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
                             AND PBILLMAST.IP_NO IN (${ipNumberList})`;
 
     try {
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
-      // callBack(null, result.rows);
+      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       return result.rows;
     } catch (error) {
       console.log(error);
       throw error;
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
   tsshPharmacyGstRptFour: async (data) => {
-    let conn_ora = await getTmcConnection();
-
     const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(",")) || null;
     const fromDate = data.from;
     const toDate = data.to;
@@ -908,14 +861,11 @@ TO_DATE(:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
                             AND PBILLMAST.IP_NO IN (${ipNumberList})`;
 
     try {
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
-      // callBack(null, result.rows);
+      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       return result.rows;
     } catch (error) {
       callBack(error, null);
       throw error;
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
 
@@ -952,10 +902,9 @@ TO_DATE(:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
   },
 
   /****GST REPORT TMCH START */
-  tmchGstReport: async (conn_ora, data) => {
+  tmchGstReport: async (data) => {
     //GST FIRST REPORTS
     const reportTmch_One = new Promise(async (resolve, reject) => {
-      // let conn_ora = await getTmcConnection();
       const ipNumberListString = data?.ptno?.map((item) => `'${item}'`).join(",") || null;
       const fromDate = data.from;
       const toDate = data.to;
@@ -1026,15 +975,8 @@ TO_DATE(:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
                             AND TAX.TX_CODE = MRETDETL.MRC_ACTTXCODE`;
       // console.log(sql)
       try {
-        const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+        const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
         resolve({status: 1, message: "Success", data: result.rows});
-        // console.log(result.rows);
-        // result.resultSet?.getRows((err, rows) => {
-        //   if (err) {
-        //     reject({status: 0, message: err, data: []});
-        //   } else {
-        // }
-        // });
       } catch (error) {
         reject({status: 0, message: error, data: []});
       }
@@ -1042,7 +984,6 @@ TO_DATE(:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
 
     /// SECOND REPORT
     const reportTmch_Two = new Promise(async (resolve, reject) => {
-      // let conn_ora = await getTmcConnection();
       const ipNumberListString = data?.ptno?.map((item) => `'${item}'`).join(",") || null;
       const fromDate = data.from;
       const toDate = data.to;
@@ -1080,15 +1021,8 @@ TO_DATE(:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
                             AND MRETDETL.OU_CODE = OUTLET.OU_CODE
                             AND DISBILLMAST.IP_NO NOT IN (${ipNumberListString})`;
       // console.log(sql)
-
       try {
-        const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
-        //     result.resultSet?.getRows((err, rows) => {
-        //       if (err) {
-        //         reject({status: 0, message: err, data: []});
-        //       } else {
-        //     }
-        // });
+        const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
         resolve({status: 1, message: "Success", data: result.rows});
       } catch (error) {
         reject({status: 0, message: error, data: []});
@@ -1098,8 +1032,6 @@ TO_DATE(:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
     // THIR REPORTS
 
     const reportTmch_Three = new Promise(async (resolve, reject) => {
-      // let conn_ora = await getTmcConnection();
-
       const ipNumberListString = data?.ptno?.map((item) => `'${item}'`).join(",") || null;
       const fromDate = data.from;
       const toDate = data.to;
@@ -1169,16 +1101,8 @@ TO_DATE(:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
                                 AND MEDDESC.IT_CODE = MRETDETL.IT_CODE
                                 AND MRETDETL.OU_CODE = OUTLET.OU_CODE
                                 AND TAX.TX_CODE = MRETDETL.MRC_ACTTXCODE`;
-      // console.log(sql)
-
       try {
-        const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
-        //     result.resultSet?.getRows((err, rows) => {
-        //       if (err) {
-        //         reject({status: 0, message: err, data: []});
-        //       } else {
-        //     }
-        // });
+        const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
         resolve({status: 1, message: "Success", data: result.rows});
       } catch (error) {
         reject({status: 0, message: error, data: []});
@@ -1186,8 +1110,6 @@ TO_DATE(:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
     });
 
     const reportTmch_Four = new Promise(async (resolve, reject) => {
-      // let conn_ora = await getTmcConnection();
-
       const ipNumberListString = data?.ptno?.map((item) => `'${item}'`).join(",") || null;
       const fromDate = data.from;
       const toDate = data.to;
@@ -1226,13 +1148,7 @@ TO_DATE(:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
                                 AND Disbillmast.IP_NO NOT IN (${ipNumberListString})`;
       // console.log(sql)
       try {
-        const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
-        //     result.resultSet?.getRows((err, rows) => {
-        //       if (err) {
-        //         reject({status: 0, message: err, data: []});
-        //       } else {
-        //     }
-        // });
+        const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
         resolve({status: 1, message: "Success", data: result.rows});
       } catch (error) {
         reject({status: 0, message: error, data: []});
@@ -1240,8 +1156,6 @@ TO_DATE(:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
     });
 
     const reportTmch_Five = new Promise(async (resolve, reject) => {
-      // let conn_ora = await getTmcConnection();
-
       const ipNumberListString = data?.ptno?.map((item) => `'${item}'`).join(",") || null;
       const fromDate = data.from;
       const toDate = data.to;
@@ -1278,15 +1192,8 @@ TO_DATE(:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
                             AND TAX.TX_CODE = PBILLDETL.PBC_ACTTXCODE
                             AND OUTLET.OU_CODE = PBILLMAST.OU_CODE
                             AND PBILLMAST.IP_NO NOT IN (${ipNumberListString})`;
-      // console.log(sql)
       try {
-        const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
-        //     result.resultSet?.getRows((err, rows) => {
-        //       if (err) {
-        //         reject({status: 0, message: err, data: []});
-        //       } else {
-        //     }
-        // });
+        const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
         resolve({status: 1, message: "Success", data: result.rows});
       } catch (error) {
         reject({status: 0, message: error, data: []});
@@ -1316,9 +1223,8 @@ TO_DATE(:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
 
   /*******TMCH REPORT END */
   /*******TSSH REPORT START */
-  tsshGstReports: async (conn_ora, data) => {
+  tsshGstReports: async (data) => {
     const reportTssh_One = new Promise(async (resolve, reject) => {
-      // let conn_ora = await getTmcConnection();
       const ipNumberListString = data?.ptno?.map((item) => `'${item}'`).join(",") || null;
       const fromDate = data.from;
       const toDate = data.to;
@@ -1356,14 +1262,7 @@ TO_DATE(:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
                         AND DISBILLMAST.IP_NO IN (${ipNumberListString})`;
 
       try {
-        const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
-
-        //     result.resultSet?.getRows((err, rows) => {
-        //       if (err) {
-        //         reject({status: 0, message: err, data: []});
-        //       } else {
-        //     }
-        // });
+        const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
         resolve({status: 1, message: "Success", data: result.rows});
       } catch (error) {
         reject({status: 0, message: error, data: []});
@@ -1371,8 +1270,6 @@ TO_DATE(:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
     });
 
     const reportTssh_Two = new Promise(async (resolve, reject) => {
-      // let conn_ora = await getTmcConnection();
-
       const ipNumberListString = data?.ptno?.map((item) => `'${item}'`).join(",") || null;
       const fromDate = data.from;
       const toDate = data.to;
@@ -1409,14 +1306,7 @@ TO_DATE(:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
                                 AND OUTLET.OU_CODE = PBILLMAST.OU_CODE
                                 AND Disbillmast.IP_NO IN (${ipNumberListString})`;
       try {
-        const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
-
-        //     result.resultSet?.getRows((err, rows) => {
-        //       if (err) {
-        //         reject({status: 0, message: err, data: []});
-        //       } else {
-        //     }
-        // });
+        const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
         resolve({status: 1, message: "Success", data: result.rows});
       } catch (error) {
         reject({status: 0, message: error, data: []});
@@ -1424,7 +1314,6 @@ TO_DATE(:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
     });
 
     const reportTssh_Three = new Promise(async (resolve, reject) => {
-      // let conn_ora = await getTmcConnection();
       const ipNumberListString = data?.ptno?.map((item) => `'${item}'`).join(",") || null;
       const fromDate = data.from;
       const toDate = data.to;
@@ -1461,14 +1350,7 @@ TO_DATE(:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
                                 AND OUTLET.OU_CODE = PBILLMAST.OU_CODE
                                 AND PBILLMAST.IP_NO IN (${ipNumberListString})`;
       try {
-        const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
-
-        //     result.resultSet?.getRows((err, rows) => {
-        //       if (err) {
-        //         reject({status: 0, message: err, data: []});
-        //       } else {
-        //     }
-        // });
+        const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
         resolve({status: 1, message: "Success", data: result.rows});
       } catch (error) {
         reject({status: 0, message: error, data: []});

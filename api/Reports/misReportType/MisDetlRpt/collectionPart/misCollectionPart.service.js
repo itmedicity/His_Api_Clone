@@ -1,11 +1,9 @@
 // @ts-nocheck
+const {executeTmc} = require("../../../../../config/oracleExecutor");
 const {oracledb, getTmcConnection} = require("../../../../../config/oradbconfig");
 
 module.exports = {
   creditInsuranceBillDetlPart1: async (data) => {
-    let conn_ora = await getTmcConnection();
-
-    // const ipNumberList = data.ptno.join(',');
     const fromDate = data.from;
     const toDate = data.to;
 
@@ -222,20 +220,15 @@ module.exports = {
                                     A.UserName
                             HAVING SUM (A.Amt) <> 0`;
     try {
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       //       callBack(null, );
       return result.rows;
     } catch (error) {
       console.log(error);
       throw error;
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
   creditInsuranceBillDetlPart2: async (data) => {
-    let conn_ora = await getTmcConnection();
-
-    // const ipNumberList = data.ptno.join(',');
     const fromDate = data.from;
     const toDate = data.to;
 
@@ -288,20 +281,15 @@ module.exports = {
                         HAVING SUM (A.Amt) <> 0
                         ORDER BY A.Pt_no`;
     try {
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       //       callBack(null, );
       return result.rows;
     } catch (error) {
       console.log(error);
       throw error;
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
   creditInsuranceBillDetlPart3: async (data) => {
-    let conn_ora = await getTmcConnection();
-
-    // const ipNumberList = data.ptno.join(',');
     const fromDate = data.from;
     const toDate = data.to;
 
@@ -342,20 +330,15 @@ module.exports = {
                                 Usc_Name
                         HAVING SUM (NVL (Dmn_credit, 0)) <> 0`;
     try {
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       //       callBack(null, );
       return result.rows;
     } catch (error) {
       console.log(error);
       throw error;
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
   creditInsuranceBillDetlPart4: async (data) => {
-    let conn_ora = await getTmcConnection();
-
-    // const ipNumberList = data.ptno.join(',');
     const fromDate = data.from;
     const toDate = data.to;
 
@@ -400,20 +383,15 @@ module.exports = {
                         HAVING SUM (NVL (Bmn_credit, 0)) <> 0
                         ORDER BY Pbillmast.Pt_no`;
     try {
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       //       callBack(null, );
       return result.rows;
     } catch (error) {
       console.log(error);
       throw error;
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
   creditInsuranceBillDetlPart5: async (data) => {
-    let conn_ora = await getTmcConnection();
-
-    // const ipNumberList = data.ptno.join(',');
     const fromDate = data.from;
     const toDate = data.to;
 
@@ -458,20 +436,15 @@ module.exports = {
                         HAVING SUM (NVL (Bmn_credit, 0)) <> 0
                         ORDER BY Pbillmast.Pt_no`;
     try {
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       //       callBack(null, );
       return result.rows;
     } catch (error) {
       console.log(error);
       throw error;
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
   creditInsuranceBillDetlPart6: async (data) => {
-    let conn_ora = await getTmcConnection();
-
-    // const ipNumberList = data.ptno.join(',');
     const fromDate = data.from;
     const toDate = data.to;
 
@@ -523,20 +496,15 @@ module.exports = {
                                 A.UserName
                         HAVING SUM (A.Amt) <> 0`;
     try {
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       //       callBack(null, );
       return result.rows;
     } catch (error) {
       console.log(error);
       throw error;
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
   unSettledAmountDetl: async (data) => {
-    let conn_ora = await getTmcConnection();
-
-    // const ipNumberList = data.ptno.join(',');
     const fromDate = data.from;
     const toDate = data.to;
 
@@ -885,20 +853,15 @@ module.exports = {
                             HAVING SUM (NVL (Amt, 0)) <> 0
                             ORDER BY 3, 1`;
     try {
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       //       callBack(null, );
       return result.rows;
     } catch (error) {
       console.log(error);
       throw error;
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
   advanceCollection: async (data) => {
-    let conn_ora = await getTmcConnection();
-
-    // const ipNumberList = data.ptno.join(',');
     const fromDate = data.from;
     const toDate = data.to;
 
@@ -982,20 +945,15 @@ module.exports = {
                                 Ar_no,
                                 Usc_name`;
     try {
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       //       callBack(null, );
       return result.rows;
     } catch (error) {
       console.log(error);
       throw error;
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
   creditInsuranceBillCollection1: async (data) => {
-    let conn_ora = await getTmcConnection();
-
-    // const ipNumberList = data.ptno.join(',');
     const fromDate = data.from;
     const toDate = data.to;
 
@@ -1018,20 +976,15 @@ module.exports = {
                                 TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
                             AND X.MH_CODE IN (SELECT MH_CODE FROM multihospital)`;
     try {
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       //       callBack(null, );
       return result.rows;
     } catch (error) {
       console.log(error);
       throw error;
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
   creditInsuranceBillCollection2: async (data) => {
-    let conn_ora = await getTmcConnection();
-
-    // const ipNumberList = data.ptno.join(',');
     const fromDate = data.from;
     const toDate = data.to;
 
@@ -1052,14 +1005,12 @@ module.exports = {
                             AND X.Rfd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
                             AND X.MH_CODE IN (SELECT MH_CODE FROM multihospital)`;
     try {
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       //       callBack(null, );
       return result.rows;
     } catch (error) {
       console.log(error);
       throw error;
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
 };

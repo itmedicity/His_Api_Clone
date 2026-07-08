@@ -1,9 +1,10 @@
-const {getTmcConnection, oracledb} = require("../../config/oradbconfig");
+const {executeTmc} = require("../../config/oracleExecutor");
+const {oracledb} = require("../../config/oradbconfig");
+
 module.exports = {
   GetIPPatientList: async (data, callBack) => {
-    let conn_ora = await getTmcConnection();
     try {
-      const result = await conn_ora.execute(
+      const result = await executeTmc(
         `SELECT
                        IP_NO,IPD_DATE,PT_NO,PTC_PTNAME,PTC_TYPE,PTC_SEX,PTN_YEARAGE,PTN_MONTHAGE,PTN_DAYAGE,PTC_LOADD1,
                        PTC_LOADD2,PTC_MOBILE,IPADMISS.BD_CODE,BDC_NO,IPADMISS.DO_CODE,IPD_DISC,IPC_STATUS,DOC_NAME
@@ -27,8 +28,6 @@ module.exports = {
       return callBack(null, hisData);
     } catch (error) {
       return callBack(error);
-    } finally {
-      await conn_ora.close();
     }
   },
 };

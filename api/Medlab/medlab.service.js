@@ -1,10 +1,9 @@
 const {format, subHours, setSeconds, setMinutes, setHours, startOfDay} = require("date-fns");
 const {oracledb, getTmcConnection} = require("../../config/oradbconfig");
+const {executeTmc} = require("../../config/oracleExecutor");
 
 module.exports = {
   getAllPatientLabResults: async () => {
-    let conn_ora = await getTmcConnection();
-
     const sql = `
                     SELECT DISTINCT
                     PT.PT_NO,
@@ -37,7 +36,7 @@ module.exports = {
       // To date: today at 23:59:59
       const endOfDay = setSeconds(setMinutes(setHours(now, 23), 59), 59);
       const toDate = format(endOfDay, "dd/MM/yyyy HH:mm:ss");
-      const result = await conn_ora.execute(
+      const result = await executeTmc(
         sql,
         {
           FROM_DATE: formattedFromDate,
@@ -52,13 +51,9 @@ module.exports = {
     } catch (error) {
       console.log(error);
       throw error;
-    } finally {
-      await conn_ora.close();
     }
   },
   getAllIcuBeds: async () => {
-    let conn_ora = await getTmcConnection();
-
     const sql = `
                     SELECT  NS AS "NS",
     SUM(TOT) AS "TOT",
@@ -82,7 +77,7 @@ FROM (
              GROUP BY NS
              ORDER BY NS`;
     try {
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       //   await result.resultSet?.getRows((err, rows) => {
       // });
       return result.rows;
@@ -90,8 +85,6 @@ FROM (
     } catch (error) {
       console.log(error);
       throw error;
-    } finally {
-      await conn_ora.close();
     }
   },
 };

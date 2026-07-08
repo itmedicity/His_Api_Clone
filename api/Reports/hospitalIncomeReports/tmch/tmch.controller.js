@@ -233,11 +233,7 @@ const getTmchReport = async (req, res) => {
       message: error.message || "Internal Server Error",
     });
   } finally {
-    // Clean up and close all connections
-    if (conn) await oracleConnectionClose(conn);
-    // if (connPharmacy) await oracleConnectionClose(connPharmacy);
-    // if (connGrouped) await oracleConnectionClose(connGrouped);
-    // oracleConnectionClose(conn);
+    await oracleConnectionClose(conn);
   }
 };
 

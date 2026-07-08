@@ -4,7 +4,7 @@ const {format, subHours, subMonths, subSeconds, startOfDay} = require("date-fns"
 // const pool = require("../config/dbconfig");
 // const mysqlpool = require("../config/dbconfigmeliora");
 // const bispool = require("../config/dbconfbis");
-const {oracledb, getTmcCronConnection, getKmcConnection} = require("../config/oradbconfig");
+const {oracledb, getTmcCronConnection, getKmcConnection, oracleConnectionClose} = require("../config/oradbconfig");
 const {pools, acquireLock, transaction, releaseLock} = require("../config/mysqldbconfig");
 const {
   endLogSuccess,
@@ -153,7 +153,8 @@ const getAdmittedPatientInfoToInsert = async () => {
     if (logId) await endLogFailure(logId, err);
     throw err;
   } finally {
-    if (ora) await ora.close();
+    // if (ora) await ora.close();
+    await oracleConnectionClose(ora);
     await releaseLock("meliora", CRON_LOCK);
   }
 };
@@ -298,7 +299,8 @@ const UpdateDischargeAndBedStatus = async () => {
     if (logId) await endLogFailure(logId, error);
     throw error;
   } finally {
-    if (ora) await ora.close();
+    // if (ora) await ora.close();
+    await oracleConnectionClose(ora);
     await releaseLock("meliora", CRON_LOCK);
   }
 };
@@ -414,7 +416,8 @@ const UpdateInpatientDetailRmall = async () => {
     if (logId) await endLogFailure(logId, err);
     throw err;
   } finally {
-    if (conn_ora) await conn_ora.close();
+    // if (conn_ora) await conn_ora.close();
+    await oracleConnectionClose(conn_ora);
     await releaseLock("meliora", CRON_LOCK);
   }
 };
@@ -545,7 +548,8 @@ const UpdateFbBedDetailMeliora = async () => {
     if (logId) await endLogFailure(logId, err);
     throw err;
   } finally {
-    if (conn_ora) await conn_ora.close();
+    // if (conn_ora) await conn_ora.close();
+    await oracleConnectionClose(conn_ora);
     await releaseLock("meliora", CRON_LOCK);
   }
 };
@@ -669,7 +673,8 @@ const InsertChilderDetailMeliora = async () => {
     if (logId) await endLogFailure(logId, err);
     throw err;
   } finally {
-    if (conn_ora) await conn_ora.close();
+    // if (conn_ora) await conn_ora.close();
+    await oracleConnectionClose(conn_ora);
     await releaseLock("meliora", CRON_LOCK);
   }
 };

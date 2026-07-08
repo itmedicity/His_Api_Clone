@@ -1,11 +1,10 @@
 // @ts-nocheck
+const {executeTmc} = require("../../../../../config/oracleExecutor");
 const {oracledb, getTmcConnection} = require("../../../../../config/oradbconfig");
 
 module.exports = {
   // BED INCOME
   bedIncome: async (data) => {
-    let conn_ora = await getTmcConnection();
-
     const ipNumberList = data?.ptno?.join(",");
     const fromDate = data.from;
     const toDate = data.to;
@@ -1359,19 +1358,15 @@ module.exports = {
                         HAVING SUM (Amt) <> 0
                         ORDER BY Pcc_Desc`;
     try {
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       //       callBack(null, );
       return result.rows;
     } catch (error) {
       console.log(error);
       throw error;
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
   nsIncome: async (data) => {
-    let conn_ora = await getTmcConnection();
-
     // const ipNumberList = data.ptno.join(',');
     const fromDate = data.from;
     const toDate = data.to;
@@ -2726,19 +2721,15 @@ module.exports = {
                 ORDER BY Pcc_Desc`;
 
     try {
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       //       callBack(null, );
       return result.rows;
     } catch (error) {
       console.log(error);
       throw error;
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
   roomRentIncome: async (data) => {
-    let conn_ora = await getTmcConnection();
-
     // const ipNumberList = data.ptno.join(',');
     const fromDate = data.from;
     const toDate = data.to;
@@ -4093,19 +4084,15 @@ module.exports = {
                         ORDER BY Pcc_Desc`;
 
     try {
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       //       callBack(null, );
       return result.rows;
     } catch (error) {
       console.log(error);
       throw error;
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
   otherIncome: async (data) => {
-    let conn_ora = await getTmcConnection();
-
     // const ipNumberList = data.ptno.join(',');
     const fromDate = data.from;
     const toDate = data.to;
@@ -5460,19 +5447,15 @@ GROUP BY Code, Pcc_Desc
 ORDER BY Pcc_Desc`;
 
     try {
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       //       callBack(null, );
       return result.rows;
     } catch (error) {
       console.log(error);
       throw error;
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
   consultingIncome: async (data) => {
-    let conn_ora = await getTmcConnection();
-
     // const ipNumberList = data.ptno.join(',');
     const fromDate = data.from;
     const toDate = data.to;
@@ -6826,19 +6809,15 @@ ORDER BY Pcc_Desc`;
                 HAVING SUM (Amt) <> 0
                 ORDER BY Pcc_Desc`;
     try {
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       //       callBack(null, );
       return result.rows;
     } catch (error) {
       console.log(error);
       throw error;
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
   anesthetiaIncome: async (data) => {
-    let conn_ora = await getTmcConnection();
-
     // const ipNumberList = data.ptno.join(',');
     const fromDate = data.from;
     const toDate = data.to;
@@ -8193,19 +8172,15 @@ ORDER BY Pcc_Desc`;
                         ORDER BY Pcc_Desc`;
 
     try {
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       //       callBack(null, );
       return result.rows;
     } catch (error) {
       console.log(error);
       throw error;
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
   surgeonIncome: async (data) => {
-    let conn_ora = await getTmcConnection();
-
     // const ipNumberList = data.ptno.join(',');
     const fromDate = data.from;
     const toDate = data.to;
@@ -9559,19 +9534,15 @@ ORDER BY Pcc_Desc`;
                         HAVING SUM (Amt) <> 0
                         ORDER BY Pcc_Desc`;
     try {
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       //       callBack(null, );
       return result.rows;
     } catch (error) {
       console.log(error);
       throw error;
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
   theaterIncome: async (data) => {
-    let conn_ora = await getTmcConnection();
-
     // const ipNumberList = data.ptno.join(',');
     const fromDate = data.from;
     const toDate = data.to;
@@ -10926,19 +10897,15 @@ ORDER BY Pcc_Desc`;
                         ORDER BY Pcc_Desc`;
 
     try {
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       //       callBack(null, );
       return result.rows;
     } catch (error) {
       console.log(error);
       throw error;
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
   cardiologyIncome: async (data) => {
-    let conn_ora = await getTmcConnection();
-
     // const ipNumberList = data.ptno.join(',');
     const fromDate = data.from;
     const toDate = data.to;
@@ -12292,19 +12259,15 @@ ORDER BY Pcc_Desc`;
                         HAVING SUM (Amt) <> 0
                         ORDER BY Pcc_Desc`;
     try {
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       //       callBack(null, );
       return result.rows;
     } catch (error) {
       console.log(error);
       throw error;
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
   disPosibleItemIncome: async (data) => {
-    let conn_ora = await getTmcConnection();
-
     // const ipNumberList = data.ptno.join(',');
     const fromDate = data.from;
     const toDate = data.to;
@@ -13659,19 +13622,15 @@ ORDER BY Pcc_Desc`;
                         ORDER BY Pcc_Desc`;
 
     try {
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       //       callBack(null, );
       return result.rows;
     } catch (error) {
       console.log(error);
       throw error;
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
   icuIncome: async (data) => {
-    let conn_ora = await getTmcConnection();
-
     // const ipNumberList = data.ptno.join(',');
     const fromDate = data.from;
     const toDate = data.to;
@@ -15025,19 +14984,15 @@ ORDER BY Pcc_Desc`;
                         HAVING SUM (Amt) <> 0
                         ORDER BY Pcc_Desc`;
     try {
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       //       callBack(null, );
       return result.rows;
     } catch (error) {
       console.log(error);
       throw error;
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
   icuprocedureIncome: async (data) => {
-    let conn_ora = await getTmcConnection();
-
     // const ipNumberList = data.ptno.join(',');
     const fromDate = data.from;
     const toDate = data.to;
@@ -16391,19 +16346,15 @@ ORDER BY Pcc_Desc`;
                     HAVING SUM (Amt) <> 0
                     ORDER BY Pcc_Desc`;
     try {
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       //       callBack(null, );
       return result.rows;
     } catch (error) {
       console.log(error);
       throw error;
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
   radiologyIncome: async (data) => {
-    let conn_ora = await getTmcConnection();
-
     // const ipNumberList = data.ptno.join(',');
     const fromDate = data.from;
     const toDate = data.to;
@@ -17757,20 +17708,16 @@ ORDER BY Pcc_Desc`;
                             HAVING SUM (Amt) <> 0
                             ORDER BY Pcc_Desc`;
     try {
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       //       callBack(null, )
       // ;
       return result.rows;
     } catch (error) {
       console.log(error);
       throw error;
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
   laboratoryIncome: async (data) => {
-    let conn_ora = await getTmcConnection();
-
     // const ipNumberList = data.ptno.join(',');
     const fromDate = data.from;
     const toDate = data.to;
@@ -19124,19 +19071,15 @@ ORDER BY Pcc_Desc`;
                             HAVING SUM (Amt) <> 0
                             ORDER BY Pcc_Desc`;
     try {
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       //       callBack(null, );
       return result.rows;
     } catch (error) {
       console.log(error);
       throw error;
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
   mriIncome: async (data) => {
-    let conn_ora = await getTmcConnection();
-
     // const ipNumberList = data.ptno.join(',');
     const fromDate = data.from;
     const toDate = data.to;
@@ -20490,19 +20433,15 @@ ORDER BY Pcc_Desc`;
                                 HAVING SUM (Amt) <> 0
                                 ORDER BY Pcc_Desc`;
     try {
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       //       callBack(null, );
       return result.rows;
     } catch (error) {
       console.log(error);
       throw error;
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
   dietIncome: async (data) => {
-    let conn_ora = await getTmcConnection();
-
     // const ipNumberList = data.ptno.join(',');
     const fromDate = data.from;
     const toDate = data.to;
@@ -21856,19 +21795,15 @@ ORDER BY Pcc_Desc`;
                                 HAVING SUM (Amt) <> 0
                                 ORDER BY Pcc_Desc`;
     try {
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       //       callBack(null, );
       return result.rows;
     } catch (error) {
       console.log(error);
       throw error;
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
   pharmacyIncomePart1: async (data) => {
-    let conn_ora = await getTmcConnection();
-
     // const ipNumberList = data.ptno.join(',');
     const fromDate = data.from;
     const toDate = data.to;
@@ -22027,19 +21962,15 @@ ORDER BY Pcc_Desc`;
                         HAVING SUM (Amt) <> 0
                         ORDER BY Bmd_Date`;
     try {
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       //       callBack(null, );
       return result.rows;
     } catch (error) {
       console.log(error);
       throw error;
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
   pharmacyIncomePart2: async (data) => {
-    let conn_ora = await getTmcConnection();
-
     // const ipNumberList = data.ptno.join(',');
     const fromDate = data.from;
     const toDate = data.to;
@@ -22136,19 +22067,15 @@ ORDER BY Pcc_Desc`;
                             HAVING SUM (Amt) <> 0
                             ORDER BY Opd_Date`;
     try {
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       //       callBack(null, );
       throw result.rows;
     } catch (error) {
       console.log(error);
       throw error;
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
   pharmacyIncomePart3: async (data) => {
-    let conn_ora = await getTmcConnection();
-
     // const ipNumberList = data.ptno.join(',');
     const fromDate = data.from;
     const toDate = data.to;
@@ -22178,19 +22105,15 @@ ORDER BY Pcc_Desc`;
                                 Ptc_Ptname`;
 
     try {
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       //       callBack(null, );
       return result.rows;
     } catch (error) {
       console.log(error);
       throw error;
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
   pharmacyIncomePart4: async (data) => {
-    let conn_ora = await getTmcConnection();
-
     // const ipNumberList = data.ptno.join(',');
     const fromDate = data.from;
     const toDate = data.to;
@@ -22284,14 +22207,12 @@ ORDER BY Pcc_Desc`;
                     HAVING SUM (Amt) <> 0
                     ORDER BY Dmd_Date`;
     try {
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       //       callBack(null, );
       return result.rows;
     } catch (error) {
       console.log(error);
       throw error;
-    } finally {
-      if (conn_ora) await conn_ora.close();
     }
   },
 };

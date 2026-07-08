@@ -1,5 +1,5 @@
 // @ts-nocheck
-const {oracledb, getTmcConnection} = require("../../../../../config/oradbconfig");
+const {oracledb, getTmcConnection, oracleConnectionClose} = require("../../../../../config/oradbconfig");
 
 module.exports = {
   creditInsuranceBillDetlPart1: async (data) => {
@@ -231,10 +231,7 @@ module.exports = {
       console.log(error);
       throw error;
     } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-        // await pool_ora.close();
-      }
+      await oracleConnectionClose(conn_ora);
     }
   },
   creditInsuranceBillDetlPart2: async (data) => {
@@ -301,10 +298,7 @@ module.exports = {
       console.log(error);
       throw error;
     } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-        // await pool_ora.close();
-      }
+      await oracleConnectionClose(conn_ora);
     }
   },
   creditInsuranceBillDetlPart3: async (data) => {
@@ -359,10 +353,7 @@ module.exports = {
       console.log(error);
       throw error;
     } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-        // await pool_ora.close();
-      }
+      await oracleConnectionClose(conn_ora);
     }
   },
   creditInsuranceBillDetlPart4: async (data) => {
@@ -413,10 +404,7 @@ module.exports = {
       console.log(error);
       throw error;
     } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-        // await pool_ora.close();
-      }
+      await oracleConnectionClose(conn_ora);
     }
   },
   creditInsuranceBillDetlPart5: async (data) => {
@@ -469,10 +457,7 @@ module.exports = {
       console.log(error);
       throw error;
     } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-        // await pool_ora.close();
-      }
+      await oracleConnectionClose(conn_ora);
     }
   },
   creditInsuranceBillDetlPart6: async (data) => {
@@ -538,10 +523,7 @@ module.exports = {
       console.log(error);
       throw error;
     } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-        // await pool_ora.close();
-      }
+      await oracleConnectionClose(conn_ora);
     }
   },
   unSettledAmountDetl: async (data) => {
@@ -897,10 +879,7 @@ module.exports = {
       console.log(error);
       throw error;
     } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-        // await pool_ora.close();
-      }
+      await oracleConnectionClose(conn_ora);
     }
   },
   advanceCollection: async (data) => {
@@ -1001,10 +980,7 @@ module.exports = {
       console.log(error);
       throw error;
     } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-        // await pool_ora.close();
-      }
+      await oracleConnectionClose(conn_ora);
     }
   },
   creditInsuranceBillCollection1: async (data) => {
@@ -1081,10 +1057,7 @@ module.exports = {
       console.log(error);
       throw error;
     } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-        // await pool_ora.close();
-      }
+      await oracleConnectionClose(conn_ora);
     }
   },
   creditInsuranceBillCollection2: async (data) => {
@@ -1142,10 +1115,7 @@ module.exports = {
       console.log(error);
       throw error;
     } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-        // await pool_ora.close();
-      }
+      await oracleConnectionClose(conn_ora);
     }
   },
 };

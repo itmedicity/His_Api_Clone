@@ -1,5 +1,5 @@
 // @ts-nocheck
-const {oracledb, getTmcConnection} = require("../../../../../config/oradbconfig");
+const {oracledb} = require("../../../../../config/oradbconfig");
 
 module.exports = {
   // BED INCOME

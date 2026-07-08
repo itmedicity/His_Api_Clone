@@ -1,13 +1,13 @@
-const {oracledb, getTmcConnection} = require("../../../../config/oradbconfig");
-const oracleConnectionClose = async (conn_ora) => {
-  try {
-    if (conn_ora) {
-      await conn_ora.close();
-    }
-  } catch (error) {
-    console.log("Error Closing Oracle Connection", error);
-  }
-};
+const {oracledb, getTmcConnection, oracleConnectionClose} = require("../../../../config/oradbconfig");
+// const oracleConnectionClose = async (conn_ora) => {
+//   try {
+//     if (conn_ora) {
+//       await conn_ora.close();
+//     }
+//   } catch (error) {
+//     console.log("Error Closing Oracle Connection", error);
+//   }
+// };
 module.exports = {
   gstreportsPartOne: async (data, callBack) => {
     let conn_ora = await getTmcConnection();

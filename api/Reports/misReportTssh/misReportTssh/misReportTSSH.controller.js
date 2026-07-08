@@ -1,4 +1,4 @@
-const {getTmcConnection} = require("../../../../config/oradbconfig");
+const {getTmcConnection, oracleConnectionClose} = require("../../../../config/oradbconfig");
 const {insertIntoGTT} = require("../../../../utls/controller-helperFun");
 
 const collectionTSSHService = require("./collectionTssh.service");
@@ -190,13 +190,14 @@ const getCollectionAndIncomeMisReportTSSH = async (req, res) => {
       message: error.message || "Unexpected Error",
     });
   } finally {
-    if (conn) {
-      try {
-        await conn.close();
-      } catch (closeErr) {
-        console.error("Error closing Oracle connection:", closeErr);
-      }
-    }
+    await oracleConnectionClose(conn);
+    // if (conn) {
+    //   try {
+    //     await conn.close();
+    //   } catch (closeErr) {
+    //     console.error("Error closing Oracle connection:", closeErr);
+    //   }
+    // }
   }
 };
 
