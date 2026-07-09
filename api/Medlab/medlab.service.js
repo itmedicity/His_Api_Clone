@@ -4,8 +4,7 @@ const {executeTmc} = require("../../config/oracleExecutor");
 
 module.exports = {
   getAllPatientLabResults: async () => {
-    const sql = `
-                    SELECT DISTINCT
+    const sql = `SELECT DISTINCT
                     PT.PT_NO,
                     PT.PTC_NAME,
                     TS.BMC_SLNO,
@@ -26,21 +25,20 @@ module.exports = {
                 AND BM.PT_NO IS NOT NULL 
                 AND VM.VSD_DATE BETWEEN to_date(:FROM_DATE,'dd/MM/yyyy hh24:mi:ss') AND to_date(:TO_DATE,'dd/MM/yyyy hh24:mi:ss') ) PT
                 INNER JOIN TESTRESULT TS ON PT.BMC_SLNO = TS.BMC_SLNO
-                LEFT JOIN PRODESCRIPTION PD ON TS.PD_CODE = PD.PD_CODE
-                     `;
+                LEFT JOIN PRODESCRIPTION PD ON TS.PD_CODE = PD.PD_CODE`;
     try {
       const now = new Date();
       const fromDate = subHours(now, 6);
 
-      const formattedFromDate = format(fromDate, 'dd/MM/yyyy HH:mm:ss');
-      const toDate = format(now, 'dd/MM/yyyy HH:mm:ss');
-      const result = await conn_ora.execute(
+      const formattedFromDate = format(fromDate, "dd/MM/yyyy HH:mm:ss");
+      const toDate = format(now, "dd/MM/yyyy HH:mm:ss");
+      const result = await executeTmc(
         sql,
         {
           FROM_DATE: formattedFromDate,
           TO_DATE: toDate,
         },
-        { outFormat: oracledb.OUT_FORMAT_OBJECT },
+        {outFormat: oracledb.OUT_FORMAT_OBJECT},
       );
       return result.rows;
       // await result.resultSet?.getRows((err, rows) => {
