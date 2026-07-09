@@ -71,7 +71,7 @@ module.exports = {
           STATUS: {type: oracledb.STRING, maxSize: 1},
         },
       };
-      const result = await executeMany(sql, data, options);
+      const result = await executeMany(getTmcConnection, sql, data, options);
       return result;
     } catch (error) {
       throw error;

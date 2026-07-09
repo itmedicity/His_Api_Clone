@@ -102,27 +102,11 @@ async function executeCron(sql, bind = {}, options = {}) {
 
 // EXECUTE MANY SQL
 
-async function executeMany(
-  getConnection,
-
-  sql,
-
-  binds,
-
-  options = {},
-) {
+async function executeMany(getConnection, sql, binds, options = {}) {
   let connection;
-
   try {
     connection = await getConnection();
-
-    return await connection.executeMany(
-      sql,
-
-      binds,
-
-      options,
-    );
+    return await connection.executeMany(sql, binds, options);
   } finally {
     await oracleConnectionClose(connection);
     connection = null;
