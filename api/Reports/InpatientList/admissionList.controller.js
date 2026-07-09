@@ -26,6 +26,9 @@ const {
   getTsshIncomeReport,
   getIpNumberTsshGrouped,
   getDischargedIpInfoFromTMCH,
+  getPatientDetailsByBillNo,
+  updateDataUsingMrdNumber,
+  updateDataUsingBillNumber
 } = require("./admissionList.service");
 
 module.exports = {
@@ -589,6 +592,197 @@ module.exports = {
       return res.status(200).json({
         success: 0,
         message: error,
+      });
+    }
+  },
+
+  // getPatientDetailsByBillNo: (req, res) => {
+  //   const body = req.body;
+  //   getPatientDetailsByBillNo(body, (err, results) => {
+
+  //     if (err) {
+  //       return res.status(200).json({
+  //         success: 0,
+  //         message: err.message
+  //       });
+  //     }
+  //     if (Object.keys(results).length === 0) {
+  //       return res.status(200).json({
+  //         success: 2,
+  //         message: "No Result",
+  //       });
+  //     }
+  //     return res.status(200).json({
+  //       success: 1,
+  //       data: results,
+  //     });
+  //   })
+  // },
+
+
+
+
+  getPatientDetailsByBillNo: async (req, res) => {
+    try {
+      const body = req.body;
+      const data = await getPatientDetailsByBillNo(body);
+      if (data.length === 0) {
+        return res.status(200).json({
+          success: 2,
+          message: "No Result",
+          data: [],
+        });
+      }
+
+      return res.status(200).json({
+        success: 1,
+        message: "Patient Infomation",
+        data: data,
+      });
+    } catch (error) {
+      return res.status(200).json({
+        success: 0,
+        message: error,
+      });
+    }
+  },
+
+
+
+
+
+
+
+  // updateDataUsingMrdNumber: async (req, res) => {
+  //   try {
+  //     const body = req.body;
+  //     if (!Array.isArray(body) || body.length === 0) {
+  //       return res.status(200).json({
+  //         success: 0,
+  //         message: "Invalid or empty request body",
+  //       });
+  //     }
+  //     await updateDataUsingMrdNumber(body);
+
+  //     return res.status(200).json({
+  //       success: 1,
+  //       message: "Updated successfully",
+  //     });
+  //   } catch (error) {
+  //     return res.status(200).json({
+  //       success: 0,
+  //       message: error.sqlMessage || error.message || "Update failed",
+  //     });
+  //   }
+  // },
+
+  // updateDataUsingMrdNumber: async (req, res) => {
+  //   try {
+  //     const body = req.body;
+  //     await updateDataUsingMrdNumber(body);
+
+  //     return res.status(200).json({
+  //       success: 1,
+  //       message: "Updated successfully",
+  //     });
+  //   } catch (error) {
+  //     return res.status(200).json({
+  //       success: 0,
+  //       message: error,
+  //     });
+  //   }
+  // },
+
+
+
+  // updateDataUsingMrdNumber: (req, res) => {
+  //   const body = req.body;
+  //   updateDataUsingMrdNumber(body, (err, results) => {
+  //     if (err) {
+  //       return res.status(200).json({
+  //         success: 0,
+  //         message: err.message
+  //       });
+  //     }
+  //     if (Object.keys(results).length === 0) {
+  //       return res.status(200).json({
+  //         success: 2,
+  //         message: "No Result",
+  //       });
+  //     }
+  //     return res.status(200).json({
+  //       succ: 1,
+  //       data: results,
+  //     });
+  //   })
+  // },
+  // updateDataUsingBillNumber: (req, res) => {
+  //   const body = req.body;
+  //   updateDataUsingBillNumber(body, (err, results) => {
+  //     if (err) {
+  //       return res.status(200).json({
+  //         success: 0,
+  //         message: err.message
+  //       });
+  //     }
+  //     if (Object.keys(results).length === 0) {
+  //       return res.status(200).json({
+  //         success: 2,
+  //         message: "No Result",
+  //       });
+  //     }
+  //     return res.status(200).json({
+  //       succ: 1,
+  //       data: results,
+  //     });
+  //   })
+  // },
+
+
+  updateDataUsingBillNumber: async (req, res) => {
+    try {
+      const body = req.body;
+      const data = await updateDataUsingBillNumber(body);
+      if (data.rowsAffected === 0) {
+        return res.status(200).json({
+          succ: 2,
+          msg: "No record updated",
+        });
+      }
+
+      return res.status(200).json({
+        succ: 1,
+        msg: "Data updated successfully",
+        data,
+      });
+    } catch (error) {
+      return res.status(200).json({
+        succ: 0,
+        msg: error.message,
+      });
+    }
+  },
+
+  updateDataUsingMrdNumber: async (req, res) => {
+    try {
+      const body = req.body;
+      const data = await updateDataUsingMrdNumber(body);
+      if (data.rowsAffected === 0) {
+        return res.status(200).json({
+          succ: 2,
+          msg: "No record updated",
+        });
+      }
+
+      return res.status(200).json({
+        succ: 1,
+        msg: "Data updated successfully",
+        data,
+      });
+    } catch (error) {
+      return res.status(200).json({
+        succ: 0,
+        msg: error.message,
       });
     }
   },

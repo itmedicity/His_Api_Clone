@@ -30,19 +30,17 @@ module.exports = {
                      `;
     try {
       const now = new Date();
-      const startOfToday = startOfDay(now); //eg : 01/09/2025 00:00:00
-      const fromDate = subHours(startOfToday, 7); // subtract 7 hours
-      const formattedFromDate = format(fromDate, "dd/MM/yyyy HH:mm:ss");
-      // To date: today at 23:59:59
-      const endOfDay = setSeconds(setMinutes(setHours(now, 23), 59), 59);
-      const toDate = format(endOfDay, "dd/MM/yyyy HH:mm:ss");
-      const result = await executeTmc(
+      const fromDate = subHours(now, 6);
+
+      const formattedFromDate = format(fromDate, 'dd/MM/yyyy HH:mm:ss');
+      const toDate = format(now, 'dd/MM/yyyy HH:mm:ss');
+      const result = await conn_ora.execute(
         sql,
         {
           FROM_DATE: formattedFromDate,
           TO_DATE: toDate,
         },
-        {outFormat: oracledb.OUT_FORMAT_OBJECT},
+        { outFormat: oracledb.OUT_FORMAT_OBJECT },
       );
       return result.rows;
       // await result.resultSet?.getRows((err, rows) => {
