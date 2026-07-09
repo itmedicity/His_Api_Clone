@@ -1,6 +1,6 @@
-const {pools} = require("../../config/mysqldbconfig");
-const {getTmcConnection, oracledb} = require("../../config/oradbconfig");
-const {executeTmc} = require("../../config/oracleExecutor");
+const { pools } = require("../../config/mysqldbconfig");
+const { getTmcConnection, oracledb } = require("../../config/oradbconfig");
+const { executeTmc } = require("../../config/oracleExecutor");
 
 module.exports = {
   getPODetails: async (data) => {
@@ -31,9 +31,9 @@ module.exports = {
           date2: data.to,
           stcode: data.stcode,
         },
-        {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT},
+        { outFormat: oracledb.OUT_FORMAT_OBJECT },
       );
-      const hisData = await result.resultSet?.getRows();
+      const hisData = result.rows;
       return hisData;
     } catch (error) {
       console.log(error);
@@ -60,8 +60,8 @@ module.exports = {
                        AND PO_NO IN (${ponoArray})
                        AND ST_CODE IN (${stcodeArray})
                        AND PORDMAST.POD_DATE >= ADD_MONTHS(SYSDATE, -30) `;
-      const result = await executeTmc(query, {}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
-      const hisData = await result.resultSet?.getRows();
+      const result = await executeTmc(query, {}, { outFormat: oracledb.OUT_FORMAT_OBJECT });
+      const hisData = result.rows;
       return callBack(null, hisData);
     } catch (error) {
       return callBack(error);
@@ -87,8 +87,8 @@ module.exports = {
                         AND PORDMAST.PO_NO IN  (${ponoArray})
                         AND PORDMAST.ST_CODE IN (${stcodeArray})
                         AND PORDMAST.POD_DATE >= ADD_MONTHS(SYSDATE, -50)`;
-      const result = await executeTmc(query, {}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
-      const hisData = await result.resultSet?.getRows();
+      const result = await executeTmc(query, {}, { outFormat: oracledb.OUT_FORMAT_OBJECT });
+      const hisData = result.rows;
       return hisData;
     } catch (error) {
       console.log(error);
@@ -120,7 +120,7 @@ module.exports = {
         {
           spcode: id,
         },
-        {outFormat: oracledb.OUT_FORMAT_OBJECT},
+        { outFormat: oracledb.OUT_FORMAT_OBJECT },
       );
       const hisData = result.rows;
       return hisData;
@@ -144,8 +144,8 @@ module.exports = {
                        AND PORDMAST.PO_NO IN  (${ponoArray})
                        AND PORDMAST.ST_CODE IN (${stcodeArray})
                        AND PORDMAST.POD_DATE >= ADD_MONTHS(SYSDATE, -12)`;
-      const result = await executeTmc(query, {}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
-      const hisData = await result.resultSet?.getRows();
+      const result = await executeTmc(query, {}, { outFormat: oracledb.OUT_FORMAT_OBJECT });
+      const hisData = result.rows
       return hisData;
     } catch (error) {
       console.log(error);
