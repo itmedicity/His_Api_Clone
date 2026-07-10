@@ -1,14 +1,15 @@
 // @ts-ignore
 const {oracledb, getTmcConnection, oracleConnectionClose} = require("../../../config/oradbconfig");
 const {query, transaction} = require("../../../config/mysqldbconfig");
+const {executeTmc} = require("../../../config/oracleExecutor");
 module.exports = {
   /**
    * @description ORACLE UPDATION : IP ADMISSION
    */
   ipAdmissionList: async (data) => {
-    let conn_ora;
+    // let conn_ora;
     try {
-      conn_ora = await getTmcConnection();
+      // conn_ora = await getTmcConnection();
       const sql = ` SELECT 
                         IP_NO,
                         PT_NO,
@@ -20,20 +21,18 @@ module.exports = {
                     WHERE IPD_DATE   >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss') 
                     AND IPD_DATE   <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss') 
                     AND IPC_PTFLAG = 'N'`;
-      const { rows } = await conn_ora.execute(
+      const {rows} = await executeTmc(
         sql,
         {
           fromDate: data.from,
           toDate: data.to,
         },
-        { outFormat: oracledb.OUT_FORMAT_OBJECT },
+        {outFormat: oracledb.OUT_FORMAT_OBJECT},
       );
       return rows;
     } catch (error) {
       console.log(error);
       throw error;
-    } finally {
-      await oracleConnectionClose(conn_ora);
     }
   },
   /**
@@ -98,10 +97,10 @@ module.exports = {
     return query("ellider", `DELETE FROM tssh_ipadmiss WHERE ip_slno IN (?)`, [data]);
   },
   getPatientData: async (ptno) => {
-    let conn_ora;
+    // let conn_ora;
     try {
-      conn_ora = await getTmcConnection();
-      const { rows } = await conn_ora.execute(
+      // conn_ora = await getTmcConnection();
+      const {rows} = await executeTmc(
         ` SELECT 
                     PT_NO,
                     PTC_PTNAME,
@@ -115,14 +114,12 @@ module.exports = {
         {
           ptno: ptno,
         },
-        { outFormat: oracledb.OUT_FORMAT_OBJECT },
+        {outFormat: oracledb.OUT_FORMAT_OBJECT},
       );
       return rows;
     } catch (error) {
       console.log(error);
       throw error;
-    } finally {
-      await oracleConnectionClose(conn_ora);
     }
   },
   getTsshPatientList: async (data) => {
@@ -136,9 +133,9 @@ module.exports = {
     );
   },
   getTotalPatientList: async (data) => {
-    let conn_ora;
+    // let conn_ora;
     try {
-      conn_ora = await getTmcConnection();
+      // conn_ora = await getTmcConnection();
       const sql = `SELECT  
                         IP_NO
                     FROM DISBILLMAST
@@ -160,27 +157,25 @@ module.exports = {
                         AND DMD_DATE > TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss') 
                         AND IPD_DATE < TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
 
-      const { rows } = await conn_ora.execute(
+      const {rows} = await executeTmc(
         sql,
         {
           fromDate: data.from,
           toDate: data.to,
         },
-        { outFormat: oracledb.OUT_FORMAT_OBJECT },
+        {outFormat: oracledb.OUT_FORMAT_OBJECT},
       );
       return rows;
     } catch (error) {
       console.log(error);
       throw error;
-    } finally {
-      await oracleConnectionClose(conn_ora);
     }
   },
   // GET DISCHARGE INFO FROM ORACLE
   getDischargePatientList: async (data) => {
-    let conn_ora;
+    // let conn_ora;
     try {
-      conn_ora = await getTmcConnection();
+      // conn_ora = await getTmcConnection();
       const sql = `SELECT 
                         TO_CHAR(DMD_DATE ,'YYYY-MM-DD hh24:mi') DISDATE,
                         IP_NO
@@ -188,20 +183,18 @@ module.exports = {
                     WHERE  DMD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND DMD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND IPADMISS.IPC_PTFLAG = 'N'`;
-      const { rows } = await conn_ora.execute(
+      const {rows} = await executeTmc(
         sql,
         {
           fromDate: data.from,
           toDate: data.to,
         },
-        { outFormat: oracledb.OUT_FORMAT_OBJECT },
+        {outFormat: oracledb.OUT_FORMAT_OBJECT},
       );
       return rows;
     } catch (error) {
       console.log(error);
       throw error;
-    } finally {
-      await oracleConnectionClose(conn_ora);
     }
   },
   /*************  ✨ Windsurf Command ⭐  *************/
@@ -283,10 +276,10 @@ module.exports = {
     );
   },
   getIpadmissChecks: async (data) => {
-    let conn_ora;
+    // let conn_ora;
     try {
-      conn_ora = await getTmcConnection();
-      const { rows } = await conn_ora.execute(
+      // conn_ora = await getTmcConnection();
+      const {rows} = await executeTmc(
         `SELECT
                  IP_NO ,IPD_DISC
                   FROM IPADMISS
@@ -294,22 +287,19 @@ module.exports = {
         {
           ptno: data,
         },
-        { outFormat: oracledb.OUT_FORMAT_OBJECT },
+        {outFormat: oracledb.OUT_FORMAT_OBJECT},
       );
       return rows;
     } catch (error) {
       console.log(error);
       throw error;
-    } finally {
-      // await conn_ora.close();
-      await oracleConnectionClose(conn_ora);
     }
   },
   // GET DISCHARGE INFO FROM ORACLE
   getIpReceiptPatientInfo: async (data) => {
-    let conn_ora;
+    // let conn_ora;
     try {
-      conn_ora = await getTmcConnection();
+      // conn_ora = await getTmcConnection();
       const fromDate = data.from;
       const toDate = data.to;
       const sql = `SELECT 
@@ -320,20 +310,18 @@ module.exports = {
                     AND IRC_CANCEL IS NULL
                     AND IRD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')  
                     AND  IRD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
-      const result = await conn_ora.execute(
+      const result = await executeTmc(
         sql,
         {
           fromDate: fromDate,
           toDate: toDate,
         },
-        { outFormat: oracledb.OUT_FORMAT_OBJECT },
+        {outFormat: oracledb.OUT_FORMAT_OBJECT},
       );
       return result.rows;
     } catch (error) {
       console.log(error);
       throw error;
-    } finally {
-      await oracleConnectionClose(conn_ora);
     }
   },
   /*************  ✨ Windsurf Command ⭐  *************/
@@ -568,18 +556,11 @@ module.exports = {
     );
   },
 
-
-
-
-
-
-
-
   getPatientDetailsByBillNo: async (data) => {
     let conn_ora;
     try {
-      conn_ora = await getTmcConnection();
-      const { rows } = await conn_ora.execute(
+      // conn_ora = await getTmcConnection();
+      const {rows} = await executeTmc(
         `SELECT
           B.ptc_name,
           B.pt_no,
@@ -596,40 +577,16 @@ module.exports = {
      AND TRUNC(B.bmd_date) = TO_DATE(:billdate)`,
         {
           billno: data.billNumber,
-          billdate: data.billDate
+          billdate: data.billDate,
         },
-        { outFormat: oracledb.OUT_FORMAT_OBJECT },
+        {outFormat: oracledb.OUT_FORMAT_OBJECT},
       );
       return rows;
     } catch (error) {
       console.log(error);
       throw error;
-    } finally {
-      await conn_ora.close();
     }
   },
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
   // getPatientDetailsByBillNo: async (data, callBack) => {
 
@@ -709,10 +666,6 @@ module.exports = {
   //   }
   // },
 
-
-
-
-
   // updateDataUsingBillNumber: async (data) => {
   //   return transaction(
   //     `ellider`,
@@ -726,7 +679,6 @@ module.exports = {
   //   );
   // },
 
-
   // updateDataUsingBillNumber: async (data) => {
   //   return query("ellider", `UPDATE BILLMAST SET
   //        BMC_MOBILENO = ?,
@@ -735,11 +687,10 @@ module.exports = {
   // },
 
   updateDataUsingBillNumber: async (data) => {
-    let conn_ora;
+    // let conn_ora;
     try {
-      conn_ora = await getTmcConnection();
-
-      const result = await conn_ora.execute(
+      // conn_ora = await getTmcConnection();
+      const result = await executeTmc(
         `UPDATE BILLMAST SET
          BMC_MOBILENO = :mobile,
          BMC_EMAIL = :email
@@ -751,28 +702,20 @@ module.exports = {
         },
         {
           autoCommit: true,
-        }
+        },
       );
 
       return result;
     } catch (error) {
       console.log(error);
       throw error;
-    } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-      }
     }
   },
 
-
-
   updateDataUsingMrdNumber: async (data) => {
-    let conn_ora;
+    // let conn_ora;
     try {
-      conn_ora = await getTmcConnection();
-
-      const result = await conn_ora.execute(
+      const result = await executeTmc(
         `UPDATE PATIENT
        SET PTC_EMAIL = :email,
            PTC_MOBILE = :mobile
@@ -780,38 +723,20 @@ module.exports = {
         {
           email: data.newEmail,
           mobile: data.mobileNumber,
-          mrdNo: data.mrdNo
+          mrdNo: data.mrdNo,
         },
         {
           autoCommit: true,
-        }
+        },
       );
 
       return result;
     } catch (error) {
       console.log(error);
       throw error;
-    } finally {
-      if (conn_ora) {
-        await conn_ora.close();
-      }
     }
-  }
-
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
+  },
+};
 
 //   updateDataUsingBillNumber: async (data, callBack) => {
 //     let conn_ora = null;
