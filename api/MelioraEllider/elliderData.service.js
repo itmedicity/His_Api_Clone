@@ -2,6 +2,7 @@ const {pools, query} = require("../../config/mysqldbconfig");
 const {oracledb, getTmcConnection, getTmcCronConnection} = require("../../config/oradbconfig");
 const {getCompanySlno, getSchemaByCompanyAndModule} = require("../../cron-jobs/CronLogger");
 const {executeTmc} = require("../../config/oracleExecutor");
+const {buildInClause} = require("../../utls/controller-helperFun");
 module.exports = {
   //using
   getOutlet: async () => {
@@ -945,9 +946,9 @@ GROUP BY ipadmiss.IP_NO,
         return callBack(null, []); // no codes to query
       }
       //  Join the codes directly into the query
-      const codes = data.map((code) => `'${code}'`).join(",");
+      const codes = buildInClause(data, "code");
       const sql = `
-            SELECT 
+            SELECT
                 RT_CODE,
                 RTC_DESC,
                 RTC_ALIAS,
@@ -955,13 +956,13 @@ GROUP BY ipadmiss.IP_NO,
                 RTC_STATUS,
                 ICU,
                 RTC_MHCODE
-            FROM 
+            FROM
                 roomtype
-            WHERE 
-                RT_CODE IN (${codes})
+            WHERE
+                RT_CODE IN ${codes.clause}
         `;
 
-      const result = await executeTmc(sql, [], {
+      const result = await executeTmc(sql, {...codes.binds}, {
         outFormat: oracledb.OUT_FORMAT_OBJECT,
       });
 
@@ -979,21 +980,21 @@ GROUP BY ipadmiss.IP_NO,
         return callBack(null, []); // no codes to query
       }
       //  Join the codes directly into the query
-      const codes = data.map((code) => `'${code}'`).join(",");
+      const codes = buildInClause(data, "code");
       const sql = `
-            SELECT 
+            SELECT
                 RC_CODE,
                 RCC_DESC,
                 RCC_ALIAS,
                 RCC_STATUS,
                 RCC_MHCODE
-            FROM 
+            FROM
                 roomcategory
-            WHERE 
-                RC_CODE IN (${codes})
+            WHERE
+                RC_CODE IN ${codes.clause}
         `;
 
-      const result = await executeTmc(sql, [], {
+      const result = await executeTmc(sql, {...codes.binds}, {
         outFormat: oracledb.OUT_FORMAT_OBJECT,
       });
 
@@ -1012,22 +1013,22 @@ GROUP BY ipadmiss.IP_NO,
         return callBack(null, []); // no codes to query
       }
       //  Join the codes directly into the query
-      const codes = data.map((code) => `'${code}'`).join(",");
+      const codes = buildInClause(data, "code");
       const sql = `
-            SELECT 
+            SELECT
                 RM_CODE,
                 RMC_DESC,
                 RMC_ALIAS,
                 RMC_STATUS,
                 RMC_MHCODE,
                 NS_CODE
-            FROM 
+            FROM
                 roommaster
-            WHERE 
-                RM_CODE IN (${codes})
+            WHERE
+                RM_CODE IN ${codes.clause}
         `;
 
-      const result = await executeTmc(sql, [], {
+      const result = await executeTmc(sql, {...codes.binds}, {
         outFormat: oracledb.OUT_FORMAT_OBJECT,
       });
 
@@ -1045,20 +1046,20 @@ GROUP BY ipadmiss.IP_NO,
         return callBack(null, []); // no codes to query
       }
       //  Join the codes directly into the query
-      const codes = data.map((code) => `'${code}'`).join(",");
+      const codes = buildInClause(data, "code");
       const sql = `
-            SELECT 
+            SELECT
                 NS_CODE,
                 NSC_DESC,
                 NSC_ALIAS,
                 NSC_STATUS
-            FROM 
+            FROM
                 nurstation
-            WHERE 
-                NS_CODE IN (${codes})
+            WHERE
+                NS_CODE IN ${codes.clause}
         `;
 
-      const result = await executeTmc(sql, [], {
+      const result = await executeTmc(sql, {...codes.binds}, {
         outFormat: oracledb.OUT_FORMAT_OBJECT,
       });
 

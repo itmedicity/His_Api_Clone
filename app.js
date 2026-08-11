@@ -6,6 +6,7 @@ const helmet = require("helmet");
 const {mysqlExecute} = require("./cron-jobs/CronLogger");
 const {initializePools, closePools, restartPools, healthCheck, printPoolStats, scheduleRestart, startHealthMonitor} = require("./config/oradbconfig");
 const registerRoutes = require("./routes");
+const {checkToken} = require("./auth/jwtValidation");
 
 // INITALIZING POOLS
 async function bootstrap() {
@@ -42,9 +43,7 @@ app.use(compression());
 // CORS CONFIGURATION
 app.use(
   cors({
-    origin: "*",
-    // credentials: true,
-    // origin: ["http://localhost:3000", "https://mis.tmchospital.com"],
+    origin: ["http://localhost:3000", "https://mis.tmchospital.com"],
     credentials: false,
   }),
 );
@@ -94,11 +93,11 @@ app.get("/health", async (req, res) => {
   }
 });
 
-app.get("/pool", (req, res) => {
+app.get("/pool", checkToken, (req, res) => {
   res.json(printPoolStats());
 });
 
-app.get("/api/restart", async (req, res) => {
+app.get("/api/restart", checkToken, async (req, res) => {
   try {
     await restartPools();
     res.json({success: true});

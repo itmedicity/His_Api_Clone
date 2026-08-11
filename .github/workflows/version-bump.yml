@@ -1,0 +1,42 @@
+name: Auto Version Bump
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  bump-version:
+    # Skip the bot's own release commit so this doesn't try to bump itself.
+    if: >-
+      !contains(github.event.head_commit.message, 'chore(release):') &&
+      !contains(github.event.head_commit.message, '[skip version]')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Extract commit messages from this push
+        run: jq -r '.commits[].message' "$GITHUB_EVENT_PATH" > /tmp/commit_messages.txt
+
+      - name: Bump version and update changelog
+        run: node scripts/bump-version.js /tmp/commit_messages.txt
+
+      - name: Commit and push version bump
+        run: |
+          NEW_VERSION=$(node -p "require('./package.json').version")
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package.json version.md
+          git commit -m "chore(release): v${NEW_VERSION} [skip version]"
+          git push

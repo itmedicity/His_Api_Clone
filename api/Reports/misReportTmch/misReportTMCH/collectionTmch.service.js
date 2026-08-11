@@ -1022,12 +1022,12 @@ module.exports = {
                     WHERE IPRECEIPT.DMC_SLNO =  DISBILLMAST.DMC_SLNO
                     AND IPRECEIPT.DMC_SLNO = IPADMISS.DMC_SLNO
                     AND IRC_CANCEL IS NULL
-                    AND Disbillmast.Dmd_date < TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
-                    AND IRD_DATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')  
-                    AND  IRD_DATE <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                    AND Disbillmast.Dmd_date < TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                    AND IRD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                    AND  IRD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                     GROUP BY DISBILLMAST.IP_NO,IPADMISS.IPD_DATE`;
     try {
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await conn_ora.execute(sql, {fromDate, toDate}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       return result.rows;
     } catch (error) {
       console.log(error);

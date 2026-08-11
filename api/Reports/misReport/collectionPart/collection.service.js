@@ -998,9 +998,9 @@ module.exports = {
                         AND NVL (Refundreceiptmast.RPN_RTCREDIT, 0) > 0
                         AND Refundreceiptmast.Roc_Slno IS NULL
                         AND Refundreceiptmast.Rfd_Date >=
-                            TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                            TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                         AND Refundreceiptmast.Rfd_Date <=
-                            TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                            TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                         AND REFUNDRECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                 UNION ALL
                 SELECT SUM (NVL (refundbillmast.BMN_RTCREDIT, 0)) * -1 AS Amt,
@@ -1012,10 +1012,10 @@ module.exports = {
                         AND NVL (refundbillmast.BMN_RTCREDIT, 0) > 0
                         AND RefundBillmast.Roc_Slno IS NULL
                         AND refundbillmast.Rfd_Date >=
-                            TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                            TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                         AND refundbillmast.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         AND refundbillmast.Rfd_Date <=
-                            TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                            TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                 HAVING SUM (NVL (refundbillmast.BMN_RTCREDIT, 0)) > 0
                 UNION ALL
                 SELECT SUM (
@@ -1037,9 +1037,9 @@ module.exports = {
                         AND NVL (Mretmast.BMN_RTCREDIT, 0) > 0
                         AND Mretmast.MRC_RETCNCODE IS NULL
                         AND Mretmast.MRD_DATE >=
-                            TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                            TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                         AND Mretmast.MRD_DATE <=
-                            TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                            TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                         AND MRETMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                 UNION ALL
                 SELECT SUM (DECODE (Opbillrefundmast.Roc_Cacr, 'R', NVL (Ron_Credit, 0), 0))
@@ -1049,9 +1049,9 @@ module.exports = {
                 FROM Opbillrefundmast
                 WHERE (NVL (Roc_Cancel, 'N') = 'N')
                         AND Opbillrefundmast.Rod_Date >=
-                            TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                            TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                         AND Opbillrefundmast.Rod_Date <=
-                            TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                            TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                         AND OPBILLREFUNDMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         AND (DECODE (Opbillrefundmast.Roc_Cacr, 'R', Ron_Credit, 0)) <> 0
                 UNION ALL
@@ -1062,10 +1062,10 @@ module.exports = {
                         AND NVL (Ric_Cancel, 'N') = 'N'
                         AND Dmc_Slno IS NOT NULL
                         AND Rid_Date >=
-                            TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                            TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                         AND IPREFUNDMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         AND Rid_Date <=
-                            TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                            TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                 UNION ALL
                 SELECT SUM (NVL (refundbillmast.BMN_RTCREDIT, 0)) * -1 AS Amt,
                         SUM (NVL (refundbillmast.RFN_TOTTAX, 0)) * -1 tax
@@ -1076,10 +1076,10 @@ module.exports = {
                         AND RefundBillmast.Roc_Slno IS NULL
                         AND refundbillmast.RFC_RETCNCODE IS NOT NULL
                         AND refundbillmast.RFD_RETDATE >=
-                            TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                            TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                         AND refundbillmast.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         AND refundbillmast.RFD_RETDATE <=
-                            TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                            TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                 HAVING SUM (NVL (refundbillmast.BMN_RTCREDIT, 0)) > 0
                 UNION ALL
                 SELECT SUM (
@@ -1101,11 +1101,11 @@ module.exports = {
                         AND NVL (Mretmast.BMN_RTCREDIT, 0) <> 0
                         AND Mretmast.MRC_RETCNCODE IS NOT NULL
                         AND Mretmast.MRD_RETDATE >=
-                            TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                            TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                         AND Mretmast.MRD_RETDATE <=
-                            TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                            TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                         AND MRETMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)`,
-      {},
+      {fromDate, toDate},
       {outFormat: oracledb.OUT_FORMAT_OBJECT},
     );
     return result.rows;

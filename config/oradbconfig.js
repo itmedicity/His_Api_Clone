@@ -8,27 +8,18 @@ oracledb.outFormat = oracledb.OUT_FORMAT_OBJECT;
 const pools = {
   TMC: null,
   TMC_CRON: null,
-  KMC: null,
+  // KMC: null, // KMC pool disabled - not currently in use
 };
 
 let initPromise = null;
-// let restarting = false;
 let initialized = false;
-// restart lock GLOBAL VARIABLES
 
-let restartPromise = null;
-let isRestarting = false;
-let activeRequests = 0;
-let lastRestart = null;
+// `activeConnections` is the single source of truth for "how many requests
+// are mid-flight right now" — populated by requestStarted()/requestFinished()
+// below. scheduleRestart() and waitUntilIdle() both read it, filtered by
+// pool name, so a restart only waits on / is skipped by activity on the
+// pool actually being restarted.
 const activeConnections = new Map();
-// let shuttingDown = false;
-
-// TRACK ACTIVE REQUESTS
-// function requestStarted(source = "") {
-//   activeRequests++;
-//   // console.log("START", activeRequests);
-//   console.log(`START ${activeRequests} ${source}`);
-// }
 
 function requestStarted(conn, poolName) {
   const id = Date.now() + "-" + Math.random();
@@ -54,11 +45,6 @@ function requestFinished(conn) {
   console.log("CLOSE", activeConnections.size);
 }
 
-// function requestFinished(source = "") {
-//   activeRequests--;
-//   // console.log("END", activeRequests);
-//   console.log(`END ${activeRequests} ${source}`);
-//}
 // ORACLE POOL MANAGER
 const CONFIG = {
   TMC: {
@@ -82,7 +68,7 @@ const CONFIG = {
     connectString: process.env.ORA_CONN_STRING,
 
     poolMin: 2,
-    poolMax: 10,
+    poolMax: 5,
     poolIncrement: 2,
     poolTimeout: 60,
     queueTimeout: 60000,
@@ -91,20 +77,20 @@ const CONFIG = {
     callTimeout: 180000,
   },
 
-  KMC: {
-    user: process.env.KMC_ORA_USER,
-    password: process.env.KMC_ORAC_PASS,
-    connectString: process.env.KMC_ORA_CONN_STRING,
-
-    poolMin: 1,
-    poolMax: 2,
-    poolIncrement: 1,
-    poolTimeout: 60,
-    queueTimeout: 60000,
-    stmtCacheSize: 30,
-    poolPingInterval: 60,
-    callTimeout: 180000,
-  },
+  // KMC: {
+  //   user: process.env.KMC_ORA_USER,
+  //   password: process.env.KMC_ORAC_PASS,
+  //   connectString: process.env.KMC_ORA_CONN_STRING,
+  //
+  //   poolMin: 1,
+  //   poolMax: 2,
+  //   poolIncrement: 1,
+  //   poolTimeout: 60,
+  //   queueTimeout: 60000,
+  //   stmtCacheSize: 30,
+  //   poolPingInterval: 60,
+  //   callTimeout: 180000,
+  // },
 };
 
 // CREATE POOLS
@@ -127,7 +113,7 @@ async function initializePools() {
   if (initPromise) return initPromise;
 
   initPromise = (async () => {
-    await Promise.all([createPool("TMC"), createPool("TMC_CRON"), createPool("KMC")]);
+    await Promise.all(Object.keys(CONFIG).map(createPool));
 
     initialized = true;
 
@@ -166,9 +152,9 @@ async function getTmcCronConnection() {
   return getConnection("TMC_CRON");
 }
 
-async function getKmcConnection() {
-  return getConnection("KMC");
-}
+// async function getKmcConnection() {
+//   return getConnection("KMC");
+// }
 
 //CLOSE SINGLE CONNECTION
 
@@ -204,121 +190,112 @@ async function closePools() {
   initPromise = null;
 }
 
-// Wait Until All Reports Finish
-async function waitUntilIdle(timeout = 30000) {
-  // 30 seconds
+// Wait until ONE named pool's in-flight requests finish. Scoped per-pool so
+// restarting TMC_CRON, say, doesn't block on unrelated TMC activity.
+async function waitUntilIdle(poolName, timeout = 30000) {
   const start = Date.now();
-  console.log("Open Connections");
 
-  for (const [, c] of activeConnections) {
-    console.log(c.pool);
-    console.log(c.started);
-    console.log(c.stack);
-  }
-
-  // while (activeRequests > 0) {
-  //   console.log(`Waiting... Active Requests : ${activeRequests}`);
-
-  //   await new Promise((r) => setTimeout(r, 1000));
-
-  //   if (Date.now() - start > timeout) {
-  //     console.warn("Timeout waiting.");
-
-  //     break;
-  //   }
-  // }
-}
-
-// CREATE NEW POOLS (FOR RESTART)
-async function buildNewPools() {
-  return {
-    TMC: await oracledb.createPool(CONFIG.TMC),
-    TMC_CRON: await oracledb.createPool(CONFIG.TMC_CRON),
-    KMC: await oracledb.createPool(CONFIG.KMC),
-  };
-}
-// POOL SWAP (FOR RESTART)
-async function swapPools(newPools) {
-  const oldPools = {...pools};
-
-  pools.TMC = newPools.TMC;
-
-  pools.TMC_CRON = newPools.TMC_CRON;
-
-  pools.KMC = newPools.KMC;
-
-  return oldPools;
-}
-
-// CLOSE OLD POOLS (FOR RESTART)
-async function destroyPools(oldPools) {
-  for (const name of Object.keys(oldPools)) {
-    try {
-      if (oldPools[name]) {
-        console.log(`Closing ${name}`);
-
-        await oldPools[name].close(300);
-      }
-    } catch (err) {
-      console.error(err);
+  const isBusy = () => {
+    for (const [, c] of activeConnections) {
+      if (c.pool === poolName) return true;
     }
+    return false;
+  };
+
+  while (isBusy()) {
+    console.log(`Waiting for ${poolName} to go idle before restart...`);
+
+    if (Date.now() - start > timeout) {
+      console.warn(`Timeout waiting for ${poolName} connections to finish.`);
+      break;
+    }
+
+    await new Promise((r) => setTimeout(r, 1000));
   }
 }
 
-async function restartPools() {
-  if (restartPromise) return restartPromise;
+// PER-POOL RESTART STATE
+// Each pool restarts independently. A recoverable error on one pool (e.g.
+// TMC_CRON) only rebuilds that pool now, instead of tearing down every pool
+// (including TMC, which serves live traffic) like the old restartPools()
+// used to.
+const restartState = Object.fromEntries(Object.keys(CONFIG).map((name) => [name, {promise: null, isRestarting: false, lastRestart: null}]));
 
-  restartPromise = (async () => {
-    if (isRestarting) return;
+// RESTART A SINGLE NAMED POOL
+async function restartPool(name) {
+  const state = restartState[name];
+  if (!state) throw new Error(`Unknown pool: ${name}`);
 
-    isRestarting = true;
+  if (state.promise) return state.promise;
+
+  state.promise = (async () => {
+    state.isRestarting = true;
 
     console.log("================================");
-
-    console.log("Oracle Restart Started");
-
+    console.log(`Oracle Restart Started: ${name}`);
     console.log("================================");
 
     try {
-      await waitUntilIdle();
+      await waitUntilIdle(name);
 
-      const newPools = await buildNewPools();
+      const newPool = await oracledb.createPool(CONFIG[name]);
+      const oldPool = pools[name];
 
-      const oldPools = await swapPools(newPools);
+      pools[name] = newPool;
 
-      await destroyPools(oldPools);
+      if (oldPool) {
+        try {
+          console.log(`Closing old ${name} pool`);
+          await oldPool.close(300);
+        } catch (err) {
+          console.error(err);
+        }
+      }
 
-      lastRestart = new Date();
+      state.lastRestart = new Date();
 
-      console.log("Restart Success");
+      console.log(`Restart Success: ${name}`);
     } catch (err) {
       console.error(err);
 
       throw err;
     } finally {
-      restartPromise = null;
-
-      isRestarting = false;
+      state.promise = null;
+      state.isRestarting = false;
     }
   })();
 
-  return restartPromise;
+  return state.promise;
+}
+
+// RESTART POOLS - restarts one named pool, or every configured pool when no
+// name is given (used by the manual /api/restart admin endpoint).
+async function restartPools(name) {
+  if (name) return restartPool(name);
+  return Promise.all(Object.keys(CONFIG).map(restartPool));
 }
 
 // POOL STATISTICS
 
 function printPoolStats() {
+  const stats = [];
+
   Object.keys(pools).forEach((name) => {
     const p = pools[name];
 
     if (!p) return;
 
-    console.log({
+    const stat = {
       pool: name,
       open: p.connectionsOpen,
       inUse: p.connectionsInUse,
-    });
+    };
+
+    console.log(stat);
+    stats.push(stat);
   });
+
+  return stats;
 }
 
 // hEALTH cHECK
@@ -346,35 +323,61 @@ async function healthCheck(poolName) {
 function startHealthMonitor() {
   console.log("Health Monitor Started");
 
-  setInterval(async () => {
-    try {
-      const ok1 = await healthCheck("TMC");
-      const ok2 = await healthCheck("TMC_CRON");
-      const ok3 = await healthCheck("KMC");
-    } catch (err) {
-      console.error(err);
-    }
-  }, 60000); // every 10 minutes
+  setInterval(
+    async () => {
+      try {
+        for (const name of Object.keys(CONFIG)) {
+          await healthCheck(name);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    },
+    10 * 60 * 1000, // every 10 minutes
+  );
 }
 
 // SCHEDULED RESTART
+// Restarts each configured pool roughly every `hours` hours. If a pool is
+// still busy at the scheduled time, it isn't just skipped until the next
+// full interval (which could mean it never restarts on a continuously busy
+// system) — it's retried on a shorter cadence until an idle window shows up.
+const pendingRestartRetry = new Set();
+
 function scheduleRestart(hours = 3) {
+  const intervalMs = hours * 60 * 60 * 1000;
+  const retryMs = 5 * 60 * 1000;
+
+  function isPoolBusy(name) {
+    for (const [, c] of activeConnections) {
+      if (c.pool === name) return true;
+    }
+    return false;
+  }
+
+  function attemptRestart(name) {
+    if (isPoolBusy(name)) {
+      if (pendingRestartRetry.has(name)) return;
+      pendingRestartRetry.add(name);
+
+      console.log(`Skipping restart for ${name}, active connections present. Retrying in ${retryMs / 60000} min`);
+
+      setTimeout(() => {
+        pendingRestartRetry.delete(name);
+        attemptRestart(name);
+      }, retryMs);
+
+      return;
+    }
+
+    restartPool(name).catch((err) => console.error(`Scheduled restart failed for ${name}:`, err));
+  }
+
   console.log(`Pool restart every ${hours} hours`);
 
-  setInterval(
-    async () => {
-      if (activeRequests === 0) {
-        await restartPools();
-      } else {
-        console.log(
-          "Skipping restart, active reports",
-
-          activeRequests,
-        );
-      }
-    },
-    hours * 60 * 60 * 1000,
-  );
+  setInterval(() => {
+    Object.keys(CONFIG).forEach(attemptRestart);
+  }, intervalMs);
 }
 
 module.exports = {
@@ -384,7 +387,7 @@ module.exports = {
   oracleConnectionClose,
   getTmcConnection,
   getTmcCronConnection,
-  getKmcConnection,
+  // getKmcConnection,
   restartPools,
   healthCheck,
   printPoolStats,

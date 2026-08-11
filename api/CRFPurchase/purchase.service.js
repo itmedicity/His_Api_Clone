@@ -1,6 +1,7 @@
 const {pools} = require("../../config/mysqldbconfig");
 const {getTmcConnection, oracledb} = require("../../config/oradbconfig");
 const {executeTmc} = require("../../config/oracleExecutor");
+const {buildInClause} = require("../../utls/controller-helperFun");
 
 module.exports = {
   getPODetails: async (data) => {
@@ -43,24 +44,24 @@ module.exports = {
   // AND PORDMAST.POC_CLOSE IS NULL
 
   getPendingPODetails: async (data, callBack) => {
-    const ponoArray = data?.map((d) => `'${d.pono}'`).join(",");
-    const stcodeArray = data?.map((d) => `'${d.stcode}'`).join(",");
+    const pono = buildInClause(data?.map((d) => d.pono), "pono");
+    const stcode = buildInClause(data?.map((d) => d.stcode), "stcode");
     try {
       const query = `
-                SELECT 
+                SELECT
                        PO_NO,
                        ST_CODE,
                        POD_VALIDUPTO AS PO_EXPIRY,
                        POD_EDD AS EXPECTED_DATE,
                        PON_TOTAPPROVALSCOMP AS APPROVAL
-                FROM 
+                FROM
                        PORDMAST
                 WHERE
                        POC_CANCEL IS NULL
-                       AND PO_NO IN (${ponoArray})
-                       AND ST_CODE IN (${stcodeArray})
+                       AND PO_NO IN ${pono.clause}
+                       AND ST_CODE IN ${stcode.clause}
                        AND PORDMAST.POD_DATE >= ADD_MONTHS(SYSDATE, -30) `;
-      const result = await executeTmc(query, {}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(query, {...pono.binds, ...stcode.binds}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
       const hisData = await result.resultSet?.getRows();
       return callBack(null, hisData);
     } catch (error) {
@@ -70,24 +71,24 @@ module.exports = {
   // AND POC_CLOSE IS NULL
 
   getItemGrnDetails: async (data) => {
-    const ponoArray = data?.map((d) => `'${d.pono}'`).join(",");
-    const stcodeArray = data?.map((d) => `'${d.stcode}'`).join(",");
+    const pono = buildInClause(data?.map((d) => d.pono), "pono");
+    const stcode = buildInClause(data?.map((d) => d.stcode), "stcode");
 
     // let conn_ora = await getTmcConnection();
     try {
-      const query = `SELECT 
+      const query = `SELECT
                        GRNDETL.GR_NO,GRNDETL.GRD_DATE,GRNDETL.IT_CODE, GRNDETL.GRN_QTY,PORDDETL.PDN_QTY,
-                       PORDDETL.PDN_SUPQTY,PORDMAST.PO_NO,PORDMAST.ST_CODE          
+                       PORDDETL.PDN_SUPQTY,PORDMAST.PO_NO,PORDMAST.ST_CODE
                  FROM
-                       GRNDETL 
+                       GRNDETL
                        LEFT JOIN PORDDETL ON (PORDDETL.POC_SLNO=GRNDETL.GRC_DOCNO AND PORDDETL.IT_CODE=GRNDETL.IT_CODE)
                        LEFT JOIN PORDMAST ON PORDMAST.POC_SLNO = PORDDETL.POC_SLNO
                   WHERE
                         PORDMAST.POC_CANCEL IS NULL
-                        AND PORDMAST.PO_NO IN  (${ponoArray})
-                        AND PORDMAST.ST_CODE IN (${stcodeArray})
+                        AND PORDMAST.PO_NO IN  ${pono.clause}
+                        AND PORDMAST.ST_CODE IN ${stcode.clause}
                         AND PORDMAST.POD_DATE >= ADD_MONTHS(SYSDATE, -50)`;
-      const result = await executeTmc(query, {}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(query, {...pono.binds, ...stcode.binds}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
       const hisData = await result.resultSet?.getRows();
       return hisData;
     } catch (error) {
@@ -131,20 +132,20 @@ module.exports = {
   },
 
   getItemDetails: async (data) => {
-    const ponoArray = data?.map((d) => `'${d.pono}'`).join(",");
-    const stcodeArray = data?.map((d) => `'${d.stcode}'`).join(",");
+    const pono = buildInClause(data?.map((d) => d.pono), "pono");
+    const stcode = buildInClause(data?.map((d) => d.stcode), "stcode");
     try {
-      const query = `SELECT 
-                       PORDDETL.IT_CODE,PORDDETL.PDN_QTY,PORDDETL.PDN_SUPQTY,PORDMAST.PO_NO,PORDMAST.ST_CODE          
+      const query = `SELECT
+                       PORDDETL.IT_CODE,PORDDETL.PDN_QTY,PORDDETL.PDN_SUPQTY,PORDMAST.PO_NO,PORDMAST.ST_CODE
                 FROM
-                       PORDDETL 
+                       PORDDETL
                     LEFT JOIN PORDMAST ON PORDMAST.POC_SLNO = PORDDETL.POC_SLNO
                 WHERE
                        PORDMAST.POC_CANCEL IS NULL
-                       AND PORDMAST.PO_NO IN  (${ponoArray})
-                       AND PORDMAST.ST_CODE IN (${stcodeArray})
+                       AND PORDMAST.PO_NO IN  ${pono.clause}
+                       AND PORDMAST.ST_CODE IN ${stcode.clause}
                        AND PORDMAST.POD_DATE >= ADD_MONTHS(SYSDATE, -12)`;
-      const result = await executeTmc(query, {}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(query, {...pono.binds, ...stcode.binds}, {resultSet: true, outFormat: oracledb.OUT_FORMAT_OBJECT});
       const hisData = await result.resultSet?.getRows();
       return hisData;
     } catch (error) {

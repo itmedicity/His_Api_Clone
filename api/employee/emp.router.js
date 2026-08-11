@@ -1,5 +1,5 @@
 const router = require("express").Router();
-// // const { checkToken } = require("../../auth/jwtValidation");
+const {checkToken} = require("../../auth/jwtValidation");
 // const { employeeDelete,
 //     employeeGetById,
 //     employeeInsert,
@@ -29,16 +29,16 @@ const {createEmployee, getAllEmployees, viewEmployees, searchEmployees, resetEmp
 router.post("/login", login);
 
 /* ---------------- EMPLOYEE CRUD ---------------- */
-router.post("/insert", createEmployee);
-router.patch("/resetpass", resetEmployeePassword);
-router.patch("/update", updateEmployee);
-router.get("/select", getAllEmployees);
-router.get("/view", viewEmployees);
-router.get("/:id", getEmployeeByIdCtrl);
-router.delete("/", deleteEmployee);
-router.post("/search", searchEmployees);
+router.post("/insert", checkToken, createEmployee);
+router.patch("/resetpass", checkToken, resetEmployeePassword);
+router.patch("/update", checkToken, updateEmployee);
+router.get("/select", checkToken, getAllEmployees);
+router.get("/view", checkToken, viewEmployees);
+router.get("/:id", checkToken, getEmployeeByIdCtrl);
+router.delete("/", checkToken, deleteEmployee);
+router.post("/search", checkToken, searchEmployees);
 
 /* ---------------- MENU RIGHTS ---------------- */
-router.get("/getmenu/:id", menuRights);
+router.get("/getmenu/:id", checkToken, menuRights);
 
 module.exports = router;
