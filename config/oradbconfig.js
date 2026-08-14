@@ -2,8 +2,12 @@ const oracledb = require("oracledb");
 
 oracledb.outFormat = oracledb.OUT_FORMAT_OBJECT;
 
-// Thin Mode
-// Do NOT call initOracleClient()
+// Thick Mode required: the target DB server predates what node-oracledb's
+// Thin mode protocol supports (NJS-138 otherwise). Uses the Oracle Client
+// libraries already on PATH (C:\app\...\11.2.0\dbhome_1 / D:\app\...\11.2.0\client_1).
+// oracledb 7.x's Thick mode requires Oracle Client 19.1+ (DPI-1050 on this
+// 11.2 client), so this is pinned to 6.9.0 — the last line supporting it.
+oracledb.initOracleClient();
 
 const pools = {
   TMC: null,
