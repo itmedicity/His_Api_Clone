@@ -26,7 +26,6 @@ const insertIntoGTT = async (conn, data = []) => {
         VALUES (v_ip(i), v_status(i));
     END;
   `;
-
   await conn.execute(
     sql,
     {
@@ -185,4 +184,26 @@ const getGttPatientList = async (conn) => {
   return result.rows;
 };
 
-module.exports = {controllerHelper, controllerGETHelper, insertIntoGTT, getGttPatientList, controllerWithIpNumberInsertHelper};
+// SAFELY BUILD AN `IN (:p0, :p1, ...)` CLAUSE + BIND OBJECT FROM AN ARRAY,
+// SO CALLERS NEVER HAVE TO STRING-CONCATENATE VALUES INTO SQL.
+// Oracle has no direct array bind for IN(), so this generates one named
+// placeholder per value instead of interpolating the values themselves.
+const buildInClause = (values, prefix) => {
+  const list = Array.isArray(values) ? values.filter((v) => v !== undefined && v !== null && v !== "") : [];
+
+  if (list.length === 0) {
+    // IN (NULL) matches nothing, which mirrors the old "empty list -> no rows" behavior
+    return {clause: "(NULL)", binds: {}};
+  }
+
+  const binds = {};
+  const placeholders = list.map((value, i) => {
+    const key = `${prefix}${i}`;
+    binds[key] = value;
+    return `:${key}`;
+  });
+
+  return {clause: `(${placeholders.join(",")})`, binds};
+};
+
+module.exports = {controllerHelper, controllerGETHelper, insertIntoGTT, getGttPatientList, controllerWithIpNumberInsertHelper, buildInClause};

@@ -1,6 +1,7 @@
 const {pools, query} = require("../../../config/mysqldbconfig");
 const {oracledb} = require("../../../config/oradbconfig");
 const {executeTmc} = require("../../../config/oracleExecutor");
+const {buildInClause} = require("../../../utls/controller-helperFun");
 
 module.exports = {
   getGstReportOfPharmacy: async (data) => {
@@ -650,7 +651,7 @@ TO_DATE(:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
     }
   }, // TSSH PHARMACY GST REPORTS
   tsshPharmacyGstRptOne: async (data) => {
-    const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(",")) || null;
+    const ipNumberList = buildInClause(data?.ptno, "ip");
     const fromDate = data.from;
     const toDate = data.to;
 
@@ -675,15 +676,19 @@ TO_DATE(:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
                     AND NVL (Mretdetl.Mrc_cancel, 'N') = 'N'
                     AND NVL (Dmc_Cancel, 'N') = 'N'
                     AND Disbillmast.Dmc_Cacr <> 'M'
-                    AND Disbillmast.Dmd_date >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                    AND Disbillmast.Dmd_date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-                    AND Disbillmast.Dmd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                    AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                     AND MEDDESC.IT_CODE = MRETDETL.IT_CODE
                     AND TAX.TX_CODE = MRETDETL.MRC_ACTTXCODE
-                    AND DISBILLMAST.IP_NO IN (${ipNumberList})`;
+                    AND DISBILLMAST.IP_NO IN ${ipNumberList.clause}`;
 
     try {
-      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(
+        sql,
+        {...ipNumberList.binds, fromDate, toDate},
+        {outFormat: oracledb.OUT_FORMAT_OBJECT},
+      );
       // callBack(null, result.rows);
       return result.rows;
     } catch (error) {
@@ -693,8 +698,7 @@ TO_DATE(:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
   },
   tsshPharmacyGstRptTwo: async (data) => {
     const group = data?.group;
-    const ipNumberList = group === 1 ? null : (data?.ptno?.length > 0 && data.ptno.join(",")) || null;
-    // const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(',')) || null;
+    const ipNumberList = buildInClause(group === 1 ? null : data?.ptno, "ip");
     const fromDate = data.from;
     const toDate = data.to;
 
@@ -719,15 +723,19 @@ TO_DATE(:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
                             AND Pbillmast.Bmc_Cacr = 'I'
                             AND NVL (Dmc_Cancel, 'N') = 'N'
                             AND Disbillmast.Dmc_Cacr <> 'M'
-                            AND Disbillmast.Dmd_date >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                            AND Disbillmast.Dmd_date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-                            AND Disbillmast.Dmd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                            AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                             AND MEDDESC.IT_CODE = Pbilldetl.IT_CODE
                             AND TAX.TX_CODE = PBILLDETL.PBC_ACTTXCODE
-                            AND Disbillmast.IP_NO IN (${ipNumberList})`;
+                            AND Disbillmast.IP_NO IN ${ipNumberList.clause}`;
 
     try {
-      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(
+        sql,
+        {...ipNumberList.binds, fromDate, toDate},
+        {outFormat: oracledb.OUT_FORMAT_OBJECT},
+      );
       return result.rows;
       // callBack(null, result.rows);
     } catch (error) {
@@ -737,7 +745,7 @@ TO_DATE(:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
   },
   tsshPharmacyGstRptthree: async (data) => {
     const group = data?.group;
-    const ipNumberList = group === 1 ? null : (data?.ptno?.length > 0 && data.ptno.join(",")) || null;
+    const ipNumberList = buildInClause(group === 1 ? null : data?.ptno, "ip");
     const fromDate = data.from;
     const toDate = data.to;
 
@@ -762,15 +770,19 @@ TO_DATE(:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
                             AND Pbillmast.Bmc_Cacr = 'O'
                             AND Opbillmast.Opc_Cacr <> 'M'
                             AND NVL (Opbillmast.Opn_cancel, 'N') = 'N'
-                            AND Opbillmast.Opd_date >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                            AND Opbillmast.Opd_date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                             AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-                            AND Opbillmast.Opd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                            AND Opbillmast.Opd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                             AND MEDDESC.IT_CODE = Pbilldetl.IT_CODE
                             AND TAX.TX_CODE = PBILLDETL.PBC_ACTTXCODE
-                            AND PBILLMAST.IP_NO IN (${ipNumberList})`;
+                            AND PBILLMAST.IP_NO IN ${ipNumberList.clause}`;
 
     try {
-      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(
+        sql,
+        {...ipNumberList.binds, fromDate, toDate},
+        {outFormat: oracledb.OUT_FORMAT_OBJECT},
+      );
       return result.rows;
     } catch (error) {
       console.log(error);
@@ -778,7 +790,7 @@ TO_DATE(:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
     }
   },
   tsshPharmacyGstRptFour: async (data) => {
-    const ipNumberList = (data?.ptno?.length > 0 && data.ptno.join(",")) || null;
+    const ipNumberList = buildInClause(data?.ptno, "ip");
     const fromDate = data.from;
     const toDate = data.to;
 
@@ -801,12 +813,12 @@ TO_DATE(:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
                         AND NVL (Mretdetl.Mrc_cancel, 'N') = 'N'
                         AND NVL (Dmc_Cancel, 'N') = 'N'
                         AND Disbillmast.Dmc_Cacr <> 'M'
-                        AND Disbillmast.Dmd_date >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                        AND Disbillmast.Dmd_date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-                        AND Disbillmast.Dmd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                        AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                         AND MEDDESC.IT_CODE = MRETDETL.IT_CODE
                         AND TAX.TX_CODE = MRETDETL.MRC_ACTTXCODE
-                        AND DISBILLMAST.IP_NO IN (${ipNumberList})
+                        AND DISBILLMAST.IP_NO IN ${ipNumberList.clause}
                     UNION
                     SELECT 
                         PBILLDETL.IT_CODE CODE,
@@ -827,12 +839,12 @@ TO_DATE(:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
                             AND Pbillmast.Bmc_Cacr = 'I'
                             AND NVL (Dmc_Cancel, 'N') = 'N'
                             AND Disbillmast.Dmc_Cacr <> 'M'
-                            AND Disbillmast.Dmd_date >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                            AND Disbillmast.Dmd_date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-                            AND Disbillmast.Dmd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                            AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                             AND MEDDESC.IT_CODE = Pbilldetl.IT_CODE
                             AND TAX.TX_CODE = PBILLDETL.PBC_ACTTXCODE
-                            AND Disbillmast.IP_NO IN (${ipNumberList})
+                            AND Disbillmast.IP_NO IN ${ipNumberList.clause}
                     UNION 
                     SELECT 
                         PBILLDETL.IT_CODE CODE,
@@ -853,15 +865,19 @@ TO_DATE(:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
                             AND Pbillmast.Bmc_Cacr = 'O'
                             AND Opbillmast.Opc_Cacr <> 'M'
                             AND NVL (Opbillmast.Opn_cancel, 'N') = 'N'
-                            AND Opbillmast.Opd_date >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                            AND Opbillmast.Opd_date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                             AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-                            AND Opbillmast.Opd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                            AND Opbillmast.Opd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                         AND MEDDESC.IT_CODE = Pbilldetl.IT_CODE
                             AND TAX.TX_CODE = PBILLDETL.PBC_ACTTXCODE
-                            AND PBILLMAST.IP_NO IN (${ipNumberList})`;
+                            AND PBILLMAST.IP_NO IN ${ipNumberList.clause}`;
 
     try {
-      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(
+        sql,
+        {...ipNumberList.binds, fromDate, toDate},
+        {outFormat: oracledb.OUT_FORMAT_OBJECT},
+      );
       return result.rows;
     } catch (error) {
       callBack(error, null);
@@ -931,8 +947,8 @@ TO_DATE(:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
                             AND pbillmast.BMC_COLLCNCODE IS NULL
                             AND NVL (Pbillmast.Bmc_cancel, 'N') = 'N'
                             AND Pbillmast.Bmc_Cacr IN ('C', 'R', 'M')
-                            AND Pbillmast.BMD_DATE >= TO_DATE ('${fromDate}','dd/MM/yyyy hh24:mi:ss')
-                            AND Pbillmast.Bmd_Date <= TO_DATE ('${toDate}','dd/MM/yyyy hh24:mi:ss')
+                            AND Pbillmast.BMD_DATE >= TO_DATE (:fromDate,'dd/MM/yyyy hh24:mi:ss')
+                            AND Pbillmast.Bmd_Date <= TO_DATE (:toDate,'dd/MM/yyyy hh24:mi:ss')
                             AND MEDDESC.IT_CODE = Pbilldetl.IT_CODE
                             AND TAX.TX_CODE = PBILLDETL.PBC_ACTTXCODE
                             AND OUTLET.OU_CODE = PBILLMAST.OU_CODE
@@ -967,15 +983,15 @@ TO_DATE(:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
                             AND NVL (Mretdetl.Mrc_cancel, 'N') = 'N'
                             AND NVL (mretmast.Mrc_cancel, 'N') = 'N'
                             AND Mretdetl.MRC_CACR IN ('C', 'R')
-                            AND Mretdetl.MRD_DATE >= TO_DATE ('${fromDate}','dd/MM/yyyy hh24:mi:ss')
+                            AND Mretdetl.MRD_DATE >= TO_DATE (:fromDate,'dd/MM/yyyy hh24:mi:ss')
                             AND MRETDETL.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-                            AND Mretdetl.Mrd_Date <= TO_DATE ('${toDate}','dd/MM/yyyy hh24:mi:ss')
+                            AND Mretdetl.Mrd_Date <= TO_DATE (:toDate,'dd/MM/yyyy hh24:mi:ss')
                             AND MEDDESC.IT_CODE = MRETDETL.IT_CODE
                             AND MRETDETL.OU_CODE = OUTLET.OU_CODE
                             AND TAX.TX_CODE = MRETDETL.MRC_ACTTXCODE`;
       // console.log(sql)
       try {
-        const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+        const result = await executeTmc(sql, {fromDate, toDate}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
         resolve({status: 1, message: "Success", data: result.rows});
       } catch (error) {
         reject({status: 0, message: error, data: []});
@@ -984,7 +1000,7 @@ TO_DATE(:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
 
     /// SECOND REPORT
     const reportTmch_Two = new Promise(async (resolve, reject) => {
-      const ipNumberListString = data?.ptno?.map((item) => `'${item}'`).join(",") || null;
+      const ipNumberListString = buildInClause(data?.ptno, "ip");
       const fromDate = data.from;
       const toDate = data.to;
 
@@ -1013,16 +1029,20 @@ TO_DATE(:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
                             AND NVL (Mretdetl.Mrc_cancel, 'N') = 'N'
                             AND NVL (Dmc_Cancel, 'N') = 'N'
                             AND Disbillmast.Dmc_Cacr <> 'M'
-                            AND Disbillmast.Dmd_date >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                            AND Disbillmast.Dmd_date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-                            AND Disbillmast.Dmd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                            AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                             AND MEDDESC.IT_CODE = MRETDETL.IT_CODE
                             AND TAX.TX_CODE = MRETDETL.MRC_ACTTXCODE
                             AND MRETDETL.OU_CODE = OUTLET.OU_CODE
-                            AND DISBILLMAST.IP_NO NOT IN (${ipNumberListString})`;
+                            AND DISBILLMAST.IP_NO NOT IN ${ipNumberListString.clause}`;
       // console.log(sql)
       try {
-        const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+        const result = await executeTmc(
+          sql,
+          {...ipNumberListString.binds, fromDate, toDate},
+          {outFormat: oracledb.OUT_FORMAT_OBJECT},
+        );
         resolve({status: 1, message: "Success", data: result.rows});
       } catch (error) {
         reject({status: 0, message: error, data: []});
@@ -1059,8 +1079,8 @@ TO_DATE(:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
                                 AND pbillmast.BMC_COLLCNCODE IS NOT NULL
                                 AND NVL (Pbillmast.Bmc_cancel, 'N') = 'N'
                                 AND Pbillmast.Bmc_Cacr IN ('C', 'R', 'M')
-                                AND Pbillmast.BMD_COLLDATE >= TO_DATE ('${fromDate}','dd/MM/yyyy hh24:mi:ss')
-                                AND Pbillmast.BMD_COLLDATE <= TO_DATE ('${toDate}','dd/MM/yyyy hh24:mi:ss')
+                                AND Pbillmast.BMD_COLLDATE >= TO_DATE (:fromDate,'dd/MM/yyyy hh24:mi:ss')
+                                AND Pbillmast.BMD_COLLDATE <= TO_DATE (:toDate,'dd/MM/yyyy hh24:mi:ss')
                                 AND MEDDESC.IT_CODE = Pbilldetl.IT_CODE
                                 AND OUTLET.OU_CODE = PBILLMAST.OU_CODE
                                 AND TAX.TX_CODE = PBILLDETL.PBC_ACTTXCODE
@@ -1095,14 +1115,14 @@ TO_DATE(:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
                                 AND NVL (Mretdetl.Mrc_cancel, 'N') = 'N'
                                 AND NVL (mretmast.Mrc_cancel, 'N') = 'N'
                                 AND Mretdetl.MRC_CACR IN ('C', 'R')
-                                AND Mretmast.MRD_RETDATE >= TO_DATE ('${fromDate}','dd/MM/yyyy hh24:mi:ss')
+                                AND Mretmast.MRD_RETDATE >= TO_DATE (:fromDate,'dd/MM/yyyy hh24:mi:ss')
                                 AND MRETDETL.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-                                AND Mretmast.Mrd_RETDate <= TO_DATE ('${toDate}','dd/MM/yyyy hh24:mi:ss')
+                                AND Mretmast.Mrd_RETDate <= TO_DATE (:toDate,'dd/MM/yyyy hh24:mi:ss')
                                 AND MEDDESC.IT_CODE = MRETDETL.IT_CODE
                                 AND MRETDETL.OU_CODE = OUTLET.OU_CODE
                                 AND TAX.TX_CODE = MRETDETL.MRC_ACTTXCODE`;
       try {
-        const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+        const result = await executeTmc(sql, {fromDate, toDate}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
         resolve({status: 1, message: "Success", data: result.rows});
       } catch (error) {
         reject({status: 0, message: error, data: []});
@@ -1110,7 +1130,7 @@ TO_DATE(:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
     });
 
     const reportTmch_Four = new Promise(async (resolve, reject) => {
-      const ipNumberListString = data?.ptno?.map((item) => `'${item}'`).join(",") || null;
+      const ipNumberListString = buildInClause(data?.ptno, "ip");
       const fromDate = data.from;
       const toDate = data.to;
 
@@ -1139,16 +1159,20 @@ TO_DATE(:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
                                 AND Pbillmast.Bmc_Cacr = 'I'
                                 AND NVL (Dmc_Cancel, 'N') = 'N'
                                 AND Disbillmast.Dmc_Cacr <> 'M'
-                                AND Disbillmast.Dmd_date >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                AND Disbillmast.Dmd_date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-                                AND Disbillmast.Dmd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                                 AND MEDDESC.IT_CODE = Pbilldetl.IT_CODE
                                 AND TAX.TX_CODE = PBILLDETL.PBC_ACTTXCODE
                                 AND OUTLET.OU_CODE = PBILLMAST.OU_CODE
-                                AND Disbillmast.IP_NO NOT IN (${ipNumberListString})`;
+                                AND Disbillmast.IP_NO NOT IN ${ipNumberListString.clause}`;
       // console.log(sql)
       try {
-        const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+        const result = await executeTmc(
+          sql,
+          {...ipNumberListString.binds, fromDate, toDate},
+          {outFormat: oracledb.OUT_FORMAT_OBJECT},
+        );
         resolve({status: 1, message: "Success", data: result.rows});
       } catch (error) {
         reject({status: 0, message: error, data: []});
@@ -1156,7 +1180,7 @@ TO_DATE(:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
     });
 
     const reportTmch_Five = new Promise(async (resolve, reject) => {
-      const ipNumberListString = data?.ptno?.map((item) => `'${item}'`).join(",") || null;
+      const ipNumberListString = buildInClause(data?.ptno, "ip");
       const fromDate = data.from;
       const toDate = data.to;
 
@@ -1185,15 +1209,19 @@ TO_DATE(:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
                             AND Pbillmast.Bmc_Cacr = 'O'
                             AND Opbillmast.Opc_Cacr <> 'M'
                             AND NVL (Opbillmast.Opn_cancel, 'N') = 'N'
-                            AND Opbillmast.Opd_date >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                            AND Opbillmast.Opd_date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                             AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-                            AND Opbillmast.Opd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                            AND Opbillmast.Opd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                             AND MEDDESC.IT_CODE = Pbilldetl.IT_CODE
                             AND TAX.TX_CODE = PBILLDETL.PBC_ACTTXCODE
                             AND OUTLET.OU_CODE = PBILLMAST.OU_CODE
-                            AND PBILLMAST.IP_NO NOT IN (${ipNumberListString})`;
+                            AND PBILLMAST.IP_NO NOT IN ${ipNumberListString.clause}`;
       try {
-        const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+        const result = await executeTmc(
+          sql,
+          {...ipNumberListString.binds, fromDate, toDate},
+          {outFormat: oracledb.OUT_FORMAT_OBJECT},
+        );
         resolve({status: 1, message: "Success", data: result.rows});
       } catch (error) {
         reject({status: 0, message: error, data: []});
@@ -1225,7 +1253,7 @@ TO_DATE(:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
   /*******TSSH REPORT START */
   tsshGstReports: async (data) => {
     const reportTssh_One = new Promise(async (resolve, reject) => {
-      const ipNumberListString = data?.ptno?.map((item) => `'${item}'`).join(",") || null;
+      const ipNumberListString = buildInClause(data?.ptno, "ip");
       const fromDate = data.from;
       const toDate = data.to;
       const sql = `SELECT 
@@ -1253,16 +1281,20 @@ TO_DATE(:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
                         AND NVL (Mretdetl.Mrc_cancel, 'N') = 'N'
                         AND NVL (Dmc_Cancel, 'N') = 'N'
                         AND Disbillmast.Dmc_Cacr <> 'M'
-                        AND Disbillmast.Dmd_date >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                        AND Disbillmast.Dmd_date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-                        AND Disbillmast.Dmd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                        AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                         AND MEDDESC.IT_CODE = MRETDETL.IT_CODE
                         AND TAX.TX_CODE = MRETDETL.MRC_ACTTXCODE
                         AND MRETDETL.OU_CODE = OUTLET.OU_CODE
-                        AND DISBILLMAST.IP_NO IN (${ipNumberListString})`;
+                        AND DISBILLMAST.IP_NO IN ${ipNumberListString.clause}`;
 
       try {
-        const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+        const result = await executeTmc(
+          sql,
+          {...ipNumberListString.binds, fromDate, toDate},
+          {outFormat: oracledb.OUT_FORMAT_OBJECT},
+        );
         resolve({status: 1, message: "Success", data: result.rows});
       } catch (error) {
         reject({status: 0, message: error, data: []});
@@ -1270,7 +1302,7 @@ TO_DATE(:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
     });
 
     const reportTssh_Two = new Promise(async (resolve, reject) => {
-      const ipNumberListString = data?.ptno?.map((item) => `'${item}'`).join(",") || null;
+      const ipNumberListString = buildInClause(data?.ptno, "ip");
       const fromDate = data.from;
       const toDate = data.to;
       const sql = `SELECT 
@@ -1298,15 +1330,19 @@ TO_DATE(:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
                                 AND Pbillmast.Bmc_Cacr = 'I'
                                 AND NVL (Dmc_Cancel, 'N') = 'N'
                                 AND Disbillmast.Dmc_Cacr <> 'M'
-                                AND Disbillmast.Dmd_date >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                AND Disbillmast.Dmd_date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-                                AND Disbillmast.Dmd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                AND Disbillmast.Dmd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                                 AND MEDDESC.IT_CODE = Pbilldetl.IT_CODE
                                 AND TAX.TX_CODE = PBILLDETL.PBC_ACTTXCODE
                                 AND OUTLET.OU_CODE = PBILLMAST.OU_CODE
-                                AND Disbillmast.IP_NO IN (${ipNumberListString})`;
+                                AND Disbillmast.IP_NO IN ${ipNumberListString.clause}`;
       try {
-        const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+        const result = await executeTmc(
+          sql,
+          {...ipNumberListString.binds, fromDate, toDate},
+          {outFormat: oracledb.OUT_FORMAT_OBJECT},
+        );
         resolve({status: 1, message: "Success", data: result.rows});
       } catch (error) {
         reject({status: 0, message: error, data: []});
@@ -1314,7 +1350,7 @@ TO_DATE(:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
     });
 
     const reportTssh_Three = new Promise(async (resolve, reject) => {
-      const ipNumberListString = data?.ptno?.map((item) => `'${item}'`).join(",") || null;
+      const ipNumberListString = buildInClause(data?.ptno, "ip");
       const fromDate = data.from;
       const toDate = data.to;
       const sql = `SELECT 
@@ -1342,15 +1378,19 @@ TO_DATE(:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
                                 AND Pbillmast.Bmc_Cacr = 'O'
                                 AND Opbillmast.Opc_Cacr <> 'M'
                                 AND NVL (Opbillmast.Opn_cancel, 'N') = 'N'
-                                AND Opbillmast.Opd_date >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                AND Opbillmast.Opd_date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                                 AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-                                AND Opbillmast.Opd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                AND Opbillmast.Opd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                                 AND MEDDESC.IT_CODE = Pbilldetl.IT_CODE
                                 AND TAX.TX_CODE = PBILLDETL.PBC_ACTTXCODE
                                 AND OUTLET.OU_CODE = PBILLMAST.OU_CODE
-                                AND PBILLMAST.IP_NO IN (${ipNumberListString})`;
+                                AND PBILLMAST.IP_NO IN ${ipNumberListString.clause}`;
       try {
-        const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+        const result = await executeTmc(
+          sql,
+          {...ipNumberListString.binds, fromDate, toDate},
+          {outFormat: oracledb.OUT_FORMAT_OBJECT},
+        );
         resolve({status: 1, message: "Success", data: result.rows});
       } catch (error) {
         reject({status: 0, message: error, data: []});

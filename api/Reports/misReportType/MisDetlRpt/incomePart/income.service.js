@@ -36,10 +36,10 @@ module.exports = {
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Misincexpdtl.Dg_Grcode = 2
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -65,10 +65,10 @@ module.exports = {
                                         AND NVL (Vsc_Cancel, 'N') = 'N'
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -91,10 +91,10 @@ module.exports = {
                                         AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -123,10 +123,10 @@ module.exports = {
                                         AND NVL (disroomdetl.dmc_cancel, 'N') = 'N'
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.DMD_DATE >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND disbillmast.dmd_date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -150,10 +150,10 @@ module.exports = {
                                         AND Iprefundmast.Ric_Cacr IN ('C', 'R')
                                         AND NVL (Iprefundmast.Ric_Cancel, 'N') = 'N'
                                         AND Iprefundmast.Rid_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Iprefundmast.Rid_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND IPREFUNDMAST.MH_CODE IN
                                                 (SELECT MH_CODE FROM multihospital)
@@ -183,10 +183,10 @@ module.exports = {
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -215,10 +215,10 @@ module.exports = {
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -247,10 +247,10 @@ module.exports = {
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -279,10 +279,10 @@ module.exports = {
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -311,10 +311,10 @@ module.exports = {
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -343,10 +343,10 @@ module.exports = {
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -375,10 +375,10 @@ module.exports = {
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -407,10 +407,10 @@ module.exports = {
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -439,10 +439,10 @@ module.exports = {
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -472,10 +472,10 @@ module.exports = {
                                         AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         AND NVL (Patsurother.Src_Cancel, 'N') = 'N'
@@ -503,10 +503,10 @@ module.exports = {
                                         AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         AND NVL (Patsurdetl.Src_Cancel, 'N') = 'N'
@@ -534,10 +534,10 @@ module.exports = {
                                         AND Canbillmast.Cmc_Cacr = 'I'
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -565,10 +565,10 @@ module.exports = {
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -596,10 +596,10 @@ module.exports = {
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -627,10 +627,10 @@ module.exports = {
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -658,10 +658,10 @@ module.exports = {
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -689,10 +689,10 @@ module.exports = {
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -720,10 +720,10 @@ module.exports = {
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -751,10 +751,10 @@ module.exports = {
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -782,10 +782,10 @@ module.exports = {
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -813,10 +813,10 @@ module.exports = {
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -846,10 +846,10 @@ module.exports = {
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         AND NVL (Patsurother.Src_Cancel, 'N') = 'N'
@@ -877,10 +877,10 @@ module.exports = {
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         AND NVL (Patsurdetl.Src_Cancel, 'N') = 'N'
@@ -909,10 +909,10 @@ module.exports = {
                                         AND Receiptmast.RPC_COLLCNCODE IS NULL
                                         AND Receiptmast.Rpc_Cacr IN ('C', 'R')
                                         AND Receiptmast.Rpd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Receiptmast.Rpd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -940,10 +940,10 @@ module.exports = {
                                         AND Receiptmast.RPC_COLLCNCODE IS NOT NULL
                                         AND Receiptmast.Rpc_Cacr IN ('C', 'R')
                                         AND Receiptmast.RPD_COLLDATE >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Receiptmast.RPD_COLLDATE <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -974,10 +974,10 @@ module.exports = {
                                         AND Receiptmast.Rpc_Cacr = 'O'
                                         AND Opbillmast.Opc_cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_code, Procategory.Pcc_Desc
@@ -1005,10 +1005,10 @@ module.exports = {
                                         AND Refundreceiptmast.RFC_RETCNCODE IS NULL
                                         AND Refundreceiptmast.Rfc_Cacr IN ('C', 'R')
                                         AND Refundreceiptdetl.Rfd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Refundreceiptdetl.Rfd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND REFUNDRECEIPTMAST.MH_CODE IN
                                                 (SELECT MH_CODE FROM multihospital)
@@ -1037,10 +1037,10 @@ module.exports = {
                                         AND Refundreceiptmast.Rfc_Cancel IS NULL
                                         AND Refundreceiptmast.Rfc_Cacr IN ('C', 'R')
                                         AND Refundreceiptmast.RFD_RETDATE >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Refundreceiptmast.RFD_RETDATE <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND REFUNDRECEIPTMAST.MH_CODE IN
                                                 (SELECT MH_CODE FROM multihospital)
@@ -1075,10 +1075,10 @@ module.exports = {
                                         AND REFUNDRECEIPTMAST.RFC_CAcr IN ('O')
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -1109,10 +1109,10 @@ module.exports = {
                                         AND NVL (Billmast.Bmc_Cancel, 'N') <> 'C'
                                         AND billmast.BMC_COLLCNCODE IS NULL
                                         AND Billmast.Bmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Billmast.Bmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -1143,10 +1143,10 @@ module.exports = {
                                         AND Billmast.Bmc_Cacr IN ('C', 'R')
                                         AND NVL (Billmast.Bmc_Cancel, 'N') = 'N'
                                         AND Billmast.BMD_COLLDATE >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Billmast.BMD_COLLDATE <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -1180,10 +1180,10 @@ module.exports = {
                                         AND NVL (Billmast.Bmc_Cancel, 'N') = 'N'
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -1217,10 +1217,10 @@ module.exports = {
                                         AND NVL (Billmast.Bmc_Cancel, 'N') = 'N'
                                         AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -1249,10 +1249,10 @@ module.exports = {
                                         AND NVL (Refundbillmast.Rfc_Cancel, 'N') <> 'C'
                                         AND Refundbillmast.Rfc_Cacr IN ('C', 'R')
                                         AND Refundbilldetl.Rfd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Refundbilldetl.Rfd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -1286,10 +1286,10 @@ module.exports = {
                                         AND NVL (Refundbilldetl.Rfc_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -1322,10 +1322,10 @@ module.exports = {
                                         AND Refundbillmast.Rfc_Cacr IN ('I')
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.dmd_date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.dmd_date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -1348,17 +1348,17 @@ module.exports = {
                                         AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.dmd_date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.dmd_date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc)
                         GROUP BY Code, Pcc_Desc
                         HAVING SUM (Amt) <> 0
                         ORDER BY Pcc_Desc`;
     try {
-      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(sql, {fromDate, toDate}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       //       callBack(null, );
       return result.rows;
     } catch (error) {
@@ -1398,10 +1398,10 @@ module.exports = {
                                     AND Disbillmast.Dmc_Cacr <> 'M'
                                     AND Misincexpdtl.Dg_Grcode = 12
                                     AND Disbillmast.Dmd_Date >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Disbillmast.Dmd_Date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -1427,10 +1427,10 @@ module.exports = {
                                     AND NVL (Vsc_Cancel, 'N') = 'N'
                                     AND Disbillmast.Dmc_Cacr <> 'M'
                                     AND Disbillmast.Dmd_Date >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Disbillmast.Dmd_Date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -1453,10 +1453,10 @@ module.exports = {
                                     AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                     AND Disbillmast.Dmc_Cacr <> 'M'
                                     AND Disbillmast.Dmd_Date >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Disbillmast.Dmd_Date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -1485,10 +1485,10 @@ module.exports = {
                                     AND NVL (disroomdetl.dmc_cancel, 'N') = 'N'
                                     AND Disbillmast.Dmc_Cacr <> 'M'
                                     AND Disbillmast.DMD_DATE >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND disbillmast.dmd_date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -1512,10 +1512,10 @@ module.exports = {
                                     AND Iprefundmast.Ric_Cacr IN ('C', 'R')
                                     AND NVL (Iprefundmast.Ric_Cancel, 'N') = 'N'
                                     AND Iprefundmast.Rid_Date >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Iprefundmast.Rid_Date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND IPREFUNDMAST.MH_CODE IN
                                             (SELECT MH_CODE FROM multihospital)
@@ -1545,10 +1545,10 @@ module.exports = {
                                     AND Disbillmast.Dmc_Cacr <> 'M'
                                     AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                     AND Disbillmast.Dmd_Date >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Disbillmast.Dmd_Date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -1577,10 +1577,10 @@ module.exports = {
                                     AND Disbillmast.Dmc_Cacr <> 'M'
                                     AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                     AND Disbillmast.Dmd_Date >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Disbillmast.Dmd_Date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -1609,10 +1609,10 @@ module.exports = {
                                     AND Disbillmast.Dmc_Cacr <> 'M'
                                     AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                     AND Disbillmast.Dmd_Date >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Disbillmast.Dmd_Date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -1641,10 +1641,10 @@ module.exports = {
                                     AND Disbillmast.Dmc_Cacr <> 'M'
                                     AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                     AND Disbillmast.Dmd_Date >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Disbillmast.Dmd_Date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -1673,10 +1673,10 @@ module.exports = {
                                     AND Disbillmast.Dmc_Cacr <> 'M'
                                     AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                     AND Disbillmast.Dmd_Date >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Disbillmast.Dmd_Date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -1705,10 +1705,10 @@ module.exports = {
                                     AND Disbillmast.Dmc_Cacr <> 'M'
                                     AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                     AND Disbillmast.Dmd_Date >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Disbillmast.Dmd_Date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -1737,10 +1737,10 @@ module.exports = {
                                     AND Disbillmast.Dmc_Cacr <> 'M'
                                     AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                     AND Disbillmast.Dmd_Date >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Disbillmast.Dmd_Date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -1769,10 +1769,10 @@ module.exports = {
                                     AND Disbillmast.Dmc_Cacr <> 'M'
                                     AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                     AND Disbillmast.Dmd_Date >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Disbillmast.Dmd_Date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -1801,10 +1801,10 @@ module.exports = {
                                     AND Disbillmast.Dmc_Cacr <> 'M'
                                     AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                     AND Disbillmast.Dmd_Date >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Disbillmast.Dmd_Date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -1834,10 +1834,10 @@ module.exports = {
                                     AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                     AND Disbillmast.Dmc_Cacr <> 'M'
                                     AND Disbillmast.Dmd_Date >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Disbillmast.Dmd_Date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     AND NVL (Patsurother.Src_Cancel, 'N') = 'N'
@@ -1865,10 +1865,10 @@ module.exports = {
                                     AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                     AND Disbillmast.Dmc_Cacr <> 'M'
                                     AND Disbillmast.Dmd_Date >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Disbillmast.Dmd_Date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     AND NVL (Patsurdetl.Src_Cancel, 'N') = 'N'
@@ -1896,10 +1896,10 @@ module.exports = {
                                     AND Canbillmast.Cmc_Cacr = 'I'
                                     AND Disbillmast.Dmc_Cacr <> 'M'
                                     AND Disbillmast.Dmd_Date >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Disbillmast.Dmd_Date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -1927,10 +1927,10 @@ module.exports = {
                                     AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                     AND Opbillmast.Opc_Cacr <> 'M'
                                     AND Opbillmast.Opd_Date >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Opbillmast.Opd_Date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -1958,10 +1958,10 @@ module.exports = {
                                     AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                     AND Opbillmast.Opc_Cacr <> 'M'
                                     AND Opbillmast.Opd_Date >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Opbillmast.Opd_Date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -1989,10 +1989,10 @@ module.exports = {
                                     AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                     AND Opbillmast.Opc_Cacr <> 'M'
                                     AND Opbillmast.Opd_Date >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Opbillmast.Opd_Date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -2020,10 +2020,10 @@ module.exports = {
                                     AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                     AND Opbillmast.Opc_Cacr <> 'M'
                                     AND Opbillmast.Opd_Date >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Opbillmast.Opd_Date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -2051,10 +2051,10 @@ module.exports = {
                                     AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                     AND Opbillmast.Opc_Cacr <> 'M'
                                     AND Opbillmast.Opd_Date >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Opbillmast.Opd_Date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -2082,10 +2082,10 @@ module.exports = {
                                     AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                     AND Opbillmast.Opc_Cacr <> 'M'
                                     AND Opbillmast.Opd_Date >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Opbillmast.Opd_Date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -2113,10 +2113,10 @@ module.exports = {
                                     AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                     AND Opbillmast.Opc_Cacr <> 'M'
                                     AND Opbillmast.Opd_Date >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Opbillmast.Opd_Date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -2144,10 +2144,10 @@ module.exports = {
                                     AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                     AND Opbillmast.Opc_Cacr <> 'M'
                                     AND Opbillmast.Opd_Date >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Opbillmast.Opd_Date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -2175,10 +2175,10 @@ module.exports = {
                                     AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                     AND Opbillmast.Opc_Cacr <> 'M'
                                     AND Opbillmast.Opd_Date >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Opbillmast.Opd_Date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -2208,10 +2208,10 @@ module.exports = {
                                     AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                     AND Opbillmast.Opc_Cacr <> 'M'
                                     AND Opbillmast.Opd_Date >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Opbillmast.Opd_Date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     AND NVL (Patsurother.Src_Cancel, 'N') = 'N'
@@ -2239,10 +2239,10 @@ module.exports = {
                                     AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                     AND Opbillmast.Opc_Cacr <> 'M'
                                     AND Opbillmast.Opd_Date >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Opbillmast.Opd_Date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     AND NVL (Patsurdetl.Src_Cancel, 'N') = 'N'
@@ -2271,10 +2271,10 @@ module.exports = {
                                     AND Receiptmast.RPC_COLLCNCODE IS NULL
                                     AND Receiptmast.Rpc_Cacr IN ('C', 'R')
                                     AND Receiptmast.Rpd_Date >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Receiptmast.Rpd_Date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -2302,10 +2302,10 @@ module.exports = {
                                     AND Receiptmast.RPC_COLLCNCODE IS NOT NULL
                                     AND Receiptmast.Rpc_Cacr IN ('C', 'R')
                                     AND Receiptmast.RPD_COLLDATE >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Receiptmast.RPD_COLLDATE <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -2336,10 +2336,10 @@ module.exports = {
                                     AND Receiptmast.Rpc_Cacr = 'O'
                                     AND Opbillmast.Opc_cacr <> 'M'
                                     AND Opbillmast.Opd_Date >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Opbillmast.Opd_Date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             GROUP BY Procategory.Pc_code, Procategory.Pcc_Desc
@@ -2367,10 +2367,10 @@ module.exports = {
                                     AND Refundreceiptmast.RFC_RETCNCODE IS NULL
                                     AND Refundreceiptmast.Rfc_Cacr IN ('C', 'R')
                                     AND Refundreceiptdetl.Rfd_Date >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Refundreceiptdetl.Rfd_Date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND REFUNDRECEIPTMAST.MH_CODE IN
                                             (SELECT MH_CODE FROM multihospital)
@@ -2399,10 +2399,10 @@ module.exports = {
                                     AND Refundreceiptmast.Rfc_Cancel IS NULL
                                     AND Refundreceiptmast.Rfc_Cacr IN ('C', 'R')
                                     AND Refundreceiptmast.RFD_RETDATE >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Refundreceiptmast.RFD_RETDATE <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND REFUNDRECEIPTMAST.MH_CODE IN
                                             (SELECT MH_CODE FROM multihospital)
@@ -2437,10 +2437,10 @@ module.exports = {
                                     AND REFUNDRECEIPTMAST.RFC_CAcr IN ('O')
                                     AND Opbillmast.Opc_Cacr <> 'M'
                                     AND Opbillmast.Opd_date >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Opbillmast.Opd_date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -2471,10 +2471,10 @@ module.exports = {
                                     AND NVL (Billmast.Bmc_Cancel, 'N') <> 'C'
                                     AND billmast.BMC_COLLCNCODE IS NULL
                                     AND Billmast.Bmd_Date >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Billmast.Bmd_Date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -2505,10 +2505,10 @@ module.exports = {
                                     AND Billmast.Bmc_Cacr IN ('C', 'R')
                                     AND NVL (Billmast.Bmc_Cancel, 'N') = 'N'
                                     AND Billmast.BMD_COLLDATE >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Billmast.BMD_COLLDATE <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -2542,10 +2542,10 @@ module.exports = {
                                     AND NVL (Billmast.Bmc_Cancel, 'N') = 'N'
                                     AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                     AND Opbillmast.Opd_Date >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Opbillmast.Opd_Date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -2579,10 +2579,10 @@ module.exports = {
                                     AND NVL (Billmast.Bmc_Cancel, 'N') = 'N'
                                     AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                     AND Disbillmast.Dmd_Date >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Disbillmast.Dmd_Date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -2611,10 +2611,10 @@ module.exports = {
                                     AND NVL (Refundbillmast.Rfc_Cancel, 'N') <> 'C'
                                     AND Refundbillmast.Rfc_Cacr IN ('C', 'R')
                                     AND Refundbilldetl.Rfd_Date >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Refundbilldetl.Rfd_Date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -2648,10 +2648,10 @@ module.exports = {
                                     AND NVL (Refundbilldetl.Rfc_Cancel, 'N') = 'N'
                                     AND Opbillmast.Opc_Cacr <> 'M'
                                     AND Opbillmast.Opd_date >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Opbillmast.Opd_date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -2684,10 +2684,10 @@ module.exports = {
                                     AND Refundbillmast.Rfc_Cacr IN ('I')
                                     AND Disbillmast.Dmc_Cacr <> 'M'
                                     AND Disbillmast.dmd_date >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Disbillmast.dmd_date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -2710,10 +2710,10 @@ module.exports = {
                                     AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                     AND Disbillmast.Dmc_Cacr <> 'M'
                                     AND Disbillmast.dmd_date >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Disbillmast.dmd_date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                             GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc)
                 GROUP BY Code, Pcc_Desc
@@ -2721,7 +2721,7 @@ module.exports = {
                 ORDER BY Pcc_Desc`;
 
     try {
-      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(sql, {fromDate, toDate}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       //       callBack(null, );
       return result.rows;
     } catch (error) {
@@ -2761,10 +2761,10 @@ module.exports = {
                                             AND Disbillmast.Dmc_Cacr <> 'M'
                                             AND Misincexpdtl.Dg_Grcode = 3
                                             AND Disbillmast.Dmd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Disbillmast.Dmd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -2790,10 +2790,10 @@ module.exports = {
                                             AND NVL (Vsc_Cancel, 'N') = 'N'
                                             AND Disbillmast.Dmc_Cacr <> 'M'
                                             AND Disbillmast.Dmd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Disbillmast.Dmd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -2816,10 +2816,10 @@ module.exports = {
                                             AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                             AND Disbillmast.Dmc_Cacr <> 'M'
                                             AND Disbillmast.Dmd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Disbillmast.Dmd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -2848,10 +2848,10 @@ module.exports = {
                                             AND NVL (disroomdetl.dmc_cancel, 'N') = 'N'
                                             AND Disbillmast.Dmc_Cacr <> 'M'
                                             AND Disbillmast.DMD_DATE >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND disbillmast.dmd_date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -2875,10 +2875,10 @@ module.exports = {
                                             AND Iprefundmast.Ric_Cacr IN ('C', 'R')
                                             AND NVL (Iprefundmast.Ric_Cancel, 'N') = 'N'
                                             AND Iprefundmast.Rid_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Iprefundmast.Rid_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND IPREFUNDMAST.MH_CODE IN
                                                     (SELECT MH_CODE FROM multihospital)
@@ -2908,10 +2908,10 @@ module.exports = {
                                             AND Disbillmast.Dmc_Cacr <> 'M'
                                             AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                             AND Disbillmast.Dmd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Disbillmast.Dmd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -2940,10 +2940,10 @@ module.exports = {
                                             AND Disbillmast.Dmc_Cacr <> 'M'
                                             AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                             AND Disbillmast.Dmd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Disbillmast.Dmd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -2972,10 +2972,10 @@ module.exports = {
                                             AND Disbillmast.Dmc_Cacr <> 'M'
                                             AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                             AND Disbillmast.Dmd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Disbillmast.Dmd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -3004,10 +3004,10 @@ module.exports = {
                                             AND Disbillmast.Dmc_Cacr <> 'M'
                                             AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                             AND Disbillmast.Dmd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Disbillmast.Dmd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -3036,10 +3036,10 @@ module.exports = {
                                             AND Disbillmast.Dmc_Cacr <> 'M'
                                             AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                             AND Disbillmast.Dmd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Disbillmast.Dmd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -3068,10 +3068,10 @@ module.exports = {
                                             AND Disbillmast.Dmc_Cacr <> 'M'
                                             AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                             AND Disbillmast.Dmd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Disbillmast.Dmd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -3100,10 +3100,10 @@ module.exports = {
                                             AND Disbillmast.Dmc_Cacr <> 'M'
                                             AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                             AND Disbillmast.Dmd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Disbillmast.Dmd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -3132,10 +3132,10 @@ module.exports = {
                                             AND Disbillmast.Dmc_Cacr <> 'M'
                                             AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                             AND Disbillmast.Dmd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Disbillmast.Dmd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -3164,10 +3164,10 @@ module.exports = {
                                             AND Disbillmast.Dmc_Cacr <> 'M'
                                             AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                             AND Disbillmast.Dmd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Disbillmast.Dmd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -3197,10 +3197,10 @@ module.exports = {
                                             AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                             AND Disbillmast.Dmc_Cacr <> 'M'
                                             AND Disbillmast.Dmd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Disbillmast.Dmd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                             AND NVL (Patsurother.Src_Cancel, 'N') = 'N'
@@ -3228,10 +3228,10 @@ module.exports = {
                                             AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                             AND Disbillmast.Dmc_Cacr <> 'M'
                                             AND Disbillmast.Dmd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Disbillmast.Dmd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                             AND NVL (Patsurdetl.Src_Cancel, 'N') = 'N'
@@ -3259,10 +3259,10 @@ module.exports = {
                                             AND Canbillmast.Cmc_Cacr = 'I'
                                             AND Disbillmast.Dmc_Cacr <> 'M'
                                             AND Disbillmast.Dmd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Disbillmast.Dmd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -3290,10 +3290,10 @@ module.exports = {
                                             AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                             AND Opbillmast.Opc_Cacr <> 'M'
                                             AND Opbillmast.Opd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Opbillmast.Opd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -3321,10 +3321,10 @@ module.exports = {
                                             AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                             AND Opbillmast.Opc_Cacr <> 'M'
                                             AND Opbillmast.Opd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Opbillmast.Opd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -3352,10 +3352,10 @@ module.exports = {
                                             AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                             AND Opbillmast.Opc_Cacr <> 'M'
                                             AND Opbillmast.Opd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Opbillmast.Opd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -3383,10 +3383,10 @@ module.exports = {
                                             AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                             AND Opbillmast.Opc_Cacr <> 'M'
                                             AND Opbillmast.Opd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Opbillmast.Opd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -3414,10 +3414,10 @@ module.exports = {
                                             AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                             AND Opbillmast.Opc_Cacr <> 'M'
                                             AND Opbillmast.Opd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Opbillmast.Opd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -3445,10 +3445,10 @@ module.exports = {
                                             AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                             AND Opbillmast.Opc_Cacr <> 'M'
                                             AND Opbillmast.Opd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Opbillmast.Opd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -3476,10 +3476,10 @@ module.exports = {
                                             AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                             AND Opbillmast.Opc_Cacr <> 'M'
                                             AND Opbillmast.Opd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Opbillmast.Opd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -3507,10 +3507,10 @@ module.exports = {
                                             AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                             AND Opbillmast.Opc_Cacr <> 'M'
                                             AND Opbillmast.Opd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Opbillmast.Opd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -3538,10 +3538,10 @@ module.exports = {
                                             AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                             AND Opbillmast.Opc_Cacr <> 'M'
                                             AND Opbillmast.Opd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Opbillmast.Opd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -3571,10 +3571,10 @@ module.exports = {
                                             AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                             AND Opbillmast.Opc_Cacr <> 'M'
                                             AND Opbillmast.Opd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Opbillmast.Opd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                             AND NVL (Patsurother.Src_Cancel, 'N') = 'N'
@@ -3602,10 +3602,10 @@ module.exports = {
                                             AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                             AND Opbillmast.Opc_Cacr <> 'M'
                                             AND Opbillmast.Opd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Opbillmast.Opd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                             AND NVL (Patsurdetl.Src_Cancel, 'N') = 'N'
@@ -3634,10 +3634,10 @@ module.exports = {
                                             AND Receiptmast.RPC_COLLCNCODE IS NULL
                                             AND Receiptmast.Rpc_Cacr IN ('C', 'R')
                                             AND Receiptmast.Rpd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Receiptmast.Rpd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -3665,10 +3665,10 @@ module.exports = {
                                             AND Receiptmast.RPC_COLLCNCODE IS NOT NULL
                                             AND Receiptmast.Rpc_Cacr IN ('C', 'R')
                                             AND Receiptmast.RPD_COLLDATE >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Receiptmast.RPD_COLLDATE <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -3699,10 +3699,10 @@ module.exports = {
                                             AND Receiptmast.Rpc_Cacr = 'O'
                                             AND Opbillmast.Opc_cacr <> 'M'
                                             AND Opbillmast.Opd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Opbillmast.Opd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_code, Procategory.Pcc_Desc
@@ -3730,10 +3730,10 @@ module.exports = {
                                             AND Refundreceiptmast.RFC_RETCNCODE IS NULL
                                             AND Refundreceiptmast.Rfc_Cacr IN ('C', 'R')
                                             AND Refundreceiptdetl.Rfd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Refundreceiptdetl.Rfd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND REFUNDRECEIPTMAST.MH_CODE IN
                                                     (SELECT MH_CODE FROM multihospital)
@@ -3762,10 +3762,10 @@ module.exports = {
                                             AND Refundreceiptmast.Rfc_Cancel IS NULL
                                             AND Refundreceiptmast.Rfc_Cacr IN ('C', 'R')
                                             AND Refundreceiptmast.RFD_RETDATE >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Refundreceiptmast.RFD_RETDATE <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND REFUNDRECEIPTMAST.MH_CODE IN
                                                     (SELECT MH_CODE FROM multihospital)
@@ -3800,10 +3800,10 @@ module.exports = {
                                             AND REFUNDRECEIPTMAST.RFC_CAcr IN ('O')
                                             AND Opbillmast.Opc_Cacr <> 'M'
                                             AND Opbillmast.Opd_date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Opbillmast.Opd_date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -3834,10 +3834,10 @@ module.exports = {
                                             AND NVL (Billmast.Bmc_Cancel, 'N') <> 'C'
                                             AND billmast.BMC_COLLCNCODE IS NULL
                                             AND Billmast.Bmd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Billmast.Bmd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -3868,10 +3868,10 @@ module.exports = {
                                             AND Billmast.Bmc_Cacr IN ('C', 'R')
                                             AND NVL (Billmast.Bmc_Cancel, 'N') = 'N'
                                             AND Billmast.BMD_COLLDATE >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Billmast.BMD_COLLDATE <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -3905,10 +3905,10 @@ module.exports = {
                                             AND NVL (Billmast.Bmc_Cancel, 'N') = 'N'
                                             AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                             AND Opbillmast.Opd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Opbillmast.Opd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -3942,10 +3942,10 @@ module.exports = {
                                             AND NVL (Billmast.Bmc_Cancel, 'N') = 'N'
                                             AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                             AND Disbillmast.Dmd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Disbillmast.Dmd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -3974,10 +3974,10 @@ module.exports = {
                                             AND NVL (Refundbillmast.Rfc_Cancel, 'N') <> 'C'
                                             AND Refundbillmast.Rfc_Cacr IN ('C', 'R')
                                             AND Refundbilldetl.Rfd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Refundbilldetl.Rfd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -4011,10 +4011,10 @@ module.exports = {
                                             AND NVL (Refundbilldetl.Rfc_Cancel, 'N') = 'N'
                                             AND Opbillmast.Opc_Cacr <> 'M'
                                             AND Opbillmast.Opd_date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Opbillmast.Opd_date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -4047,10 +4047,10 @@ module.exports = {
                                             AND Refundbillmast.Rfc_Cacr IN ('I')
                                             AND Disbillmast.Dmc_Cacr <> 'M'
                                             AND Disbillmast.dmd_date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Disbillmast.dmd_date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -4073,10 +4073,10 @@ module.exports = {
                                             AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                             AND Disbillmast.Dmc_Cacr <> 'M'
                                             AND Disbillmast.dmd_date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Disbillmast.dmd_date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc)
                         GROUP BY Code, Pcc_Desc
@@ -4084,7 +4084,7 @@ module.exports = {
                         ORDER BY Pcc_Desc`;
 
     try {
-      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(sql, {fromDate, toDate}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       //       callBack(null, );
       return result.rows;
     } catch (error) {
@@ -4124,10 +4124,10 @@ module.exports = {
                   AND Disbillmast.Dmc_Cacr <> 'M'
                   AND Misincexpdtl.Dg_Grcode = 17
                   AND Disbillmast.Dmd_Date >=
-                         TO_DATE ('${fromDate}',
+                         TO_DATE (:fromDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND Disbillmast.Dmd_Date <=
-                         TO_DATE ('${toDate}',
+                         TO_DATE (:toDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
          GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -4153,10 +4153,10 @@ module.exports = {
                   AND NVL (Vsc_Cancel, 'N') = 'N'
                   AND Disbillmast.Dmc_Cacr <> 'M'
                   AND Disbillmast.Dmd_Date >=
-                         TO_DATE ('${fromDate}',
+                         TO_DATE (:fromDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND Disbillmast.Dmd_Date <=
-                         TO_DATE ('${toDate}',
+                         TO_DATE (:toDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
          GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -4179,10 +4179,10 @@ module.exports = {
                   AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                   AND Disbillmast.Dmc_Cacr <> 'M'
                   AND Disbillmast.Dmd_Date >=
-                         TO_DATE ('${fromDate}',
+                         TO_DATE (:fromDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND Disbillmast.Dmd_Date <=
-                         TO_DATE ('${toDate}',
+                         TO_DATE (:toDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
          GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -4211,10 +4211,10 @@ module.exports = {
                   AND NVL (disroomdetl.dmc_cancel, 'N') = 'N'
                   AND Disbillmast.Dmc_Cacr <> 'M'
                   AND Disbillmast.DMD_DATE >=
-                         TO_DATE ('${fromDate}',
+                         TO_DATE (:fromDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND disbillmast.dmd_date <=
-                         TO_DATE ('${toDate}',
+                         TO_DATE (:toDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
          GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -4238,10 +4238,10 @@ module.exports = {
                   AND Iprefundmast.Ric_Cacr IN ('C', 'R')
                   AND NVL (Iprefundmast.Ric_Cancel, 'N') = 'N'
                   AND Iprefundmast.Rid_Date >=
-                         TO_DATE ('${fromDate}',
+                         TO_DATE (:fromDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND Iprefundmast.Rid_Date <=
-                         TO_DATE ('${toDate}',
+                         TO_DATE (:toDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND IPREFUNDMAST.MH_CODE IN
                          (SELECT MH_CODE FROM multihospital)
@@ -4271,10 +4271,10 @@ module.exports = {
                   AND Disbillmast.Dmc_Cacr <> 'M'
                   AND Disbillmast.Mh_code = Ipparam.Mh_Code
                   AND Disbillmast.Dmd_Date >=
-                         TO_DATE ('${fromDate}',
+                         TO_DATE (:fromDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND Disbillmast.Dmd_Date <=
-                         TO_DATE ('${toDate}',
+                         TO_DATE (:toDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
          GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -4303,10 +4303,10 @@ module.exports = {
                   AND Disbillmast.Dmc_Cacr <> 'M'
                   AND Disbillmast.Mh_code = Ipparam.Mh_Code
                   AND Disbillmast.Dmd_Date >=
-                         TO_DATE ('${fromDate}',
+                         TO_DATE (:fromDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND Disbillmast.Dmd_Date <=
-                         TO_DATE ('${toDate}',
+                         TO_DATE (:toDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
          GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -4335,10 +4335,10 @@ module.exports = {
                   AND Disbillmast.Dmc_Cacr <> 'M'
                   AND Disbillmast.Mh_code = Ipparam.Mh_Code
                   AND Disbillmast.Dmd_Date >=
-                         TO_DATE ('${fromDate}',
+                         TO_DATE (:fromDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND Disbillmast.Dmd_Date <=
-                         TO_DATE ('${toDate}',
+                         TO_DATE (:toDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
          GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -4367,10 +4367,10 @@ module.exports = {
                   AND Disbillmast.Dmc_Cacr <> 'M'
                   AND Disbillmast.Mh_code = Ipparam.Mh_Code
                   AND Disbillmast.Dmd_Date >=
-                         TO_DATE ('${fromDate}',
+                         TO_DATE (:fromDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND Disbillmast.Dmd_Date <=
-                         TO_DATE ('${toDate}',
+                         TO_DATE (:toDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
          GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -4399,10 +4399,10 @@ module.exports = {
                   AND Disbillmast.Dmc_Cacr <> 'M'
                   AND Disbillmast.Mh_code = Ipparam.Mh_Code
                   AND Disbillmast.Dmd_Date >=
-                         TO_DATE ('${fromDate}',
+                         TO_DATE (:fromDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND Disbillmast.Dmd_Date <=
-                         TO_DATE ('${toDate}',
+                         TO_DATE (:toDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
          GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -4431,10 +4431,10 @@ module.exports = {
                   AND Disbillmast.Dmc_Cacr <> 'M'
                   AND Disbillmast.Mh_code = Ipparam.Mh_Code
                   AND Disbillmast.Dmd_Date >=
-                         TO_DATE ('${fromDate}',
+                         TO_DATE (:fromDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND Disbillmast.Dmd_Date <=
-                         TO_DATE ('${toDate}',
+                         TO_DATE (:toDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
          GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -4463,10 +4463,10 @@ module.exports = {
                   AND Disbillmast.Dmc_Cacr <> 'M'
                   AND Disbillmast.Mh_code = Ipparam.Mh_Code
                   AND Disbillmast.Dmd_Date >=
-                         TO_DATE ('${fromDate}',
+                         TO_DATE (:fromDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND Disbillmast.Dmd_Date <=
-                         TO_DATE ('${toDate}',
+                         TO_DATE (:toDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
          GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -4495,10 +4495,10 @@ module.exports = {
                   AND Disbillmast.Dmc_Cacr <> 'M'
                   AND Disbillmast.Mh_code = Ipparam.Mh_Code
                   AND Disbillmast.Dmd_Date >=
-                         TO_DATE ('${fromDate}',
+                         TO_DATE (:fromDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND Disbillmast.Dmd_Date <=
-                         TO_DATE ('${toDate}',
+                         TO_DATE (:toDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
          GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -4527,10 +4527,10 @@ module.exports = {
                   AND Disbillmast.Dmc_Cacr <> 'M'
                   AND Disbillmast.Mh_code = Ipparam.Mh_Code
                   AND Disbillmast.Dmd_Date >=
-                         TO_DATE ('${fromDate}',
+                         TO_DATE (:fromDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND Disbillmast.Dmd_Date <=
-                         TO_DATE ('${toDate}',
+                         TO_DATE (:toDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
          GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -4560,10 +4560,10 @@ module.exports = {
                   AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                   AND Disbillmast.Dmc_Cacr <> 'M'
                   AND Disbillmast.Dmd_Date >=
-                         TO_DATE ('${fromDate}',
+                         TO_DATE (:fromDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND Disbillmast.Dmd_Date <=
-                         TO_DATE ('${toDate}',
+                         TO_DATE (:toDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                   AND NVL (Patsurother.Src_Cancel, 'N') = 'N'
@@ -4591,10 +4591,10 @@ module.exports = {
                   AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                   AND Disbillmast.Dmc_Cacr <> 'M'
                   AND Disbillmast.Dmd_Date >=
-                         TO_DATE ('${fromDate}',
+                         TO_DATE (:fromDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND Disbillmast.Dmd_Date <=
-                         TO_DATE ('${toDate}',
+                         TO_DATE (:toDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                   AND NVL (Patsurdetl.Src_Cancel, 'N') = 'N'
@@ -4622,10 +4622,10 @@ module.exports = {
                   AND Canbillmast.Cmc_Cacr = 'I'
                   AND Disbillmast.Dmc_Cacr <> 'M'
                   AND Disbillmast.Dmd_Date >=
-                         TO_DATE ('${fromDate}',
+                         TO_DATE (:fromDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND Disbillmast.Dmd_Date <=
-                         TO_DATE ('${toDate}',
+                         TO_DATE (:toDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
          GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -4653,10 +4653,10 @@ module.exports = {
                   AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                   AND Opbillmast.Opc_Cacr <> 'M'
                   AND Opbillmast.Opd_Date >=
-                         TO_DATE ('${fromDate}',
+                         TO_DATE (:fromDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND Opbillmast.Opd_Date <=
-                         TO_DATE ('${toDate}',
+                         TO_DATE (:toDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
          GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -4684,10 +4684,10 @@ module.exports = {
                   AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                   AND Opbillmast.Opc_Cacr <> 'M'
                   AND Opbillmast.Opd_Date >=
-                         TO_DATE ('${fromDate}',
+                         TO_DATE (:fromDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND Opbillmast.Opd_Date <=
-                         TO_DATE ('${toDate}',
+                         TO_DATE (:toDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
          GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -4715,10 +4715,10 @@ module.exports = {
                   AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                   AND Opbillmast.Opc_Cacr <> 'M'
                   AND Opbillmast.Opd_Date >=
-                         TO_DATE ('${fromDate}',
+                         TO_DATE (:fromDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND Opbillmast.Opd_Date <=
-                         TO_DATE ('${toDate}',
+                         TO_DATE (:toDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
          GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -4746,10 +4746,10 @@ module.exports = {
                   AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                   AND Opbillmast.Opc_Cacr <> 'M'
                   AND Opbillmast.Opd_Date >=
-                         TO_DATE ('${fromDate}',
+                         TO_DATE (:fromDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND Opbillmast.Opd_Date <=
-                         TO_DATE ('${toDate}',
+                         TO_DATE (:toDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
          GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -4777,10 +4777,10 @@ module.exports = {
                   AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                   AND Opbillmast.Opc_Cacr <> 'M'
                   AND Opbillmast.Opd_Date >=
-                         TO_DATE ('${fromDate}',
+                         TO_DATE (:fromDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND Opbillmast.Opd_Date <=
-                         TO_DATE ('${toDate}',
+                         TO_DATE (:toDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
          GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -4808,10 +4808,10 @@ module.exports = {
                   AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                   AND Opbillmast.Opc_Cacr <> 'M'
                   AND Opbillmast.Opd_Date >=
-                         TO_DATE ('${fromDate}',
+                         TO_DATE (:fromDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND Opbillmast.Opd_Date <=
-                         TO_DATE ('${toDate}',
+                         TO_DATE (:toDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
          GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -4839,10 +4839,10 @@ module.exports = {
                   AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                   AND Opbillmast.Opc_Cacr <> 'M'
                   AND Opbillmast.Opd_Date >=
-                         TO_DATE ('${fromDate}',
+                         TO_DATE (:fromDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND Opbillmast.Opd_Date <=
-                         TO_DATE ('${toDate}',
+                         TO_DATE (:toDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
          GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -4870,10 +4870,10 @@ module.exports = {
                   AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                   AND Opbillmast.Opc_Cacr <> 'M'
                   AND Opbillmast.Opd_Date >=
-                         TO_DATE ('${fromDate}',
+                         TO_DATE (:fromDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND Opbillmast.Opd_Date <=
-                         TO_DATE ('${toDate}',
+                         TO_DATE (:toDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
          GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -4901,10 +4901,10 @@ module.exports = {
                   AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                   AND Opbillmast.Opc_Cacr <> 'M'
                   AND Opbillmast.Opd_Date >=
-                         TO_DATE ('${fromDate}',
+                         TO_DATE (:fromDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND Opbillmast.Opd_Date <=
-                         TO_DATE ('${toDate}',
+                         TO_DATE (:toDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
          GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -4934,10 +4934,10 @@ module.exports = {
                   AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                   AND Opbillmast.Opc_Cacr <> 'M'
                   AND Opbillmast.Opd_Date >=
-                         TO_DATE ('${fromDate}',
+                         TO_DATE (:fromDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND Opbillmast.Opd_Date <=
-                         TO_DATE ('${toDate}',
+                         TO_DATE (:toDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                   AND NVL (Patsurother.Src_Cancel, 'N') = 'N'
@@ -4965,10 +4965,10 @@ module.exports = {
                   AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                   AND Opbillmast.Opc_Cacr <> 'M'
                   AND Opbillmast.Opd_Date >=
-                         TO_DATE ('${fromDate}',
+                         TO_DATE (:fromDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND Opbillmast.Opd_Date <=
-                         TO_DATE ('${toDate}',
+                         TO_DATE (:toDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                   AND NVL (Patsurdetl.Src_Cancel, 'N') = 'N'
@@ -4997,10 +4997,10 @@ module.exports = {
                   AND Receiptmast.RPC_COLLCNCODE IS NULL
                   AND Receiptmast.Rpc_Cacr IN ('C', 'R')
                   AND Receiptmast.Rpd_Date >=
-                         TO_DATE ('${fromDate}',
+                         TO_DATE (:fromDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND Receiptmast.Rpd_Date <=
-                         TO_DATE ('${toDate}',
+                         TO_DATE (:toDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
          GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -5028,10 +5028,10 @@ module.exports = {
                   AND Receiptmast.RPC_COLLCNCODE IS NOT NULL
                   AND Receiptmast.Rpc_Cacr IN ('C', 'R')
                   AND Receiptmast.RPD_COLLDATE >=
-                         TO_DATE ('${fromDate}',
+                         TO_DATE (:fromDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND Receiptmast.RPD_COLLDATE <=
-                         TO_DATE ('${toDate}',
+                         TO_DATE (:toDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
          GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -5062,10 +5062,10 @@ module.exports = {
                   AND Receiptmast.Rpc_Cacr = 'O'
                   AND Opbillmast.Opc_cacr <> 'M'
                   AND Opbillmast.Opd_Date >=
-                         TO_DATE ('${fromDate}',
+                         TO_DATE (:fromDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND Opbillmast.Opd_Date <=
-                         TO_DATE ('${toDate}',
+                         TO_DATE (:toDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
          GROUP BY Procategory.Pc_code, Procategory.Pcc_Desc
@@ -5093,10 +5093,10 @@ module.exports = {
                   AND Refundreceiptmast.RFC_RETCNCODE IS NULL
                   AND Refundreceiptmast.Rfc_Cacr IN ('C', 'R')
                   AND Refundreceiptdetl.Rfd_Date >=
-                         TO_DATE ('${fromDate}',
+                         TO_DATE (:fromDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND Refundreceiptdetl.Rfd_Date <=
-                         TO_DATE ('${toDate}',
+                         TO_DATE (:toDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND REFUNDRECEIPTMAST.MH_CODE IN
                          (SELECT MH_CODE FROM multihospital)
@@ -5125,10 +5125,10 @@ module.exports = {
                   AND Refundreceiptmast.Rfc_Cancel IS NULL
                   AND Refundreceiptmast.Rfc_Cacr IN ('C', 'R')
                   AND Refundreceiptmast.RFD_RETDATE >=
-                         TO_DATE ('${fromDate}',
+                         TO_DATE (:fromDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND Refundreceiptmast.RFD_RETDATE <=
-                         TO_DATE ('${toDate}',
+                         TO_DATE (:toDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND REFUNDRECEIPTMAST.MH_CODE IN
                          (SELECT MH_CODE FROM multihospital)
@@ -5163,10 +5163,10 @@ module.exports = {
                   AND REFUNDRECEIPTMAST.RFC_CAcr IN ('O')
                   AND Opbillmast.Opc_Cacr <> 'M'
                   AND Opbillmast.Opd_date >=
-                         TO_DATE ('${fromDate}',
+                         TO_DATE (:fromDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND Opbillmast.Opd_date <=
-                         TO_DATE ('${toDate}',
+                         TO_DATE (:toDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
          GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -5197,10 +5197,10 @@ module.exports = {
                   AND NVL (Billmast.Bmc_Cancel, 'N') <> 'C'
                   AND billmast.BMC_COLLCNCODE IS NULL
                   AND Billmast.Bmd_Date >=
-                         TO_DATE ('${fromDate}',
+                         TO_DATE (:fromDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND Billmast.Bmd_Date <=
-                         TO_DATE ('${toDate}',
+                         TO_DATE (:toDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
          GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -5231,10 +5231,10 @@ module.exports = {
                   AND Billmast.Bmc_Cacr IN ('C', 'R')
                   AND NVL (Billmast.Bmc_Cancel, 'N') = 'N'
                   AND Billmast.BMD_COLLDATE >=
-                         TO_DATE ('${fromDate}',
+                         TO_DATE (:fromDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND Billmast.BMD_COLLDATE <=
-                         TO_DATE ('${toDate}',
+                         TO_DATE (:toDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
          GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -5268,10 +5268,10 @@ module.exports = {
                   AND NVL (Billmast.Bmc_Cancel, 'N') = 'N'
                   AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                   AND Opbillmast.Opd_Date >=
-                         TO_DATE ('${fromDate}',
+                         TO_DATE (:fromDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND Opbillmast.Opd_Date <=
-                         TO_DATE ('${toDate}',
+                         TO_DATE (:toDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
          GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -5305,10 +5305,10 @@ module.exports = {
                   AND NVL (Billmast.Bmc_Cancel, 'N') = 'N'
                   AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                   AND Disbillmast.Dmd_Date >=
-                         TO_DATE ('${fromDate}',
+                         TO_DATE (:fromDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND Disbillmast.Dmd_Date <=
-                         TO_DATE ('${toDate}',
+                         TO_DATE (:toDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
          GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -5337,10 +5337,10 @@ module.exports = {
                   AND NVL (Refundbillmast.Rfc_Cancel, 'N') <> 'C'
                   AND Refundbillmast.Rfc_Cacr IN ('C', 'R')
                   AND Refundbilldetl.Rfd_Date >=
-                         TO_DATE ('${fromDate}',
+                         TO_DATE (:fromDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND Refundbilldetl.Rfd_Date <=
-                         TO_DATE ('${toDate}',
+                         TO_DATE (:toDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
          GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -5374,10 +5374,10 @@ module.exports = {
                   AND NVL (Refundbilldetl.Rfc_Cancel, 'N') = 'N'
                   AND Opbillmast.Opc_Cacr <> 'M'
                   AND Opbillmast.Opd_date >=
-                         TO_DATE ('${fromDate}',
+                         TO_DATE (:fromDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND Opbillmast.Opd_date <=
-                         TO_DATE ('${toDate}',
+                         TO_DATE (:toDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
          GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -5410,10 +5410,10 @@ module.exports = {
                   AND Refundbillmast.Rfc_Cacr IN ('I')
                   AND Disbillmast.Dmc_Cacr <> 'M'
                   AND Disbillmast.dmd_date >=
-                         TO_DATE ('${fromDate}',
+                         TO_DATE (:fromDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND Disbillmast.dmd_date <=
-                         TO_DATE ('${toDate}',
+                         TO_DATE (:toDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
          GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -5436,10 +5436,10 @@ module.exports = {
                   AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                   AND Disbillmast.Dmc_Cacr <> 'M'
                   AND Disbillmast.dmd_date >=
-                         TO_DATE ('${fromDate}',
+                         TO_DATE (:fromDate,
                                   'dd/MM/yyyy hh24:mi:ss')
                   AND Disbillmast.dmd_date <=
-                         TO_DATE ('${toDate}',
+                         TO_DATE (:toDate,
                                   'dd/MM/yyyy hh24:mi:ss')
          GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc)
 GROUP BY Code, Pcc_Desc
@@ -5447,7 +5447,7 @@ GROUP BY Code, Pcc_Desc
 ORDER BY Pcc_Desc`;
 
     try {
-      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(sql, {fromDate, toDate}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       //       callBack(null, );
       return result.rows;
     } catch (error) {
@@ -5487,10 +5487,10 @@ ORDER BY Pcc_Desc`;
                                 AND Disbillmast.Dmc_Cacr <> 'M'
                                 AND Misincexpdtl.Dg_Grcode = 5
                                 AND Disbillmast.Dmd_Date >=
-                                        TO_DATE ('${fromDate}',
+                                        TO_DATE (:fromDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND Disbillmast.Dmd_Date <=
-                                        TO_DATE ('${toDate}',
+                                        TO_DATE (:toDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -5516,10 +5516,10 @@ ORDER BY Pcc_Desc`;
                                 AND NVL (Vsc_Cancel, 'N') = 'N'
                                 AND Disbillmast.Dmc_Cacr <> 'M'
                                 AND Disbillmast.Dmd_Date >=
-                                        TO_DATE ('${fromDate}',
+                                        TO_DATE (:fromDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND Disbillmast.Dmd_Date <=
-                                        TO_DATE ('${toDate}',
+                                        TO_DATE (:toDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -5542,10 +5542,10 @@ ORDER BY Pcc_Desc`;
                                 AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                 AND Disbillmast.Dmc_Cacr <> 'M'
                                 AND Disbillmast.Dmd_Date >=
-                                        TO_DATE ('${fromDate}',
+                                        TO_DATE (:fromDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND Disbillmast.Dmd_Date <=
-                                        TO_DATE ('${toDate}',
+                                        TO_DATE (:toDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -5574,10 +5574,10 @@ ORDER BY Pcc_Desc`;
                                 AND NVL (disroomdetl.dmc_cancel, 'N') = 'N'
                                 AND Disbillmast.Dmc_Cacr <> 'M'
                                 AND Disbillmast.DMD_DATE >=
-                                        TO_DATE ('${fromDate}',
+                                        TO_DATE (:fromDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND disbillmast.dmd_date <=
-                                        TO_DATE ('${toDate}',
+                                        TO_DATE (:toDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -5601,10 +5601,10 @@ ORDER BY Pcc_Desc`;
                                 AND Iprefundmast.Ric_Cacr IN ('C', 'R')
                                 AND NVL (Iprefundmast.Ric_Cancel, 'N') = 'N'
                                 AND Iprefundmast.Rid_Date >=
-                                        TO_DATE ('${fromDate}',
+                                        TO_DATE (:fromDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND Iprefundmast.Rid_Date <=
-                                        TO_DATE ('${toDate}',
+                                        TO_DATE (:toDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND IPREFUNDMAST.MH_CODE IN
                                         (SELECT MH_CODE FROM multihospital)
@@ -5634,10 +5634,10 @@ ORDER BY Pcc_Desc`;
                                 AND Disbillmast.Dmc_Cacr <> 'M'
                                 AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                 AND Disbillmast.Dmd_Date >=
-                                        TO_DATE ('${fromDate}',
+                                        TO_DATE (:fromDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND Disbillmast.Dmd_Date <=
-                                        TO_DATE ('${toDate}',
+                                        TO_DATE (:toDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -5666,10 +5666,10 @@ ORDER BY Pcc_Desc`;
                                 AND Disbillmast.Dmc_Cacr <> 'M'
                                 AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                 AND Disbillmast.Dmd_Date >=
-                                        TO_DATE ('${fromDate}',
+                                        TO_DATE (:fromDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND Disbillmast.Dmd_Date <=
-                                        TO_DATE ('${toDate}',
+                                        TO_DATE (:toDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -5698,10 +5698,10 @@ ORDER BY Pcc_Desc`;
                                 AND Disbillmast.Dmc_Cacr <> 'M'
                                 AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                 AND Disbillmast.Dmd_Date >=
-                                        TO_DATE ('${fromDate}',
+                                        TO_DATE (:fromDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND Disbillmast.Dmd_Date <=
-                                        TO_DATE ('${toDate}',
+                                        TO_DATE (:toDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -5730,10 +5730,10 @@ ORDER BY Pcc_Desc`;
                                 AND Disbillmast.Dmc_Cacr <> 'M'
                                 AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                 AND Disbillmast.Dmd_Date >=
-                                        TO_DATE ('${fromDate}',
+                                        TO_DATE (:fromDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND Disbillmast.Dmd_Date <=
-                                        TO_DATE ('${toDate}',
+                                        TO_DATE (:toDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -5762,10 +5762,10 @@ ORDER BY Pcc_Desc`;
                                 AND Disbillmast.Dmc_Cacr <> 'M'
                                 AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                 AND Disbillmast.Dmd_Date >=
-                                        TO_DATE ('${fromDate}',
+                                        TO_DATE (:fromDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND Disbillmast.Dmd_Date <=
-                                        TO_DATE ('${toDate}',
+                                        TO_DATE (:toDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -5794,10 +5794,10 @@ ORDER BY Pcc_Desc`;
                                 AND Disbillmast.Dmc_Cacr <> 'M'
                                 AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                 AND Disbillmast.Dmd_Date >=
-                                        TO_DATE ('${fromDate}',
+                                        TO_DATE (:fromDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND Disbillmast.Dmd_Date <=
-                                        TO_DATE ('${toDate}',
+                                        TO_DATE (:toDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -5826,10 +5826,10 @@ ORDER BY Pcc_Desc`;
                                 AND Disbillmast.Dmc_Cacr <> 'M'
                                 AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                 AND Disbillmast.Dmd_Date >=
-                                        TO_DATE ('${fromDate}',
+                                        TO_DATE (:fromDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND Disbillmast.Dmd_Date <=
-                                        TO_DATE ('${toDate}',
+                                        TO_DATE (:toDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -5858,10 +5858,10 @@ ORDER BY Pcc_Desc`;
                                 AND Disbillmast.Dmc_Cacr <> 'M'
                                 AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                 AND Disbillmast.Dmd_Date >=
-                                        TO_DATE ('${fromDate}',
+                                        TO_DATE (:fromDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND Disbillmast.Dmd_Date <=
-                                        TO_DATE ('${toDate}',
+                                        TO_DATE (:toDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -5890,10 +5890,10 @@ ORDER BY Pcc_Desc`;
                                 AND Disbillmast.Dmc_Cacr <> 'M'
                                 AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                 AND Disbillmast.Dmd_Date >=
-                                        TO_DATE ('${fromDate}',
+                                        TO_DATE (:fromDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND Disbillmast.Dmd_Date <=
-                                        TO_DATE ('${toDate}',
+                                        TO_DATE (:toDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -5923,10 +5923,10 @@ ORDER BY Pcc_Desc`;
                                 AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                 AND Disbillmast.Dmc_Cacr <> 'M'
                                 AND Disbillmast.Dmd_Date >=
-                                        TO_DATE ('${fromDate}',
+                                        TO_DATE (:fromDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND Disbillmast.Dmd_Date <=
-                                        TO_DATE ('${toDate}',
+                                        TO_DATE (:toDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 AND NVL (Patsurother.Src_Cancel, 'N') = 'N'
@@ -5954,10 +5954,10 @@ ORDER BY Pcc_Desc`;
                                 AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                 AND Disbillmast.Dmc_Cacr <> 'M'
                                 AND Disbillmast.Dmd_Date >=
-                                        TO_DATE ('${fromDate}',
+                                        TO_DATE (:fromDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND Disbillmast.Dmd_Date <=
-                                        TO_DATE ('${toDate}',
+                                        TO_DATE (:toDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 AND NVL (Patsurdetl.Src_Cancel, 'N') = 'N'
@@ -5985,10 +5985,10 @@ ORDER BY Pcc_Desc`;
                                 AND Canbillmast.Cmc_Cacr = 'I'
                                 AND Disbillmast.Dmc_Cacr <> 'M'
                                 AND Disbillmast.Dmd_Date >=
-                                        TO_DATE ('${fromDate}',
+                                        TO_DATE (:fromDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND Disbillmast.Dmd_Date <=
-                                        TO_DATE ('${toDate}',
+                                        TO_DATE (:toDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -6016,10 +6016,10 @@ ORDER BY Pcc_Desc`;
                                 AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                 AND Opbillmast.Opc_Cacr <> 'M'
                                 AND Opbillmast.Opd_Date >=
-                                        TO_DATE ('${fromDate}',
+                                        TO_DATE (:fromDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND Opbillmast.Opd_Date <=
-                                        TO_DATE ('${toDate}',
+                                        TO_DATE (:toDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -6047,10 +6047,10 @@ ORDER BY Pcc_Desc`;
                                 AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                 AND Opbillmast.Opc_Cacr <> 'M'
                                 AND Opbillmast.Opd_Date >=
-                                        TO_DATE ('${fromDate}',
+                                        TO_DATE (:fromDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND Opbillmast.Opd_Date <=
-                                        TO_DATE ('${toDate}',
+                                        TO_DATE (:toDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -6078,10 +6078,10 @@ ORDER BY Pcc_Desc`;
                                 AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                 AND Opbillmast.Opc_Cacr <> 'M'
                                 AND Opbillmast.Opd_Date >=
-                                        TO_DATE ('${fromDate}',
+                                        TO_DATE (:fromDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND Opbillmast.Opd_Date <=
-                                        TO_DATE ('${toDate}',
+                                        TO_DATE (:toDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -6109,10 +6109,10 @@ ORDER BY Pcc_Desc`;
                                 AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                 AND Opbillmast.Opc_Cacr <> 'M'
                                 AND Opbillmast.Opd_Date >=
-                                        TO_DATE ('${fromDate}',
+                                        TO_DATE (:fromDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND Opbillmast.Opd_Date <=
-                                        TO_DATE ('${toDate}',
+                                        TO_DATE (:toDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -6140,10 +6140,10 @@ ORDER BY Pcc_Desc`;
                                 AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                 AND Opbillmast.Opc_Cacr <> 'M'
                                 AND Opbillmast.Opd_Date >=
-                                        TO_DATE ('${fromDate}',
+                                        TO_DATE (:fromDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND Opbillmast.Opd_Date <=
-                                        TO_DATE ('${toDate}',
+                                        TO_DATE (:toDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -6171,10 +6171,10 @@ ORDER BY Pcc_Desc`;
                                 AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                 AND Opbillmast.Opc_Cacr <> 'M'
                                 AND Opbillmast.Opd_Date >=
-                                        TO_DATE ('${fromDate}',
+                                        TO_DATE (:fromDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND Opbillmast.Opd_Date <=
-                                        TO_DATE ('${toDate}',
+                                        TO_DATE (:toDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -6202,10 +6202,10 @@ ORDER BY Pcc_Desc`;
                                 AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                 AND Opbillmast.Opc_Cacr <> 'M'
                                 AND Opbillmast.Opd_Date >=
-                                        TO_DATE ('${fromDate}',
+                                        TO_DATE (:fromDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND Opbillmast.Opd_Date <=
-                                        TO_DATE ('${toDate}',
+                                        TO_DATE (:toDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -6233,10 +6233,10 @@ ORDER BY Pcc_Desc`;
                                 AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                 AND Opbillmast.Opc_Cacr <> 'M'
                                 AND Opbillmast.Opd_Date >=
-                                        TO_DATE ('${fromDate}',
+                                        TO_DATE (:fromDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND Opbillmast.Opd_Date <=
-                                        TO_DATE ('${toDate}',
+                                        TO_DATE (:toDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -6264,10 +6264,10 @@ ORDER BY Pcc_Desc`;
                                 AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                 AND Opbillmast.Opc_Cacr <> 'M'
                                 AND Opbillmast.Opd_Date >=
-                                        TO_DATE ('${fromDate}',
+                                        TO_DATE (:fromDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND Opbillmast.Opd_Date <=
-                                        TO_DATE ('${toDate}',
+                                        TO_DATE (:toDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -6297,10 +6297,10 @@ ORDER BY Pcc_Desc`;
                                 AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                 AND Opbillmast.Opc_Cacr <> 'M'
                                 AND Opbillmast.Opd_Date >=
-                                        TO_DATE ('${fromDate}',
+                                        TO_DATE (:fromDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND Opbillmast.Opd_Date <=
-                                        TO_DATE ('${toDate}',
+                                        TO_DATE (:toDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 AND NVL (Patsurother.Src_Cancel, 'N') = 'N'
@@ -6328,10 +6328,10 @@ ORDER BY Pcc_Desc`;
                                 AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                 AND Opbillmast.Opc_Cacr <> 'M'
                                 AND Opbillmast.Opd_Date >=
-                                        TO_DATE ('${fromDate}',
+                                        TO_DATE (:fromDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND Opbillmast.Opd_Date <=
-                                        TO_DATE ('${toDate}',
+                                        TO_DATE (:toDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 AND NVL (Patsurdetl.Src_Cancel, 'N') = 'N'
@@ -6360,10 +6360,10 @@ ORDER BY Pcc_Desc`;
                                 AND Receiptmast.RPC_COLLCNCODE IS NULL
                                 AND Receiptmast.Rpc_Cacr IN ('C', 'R')
                                 AND Receiptmast.Rpd_Date >=
-                                        TO_DATE ('${fromDate}',
+                                        TO_DATE (:fromDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND Receiptmast.Rpd_Date <=
-                                        TO_DATE ('${toDate}',
+                                        TO_DATE (:toDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -6391,10 +6391,10 @@ ORDER BY Pcc_Desc`;
                                 AND Receiptmast.RPC_COLLCNCODE IS NOT NULL
                                 AND Receiptmast.Rpc_Cacr IN ('C', 'R')
                                 AND Receiptmast.RPD_COLLDATE >=
-                                        TO_DATE ('${fromDate}',
+                                        TO_DATE (:fromDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND Receiptmast.RPD_COLLDATE <=
-                                        TO_DATE ('${toDate}',
+                                        TO_DATE (:toDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -6425,10 +6425,10 @@ ORDER BY Pcc_Desc`;
                                 AND Receiptmast.Rpc_Cacr = 'O'
                                 AND Opbillmast.Opc_cacr <> 'M'
                                 AND Opbillmast.Opd_Date >=
-                                        TO_DATE ('${fromDate}',
+                                        TO_DATE (:fromDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND Opbillmast.Opd_Date <=
-                                        TO_DATE ('${toDate}',
+                                        TO_DATE (:toDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         GROUP BY Procategory.Pc_code, Procategory.Pcc_Desc
@@ -6456,10 +6456,10 @@ ORDER BY Pcc_Desc`;
                                 AND Refundreceiptmast.RFC_RETCNCODE IS NULL
                                 AND Refundreceiptmast.Rfc_Cacr IN ('C', 'R')
                                 AND Refundreceiptdetl.Rfd_Date >=
-                                        TO_DATE ('${fromDate}',
+                                        TO_DATE (:fromDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND Refundreceiptdetl.Rfd_Date <=
-                                        TO_DATE ('${toDate}',
+                                        TO_DATE (:toDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND REFUNDRECEIPTMAST.MH_CODE IN
                                         (SELECT MH_CODE FROM multihospital)
@@ -6488,10 +6488,10 @@ ORDER BY Pcc_Desc`;
                                 AND Refundreceiptmast.Rfc_Cancel IS NULL
                                 AND Refundreceiptmast.Rfc_Cacr IN ('C', 'R')
                                 AND Refundreceiptmast.RFD_RETDATE >=
-                                        TO_DATE ('${fromDate}',
+                                        TO_DATE (:fromDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND Refundreceiptmast.RFD_RETDATE <=
-                                        TO_DATE ('${toDate}',
+                                        TO_DATE (:toDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND REFUNDRECEIPTMAST.MH_CODE IN
                                         (SELECT MH_CODE FROM multihospital)
@@ -6526,10 +6526,10 @@ ORDER BY Pcc_Desc`;
                                 AND REFUNDRECEIPTMAST.RFC_CAcr IN ('O')
                                 AND Opbillmast.Opc_Cacr <> 'M'
                                 AND Opbillmast.Opd_date >=
-                                        TO_DATE ('${fromDate}',
+                                        TO_DATE (:fromDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND Opbillmast.Opd_date <=
-                                        TO_DATE ('${toDate}',
+                                        TO_DATE (:toDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -6560,10 +6560,10 @@ ORDER BY Pcc_Desc`;
                                 AND NVL (Billmast.Bmc_Cancel, 'N') <> 'C'
                                 AND billmast.BMC_COLLCNCODE IS NULL
                                 AND Billmast.Bmd_Date >=
-                                        TO_DATE ('${fromDate}',
+                                        TO_DATE (:fromDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND Billmast.Bmd_Date <=
-                                        TO_DATE ('${toDate}',
+                                        TO_DATE (:toDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -6594,10 +6594,10 @@ ORDER BY Pcc_Desc`;
                                 AND Billmast.Bmc_Cacr IN ('C', 'R')
                                 AND NVL (Billmast.Bmc_Cancel, 'N') = 'N'
                                 AND Billmast.BMD_COLLDATE >=
-                                        TO_DATE ('${fromDate}',
+                                        TO_DATE (:fromDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND Billmast.BMD_COLLDATE <=
-                                        TO_DATE ('${toDate}',
+                                        TO_DATE (:toDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -6631,10 +6631,10 @@ ORDER BY Pcc_Desc`;
                                 AND NVL (Billmast.Bmc_Cancel, 'N') = 'N'
                                 AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                 AND Opbillmast.Opd_Date >=
-                                        TO_DATE ('${fromDate}',
+                                        TO_DATE (:fromDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND Opbillmast.Opd_Date <=
-                                        TO_DATE ('${toDate}',
+                                        TO_DATE (:toDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -6668,10 +6668,10 @@ ORDER BY Pcc_Desc`;
                                 AND NVL (Billmast.Bmc_Cancel, 'N') = 'N'
                                 AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                 AND Disbillmast.Dmd_Date >=
-                                        TO_DATE ('${fromDate}',
+                                        TO_DATE (:fromDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND Disbillmast.Dmd_Date <=
-                                        TO_DATE ('${toDate}',
+                                        TO_DATE (:toDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -6700,10 +6700,10 @@ ORDER BY Pcc_Desc`;
                                 AND NVL (Refundbillmast.Rfc_Cancel, 'N') <> 'C'
                                 AND Refundbillmast.Rfc_Cacr IN ('C', 'R')
                                 AND Refundbilldetl.Rfd_Date >=
-                                        TO_DATE ('${fromDate}',
+                                        TO_DATE (:fromDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND Refundbilldetl.Rfd_Date <=
-                                        TO_DATE ('${toDate}',
+                                        TO_DATE (:toDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -6737,10 +6737,10 @@ ORDER BY Pcc_Desc`;
                                 AND NVL (Refundbilldetl.Rfc_Cancel, 'N') = 'N'
                                 AND Opbillmast.Opc_Cacr <> 'M'
                                 AND Opbillmast.Opd_date >=
-                                        TO_DATE ('${fromDate}',
+                                        TO_DATE (:fromDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND Opbillmast.Opd_date <=
-                                        TO_DATE ('${toDate}',
+                                        TO_DATE (:toDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -6773,10 +6773,10 @@ ORDER BY Pcc_Desc`;
                                 AND Refundbillmast.Rfc_Cacr IN ('I')
                                 AND Disbillmast.Dmc_Cacr <> 'M'
                                 AND Disbillmast.dmd_date >=
-                                        TO_DATE ('${fromDate}',
+                                        TO_DATE (:fromDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND Disbillmast.dmd_date <=
-                                        TO_DATE ('${toDate}',
+                                        TO_DATE (:toDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -6799,17 +6799,17 @@ ORDER BY Pcc_Desc`;
                                 AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                 AND Disbillmast.Dmc_Cacr <> 'M'
                                 AND Disbillmast.dmd_date >=
-                                        TO_DATE ('${fromDate}',
+                                        TO_DATE (:fromDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                                 AND Disbillmast.dmd_date <=
-                                        TO_DATE ('${toDate}',
+                                        TO_DATE (:toDate,
                                                 'dd/MM/yyyy hh24:mi:ss')
                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc)
                 GROUP BY Code, Pcc_Desc
                 HAVING SUM (Amt) <> 0
                 ORDER BY Pcc_Desc`;
     try {
-      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(sql, {fromDate, toDate}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       //       callBack(null, );
       return result.rows;
     } catch (error) {
@@ -6849,10 +6849,10 @@ ORDER BY Pcc_Desc`;
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Misincexpdtl.Dg_Grcode = 22
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -6878,10 +6878,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Vsc_Cancel, 'N') = 'N'
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -6904,10 +6904,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -6936,10 +6936,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (disroomdetl.dmc_cancel, 'N') = 'N'
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.DMD_DATE >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND disbillmast.dmd_date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -6963,10 +6963,10 @@ ORDER BY Pcc_Desc`;
                                         AND Iprefundmast.Ric_Cacr IN ('C', 'R')
                                         AND NVL (Iprefundmast.Ric_Cancel, 'N') = 'N'
                                         AND Iprefundmast.Rid_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Iprefundmast.Rid_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND IPREFUNDMAST.MH_CODE IN
                                                 (SELECT MH_CODE FROM multihospital)
@@ -6996,10 +6996,10 @@ ORDER BY Pcc_Desc`;
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -7028,10 +7028,10 @@ ORDER BY Pcc_Desc`;
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -7060,10 +7060,10 @@ ORDER BY Pcc_Desc`;
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -7092,10 +7092,10 @@ ORDER BY Pcc_Desc`;
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -7124,10 +7124,10 @@ ORDER BY Pcc_Desc`;
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -7156,10 +7156,10 @@ ORDER BY Pcc_Desc`;
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -7188,10 +7188,10 @@ ORDER BY Pcc_Desc`;
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -7220,10 +7220,10 @@ ORDER BY Pcc_Desc`;
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -7252,10 +7252,10 @@ ORDER BY Pcc_Desc`;
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -7285,10 +7285,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         AND NVL (Patsurother.Src_Cancel, 'N') = 'N'
@@ -7316,10 +7316,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         AND NVL (Patsurdetl.Src_Cancel, 'N') = 'N'
@@ -7347,10 +7347,10 @@ ORDER BY Pcc_Desc`;
                                         AND Canbillmast.Cmc_Cacr = 'I'
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -7378,10 +7378,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -7409,10 +7409,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -7440,10 +7440,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -7471,10 +7471,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -7502,10 +7502,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -7533,10 +7533,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -7564,10 +7564,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -7595,10 +7595,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -7626,10 +7626,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -7659,10 +7659,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         AND NVL (Patsurother.Src_Cancel, 'N') = 'N'
@@ -7690,10 +7690,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         AND NVL (Patsurdetl.Src_Cancel, 'N') = 'N'
@@ -7722,10 +7722,10 @@ ORDER BY Pcc_Desc`;
                                         AND Receiptmast.RPC_COLLCNCODE IS NULL
                                         AND Receiptmast.Rpc_Cacr IN ('C', 'R')
                                         AND Receiptmast.Rpd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Receiptmast.Rpd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -7753,10 +7753,10 @@ ORDER BY Pcc_Desc`;
                                         AND Receiptmast.RPC_COLLCNCODE IS NOT NULL
                                         AND Receiptmast.Rpc_Cacr IN ('C', 'R')
                                         AND Receiptmast.RPD_COLLDATE >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Receiptmast.RPD_COLLDATE <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -7787,10 +7787,10 @@ ORDER BY Pcc_Desc`;
                                         AND Receiptmast.Rpc_Cacr = 'O'
                                         AND Opbillmast.Opc_cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_code, Procategory.Pcc_Desc
@@ -7818,10 +7818,10 @@ ORDER BY Pcc_Desc`;
                                         AND Refundreceiptmast.RFC_RETCNCODE IS NULL
                                         AND Refundreceiptmast.Rfc_Cacr IN ('C', 'R')
                                         AND Refundreceiptdetl.Rfd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Refundreceiptdetl.Rfd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND REFUNDRECEIPTMAST.MH_CODE IN
                                                 (SELECT MH_CODE FROM multihospital)
@@ -7850,10 +7850,10 @@ ORDER BY Pcc_Desc`;
                                         AND Refundreceiptmast.Rfc_Cancel IS NULL
                                         AND Refundreceiptmast.Rfc_Cacr IN ('C', 'R')
                                         AND Refundreceiptmast.RFD_RETDATE >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Refundreceiptmast.RFD_RETDATE <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND REFUNDRECEIPTMAST.MH_CODE IN
                                                 (SELECT MH_CODE FROM multihospital)
@@ -7888,10 +7888,10 @@ ORDER BY Pcc_Desc`;
                                         AND REFUNDRECEIPTMAST.RFC_CAcr IN ('O')
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -7922,10 +7922,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Billmast.Bmc_Cancel, 'N') <> 'C'
                                         AND billmast.BMC_COLLCNCODE IS NULL
                                         AND Billmast.Bmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Billmast.Bmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -7956,10 +7956,10 @@ ORDER BY Pcc_Desc`;
                                         AND Billmast.Bmc_Cacr IN ('C', 'R')
                                         AND NVL (Billmast.Bmc_Cancel, 'N') = 'N'
                                         AND Billmast.BMD_COLLDATE >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Billmast.BMD_COLLDATE <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -7993,10 +7993,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Billmast.Bmc_Cancel, 'N') = 'N'
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -8030,10 +8030,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Billmast.Bmc_Cancel, 'N') = 'N'
                                         AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -8062,10 +8062,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Refundbillmast.Rfc_Cancel, 'N') <> 'C'
                                         AND Refundbillmast.Rfc_Cacr IN ('C', 'R')
                                         AND Refundbilldetl.Rfd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Refundbilldetl.Rfd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -8099,10 +8099,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Refundbilldetl.Rfc_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -8135,10 +8135,10 @@ ORDER BY Pcc_Desc`;
                                         AND Refundbillmast.Rfc_Cacr IN ('I')
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.dmd_date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.dmd_date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -8161,10 +8161,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.dmd_date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.dmd_date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc)
                         GROUP BY Code, Pcc_Desc
@@ -8172,7 +8172,7 @@ ORDER BY Pcc_Desc`;
                         ORDER BY Pcc_Desc`;
 
     try {
-      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(sql, {fromDate, toDate}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       //       callBack(null, );
       return result.rows;
     } catch (error) {
@@ -8212,10 +8212,10 @@ ORDER BY Pcc_Desc`;
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Misincexpdtl.Dg_Grcode = 20
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -8241,10 +8241,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Vsc_Cancel, 'N') = 'N'
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -8267,10 +8267,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -8299,10 +8299,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (disroomdetl.dmc_cancel, 'N') = 'N'
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.DMD_DATE >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND disbillmast.dmd_date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -8326,10 +8326,10 @@ ORDER BY Pcc_Desc`;
                                         AND Iprefundmast.Ric_Cacr IN ('C', 'R')
                                         AND NVL (Iprefundmast.Ric_Cancel, 'N') = 'N'
                                         AND Iprefundmast.Rid_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Iprefundmast.Rid_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND IPREFUNDMAST.MH_CODE IN
                                                 (SELECT MH_CODE FROM multihospital)
@@ -8359,10 +8359,10 @@ ORDER BY Pcc_Desc`;
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -8391,10 +8391,10 @@ ORDER BY Pcc_Desc`;
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -8423,10 +8423,10 @@ ORDER BY Pcc_Desc`;
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -8455,10 +8455,10 @@ ORDER BY Pcc_Desc`;
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -8487,10 +8487,10 @@ ORDER BY Pcc_Desc`;
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -8519,10 +8519,10 @@ ORDER BY Pcc_Desc`;
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -8551,10 +8551,10 @@ ORDER BY Pcc_Desc`;
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -8583,10 +8583,10 @@ ORDER BY Pcc_Desc`;
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -8615,10 +8615,10 @@ ORDER BY Pcc_Desc`;
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -8648,10 +8648,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         AND NVL (Patsurother.Src_Cancel, 'N') = 'N'
@@ -8679,10 +8679,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         AND NVL (Patsurdetl.Src_Cancel, 'N') = 'N'
@@ -8710,10 +8710,10 @@ ORDER BY Pcc_Desc`;
                                         AND Canbillmast.Cmc_Cacr = 'I'
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -8741,10 +8741,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -8772,10 +8772,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -8803,10 +8803,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -8834,10 +8834,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -8865,10 +8865,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -8896,10 +8896,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -8927,10 +8927,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -8958,10 +8958,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -8989,10 +8989,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -9022,10 +9022,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         AND NVL (Patsurother.Src_Cancel, 'N') = 'N'
@@ -9053,10 +9053,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         AND NVL (Patsurdetl.Src_Cancel, 'N') = 'N'
@@ -9085,10 +9085,10 @@ ORDER BY Pcc_Desc`;
                                         AND Receiptmast.RPC_COLLCNCODE IS NULL
                                         AND Receiptmast.Rpc_Cacr IN ('C', 'R')
                                         AND Receiptmast.Rpd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Receiptmast.Rpd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -9116,10 +9116,10 @@ ORDER BY Pcc_Desc`;
                                         AND Receiptmast.RPC_COLLCNCODE IS NOT NULL
                                         AND Receiptmast.Rpc_Cacr IN ('C', 'R')
                                         AND Receiptmast.RPD_COLLDATE >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Receiptmast.RPD_COLLDATE <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -9150,10 +9150,10 @@ ORDER BY Pcc_Desc`;
                                         AND Receiptmast.Rpc_Cacr = 'O'
                                         AND Opbillmast.Opc_cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_code, Procategory.Pcc_Desc
@@ -9181,10 +9181,10 @@ ORDER BY Pcc_Desc`;
                                         AND Refundreceiptmast.RFC_RETCNCODE IS NULL
                                         AND Refundreceiptmast.Rfc_Cacr IN ('C', 'R')
                                         AND Refundreceiptdetl.Rfd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Refundreceiptdetl.Rfd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND REFUNDRECEIPTMAST.MH_CODE IN
                                                 (SELECT MH_CODE FROM multihospital)
@@ -9213,10 +9213,10 @@ ORDER BY Pcc_Desc`;
                                         AND Refundreceiptmast.Rfc_Cancel IS NULL
                                         AND Refundreceiptmast.Rfc_Cacr IN ('C', 'R')
                                         AND Refundreceiptmast.RFD_RETDATE >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Refundreceiptmast.RFD_RETDATE <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND REFUNDRECEIPTMAST.MH_CODE IN
                                                 (SELECT MH_CODE FROM multihospital)
@@ -9251,10 +9251,10 @@ ORDER BY Pcc_Desc`;
                                         AND REFUNDRECEIPTMAST.RFC_CAcr IN ('O')
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -9285,10 +9285,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Billmast.Bmc_Cancel, 'N') <> 'C'
                                         AND billmast.BMC_COLLCNCODE IS NULL
                                         AND Billmast.Bmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Billmast.Bmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -9319,10 +9319,10 @@ ORDER BY Pcc_Desc`;
                                         AND Billmast.Bmc_Cacr IN ('C', 'R')
                                         AND NVL (Billmast.Bmc_Cancel, 'N') = 'N'
                                         AND Billmast.BMD_COLLDATE >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Billmast.BMD_COLLDATE <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -9356,10 +9356,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Billmast.Bmc_Cancel, 'N') = 'N'
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -9393,10 +9393,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Billmast.Bmc_Cancel, 'N') = 'N'
                                         AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -9425,10 +9425,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Refundbillmast.Rfc_Cancel, 'N') <> 'C'
                                         AND Refundbillmast.Rfc_Cacr IN ('C', 'R')
                                         AND Refundbilldetl.Rfd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Refundbilldetl.Rfd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -9462,10 +9462,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Refundbilldetl.Rfc_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -9498,10 +9498,10 @@ ORDER BY Pcc_Desc`;
                                         AND Refundbillmast.Rfc_Cacr IN ('I')
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.dmd_date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.dmd_date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -9524,17 +9524,17 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.dmd_date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.dmd_date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc)
                         GROUP BY Code, Pcc_Desc
                         HAVING SUM (Amt) <> 0
                         ORDER BY Pcc_Desc`;
     try {
-      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(sql, {fromDate, toDate}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       //       callBack(null, );
       return result.rows;
     } catch (error) {
@@ -9574,10 +9574,10 @@ ORDER BY Pcc_Desc`;
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Misincexpdtl.Dg_Grcode = 19
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -9603,10 +9603,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Vsc_Cancel, 'N') = 'N'
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -9629,10 +9629,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -9661,10 +9661,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (disroomdetl.dmc_cancel, 'N') = 'N'
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.DMD_DATE >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND disbillmast.dmd_date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -9688,10 +9688,10 @@ ORDER BY Pcc_Desc`;
                                         AND Iprefundmast.Ric_Cacr IN ('C', 'R')
                                         AND NVL (Iprefundmast.Ric_Cancel, 'N') = 'N'
                                         AND Iprefundmast.Rid_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Iprefundmast.Rid_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND IPREFUNDMAST.MH_CODE IN
                                                 (SELECT MH_CODE FROM multihospital)
@@ -9721,10 +9721,10 @@ ORDER BY Pcc_Desc`;
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -9753,10 +9753,10 @@ ORDER BY Pcc_Desc`;
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -9785,10 +9785,10 @@ ORDER BY Pcc_Desc`;
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -9817,10 +9817,10 @@ ORDER BY Pcc_Desc`;
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -9849,10 +9849,10 @@ ORDER BY Pcc_Desc`;
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -9881,10 +9881,10 @@ ORDER BY Pcc_Desc`;
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -9913,10 +9913,10 @@ ORDER BY Pcc_Desc`;
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -9945,10 +9945,10 @@ ORDER BY Pcc_Desc`;
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -9977,10 +9977,10 @@ ORDER BY Pcc_Desc`;
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -10010,10 +10010,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         AND NVL (Patsurother.Src_Cancel, 'N') = 'N'
@@ -10041,10 +10041,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         AND NVL (Patsurdetl.Src_Cancel, 'N') = 'N'
@@ -10072,10 +10072,10 @@ ORDER BY Pcc_Desc`;
                                         AND Canbillmast.Cmc_Cacr = 'I'
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -10103,10 +10103,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -10134,10 +10134,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -10165,10 +10165,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -10196,10 +10196,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -10227,10 +10227,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -10258,10 +10258,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -10289,10 +10289,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -10320,10 +10320,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -10351,10 +10351,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -10384,10 +10384,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         AND NVL (Patsurother.Src_Cancel, 'N') = 'N'
@@ -10415,10 +10415,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         AND NVL (Patsurdetl.Src_Cancel, 'N') = 'N'
@@ -10447,10 +10447,10 @@ ORDER BY Pcc_Desc`;
                                         AND Receiptmast.RPC_COLLCNCODE IS NULL
                                         AND Receiptmast.Rpc_Cacr IN ('C', 'R')
                                         AND Receiptmast.Rpd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Receiptmast.Rpd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -10478,10 +10478,10 @@ ORDER BY Pcc_Desc`;
                                         AND Receiptmast.RPC_COLLCNCODE IS NOT NULL
                                         AND Receiptmast.Rpc_Cacr IN ('C', 'R')
                                         AND Receiptmast.RPD_COLLDATE >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Receiptmast.RPD_COLLDATE <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -10512,10 +10512,10 @@ ORDER BY Pcc_Desc`;
                                         AND Receiptmast.Rpc_Cacr = 'O'
                                         AND Opbillmast.Opc_cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_code, Procategory.Pcc_Desc
@@ -10543,10 +10543,10 @@ ORDER BY Pcc_Desc`;
                                         AND Refundreceiptmast.RFC_RETCNCODE IS NULL
                                         AND Refundreceiptmast.Rfc_Cacr IN ('C', 'R')
                                         AND Refundreceiptdetl.Rfd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Refundreceiptdetl.Rfd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND REFUNDRECEIPTMAST.MH_CODE IN
                                                 (SELECT MH_CODE FROM multihospital)
@@ -10575,10 +10575,10 @@ ORDER BY Pcc_Desc`;
                                         AND Refundreceiptmast.Rfc_Cancel IS NULL
                                         AND Refundreceiptmast.Rfc_Cacr IN ('C', 'R')
                                         AND Refundreceiptmast.RFD_RETDATE >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Refundreceiptmast.RFD_RETDATE <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND REFUNDRECEIPTMAST.MH_CODE IN
                                                 (SELECT MH_CODE FROM multihospital)
@@ -10613,10 +10613,10 @@ ORDER BY Pcc_Desc`;
                                         AND REFUNDRECEIPTMAST.RFC_CAcr IN ('O')
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -10647,10 +10647,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Billmast.Bmc_Cancel, 'N') <> 'C'
                                         AND billmast.BMC_COLLCNCODE IS NULL
                                         AND Billmast.Bmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Billmast.Bmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -10681,10 +10681,10 @@ ORDER BY Pcc_Desc`;
                                         AND Billmast.Bmc_Cacr IN ('C', 'R')
                                         AND NVL (Billmast.Bmc_Cancel, 'N') = 'N'
                                         AND Billmast.BMD_COLLDATE >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Billmast.BMD_COLLDATE <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -10718,10 +10718,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Billmast.Bmc_Cancel, 'N') = 'N'
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -10755,10 +10755,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Billmast.Bmc_Cancel, 'N') = 'N'
                                         AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -10787,10 +10787,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Refundbillmast.Rfc_Cancel, 'N') <> 'C'
                                         AND Refundbillmast.Rfc_Cacr IN ('C', 'R')
                                         AND Refundbilldetl.Rfd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Refundbilldetl.Rfd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -10824,10 +10824,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Refundbilldetl.Rfc_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -10860,10 +10860,10 @@ ORDER BY Pcc_Desc`;
                                         AND Refundbillmast.Rfc_Cacr IN ('I')
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.dmd_date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.dmd_date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -10886,10 +10886,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.dmd_date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.dmd_date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc)
                         GROUP BY Code, Pcc_Desc
@@ -10897,7 +10897,7 @@ ORDER BY Pcc_Desc`;
                         ORDER BY Pcc_Desc`;
 
     try {
-      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(sql, {fromDate, toDate}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       //       callBack(null, );
       return result.rows;
     } catch (error) {
@@ -10937,10 +10937,10 @@ ORDER BY Pcc_Desc`;
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Misincexpdtl.Dg_Grcode = 4
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -10966,10 +10966,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Vsc_Cancel, 'N') = 'N'
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -10992,10 +10992,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -11024,10 +11024,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (disroomdetl.dmc_cancel, 'N') = 'N'
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.DMD_DATE >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND disbillmast.dmd_date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -11051,10 +11051,10 @@ ORDER BY Pcc_Desc`;
                                         AND Iprefundmast.Ric_Cacr IN ('C', 'R')
                                         AND NVL (Iprefundmast.Ric_Cancel, 'N') = 'N'
                                         AND Iprefundmast.Rid_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Iprefundmast.Rid_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND IPREFUNDMAST.MH_CODE IN
                                                 (SELECT MH_CODE FROM multihospital)
@@ -11084,10 +11084,10 @@ ORDER BY Pcc_Desc`;
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -11116,10 +11116,10 @@ ORDER BY Pcc_Desc`;
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -11148,10 +11148,10 @@ ORDER BY Pcc_Desc`;
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -11180,10 +11180,10 @@ ORDER BY Pcc_Desc`;
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -11212,10 +11212,10 @@ ORDER BY Pcc_Desc`;
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -11244,10 +11244,10 @@ ORDER BY Pcc_Desc`;
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -11276,10 +11276,10 @@ ORDER BY Pcc_Desc`;
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -11308,10 +11308,10 @@ ORDER BY Pcc_Desc`;
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -11340,10 +11340,10 @@ ORDER BY Pcc_Desc`;
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -11373,10 +11373,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         AND NVL (Patsurother.Src_Cancel, 'N') = 'N'
@@ -11404,10 +11404,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         AND NVL (Patsurdetl.Src_Cancel, 'N') = 'N'
@@ -11435,10 +11435,10 @@ ORDER BY Pcc_Desc`;
                                         AND Canbillmast.Cmc_Cacr = 'I'
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -11466,10 +11466,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -11497,10 +11497,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -11528,10 +11528,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -11559,10 +11559,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -11590,10 +11590,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -11621,10 +11621,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -11652,10 +11652,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -11683,10 +11683,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -11714,10 +11714,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -11747,10 +11747,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         AND NVL (Patsurother.Src_Cancel, 'N') = 'N'
@@ -11778,10 +11778,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         AND NVL (Patsurdetl.Src_Cancel, 'N') = 'N'
@@ -11810,10 +11810,10 @@ ORDER BY Pcc_Desc`;
                                         AND Receiptmast.RPC_COLLCNCODE IS NULL
                                         AND Receiptmast.Rpc_Cacr IN ('C', 'R')
                                         AND Receiptmast.Rpd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Receiptmast.Rpd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -11841,10 +11841,10 @@ ORDER BY Pcc_Desc`;
                                         AND Receiptmast.RPC_COLLCNCODE IS NOT NULL
                                         AND Receiptmast.Rpc_Cacr IN ('C', 'R')
                                         AND Receiptmast.RPD_COLLDATE >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Receiptmast.RPD_COLLDATE <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -11875,10 +11875,10 @@ ORDER BY Pcc_Desc`;
                                         AND Receiptmast.Rpc_Cacr = 'O'
                                         AND Opbillmast.Opc_cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_code, Procategory.Pcc_Desc
@@ -11906,10 +11906,10 @@ ORDER BY Pcc_Desc`;
                                         AND Refundreceiptmast.RFC_RETCNCODE IS NULL
                                         AND Refundreceiptmast.Rfc_Cacr IN ('C', 'R')
                                         AND Refundreceiptdetl.Rfd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Refundreceiptdetl.Rfd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND REFUNDRECEIPTMAST.MH_CODE IN
                                                 (SELECT MH_CODE FROM multihospital)
@@ -11938,10 +11938,10 @@ ORDER BY Pcc_Desc`;
                                         AND Refundreceiptmast.Rfc_Cancel IS NULL
                                         AND Refundreceiptmast.Rfc_Cacr IN ('C', 'R')
                                         AND Refundreceiptmast.RFD_RETDATE >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Refundreceiptmast.RFD_RETDATE <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND REFUNDRECEIPTMAST.MH_CODE IN
                                                 (SELECT MH_CODE FROM multihospital)
@@ -11976,10 +11976,10 @@ ORDER BY Pcc_Desc`;
                                         AND REFUNDRECEIPTMAST.RFC_CAcr IN ('O')
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -12010,10 +12010,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Billmast.Bmc_Cancel, 'N') <> 'C'
                                         AND billmast.BMC_COLLCNCODE IS NULL
                                         AND Billmast.Bmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Billmast.Bmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -12044,10 +12044,10 @@ ORDER BY Pcc_Desc`;
                                         AND Billmast.Bmc_Cacr IN ('C', 'R')
                                         AND NVL (Billmast.Bmc_Cancel, 'N') = 'N'
                                         AND Billmast.BMD_COLLDATE >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Billmast.BMD_COLLDATE <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -12081,10 +12081,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Billmast.Bmc_Cancel, 'N') = 'N'
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -12118,10 +12118,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Billmast.Bmc_Cancel, 'N') = 'N'
                                         AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -12150,10 +12150,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Refundbillmast.Rfc_Cancel, 'N') <> 'C'
                                         AND Refundbillmast.Rfc_Cacr IN ('C', 'R')
                                         AND Refundbilldetl.Rfd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Refundbilldetl.Rfd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -12187,10 +12187,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Refundbilldetl.Rfc_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -12223,10 +12223,10 @@ ORDER BY Pcc_Desc`;
                                         AND Refundbillmast.Rfc_Cacr IN ('I')
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.dmd_date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.dmd_date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -12249,17 +12249,17 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.dmd_date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.dmd_date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc)
                         GROUP BY Code, Pcc_Desc
                         HAVING SUM (Amt) <> 0
                         ORDER BY Pcc_Desc`;
     try {
-      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(sql, {fromDate, toDate}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       //       callBack(null, );
       return result.rows;
     } catch (error) {
@@ -12299,10 +12299,10 @@ ORDER BY Pcc_Desc`;
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Misincexpdtl.Dg_Grcode = 6
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -12328,10 +12328,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Vsc_Cancel, 'N') = 'N'
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -12354,10 +12354,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -12386,10 +12386,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (disroomdetl.dmc_cancel, 'N') = 'N'
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.DMD_DATE >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND disbillmast.dmd_date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -12413,10 +12413,10 @@ ORDER BY Pcc_Desc`;
                                         AND Iprefundmast.Ric_Cacr IN ('C', 'R')
                                         AND NVL (Iprefundmast.Ric_Cancel, 'N') = 'N'
                                         AND Iprefundmast.Rid_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Iprefundmast.Rid_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND IPREFUNDMAST.MH_CODE IN
                                                 (SELECT MH_CODE FROM multihospital)
@@ -12446,10 +12446,10 @@ ORDER BY Pcc_Desc`;
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -12478,10 +12478,10 @@ ORDER BY Pcc_Desc`;
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -12510,10 +12510,10 @@ ORDER BY Pcc_Desc`;
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -12542,10 +12542,10 @@ ORDER BY Pcc_Desc`;
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -12574,10 +12574,10 @@ ORDER BY Pcc_Desc`;
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -12606,10 +12606,10 @@ ORDER BY Pcc_Desc`;
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -12638,10 +12638,10 @@ ORDER BY Pcc_Desc`;
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -12670,10 +12670,10 @@ ORDER BY Pcc_Desc`;
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -12702,10 +12702,10 @@ ORDER BY Pcc_Desc`;
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -12735,10 +12735,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         AND NVL (Patsurother.Src_Cancel, 'N') = 'N'
@@ -12766,10 +12766,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         AND NVL (Patsurdetl.Src_Cancel, 'N') = 'N'
@@ -12797,10 +12797,10 @@ ORDER BY Pcc_Desc`;
                                         AND Canbillmast.Cmc_Cacr = 'I'
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -12828,10 +12828,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -12859,10 +12859,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -12890,10 +12890,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -12921,10 +12921,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -12952,10 +12952,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -12983,10 +12983,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -13014,10 +13014,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -13045,10 +13045,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -13076,10 +13076,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -13109,10 +13109,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         AND NVL (Patsurother.Src_Cancel, 'N') = 'N'
@@ -13140,10 +13140,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         AND NVL (Patsurdetl.Src_Cancel, 'N') = 'N'
@@ -13172,10 +13172,10 @@ ORDER BY Pcc_Desc`;
                                         AND Receiptmast.RPC_COLLCNCODE IS NULL
                                         AND Receiptmast.Rpc_Cacr IN ('C', 'R')
                                         AND Receiptmast.Rpd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Receiptmast.Rpd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -13203,10 +13203,10 @@ ORDER BY Pcc_Desc`;
                                         AND Receiptmast.RPC_COLLCNCODE IS NOT NULL
                                         AND Receiptmast.Rpc_Cacr IN ('C', 'R')
                                         AND Receiptmast.RPD_COLLDATE >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Receiptmast.RPD_COLLDATE <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -13237,10 +13237,10 @@ ORDER BY Pcc_Desc`;
                                         AND Receiptmast.Rpc_Cacr = 'O'
                                         AND Opbillmast.Opc_cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_code, Procategory.Pcc_Desc
@@ -13268,10 +13268,10 @@ ORDER BY Pcc_Desc`;
                                         AND Refundreceiptmast.RFC_RETCNCODE IS NULL
                                         AND Refundreceiptmast.Rfc_Cacr IN ('C', 'R')
                                         AND Refundreceiptdetl.Rfd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Refundreceiptdetl.Rfd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND REFUNDRECEIPTMAST.MH_CODE IN
                                                 (SELECT MH_CODE FROM multihospital)
@@ -13300,10 +13300,10 @@ ORDER BY Pcc_Desc`;
                                         AND Refundreceiptmast.Rfc_Cancel IS NULL
                                         AND Refundreceiptmast.Rfc_Cacr IN ('C', 'R')
                                         AND Refundreceiptmast.RFD_RETDATE >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Refundreceiptmast.RFD_RETDATE <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND REFUNDRECEIPTMAST.MH_CODE IN
                                                 (SELECT MH_CODE FROM multihospital)
@@ -13338,10 +13338,10 @@ ORDER BY Pcc_Desc`;
                                         AND REFUNDRECEIPTMAST.RFC_CAcr IN ('O')
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -13372,10 +13372,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Billmast.Bmc_Cancel, 'N') <> 'C'
                                         AND billmast.BMC_COLLCNCODE IS NULL
                                         AND Billmast.Bmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Billmast.Bmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -13406,10 +13406,10 @@ ORDER BY Pcc_Desc`;
                                         AND Billmast.Bmc_Cacr IN ('C', 'R')
                                         AND NVL (Billmast.Bmc_Cancel, 'N') = 'N'
                                         AND Billmast.BMD_COLLDATE >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Billmast.BMD_COLLDATE <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -13443,10 +13443,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Billmast.Bmc_Cancel, 'N') = 'N'
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -13480,10 +13480,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Billmast.Bmc_Cancel, 'N') = 'N'
                                         AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -13512,10 +13512,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Refundbillmast.Rfc_Cancel, 'N') <> 'C'
                                         AND Refundbillmast.Rfc_Cacr IN ('C', 'R')
                                         AND Refundbilldetl.Rfd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Refundbilldetl.Rfd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -13549,10 +13549,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Refundbilldetl.Rfc_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -13585,10 +13585,10 @@ ORDER BY Pcc_Desc`;
                                         AND Refundbillmast.Rfc_Cacr IN ('I')
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.dmd_date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.dmd_date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -13611,10 +13611,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.dmd_date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.dmd_date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc)
                         GROUP BY Code, Pcc_Desc
@@ -13622,7 +13622,7 @@ ORDER BY Pcc_Desc`;
                         ORDER BY Pcc_Desc`;
 
     try {
-      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(sql, {fromDate, toDate}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       //       callBack(null, );
       return result.rows;
     } catch (error) {
@@ -13662,10 +13662,10 @@ ORDER BY Pcc_Desc`;
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Misincexpdtl.Dg_Grcode = 8
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -13691,10 +13691,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Vsc_Cancel, 'N') = 'N'
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -13717,10 +13717,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -13749,10 +13749,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (disroomdetl.dmc_cancel, 'N') = 'N'
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.DMD_DATE >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND disbillmast.dmd_date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -13776,10 +13776,10 @@ ORDER BY Pcc_Desc`;
                                         AND Iprefundmast.Ric_Cacr IN ('C', 'R')
                                         AND NVL (Iprefundmast.Ric_Cancel, 'N') = 'N'
                                         AND Iprefundmast.Rid_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Iprefundmast.Rid_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND IPREFUNDMAST.MH_CODE IN
                                                 (SELECT MH_CODE FROM multihospital)
@@ -13809,10 +13809,10 @@ ORDER BY Pcc_Desc`;
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -13841,10 +13841,10 @@ ORDER BY Pcc_Desc`;
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -13873,10 +13873,10 @@ ORDER BY Pcc_Desc`;
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -13905,10 +13905,10 @@ ORDER BY Pcc_Desc`;
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -13937,10 +13937,10 @@ ORDER BY Pcc_Desc`;
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -13969,10 +13969,10 @@ ORDER BY Pcc_Desc`;
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -14001,10 +14001,10 @@ ORDER BY Pcc_Desc`;
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -14033,10 +14033,10 @@ ORDER BY Pcc_Desc`;
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -14065,10 +14065,10 @@ ORDER BY Pcc_Desc`;
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -14098,10 +14098,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         AND NVL (Patsurother.Src_Cancel, 'N') = 'N'
@@ -14129,10 +14129,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         AND NVL (Patsurdetl.Src_Cancel, 'N') = 'N'
@@ -14160,10 +14160,10 @@ ORDER BY Pcc_Desc`;
                                         AND Canbillmast.Cmc_Cacr = 'I'
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -14191,10 +14191,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -14222,10 +14222,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -14253,10 +14253,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -14284,10 +14284,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -14315,10 +14315,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -14346,10 +14346,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -14377,10 +14377,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -14408,10 +14408,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -14439,10 +14439,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -14472,10 +14472,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         AND NVL (Patsurother.Src_Cancel, 'N') = 'N'
@@ -14503,10 +14503,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         AND NVL (Patsurdetl.Src_Cancel, 'N') = 'N'
@@ -14535,10 +14535,10 @@ ORDER BY Pcc_Desc`;
                                         AND Receiptmast.RPC_COLLCNCODE IS NULL
                                         AND Receiptmast.Rpc_Cacr IN ('C', 'R')
                                         AND Receiptmast.Rpd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Receiptmast.Rpd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -14566,10 +14566,10 @@ ORDER BY Pcc_Desc`;
                                         AND Receiptmast.RPC_COLLCNCODE IS NOT NULL
                                         AND Receiptmast.Rpc_Cacr IN ('C', 'R')
                                         AND Receiptmast.RPD_COLLDATE >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Receiptmast.RPD_COLLDATE <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -14600,10 +14600,10 @@ ORDER BY Pcc_Desc`;
                                         AND Receiptmast.Rpc_Cacr = 'O'
                                         AND Opbillmast.Opc_cacr <> 'M'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_code, Procategory.Pcc_Desc
@@ -14631,10 +14631,10 @@ ORDER BY Pcc_Desc`;
                                         AND Refundreceiptmast.RFC_RETCNCODE IS NULL
                                         AND Refundreceiptmast.Rfc_Cacr IN ('C', 'R')
                                         AND Refundreceiptdetl.Rfd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Refundreceiptdetl.Rfd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND REFUNDRECEIPTMAST.MH_CODE IN
                                                 (SELECT MH_CODE FROM multihospital)
@@ -14663,10 +14663,10 @@ ORDER BY Pcc_Desc`;
                                         AND Refundreceiptmast.Rfc_Cancel IS NULL
                                         AND Refundreceiptmast.Rfc_Cacr IN ('C', 'R')
                                         AND Refundreceiptmast.RFD_RETDATE >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Refundreceiptmast.RFD_RETDATE <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND REFUNDRECEIPTMAST.MH_CODE IN
                                                 (SELECT MH_CODE FROM multihospital)
@@ -14701,10 +14701,10 @@ ORDER BY Pcc_Desc`;
                                         AND REFUNDRECEIPTMAST.RFC_CAcr IN ('O')
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -14735,10 +14735,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Billmast.Bmc_Cancel, 'N') <> 'C'
                                         AND billmast.BMC_COLLCNCODE IS NULL
                                         AND Billmast.Bmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Billmast.Bmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -14769,10 +14769,10 @@ ORDER BY Pcc_Desc`;
                                         AND Billmast.Bmc_Cacr IN ('C', 'R')
                                         AND NVL (Billmast.Bmc_Cancel, 'N') = 'N'
                                         AND Billmast.BMD_COLLDATE >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Billmast.BMD_COLLDATE <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -14806,10 +14806,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Billmast.Bmc_Cancel, 'N') = 'N'
                                         AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -14843,10 +14843,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Billmast.Bmc_Cancel, 'N') = 'N'
                                         AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                         AND Disbillmast.Dmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.Dmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -14875,10 +14875,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Refundbillmast.Rfc_Cancel, 'N') <> 'C'
                                         AND Refundbillmast.Rfc_Cacr IN ('C', 'R')
                                         AND Refundbilldetl.Rfd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Refundbilldetl.Rfd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -14912,10 +14912,10 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Refundbilldetl.Rfc_Cancel, 'N') = 'N'
                                         AND Opbillmast.Opc_Cacr <> 'M'
                                         AND Opbillmast.Opd_date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Opbillmast.Opd_date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -14948,10 +14948,10 @@ ORDER BY Pcc_Desc`;
                                         AND Refundbillmast.Rfc_Cacr IN ('I')
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.dmd_date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.dmd_date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -14974,17 +14974,17 @@ ORDER BY Pcc_Desc`;
                                         AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                         AND Disbillmast.Dmc_Cacr <> 'M'
                                         AND Disbillmast.dmd_date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Disbillmast.dmd_date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                 GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc)
                         GROUP BY Code, Pcc_Desc
                         HAVING SUM (Amt) <> 0
                         ORDER BY Pcc_Desc`;
     try {
-      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(sql, {fromDate, toDate}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       //       callBack(null, );
       return result.rows;
     } catch (error) {
@@ -15024,10 +15024,10 @@ ORDER BY Pcc_Desc`;
                                     AND Disbillmast.Dmc_Cacr <> 'M'
                                     AND Misincexpdtl.Dg_Grcode = 9
                                     AND Disbillmast.Dmd_Date >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Disbillmast.Dmd_Date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -15053,10 +15053,10 @@ ORDER BY Pcc_Desc`;
                                     AND NVL (Vsc_Cancel, 'N') = 'N'
                                     AND Disbillmast.Dmc_Cacr <> 'M'
                                     AND Disbillmast.Dmd_Date >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Disbillmast.Dmd_Date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -15079,10 +15079,10 @@ ORDER BY Pcc_Desc`;
                                     AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                     AND Disbillmast.Dmc_Cacr <> 'M'
                                     AND Disbillmast.Dmd_Date >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Disbillmast.Dmd_Date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -15111,10 +15111,10 @@ ORDER BY Pcc_Desc`;
                                     AND NVL (disroomdetl.dmc_cancel, 'N') = 'N'
                                     AND Disbillmast.Dmc_Cacr <> 'M'
                                     AND Disbillmast.DMD_DATE >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND disbillmast.dmd_date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -15138,10 +15138,10 @@ ORDER BY Pcc_Desc`;
                                     AND Iprefundmast.Ric_Cacr IN ('C', 'R')
                                     AND NVL (Iprefundmast.Ric_Cancel, 'N') = 'N'
                                     AND Iprefundmast.Rid_Date >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Iprefundmast.Rid_Date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND IPREFUNDMAST.MH_CODE IN
                                             (SELECT MH_CODE FROM multihospital)
@@ -15171,10 +15171,10 @@ ORDER BY Pcc_Desc`;
                                     AND Disbillmast.Dmc_Cacr <> 'M'
                                     AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                     AND Disbillmast.Dmd_Date >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Disbillmast.Dmd_Date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -15203,10 +15203,10 @@ ORDER BY Pcc_Desc`;
                                     AND Disbillmast.Dmc_Cacr <> 'M'
                                     AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                     AND Disbillmast.Dmd_Date >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Disbillmast.Dmd_Date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -15235,10 +15235,10 @@ ORDER BY Pcc_Desc`;
                                     AND Disbillmast.Dmc_Cacr <> 'M'
                                     AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                     AND Disbillmast.Dmd_Date >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Disbillmast.Dmd_Date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -15267,10 +15267,10 @@ ORDER BY Pcc_Desc`;
                                     AND Disbillmast.Dmc_Cacr <> 'M'
                                     AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                     AND Disbillmast.Dmd_Date >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Disbillmast.Dmd_Date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -15299,10 +15299,10 @@ ORDER BY Pcc_Desc`;
                                     AND Disbillmast.Dmc_Cacr <> 'M'
                                     AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                     AND Disbillmast.Dmd_Date >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Disbillmast.Dmd_Date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -15331,10 +15331,10 @@ ORDER BY Pcc_Desc`;
                                     AND Disbillmast.Dmc_Cacr <> 'M'
                                     AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                     AND Disbillmast.Dmd_Date >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Disbillmast.Dmd_Date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -15363,10 +15363,10 @@ ORDER BY Pcc_Desc`;
                                     AND Disbillmast.Dmc_Cacr <> 'M'
                                     AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                     AND Disbillmast.Dmd_Date >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Disbillmast.Dmd_Date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -15395,10 +15395,10 @@ ORDER BY Pcc_Desc`;
                                     AND Disbillmast.Dmc_Cacr <> 'M'
                                     AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                     AND Disbillmast.Dmd_Date >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Disbillmast.Dmd_Date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -15427,10 +15427,10 @@ ORDER BY Pcc_Desc`;
                                     AND Disbillmast.Dmc_Cacr <> 'M'
                                     AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                     AND Disbillmast.Dmd_Date >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Disbillmast.Dmd_Date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -15460,10 +15460,10 @@ ORDER BY Pcc_Desc`;
                                     AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                     AND Disbillmast.Dmc_Cacr <> 'M'
                                     AND Disbillmast.Dmd_Date >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Disbillmast.Dmd_Date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     AND NVL (Patsurother.Src_Cancel, 'N') = 'N'
@@ -15491,10 +15491,10 @@ ORDER BY Pcc_Desc`;
                                     AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                     AND Disbillmast.Dmc_Cacr <> 'M'
                                     AND Disbillmast.Dmd_Date >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Disbillmast.Dmd_Date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     AND NVL (Patsurdetl.Src_Cancel, 'N') = 'N'
@@ -15522,10 +15522,10 @@ ORDER BY Pcc_Desc`;
                                     AND Canbillmast.Cmc_Cacr = 'I'
                                     AND Disbillmast.Dmc_Cacr <> 'M'
                                     AND Disbillmast.Dmd_Date >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Disbillmast.Dmd_Date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -15553,10 +15553,10 @@ ORDER BY Pcc_Desc`;
                                     AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                     AND Opbillmast.Opc_Cacr <> 'M'
                                     AND Opbillmast.Opd_Date >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Opbillmast.Opd_Date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -15584,10 +15584,10 @@ ORDER BY Pcc_Desc`;
                                     AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                     AND Opbillmast.Opc_Cacr <> 'M'
                                     AND Opbillmast.Opd_Date >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Opbillmast.Opd_Date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -15615,10 +15615,10 @@ ORDER BY Pcc_Desc`;
                                     AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                     AND Opbillmast.Opc_Cacr <> 'M'
                                     AND Opbillmast.Opd_Date >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Opbillmast.Opd_Date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -15646,10 +15646,10 @@ ORDER BY Pcc_Desc`;
                                     AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                     AND Opbillmast.Opc_Cacr <> 'M'
                                     AND Opbillmast.Opd_Date >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Opbillmast.Opd_Date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -15677,10 +15677,10 @@ ORDER BY Pcc_Desc`;
                                     AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                     AND Opbillmast.Opc_Cacr <> 'M'
                                     AND Opbillmast.Opd_Date >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Opbillmast.Opd_Date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -15708,10 +15708,10 @@ ORDER BY Pcc_Desc`;
                                     AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                     AND Opbillmast.Opc_Cacr <> 'M'
                                     AND Opbillmast.Opd_Date >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Opbillmast.Opd_Date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -15739,10 +15739,10 @@ ORDER BY Pcc_Desc`;
                                     AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                     AND Opbillmast.Opc_Cacr <> 'M'
                                     AND Opbillmast.Opd_Date >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Opbillmast.Opd_Date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -15770,10 +15770,10 @@ ORDER BY Pcc_Desc`;
                                     AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                     AND Opbillmast.Opc_Cacr <> 'M'
                                     AND Opbillmast.Opd_Date >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Opbillmast.Opd_Date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -15801,10 +15801,10 @@ ORDER BY Pcc_Desc`;
                                     AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                     AND Opbillmast.Opc_Cacr <> 'M'
                                     AND Opbillmast.Opd_Date >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Opbillmast.Opd_Date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -15834,10 +15834,10 @@ ORDER BY Pcc_Desc`;
                                     AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                     AND Opbillmast.Opc_Cacr <> 'M'
                                     AND Opbillmast.Opd_Date >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Opbillmast.Opd_Date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     AND NVL (Patsurother.Src_Cancel, 'N') = 'N'
@@ -15865,10 +15865,10 @@ ORDER BY Pcc_Desc`;
                                     AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                     AND Opbillmast.Opc_Cacr <> 'M'
                                     AND Opbillmast.Opd_Date >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Opbillmast.Opd_Date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     AND NVL (Patsurdetl.Src_Cancel, 'N') = 'N'
@@ -15897,10 +15897,10 @@ ORDER BY Pcc_Desc`;
                                     AND Receiptmast.RPC_COLLCNCODE IS NULL
                                     AND Receiptmast.Rpc_Cacr IN ('C', 'R')
                                     AND Receiptmast.Rpd_Date >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Receiptmast.Rpd_Date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -15928,10 +15928,10 @@ ORDER BY Pcc_Desc`;
                                     AND Receiptmast.RPC_COLLCNCODE IS NOT NULL
                                     AND Receiptmast.Rpc_Cacr IN ('C', 'R')
                                     AND Receiptmast.RPD_COLLDATE >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Receiptmast.RPD_COLLDATE <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -15962,10 +15962,10 @@ ORDER BY Pcc_Desc`;
                                     AND Receiptmast.Rpc_Cacr = 'O'
                                     AND Opbillmast.Opc_cacr <> 'M'
                                     AND Opbillmast.Opd_Date >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Opbillmast.Opd_Date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             GROUP BY Procategory.Pc_code, Procategory.Pcc_Desc
@@ -15993,10 +15993,10 @@ ORDER BY Pcc_Desc`;
                                     AND Refundreceiptmast.RFC_RETCNCODE IS NULL
                                     AND Refundreceiptmast.Rfc_Cacr IN ('C', 'R')
                                     AND Refundreceiptdetl.Rfd_Date >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Refundreceiptdetl.Rfd_Date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND REFUNDRECEIPTMAST.MH_CODE IN
                                             (SELECT MH_CODE FROM multihospital)
@@ -16025,10 +16025,10 @@ ORDER BY Pcc_Desc`;
                                     AND Refundreceiptmast.Rfc_Cancel IS NULL
                                     AND Refundreceiptmast.Rfc_Cacr IN ('C', 'R')
                                     AND Refundreceiptmast.RFD_RETDATE >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Refundreceiptmast.RFD_RETDATE <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND REFUNDRECEIPTMAST.MH_CODE IN
                                             (SELECT MH_CODE FROM multihospital)
@@ -16063,10 +16063,10 @@ ORDER BY Pcc_Desc`;
                                     AND REFUNDRECEIPTMAST.RFC_CAcr IN ('O')
                                     AND Opbillmast.Opc_Cacr <> 'M'
                                     AND Opbillmast.Opd_date >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Opbillmast.Opd_date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -16097,10 +16097,10 @@ ORDER BY Pcc_Desc`;
                                     AND NVL (Billmast.Bmc_Cancel, 'N') <> 'C'
                                     AND billmast.BMC_COLLCNCODE IS NULL
                                     AND Billmast.Bmd_Date >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Billmast.Bmd_Date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -16131,10 +16131,10 @@ ORDER BY Pcc_Desc`;
                                     AND Billmast.Bmc_Cacr IN ('C', 'R')
                                     AND NVL (Billmast.Bmc_Cancel, 'N') = 'N'
                                     AND Billmast.BMD_COLLDATE >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Billmast.BMD_COLLDATE <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -16168,10 +16168,10 @@ ORDER BY Pcc_Desc`;
                                     AND NVL (Billmast.Bmc_Cancel, 'N') = 'N'
                                     AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                     AND Opbillmast.Opd_Date >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Opbillmast.Opd_Date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -16205,10 +16205,10 @@ ORDER BY Pcc_Desc`;
                                     AND NVL (Billmast.Bmc_Cancel, 'N') = 'N'
                                     AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                     AND Disbillmast.Dmd_Date >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Disbillmast.Dmd_Date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -16237,10 +16237,10 @@ ORDER BY Pcc_Desc`;
                                     AND NVL (Refundbillmast.Rfc_Cancel, 'N') <> 'C'
                                     AND Refundbillmast.Rfc_Cacr IN ('C', 'R')
                                     AND Refundbilldetl.Rfd_Date >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Refundbilldetl.Rfd_Date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -16274,10 +16274,10 @@ ORDER BY Pcc_Desc`;
                                     AND NVL (Refundbilldetl.Rfc_Cancel, 'N') = 'N'
                                     AND Opbillmast.Opc_Cacr <> 'M'
                                     AND Opbillmast.Opd_date >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Opbillmast.Opd_date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -16310,10 +16310,10 @@ ORDER BY Pcc_Desc`;
                                     AND Refundbillmast.Rfc_Cacr IN ('I')
                                     AND Disbillmast.Dmc_Cacr <> 'M'
                                     AND Disbillmast.dmd_date >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Disbillmast.dmd_date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -16336,17 +16336,17 @@ ORDER BY Pcc_Desc`;
                                     AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                     AND Disbillmast.Dmc_Cacr <> 'M'
                                     AND Disbillmast.dmd_date >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Disbillmast.dmd_date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                             GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc)
                     GROUP BY Code, Pcc_Desc
                     HAVING SUM (Amt) <> 0
                     ORDER BY Pcc_Desc`;
     try {
-      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(sql, {fromDate, toDate}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       //       callBack(null, );
       return result.rows;
     } catch (error) {
@@ -16386,10 +16386,10 @@ ORDER BY Pcc_Desc`;
                                             AND Disbillmast.Dmc_Cacr <> 'M'
                                             AND Misincexpdtl.Dg_Grcode = 7
                                             AND Disbillmast.Dmd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Disbillmast.Dmd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -16415,10 +16415,10 @@ ORDER BY Pcc_Desc`;
                                             AND NVL (Vsc_Cancel, 'N') = 'N'
                                             AND Disbillmast.Dmc_Cacr <> 'M'
                                             AND Disbillmast.Dmd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Disbillmast.Dmd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -16441,10 +16441,10 @@ ORDER BY Pcc_Desc`;
                                             AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                             AND Disbillmast.Dmc_Cacr <> 'M'
                                             AND Disbillmast.Dmd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Disbillmast.Dmd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -16473,10 +16473,10 @@ ORDER BY Pcc_Desc`;
                                             AND NVL (disroomdetl.dmc_cancel, 'N') = 'N'
                                             AND Disbillmast.Dmc_Cacr <> 'M'
                                             AND Disbillmast.DMD_DATE >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND disbillmast.dmd_date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -16500,10 +16500,10 @@ ORDER BY Pcc_Desc`;
                                             AND Iprefundmast.Ric_Cacr IN ('C', 'R')
                                             AND NVL (Iprefundmast.Ric_Cancel, 'N') = 'N'
                                             AND Iprefundmast.Rid_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Iprefundmast.Rid_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND IPREFUNDMAST.MH_CODE IN
                                                     (SELECT MH_CODE FROM multihospital)
@@ -16533,10 +16533,10 @@ ORDER BY Pcc_Desc`;
                                             AND Disbillmast.Dmc_Cacr <> 'M'
                                             AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                             AND Disbillmast.Dmd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Disbillmast.Dmd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -16565,10 +16565,10 @@ ORDER BY Pcc_Desc`;
                                             AND Disbillmast.Dmc_Cacr <> 'M'
                                             AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                             AND Disbillmast.Dmd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Disbillmast.Dmd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -16597,10 +16597,10 @@ ORDER BY Pcc_Desc`;
                                             AND Disbillmast.Dmc_Cacr <> 'M'
                                             AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                             AND Disbillmast.Dmd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Disbillmast.Dmd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -16629,10 +16629,10 @@ ORDER BY Pcc_Desc`;
                                             AND Disbillmast.Dmc_Cacr <> 'M'
                                             AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                             AND Disbillmast.Dmd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Disbillmast.Dmd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -16661,10 +16661,10 @@ ORDER BY Pcc_Desc`;
                                             AND Disbillmast.Dmc_Cacr <> 'M'
                                             AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                             AND Disbillmast.Dmd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Disbillmast.Dmd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -16693,10 +16693,10 @@ ORDER BY Pcc_Desc`;
                                             AND Disbillmast.Dmc_Cacr <> 'M'
                                             AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                             AND Disbillmast.Dmd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Disbillmast.Dmd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -16725,10 +16725,10 @@ ORDER BY Pcc_Desc`;
                                             AND Disbillmast.Dmc_Cacr <> 'M'
                                             AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                             AND Disbillmast.Dmd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Disbillmast.Dmd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -16757,10 +16757,10 @@ ORDER BY Pcc_Desc`;
                                             AND Disbillmast.Dmc_Cacr <> 'M'
                                             AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                             AND Disbillmast.Dmd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Disbillmast.Dmd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -16789,10 +16789,10 @@ ORDER BY Pcc_Desc`;
                                             AND Disbillmast.Dmc_Cacr <> 'M'
                                             AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                             AND Disbillmast.Dmd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Disbillmast.Dmd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -16822,10 +16822,10 @@ ORDER BY Pcc_Desc`;
                                             AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                             AND Disbillmast.Dmc_Cacr <> 'M'
                                             AND Disbillmast.Dmd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Disbillmast.Dmd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                             AND NVL (Patsurother.Src_Cancel, 'N') = 'N'
@@ -16853,10 +16853,10 @@ ORDER BY Pcc_Desc`;
                                             AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                             AND Disbillmast.Dmc_Cacr <> 'M'
                                             AND Disbillmast.Dmd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Disbillmast.Dmd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                             AND NVL (Patsurdetl.Src_Cancel, 'N') = 'N'
@@ -16884,10 +16884,10 @@ ORDER BY Pcc_Desc`;
                                             AND Canbillmast.Cmc_Cacr = 'I'
                                             AND Disbillmast.Dmc_Cacr <> 'M'
                                             AND Disbillmast.Dmd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Disbillmast.Dmd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -16915,10 +16915,10 @@ ORDER BY Pcc_Desc`;
                                             AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                             AND Opbillmast.Opc_Cacr <> 'M'
                                             AND Opbillmast.Opd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Opbillmast.Opd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -16946,10 +16946,10 @@ ORDER BY Pcc_Desc`;
                                             AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                             AND Opbillmast.Opc_Cacr <> 'M'
                                             AND Opbillmast.Opd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Opbillmast.Opd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -16977,10 +16977,10 @@ ORDER BY Pcc_Desc`;
                                             AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                             AND Opbillmast.Opc_Cacr <> 'M'
                                             AND Opbillmast.Opd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Opbillmast.Opd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -17008,10 +17008,10 @@ ORDER BY Pcc_Desc`;
                                             AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                             AND Opbillmast.Opc_Cacr <> 'M'
                                             AND Opbillmast.Opd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Opbillmast.Opd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -17039,10 +17039,10 @@ ORDER BY Pcc_Desc`;
                                             AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                             AND Opbillmast.Opc_Cacr <> 'M'
                                             AND Opbillmast.Opd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Opbillmast.Opd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -17070,10 +17070,10 @@ ORDER BY Pcc_Desc`;
                                             AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                             AND Opbillmast.Opc_Cacr <> 'M'
                                             AND Opbillmast.Opd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Opbillmast.Opd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -17101,10 +17101,10 @@ ORDER BY Pcc_Desc`;
                                             AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                             AND Opbillmast.Opc_Cacr <> 'M'
                                             AND Opbillmast.Opd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Opbillmast.Opd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -17132,10 +17132,10 @@ ORDER BY Pcc_Desc`;
                                             AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                             AND Opbillmast.Opc_Cacr <> 'M'
                                             AND Opbillmast.Opd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Opbillmast.Opd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -17163,10 +17163,10 @@ ORDER BY Pcc_Desc`;
                                             AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                             AND Opbillmast.Opc_Cacr <> 'M'
                                             AND Opbillmast.Opd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Opbillmast.Opd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -17196,10 +17196,10 @@ ORDER BY Pcc_Desc`;
                                             AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                             AND Opbillmast.Opc_Cacr <> 'M'
                                             AND Opbillmast.Opd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Opbillmast.Opd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                             AND NVL (Patsurother.Src_Cancel, 'N') = 'N'
@@ -17227,10 +17227,10 @@ ORDER BY Pcc_Desc`;
                                             AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                             AND Opbillmast.Opc_Cacr <> 'M'
                                             AND Opbillmast.Opd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Opbillmast.Opd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                             AND NVL (Patsurdetl.Src_Cancel, 'N') = 'N'
@@ -17259,10 +17259,10 @@ ORDER BY Pcc_Desc`;
                                             AND Receiptmast.RPC_COLLCNCODE IS NULL
                                             AND Receiptmast.Rpc_Cacr IN ('C', 'R')
                                             AND Receiptmast.Rpd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Receiptmast.Rpd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -17290,10 +17290,10 @@ ORDER BY Pcc_Desc`;
                                             AND Receiptmast.RPC_COLLCNCODE IS NOT NULL
                                             AND Receiptmast.Rpc_Cacr IN ('C', 'R')
                                             AND Receiptmast.RPD_COLLDATE >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Receiptmast.RPD_COLLDATE <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -17324,10 +17324,10 @@ ORDER BY Pcc_Desc`;
                                             AND Receiptmast.Rpc_Cacr = 'O'
                                             AND Opbillmast.Opc_cacr <> 'M'
                                             AND Opbillmast.Opd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Opbillmast.Opd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_code, Procategory.Pcc_Desc
@@ -17355,10 +17355,10 @@ ORDER BY Pcc_Desc`;
                                             AND Refundreceiptmast.RFC_RETCNCODE IS NULL
                                             AND Refundreceiptmast.Rfc_Cacr IN ('C', 'R')
                                             AND Refundreceiptdetl.Rfd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Refundreceiptdetl.Rfd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND REFUNDRECEIPTMAST.MH_CODE IN
                                                     (SELECT MH_CODE FROM multihospital)
@@ -17387,10 +17387,10 @@ ORDER BY Pcc_Desc`;
                                             AND Refundreceiptmast.Rfc_Cancel IS NULL
                                             AND Refundreceiptmast.Rfc_Cacr IN ('C', 'R')
                                             AND Refundreceiptmast.RFD_RETDATE >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Refundreceiptmast.RFD_RETDATE <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND REFUNDRECEIPTMAST.MH_CODE IN
                                                     (SELECT MH_CODE FROM multihospital)
@@ -17425,10 +17425,10 @@ ORDER BY Pcc_Desc`;
                                             AND REFUNDRECEIPTMAST.RFC_CAcr IN ('O')
                                             AND Opbillmast.Opc_Cacr <> 'M'
                                             AND Opbillmast.Opd_date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Opbillmast.Opd_date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -17459,10 +17459,10 @@ ORDER BY Pcc_Desc`;
                                             AND NVL (Billmast.Bmc_Cancel, 'N') <> 'C'
                                             AND billmast.BMC_COLLCNCODE IS NULL
                                             AND Billmast.Bmd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Billmast.Bmd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -17493,10 +17493,10 @@ ORDER BY Pcc_Desc`;
                                             AND Billmast.Bmc_Cacr IN ('C', 'R')
                                             AND NVL (Billmast.Bmc_Cancel, 'N') = 'N'
                                             AND Billmast.BMD_COLLDATE >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Billmast.BMD_COLLDATE <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -17530,10 +17530,10 @@ ORDER BY Pcc_Desc`;
                                             AND NVL (Billmast.Bmc_Cancel, 'N') = 'N'
                                             AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                             AND Opbillmast.Opd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Opbillmast.Opd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -17567,10 +17567,10 @@ ORDER BY Pcc_Desc`;
                                             AND NVL (Billmast.Bmc_Cancel, 'N') = 'N'
                                             AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                             AND Disbillmast.Dmd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Disbillmast.Dmd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -17599,10 +17599,10 @@ ORDER BY Pcc_Desc`;
                                             AND NVL (Refundbillmast.Rfc_Cancel, 'N') <> 'C'
                                             AND Refundbillmast.Rfc_Cacr IN ('C', 'R')
                                             AND Refundbilldetl.Rfd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Refundbilldetl.Rfd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -17636,10 +17636,10 @@ ORDER BY Pcc_Desc`;
                                             AND NVL (Refundbilldetl.Rfc_Cancel, 'N') = 'N'
                                             AND Opbillmast.Opc_Cacr <> 'M'
                                             AND Opbillmast.Opd_date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Opbillmast.Opd_date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -17672,10 +17672,10 @@ ORDER BY Pcc_Desc`;
                                             AND Refundbillmast.Rfc_Cacr IN ('I')
                                             AND Disbillmast.Dmc_Cacr <> 'M'
                                             AND Disbillmast.dmd_date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Disbillmast.dmd_date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -17698,17 +17698,17 @@ ORDER BY Pcc_Desc`;
                                             AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                             AND Disbillmast.Dmc_Cacr <> 'M'
                                             AND Disbillmast.dmd_date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Disbillmast.dmd_date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc)
                             GROUP BY Code, Pcc_Desc
                             HAVING SUM (Amt) <> 0
                             ORDER BY Pcc_Desc`;
     try {
-      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(sql, {fromDate, toDate}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       //       callBack(null, )
       // ;
       return result.rows;
@@ -17749,10 +17749,10 @@ ORDER BY Pcc_Desc`;
                                             AND Disbillmast.Dmc_Cacr <> 'M'
                                             AND Misincexpdtl.Dg_Grcode = 1
                                             AND Disbillmast.Dmd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Disbillmast.Dmd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -17778,10 +17778,10 @@ ORDER BY Pcc_Desc`;
                                             AND NVL (Vsc_Cancel, 'N') = 'N'
                                             AND Disbillmast.Dmc_Cacr <> 'M'
                                             AND Disbillmast.Dmd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Disbillmast.Dmd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -17804,10 +17804,10 @@ ORDER BY Pcc_Desc`;
                                             AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                             AND Disbillmast.Dmc_Cacr <> 'M'
                                             AND Disbillmast.Dmd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Disbillmast.Dmd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -17836,10 +17836,10 @@ ORDER BY Pcc_Desc`;
                                             AND NVL (disroomdetl.dmc_cancel, 'N') = 'N'
                                             AND Disbillmast.Dmc_Cacr <> 'M'
                                             AND Disbillmast.DMD_DATE >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND disbillmast.dmd_date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -17863,10 +17863,10 @@ ORDER BY Pcc_Desc`;
                                             AND Iprefundmast.Ric_Cacr IN ('C', 'R')
                                             AND NVL (Iprefundmast.Ric_Cancel, 'N') = 'N'
                                             AND Iprefundmast.Rid_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Iprefundmast.Rid_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND IPREFUNDMAST.MH_CODE IN
                                                     (SELECT MH_CODE FROM multihospital)
@@ -17896,10 +17896,10 @@ ORDER BY Pcc_Desc`;
                                             AND Disbillmast.Dmc_Cacr <> 'M'
                                             AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                             AND Disbillmast.Dmd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Disbillmast.Dmd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -17928,10 +17928,10 @@ ORDER BY Pcc_Desc`;
                                             AND Disbillmast.Dmc_Cacr <> 'M'
                                             AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                             AND Disbillmast.Dmd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Disbillmast.Dmd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -17960,10 +17960,10 @@ ORDER BY Pcc_Desc`;
                                             AND Disbillmast.Dmc_Cacr <> 'M'
                                             AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                             AND Disbillmast.Dmd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Disbillmast.Dmd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -17992,10 +17992,10 @@ ORDER BY Pcc_Desc`;
                                             AND Disbillmast.Dmc_Cacr <> 'M'
                                             AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                             AND Disbillmast.Dmd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Disbillmast.Dmd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -18024,10 +18024,10 @@ ORDER BY Pcc_Desc`;
                                             AND Disbillmast.Dmc_Cacr <> 'M'
                                             AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                             AND Disbillmast.Dmd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Disbillmast.Dmd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -18056,10 +18056,10 @@ ORDER BY Pcc_Desc`;
                                             AND Disbillmast.Dmc_Cacr <> 'M'
                                             AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                             AND Disbillmast.Dmd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Disbillmast.Dmd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -18088,10 +18088,10 @@ ORDER BY Pcc_Desc`;
                                             AND Disbillmast.Dmc_Cacr <> 'M'
                                             AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                             AND Disbillmast.Dmd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Disbillmast.Dmd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -18120,10 +18120,10 @@ ORDER BY Pcc_Desc`;
                                             AND Disbillmast.Dmc_Cacr <> 'M'
                                             AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                             AND Disbillmast.Dmd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Disbillmast.Dmd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -18152,10 +18152,10 @@ ORDER BY Pcc_Desc`;
                                             AND Disbillmast.Dmc_Cacr <> 'M'
                                             AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                             AND Disbillmast.Dmd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Disbillmast.Dmd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -18185,10 +18185,10 @@ ORDER BY Pcc_Desc`;
                                             AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                             AND Disbillmast.Dmc_Cacr <> 'M'
                                             AND Disbillmast.Dmd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Disbillmast.Dmd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                             AND NVL (Patsurother.Src_Cancel, 'N') = 'N'
@@ -18216,10 +18216,10 @@ ORDER BY Pcc_Desc`;
                                             AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                             AND Disbillmast.Dmc_Cacr <> 'M'
                                             AND Disbillmast.Dmd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Disbillmast.Dmd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                             AND NVL (Patsurdetl.Src_Cancel, 'N') = 'N'
@@ -18247,10 +18247,10 @@ ORDER BY Pcc_Desc`;
                                             AND Canbillmast.Cmc_Cacr = 'I'
                                             AND Disbillmast.Dmc_Cacr <> 'M'
                                             AND Disbillmast.Dmd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Disbillmast.Dmd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -18278,10 +18278,10 @@ ORDER BY Pcc_Desc`;
                                             AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                             AND Opbillmast.Opc_Cacr <> 'M'
                                             AND Opbillmast.Opd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Opbillmast.Opd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -18309,10 +18309,10 @@ ORDER BY Pcc_Desc`;
                                             AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                             AND Opbillmast.Opc_Cacr <> 'M'
                                             AND Opbillmast.Opd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Opbillmast.Opd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -18340,10 +18340,10 @@ ORDER BY Pcc_Desc`;
                                             AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                             AND Opbillmast.Opc_Cacr <> 'M'
                                             AND Opbillmast.Opd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Opbillmast.Opd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -18371,10 +18371,10 @@ ORDER BY Pcc_Desc`;
                                             AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                             AND Opbillmast.Opc_Cacr <> 'M'
                                             AND Opbillmast.Opd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Opbillmast.Opd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -18402,10 +18402,10 @@ ORDER BY Pcc_Desc`;
                                             AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                             AND Opbillmast.Opc_Cacr <> 'M'
                                             AND Opbillmast.Opd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Opbillmast.Opd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -18433,10 +18433,10 @@ ORDER BY Pcc_Desc`;
                                             AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                             AND Opbillmast.Opc_Cacr <> 'M'
                                             AND Opbillmast.Opd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Opbillmast.Opd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -18464,10 +18464,10 @@ ORDER BY Pcc_Desc`;
                                             AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                             AND Opbillmast.Opc_Cacr <> 'M'
                                             AND Opbillmast.Opd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Opbillmast.Opd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -18495,10 +18495,10 @@ ORDER BY Pcc_Desc`;
                                             AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                             AND Opbillmast.Opc_Cacr <> 'M'
                                             AND Opbillmast.Opd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Opbillmast.Opd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -18526,10 +18526,10 @@ ORDER BY Pcc_Desc`;
                                             AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                             AND Opbillmast.Opc_Cacr <> 'M'
                                             AND Opbillmast.Opd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Opbillmast.Opd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -18559,10 +18559,10 @@ ORDER BY Pcc_Desc`;
                                             AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                             AND Opbillmast.Opc_Cacr <> 'M'
                                             AND Opbillmast.Opd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Opbillmast.Opd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                             AND NVL (Patsurother.Src_Cancel, 'N') = 'N'
@@ -18590,10 +18590,10 @@ ORDER BY Pcc_Desc`;
                                             AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                             AND Opbillmast.Opc_Cacr <> 'M'
                                             AND Opbillmast.Opd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Opbillmast.Opd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                             AND NVL (Patsurdetl.Src_Cancel, 'N') = 'N'
@@ -18622,10 +18622,10 @@ ORDER BY Pcc_Desc`;
                                             AND Receiptmast.RPC_COLLCNCODE IS NULL
                                             AND Receiptmast.Rpc_Cacr IN ('C', 'R')
                                             AND Receiptmast.Rpd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Receiptmast.Rpd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -18653,10 +18653,10 @@ ORDER BY Pcc_Desc`;
                                             AND Receiptmast.RPC_COLLCNCODE IS NOT NULL
                                             AND Receiptmast.Rpc_Cacr IN ('C', 'R')
                                             AND Receiptmast.RPD_COLLDATE >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Receiptmast.RPD_COLLDATE <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -18687,10 +18687,10 @@ ORDER BY Pcc_Desc`;
                                             AND Receiptmast.Rpc_Cacr = 'O'
                                             AND Opbillmast.Opc_cacr <> 'M'
                                             AND Opbillmast.Opd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Opbillmast.Opd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_code, Procategory.Pcc_Desc
@@ -18718,10 +18718,10 @@ ORDER BY Pcc_Desc`;
                                             AND Refundreceiptmast.RFC_RETCNCODE IS NULL
                                             AND Refundreceiptmast.Rfc_Cacr IN ('C', 'R')
                                             AND Refundreceiptdetl.Rfd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Refundreceiptdetl.Rfd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND REFUNDRECEIPTMAST.MH_CODE IN
                                                     (SELECT MH_CODE FROM multihospital)
@@ -18750,10 +18750,10 @@ ORDER BY Pcc_Desc`;
                                             AND Refundreceiptmast.Rfc_Cancel IS NULL
                                             AND Refundreceiptmast.Rfc_Cacr IN ('C', 'R')
                                             AND Refundreceiptmast.RFD_RETDATE >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Refundreceiptmast.RFD_RETDATE <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND REFUNDRECEIPTMAST.MH_CODE IN
                                                     (SELECT MH_CODE FROM multihospital)
@@ -18788,10 +18788,10 @@ ORDER BY Pcc_Desc`;
                                             AND REFUNDRECEIPTMAST.RFC_CAcr IN ('O')
                                             AND Opbillmast.Opc_Cacr <> 'M'
                                             AND Opbillmast.Opd_date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Opbillmast.Opd_date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -18822,10 +18822,10 @@ ORDER BY Pcc_Desc`;
                                             AND NVL (Billmast.Bmc_Cancel, 'N') <> 'C'
                                             AND billmast.BMC_COLLCNCODE IS NULL
                                             AND Billmast.Bmd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Billmast.Bmd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -18856,10 +18856,10 @@ ORDER BY Pcc_Desc`;
                                             AND Billmast.Bmc_Cacr IN ('C', 'R')
                                             AND NVL (Billmast.Bmc_Cancel, 'N') = 'N'
                                             AND Billmast.BMD_COLLDATE >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Billmast.BMD_COLLDATE <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -18893,10 +18893,10 @@ ORDER BY Pcc_Desc`;
                                             AND NVL (Billmast.Bmc_Cancel, 'N') = 'N'
                                             AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                             AND Opbillmast.Opd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Opbillmast.Opd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -18930,10 +18930,10 @@ ORDER BY Pcc_Desc`;
                                             AND NVL (Billmast.Bmc_Cancel, 'N') = 'N'
                                             AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                             AND Disbillmast.Dmd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Disbillmast.Dmd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -18962,10 +18962,10 @@ ORDER BY Pcc_Desc`;
                                             AND NVL (Refundbillmast.Rfc_Cancel, 'N') <> 'C'
                                             AND Refundbillmast.Rfc_Cacr IN ('C', 'R')
                                             AND Refundbilldetl.Rfd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Refundbilldetl.Rfd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -18999,10 +18999,10 @@ ORDER BY Pcc_Desc`;
                                             AND NVL (Refundbilldetl.Rfc_Cancel, 'N') = 'N'
                                             AND Opbillmast.Opc_Cacr <> 'M'
                                             AND Opbillmast.Opd_date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Opbillmast.Opd_date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -19035,10 +19035,10 @@ ORDER BY Pcc_Desc`;
                                             AND Refundbillmast.Rfc_Cacr IN ('I')
                                             AND Disbillmast.Dmc_Cacr <> 'M'
                                             AND Disbillmast.dmd_date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Disbillmast.dmd_date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -19061,17 +19061,17 @@ ORDER BY Pcc_Desc`;
                                             AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                             AND Disbillmast.Dmc_Cacr <> 'M'
                                             AND Disbillmast.dmd_date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Disbillmast.dmd_date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                     GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc)
                             GROUP BY Code, Pcc_Desc
                             HAVING SUM (Amt) <> 0
                             ORDER BY Pcc_Desc`;
     try {
-      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(sql, {fromDate, toDate}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       //       callBack(null, );
       return result.rows;
     } catch (error) {
@@ -19111,10 +19111,10 @@ ORDER BY Pcc_Desc`;
                                                 AND Disbillmast.Dmc_Cacr <> 'M'
                                                 AND Misincexpdtl.Dg_Grcode = 44
                                                 AND Disbillmast.Dmd_Date >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Disbillmast.Dmd_Date <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -19140,10 +19140,10 @@ ORDER BY Pcc_Desc`;
                                                 AND NVL (Vsc_Cancel, 'N') = 'N'
                                                 AND Disbillmast.Dmc_Cacr <> 'M'
                                                 AND Disbillmast.Dmd_Date >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Disbillmast.Dmd_Date <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -19166,10 +19166,10 @@ ORDER BY Pcc_Desc`;
                                                 AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                                 AND Disbillmast.Dmc_Cacr <> 'M'
                                                 AND Disbillmast.Dmd_Date >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Disbillmast.Dmd_Date <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -19198,10 +19198,10 @@ ORDER BY Pcc_Desc`;
                                                 AND NVL (disroomdetl.dmc_cancel, 'N') = 'N'
                                                 AND Disbillmast.Dmc_Cacr <> 'M'
                                                 AND Disbillmast.DMD_DATE >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND disbillmast.dmd_date <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -19225,10 +19225,10 @@ ORDER BY Pcc_Desc`;
                                                 AND Iprefundmast.Ric_Cacr IN ('C', 'R')
                                                 AND NVL (Iprefundmast.Ric_Cancel, 'N') = 'N'
                                                 AND Iprefundmast.Rid_Date >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Iprefundmast.Rid_Date <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND IPREFUNDMAST.MH_CODE IN
                                                         (SELECT MH_CODE FROM multihospital)
@@ -19258,10 +19258,10 @@ ORDER BY Pcc_Desc`;
                                                 AND Disbillmast.Dmc_Cacr <> 'M'
                                                 AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                                 AND Disbillmast.Dmd_Date >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Disbillmast.Dmd_Date <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -19290,10 +19290,10 @@ ORDER BY Pcc_Desc`;
                                                 AND Disbillmast.Dmc_Cacr <> 'M'
                                                 AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                                 AND Disbillmast.Dmd_Date >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Disbillmast.Dmd_Date <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -19322,10 +19322,10 @@ ORDER BY Pcc_Desc`;
                                                 AND Disbillmast.Dmc_Cacr <> 'M'
                                                 AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                                 AND Disbillmast.Dmd_Date >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Disbillmast.Dmd_Date <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -19354,10 +19354,10 @@ ORDER BY Pcc_Desc`;
                                                 AND Disbillmast.Dmc_Cacr <> 'M'
                                                 AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                                 AND Disbillmast.Dmd_Date >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Disbillmast.Dmd_Date <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -19386,10 +19386,10 @@ ORDER BY Pcc_Desc`;
                                                 AND Disbillmast.Dmc_Cacr <> 'M'
                                                 AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                                 AND Disbillmast.Dmd_Date >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Disbillmast.Dmd_Date <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -19418,10 +19418,10 @@ ORDER BY Pcc_Desc`;
                                                 AND Disbillmast.Dmc_Cacr <> 'M'
                                                 AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                                 AND Disbillmast.Dmd_Date >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Disbillmast.Dmd_Date <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -19450,10 +19450,10 @@ ORDER BY Pcc_Desc`;
                                                 AND Disbillmast.Dmc_Cacr <> 'M'
                                                 AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                                 AND Disbillmast.Dmd_Date >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Disbillmast.Dmd_Date <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -19482,10 +19482,10 @@ ORDER BY Pcc_Desc`;
                                                 AND Disbillmast.Dmc_Cacr <> 'M'
                                                 AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                                 AND Disbillmast.Dmd_Date >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Disbillmast.Dmd_Date <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -19514,10 +19514,10 @@ ORDER BY Pcc_Desc`;
                                                 AND Disbillmast.Dmc_Cacr <> 'M'
                                                 AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                                 AND Disbillmast.Dmd_Date >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Disbillmast.Dmd_Date <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -19547,10 +19547,10 @@ ORDER BY Pcc_Desc`;
                                                 AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                                 AND Disbillmast.Dmc_Cacr <> 'M'
                                                 AND Disbillmast.Dmd_Date >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Disbillmast.Dmd_Date <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                                 AND NVL (Patsurother.Src_Cancel, 'N') = 'N'
@@ -19578,10 +19578,10 @@ ORDER BY Pcc_Desc`;
                                                 AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                                 AND Disbillmast.Dmc_Cacr <> 'M'
                                                 AND Disbillmast.Dmd_Date >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Disbillmast.Dmd_Date <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                                 AND NVL (Patsurdetl.Src_Cancel, 'N') = 'N'
@@ -19609,10 +19609,10 @@ ORDER BY Pcc_Desc`;
                                                 AND Canbillmast.Cmc_Cacr = 'I'
                                                 AND Disbillmast.Dmc_Cacr <> 'M'
                                                 AND Disbillmast.Dmd_Date >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Disbillmast.Dmd_Date <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -19640,10 +19640,10 @@ ORDER BY Pcc_Desc`;
                                                 AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                                 AND Opbillmast.Opc_Cacr <> 'M'
                                                 AND Opbillmast.Opd_Date >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Opbillmast.Opd_Date <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -19671,10 +19671,10 @@ ORDER BY Pcc_Desc`;
                                                 AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                                 AND Opbillmast.Opc_Cacr <> 'M'
                                                 AND Opbillmast.Opd_Date >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Opbillmast.Opd_Date <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -19702,10 +19702,10 @@ ORDER BY Pcc_Desc`;
                                                 AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                                 AND Opbillmast.Opc_Cacr <> 'M'
                                                 AND Opbillmast.Opd_Date >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Opbillmast.Opd_Date <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -19733,10 +19733,10 @@ ORDER BY Pcc_Desc`;
                                                 AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                                 AND Opbillmast.Opc_Cacr <> 'M'
                                                 AND Opbillmast.Opd_Date >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Opbillmast.Opd_Date <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -19764,10 +19764,10 @@ ORDER BY Pcc_Desc`;
                                                 AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                                 AND Opbillmast.Opc_Cacr <> 'M'
                                                 AND Opbillmast.Opd_Date >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Opbillmast.Opd_Date <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -19795,10 +19795,10 @@ ORDER BY Pcc_Desc`;
                                                 AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                                 AND Opbillmast.Opc_Cacr <> 'M'
                                                 AND Opbillmast.Opd_Date >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Opbillmast.Opd_Date <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -19826,10 +19826,10 @@ ORDER BY Pcc_Desc`;
                                                 AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                                 AND Opbillmast.Opc_Cacr <> 'M'
                                                 AND Opbillmast.Opd_Date >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Opbillmast.Opd_Date <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -19857,10 +19857,10 @@ ORDER BY Pcc_Desc`;
                                                 AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                                 AND Opbillmast.Opc_Cacr <> 'M'
                                                 AND Opbillmast.Opd_Date >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Opbillmast.Opd_Date <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -19888,10 +19888,10 @@ ORDER BY Pcc_Desc`;
                                                 AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                                 AND Opbillmast.Opc_Cacr <> 'M'
                                                 AND Opbillmast.Opd_Date >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Opbillmast.Opd_Date <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -19921,10 +19921,10 @@ ORDER BY Pcc_Desc`;
                                                 AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                                 AND Opbillmast.Opc_Cacr <> 'M'
                                                 AND Opbillmast.Opd_Date >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Opbillmast.Opd_Date <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                                 AND NVL (Patsurother.Src_Cancel, 'N') = 'N'
@@ -19952,10 +19952,10 @@ ORDER BY Pcc_Desc`;
                                                 AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                                 AND Opbillmast.Opc_Cacr <> 'M'
                                                 AND Opbillmast.Opd_Date >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Opbillmast.Opd_Date <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                                 AND NVL (Patsurdetl.Src_Cancel, 'N') = 'N'
@@ -19984,10 +19984,10 @@ ORDER BY Pcc_Desc`;
                                                 AND Receiptmast.RPC_COLLCNCODE IS NULL
                                                 AND Receiptmast.Rpc_Cacr IN ('C', 'R')
                                                 AND Receiptmast.Rpd_Date >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Receiptmast.Rpd_Date <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -20015,10 +20015,10 @@ ORDER BY Pcc_Desc`;
                                                 AND Receiptmast.RPC_COLLCNCODE IS NOT NULL
                                                 AND Receiptmast.Rpc_Cacr IN ('C', 'R')
                                                 AND Receiptmast.RPD_COLLDATE >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Receiptmast.RPD_COLLDATE <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -20049,10 +20049,10 @@ ORDER BY Pcc_Desc`;
                                                 AND Receiptmast.Rpc_Cacr = 'O'
                                                 AND Opbillmast.Opc_cacr <> 'M'
                                                 AND Opbillmast.Opd_Date >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Opbillmast.Opd_Date <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         GROUP BY Procategory.Pc_code, Procategory.Pcc_Desc
@@ -20080,10 +20080,10 @@ ORDER BY Pcc_Desc`;
                                                 AND Refundreceiptmast.RFC_RETCNCODE IS NULL
                                                 AND Refundreceiptmast.Rfc_Cacr IN ('C', 'R')
                                                 AND Refundreceiptdetl.Rfd_Date >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Refundreceiptdetl.Rfd_Date <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND REFUNDRECEIPTMAST.MH_CODE IN
                                                         (SELECT MH_CODE FROM multihospital)
@@ -20112,10 +20112,10 @@ ORDER BY Pcc_Desc`;
                                                 AND Refundreceiptmast.Rfc_Cancel IS NULL
                                                 AND Refundreceiptmast.Rfc_Cacr IN ('C', 'R')
                                                 AND Refundreceiptmast.RFD_RETDATE >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Refundreceiptmast.RFD_RETDATE <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND REFUNDRECEIPTMAST.MH_CODE IN
                                                         (SELECT MH_CODE FROM multihospital)
@@ -20150,10 +20150,10 @@ ORDER BY Pcc_Desc`;
                                                 AND REFUNDRECEIPTMAST.RFC_CAcr IN ('O')
                                                 AND Opbillmast.Opc_Cacr <> 'M'
                                                 AND Opbillmast.Opd_date >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Opbillmast.Opd_date <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -20184,10 +20184,10 @@ ORDER BY Pcc_Desc`;
                                                 AND NVL (Billmast.Bmc_Cancel, 'N') <> 'C'
                                                 AND billmast.BMC_COLLCNCODE IS NULL
                                                 AND Billmast.Bmd_Date >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Billmast.Bmd_Date <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -20218,10 +20218,10 @@ ORDER BY Pcc_Desc`;
                                                 AND Billmast.Bmc_Cacr IN ('C', 'R')
                                                 AND NVL (Billmast.Bmc_Cancel, 'N') = 'N'
                                                 AND Billmast.BMD_COLLDATE >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Billmast.BMD_COLLDATE <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -20255,10 +20255,10 @@ ORDER BY Pcc_Desc`;
                                                 AND NVL (Billmast.Bmc_Cancel, 'N') = 'N'
                                                 AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                                 AND Opbillmast.Opd_Date >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Opbillmast.Opd_Date <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -20292,10 +20292,10 @@ ORDER BY Pcc_Desc`;
                                                 AND NVL (Billmast.Bmc_Cancel, 'N') = 'N'
                                                 AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                                 AND Disbillmast.Dmd_Date >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Disbillmast.Dmd_Date <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -20324,10 +20324,10 @@ ORDER BY Pcc_Desc`;
                                                 AND NVL (Refundbillmast.Rfc_Cancel, 'N') <> 'C'
                                                 AND Refundbillmast.Rfc_Cacr IN ('C', 'R')
                                                 AND Refundbilldetl.Rfd_Date >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Refundbilldetl.Rfd_Date <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -20361,10 +20361,10 @@ ORDER BY Pcc_Desc`;
                                                 AND NVL (Refundbilldetl.Rfc_Cancel, 'N') = 'N'
                                                 AND Opbillmast.Opc_Cacr <> 'M'
                                                 AND Opbillmast.Opd_date >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Opbillmast.Opd_date <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -20397,10 +20397,10 @@ ORDER BY Pcc_Desc`;
                                                 AND Refundbillmast.Rfc_Cacr IN ('I')
                                                 AND Disbillmast.Dmc_Cacr <> 'M'
                                                 AND Disbillmast.dmd_date >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Disbillmast.dmd_date <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -20423,17 +20423,17 @@ ORDER BY Pcc_Desc`;
                                                 AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                                 AND Disbillmast.Dmc_Cacr <> 'M'
                                                 AND Disbillmast.dmd_date >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Disbillmast.dmd_date <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc)
                                 GROUP BY Code, Pcc_Desc
                                 HAVING SUM (Amt) <> 0
                                 ORDER BY Pcc_Desc`;
     try {
-      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(sql, {fromDate, toDate}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       //       callBack(null, );
       return result.rows;
     } catch (error) {
@@ -20473,10 +20473,10 @@ ORDER BY Pcc_Desc`;
                                                 AND Disbillmast.Dmc_Cacr <> 'M'
                                                 AND Misincexpdtl.Dg_Grcode = 46
                                                 AND Disbillmast.Dmd_Date >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Disbillmast.Dmd_Date <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -20502,10 +20502,10 @@ ORDER BY Pcc_Desc`;
                                                 AND NVL (Vsc_Cancel, 'N') = 'N'
                                                 AND Disbillmast.Dmc_Cacr <> 'M'
                                                 AND Disbillmast.Dmd_Date >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Disbillmast.Dmd_Date <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -20528,10 +20528,10 @@ ORDER BY Pcc_Desc`;
                                                 AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                                 AND Disbillmast.Dmc_Cacr <> 'M'
                                                 AND Disbillmast.Dmd_Date >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Disbillmast.Dmd_Date <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -20560,10 +20560,10 @@ ORDER BY Pcc_Desc`;
                                                 AND NVL (disroomdetl.dmc_cancel, 'N') = 'N'
                                                 AND Disbillmast.Dmc_Cacr <> 'M'
                                                 AND Disbillmast.DMD_DATE >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND disbillmast.dmd_date <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -20587,10 +20587,10 @@ ORDER BY Pcc_Desc`;
                                                 AND Iprefundmast.Ric_Cacr IN ('C', 'R')
                                                 AND NVL (Iprefundmast.Ric_Cancel, 'N') = 'N'
                                                 AND Iprefundmast.Rid_Date >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Iprefundmast.Rid_Date <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND IPREFUNDMAST.MH_CODE IN
                                                         (SELECT MH_CODE FROM multihospital)
@@ -20620,10 +20620,10 @@ ORDER BY Pcc_Desc`;
                                                 AND Disbillmast.Dmc_Cacr <> 'M'
                                                 AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                                 AND Disbillmast.Dmd_Date >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Disbillmast.Dmd_Date <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -20652,10 +20652,10 @@ ORDER BY Pcc_Desc`;
                                                 AND Disbillmast.Dmc_Cacr <> 'M'
                                                 AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                                 AND Disbillmast.Dmd_Date >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Disbillmast.Dmd_Date <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -20684,10 +20684,10 @@ ORDER BY Pcc_Desc`;
                                                 AND Disbillmast.Dmc_Cacr <> 'M'
                                                 AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                                 AND Disbillmast.Dmd_Date >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Disbillmast.Dmd_Date <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -20716,10 +20716,10 @@ ORDER BY Pcc_Desc`;
                                                 AND Disbillmast.Dmc_Cacr <> 'M'
                                                 AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                                 AND Disbillmast.Dmd_Date >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Disbillmast.Dmd_Date <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -20748,10 +20748,10 @@ ORDER BY Pcc_Desc`;
                                                 AND Disbillmast.Dmc_Cacr <> 'M'
                                                 AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                                 AND Disbillmast.Dmd_Date >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Disbillmast.Dmd_Date <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -20780,10 +20780,10 @@ ORDER BY Pcc_Desc`;
                                                 AND Disbillmast.Dmc_Cacr <> 'M'
                                                 AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                                 AND Disbillmast.Dmd_Date >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Disbillmast.Dmd_Date <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -20812,10 +20812,10 @@ ORDER BY Pcc_Desc`;
                                                 AND Disbillmast.Dmc_Cacr <> 'M'
                                                 AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                                 AND Disbillmast.Dmd_Date >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Disbillmast.Dmd_Date <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -20844,10 +20844,10 @@ ORDER BY Pcc_Desc`;
                                                 AND Disbillmast.Dmc_Cacr <> 'M'
                                                 AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                                 AND Disbillmast.Dmd_Date >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Disbillmast.Dmd_Date <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -20876,10 +20876,10 @@ ORDER BY Pcc_Desc`;
                                                 AND Disbillmast.Dmc_Cacr <> 'M'
                                                 AND Disbillmast.Mh_code = Ipparam.Mh_Code
                                                 AND Disbillmast.Dmd_Date >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Disbillmast.Dmd_Date <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -20909,10 +20909,10 @@ ORDER BY Pcc_Desc`;
                                                 AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                                 AND Disbillmast.Dmc_Cacr <> 'M'
                                                 AND Disbillmast.Dmd_Date >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Disbillmast.Dmd_Date <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                                 AND NVL (Patsurother.Src_Cancel, 'N') = 'N'
@@ -20940,10 +20940,10 @@ ORDER BY Pcc_Desc`;
                                                 AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                                 AND Disbillmast.Dmc_Cacr <> 'M'
                                                 AND Disbillmast.Dmd_Date >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Disbillmast.Dmd_Date <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                                 AND NVL (Patsurdetl.Src_Cancel, 'N') = 'N'
@@ -20971,10 +20971,10 @@ ORDER BY Pcc_Desc`;
                                                 AND Canbillmast.Cmc_Cacr = 'I'
                                                 AND Disbillmast.Dmc_Cacr <> 'M'
                                                 AND Disbillmast.Dmd_Date >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Disbillmast.Dmd_Date <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -21002,10 +21002,10 @@ ORDER BY Pcc_Desc`;
                                                 AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                                 AND Opbillmast.Opc_Cacr <> 'M'
                                                 AND Opbillmast.Opd_Date >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Opbillmast.Opd_Date <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -21033,10 +21033,10 @@ ORDER BY Pcc_Desc`;
                                                 AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                                 AND Opbillmast.Opc_Cacr <> 'M'
                                                 AND Opbillmast.Opd_Date >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Opbillmast.Opd_Date <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -21064,10 +21064,10 @@ ORDER BY Pcc_Desc`;
                                                 AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                                 AND Opbillmast.Opc_Cacr <> 'M'
                                                 AND Opbillmast.Opd_Date >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Opbillmast.Opd_Date <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -21095,10 +21095,10 @@ ORDER BY Pcc_Desc`;
                                                 AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                                 AND Opbillmast.Opc_Cacr <> 'M'
                                                 AND Opbillmast.Opd_Date >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Opbillmast.Opd_Date <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -21126,10 +21126,10 @@ ORDER BY Pcc_Desc`;
                                                 AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                                 AND Opbillmast.Opc_Cacr <> 'M'
                                                 AND Opbillmast.Opd_Date >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Opbillmast.Opd_Date <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -21157,10 +21157,10 @@ ORDER BY Pcc_Desc`;
                                                 AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                                 AND Opbillmast.Opc_Cacr <> 'M'
                                                 AND Opbillmast.Opd_Date >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Opbillmast.Opd_Date <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -21188,10 +21188,10 @@ ORDER BY Pcc_Desc`;
                                                 AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                                 AND Opbillmast.Opc_Cacr <> 'M'
                                                 AND Opbillmast.Opd_Date >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Opbillmast.Opd_Date <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -21219,10 +21219,10 @@ ORDER BY Pcc_Desc`;
                                                 AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                                 AND Opbillmast.Opc_Cacr <> 'M'
                                                 AND Opbillmast.Opd_Date >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Opbillmast.Opd_Date <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -21250,10 +21250,10 @@ ORDER BY Pcc_Desc`;
                                                 AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                                 AND Opbillmast.Opc_Cacr <> 'M'
                                                 AND Opbillmast.Opd_Date >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Opbillmast.Opd_Date <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -21283,10 +21283,10 @@ ORDER BY Pcc_Desc`;
                                                 AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                                 AND Opbillmast.Opc_Cacr <> 'M'
                                                 AND Opbillmast.Opd_Date >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Opbillmast.Opd_Date <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                                 AND NVL (Patsurother.Src_Cancel, 'N') = 'N'
@@ -21314,10 +21314,10 @@ ORDER BY Pcc_Desc`;
                                                 AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                                 AND Opbillmast.Opc_Cacr <> 'M'
                                                 AND Opbillmast.Opd_Date >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Opbillmast.Opd_Date <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                                 AND NVL (Patsurdetl.Src_Cancel, 'N') = 'N'
@@ -21346,10 +21346,10 @@ ORDER BY Pcc_Desc`;
                                                 AND Receiptmast.RPC_COLLCNCODE IS NULL
                                                 AND Receiptmast.Rpc_Cacr IN ('C', 'R')
                                                 AND Receiptmast.Rpd_Date >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Receiptmast.Rpd_Date <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -21377,10 +21377,10 @@ ORDER BY Pcc_Desc`;
                                                 AND Receiptmast.RPC_COLLCNCODE IS NOT NULL
                                                 AND Receiptmast.Rpc_Cacr IN ('C', 'R')
                                                 AND Receiptmast.RPD_COLLDATE >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Receiptmast.RPD_COLLDATE <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -21411,10 +21411,10 @@ ORDER BY Pcc_Desc`;
                                                 AND Receiptmast.Rpc_Cacr = 'O'
                                                 AND Opbillmast.Opc_cacr <> 'M'
                                                 AND Opbillmast.Opd_Date >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Opbillmast.Opd_Date <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND RECEIPTMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         GROUP BY Procategory.Pc_code, Procategory.Pcc_Desc
@@ -21442,10 +21442,10 @@ ORDER BY Pcc_Desc`;
                                                 AND Refundreceiptmast.RFC_RETCNCODE IS NULL
                                                 AND Refundreceiptmast.Rfc_Cacr IN ('C', 'R')
                                                 AND Refundreceiptdetl.Rfd_Date >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Refundreceiptdetl.Rfd_Date <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND REFUNDRECEIPTMAST.MH_CODE IN
                                                         (SELECT MH_CODE FROM multihospital)
@@ -21474,10 +21474,10 @@ ORDER BY Pcc_Desc`;
                                                 AND Refundreceiptmast.Rfc_Cancel IS NULL
                                                 AND Refundreceiptmast.Rfc_Cacr IN ('C', 'R')
                                                 AND Refundreceiptmast.RFD_RETDATE >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Refundreceiptmast.RFD_RETDATE <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND REFUNDRECEIPTMAST.MH_CODE IN
                                                         (SELECT MH_CODE FROM multihospital)
@@ -21512,10 +21512,10 @@ ORDER BY Pcc_Desc`;
                                                 AND REFUNDRECEIPTMAST.RFC_CAcr IN ('O')
                                                 AND Opbillmast.Opc_Cacr <> 'M'
                                                 AND Opbillmast.Opd_date >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Opbillmast.Opd_date <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -21546,10 +21546,10 @@ ORDER BY Pcc_Desc`;
                                                 AND NVL (Billmast.Bmc_Cancel, 'N') <> 'C'
                                                 AND billmast.BMC_COLLCNCODE IS NULL
                                                 AND Billmast.Bmd_Date >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Billmast.Bmd_Date <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -21580,10 +21580,10 @@ ORDER BY Pcc_Desc`;
                                                 AND Billmast.Bmc_Cacr IN ('C', 'R')
                                                 AND NVL (Billmast.Bmc_Cancel, 'N') = 'N'
                                                 AND Billmast.BMD_COLLDATE >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Billmast.BMD_COLLDATE <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -21617,10 +21617,10 @@ ORDER BY Pcc_Desc`;
                                                 AND NVL (Billmast.Bmc_Cancel, 'N') = 'N'
                                                 AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                                 AND Opbillmast.Opd_Date >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Opbillmast.Opd_Date <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -21654,10 +21654,10 @@ ORDER BY Pcc_Desc`;
                                                 AND NVL (Billmast.Bmc_Cancel, 'N') = 'N'
                                                 AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                                 AND Disbillmast.Dmd_Date >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Disbillmast.Dmd_Date <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -21686,10 +21686,10 @@ ORDER BY Pcc_Desc`;
                                                 AND NVL (Refundbillmast.Rfc_Cancel, 'N') <> 'C'
                                                 AND Refundbillmast.Rfc_Cacr IN ('C', 'R')
                                                 AND Refundbilldetl.Rfd_Date >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Refundbilldetl.Rfd_Date <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -21723,10 +21723,10 @@ ORDER BY Pcc_Desc`;
                                                 AND NVL (Refundbilldetl.Rfc_Cancel, 'N') = 'N'
                                                 AND Opbillmast.Opc_Cacr <> 'M'
                                                 AND Opbillmast.Opd_date >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Opbillmast.Opd_date <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -21759,10 +21759,10 @@ ORDER BY Pcc_Desc`;
                                                 AND Refundbillmast.Rfc_Cacr IN ('I')
                                                 AND Disbillmast.Dmc_Cacr <> 'M'
                                                 AND Disbillmast.dmd_date >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Disbillmast.dmd_date <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc
@@ -21785,17 +21785,17 @@ ORDER BY Pcc_Desc`;
                                                 AND NVL (Disbillmast.Dmc_Cancel, 'N') = 'N'
                                                 AND Disbillmast.Dmc_Cacr <> 'M'
                                                 AND Disbillmast.dmd_date >=
-                                                        TO_DATE ('${fromDate}',
+                                                        TO_DATE (:fromDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                                 AND Disbillmast.dmd_date <=
-                                                        TO_DATE ('${toDate}',
+                                                        TO_DATE (:toDate,
                                                                 'dd/MM/yyyy hh24:mi:ss')
                                         GROUP BY Procategory.Pc_Code, Procategory.Pcc_Desc)
                                 GROUP BY Code, Pcc_Desc
                                 HAVING SUM (Amt) <> 0
                                 ORDER BY Pcc_Desc`;
     try {
-      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(sql, {fromDate, toDate}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       //       callBack(null, );
       return result.rows;
     } catch (error) {
@@ -21832,10 +21832,10 @@ ORDER BY Pcc_Desc`;
                                         AND Pbillmast.Bmc_Cacr IN ('C', 'R')
                                         AND BMC_COLLCNCODE IS NULL
                                         AND Pbillmast.Bmd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Pbillmast.Bmd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND pbillmast.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Pbillmast.Bm_No,
@@ -21873,10 +21873,10 @@ ORDER BY Pcc_Desc`;
                                         AND MRC_RETCNCODE IS NULL
                                         AND NVL (MretMAST.Mrc_Cancel, 'N') = 'N'
                                         AND Mretdetl.Mrd_Date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Mretdetl.Mrd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND MRETMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Pbilldetl.Bm_no,
@@ -21902,10 +21902,10 @@ ORDER BY Pcc_Desc`;
                                         AND Pbillmast.Bmc_Cacr IN ('C', 'R')
                                         AND BMC_COLLCNCODE IS NOT NULL
                                         AND Pbillmast.BMD_COLLDATE >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Pbillmast.BMD_COLLDATE <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND pbillmast.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Pbillmast.Bm_No,
@@ -21943,10 +21943,10 @@ ORDER BY Pcc_Desc`;
                                         AND Mretdetl.Mrc_Cacr IN ('C', 'R')
                                         AND MRC_RETCNCODE IS NOT NULL
                                         AND Mretmast.MRD_RETDATE >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND Mretmast.MRD_RETDATE <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND MRETMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 GROUP BY Pbilldetl.Bm_no,
@@ -21962,7 +21962,7 @@ ORDER BY Pcc_Desc`;
                         HAVING SUM (Amt) <> 0
                         ORDER BY Bmd_Date`;
     try {
-      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(sql, {fromDate, toDate}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       //       callBack(null, );
       return result.rows;
     } catch (error) {
@@ -22004,10 +22004,10 @@ ORDER BY Pcc_Desc`;
                                             AND Pbillmast.Bmc_Cacr = 'O'
                                             AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                             AND Opbillmast.Opd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Opbillmast.Opd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Opbillmast.Op_No,
@@ -22048,10 +22048,10 @@ ORDER BY Pcc_Desc`;
                                             AND NVL (MretMAST.Mrc_Cancel, 'N') = 'N'
                                             AND NVL (Opbillmast.Opn_Cancel, 'N') = 'N'
                                             AND Opbillmast.Opd_Date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Opbillmast.Opd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND OPBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Opbillmast.Op_No,
@@ -22067,7 +22067,7 @@ ORDER BY Pcc_Desc`;
                             HAVING SUM (Amt) <> 0
                             ORDER BY Opd_Date`;
     try {
-      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(sql, {fromDate, toDate}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       //       callBack(null, );
       throw result.rows;
     } catch (error) {
@@ -22094,9 +22094,9 @@ ORDER BY Pcc_Desc`;
                                 AND Iprefundmast.Ric_Cacr IN ('C', 'R')
                                 AND Iprefunditemdetl.Ric_Type = 'PHY'
                                 AND Iprefundmast.Rid_Date >=
-                                    TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                    TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                                 AND Iprefundmast.Rid_Date <=
-                                    TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                    TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                                 AND IPREFUNDMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         GROUP BY Iprefundmast.Ri_No,
                                 Iprefundmast.Ric_Slno,
@@ -22105,7 +22105,7 @@ ORDER BY Pcc_Desc`;
                                 Ptc_Ptname`;
 
     try {
-      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(sql, {fromDate, toDate}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       //       callBack(null, );
       return result.rows;
     } catch (error) {
@@ -22147,10 +22147,10 @@ ORDER BY Pcc_Desc`;
                                     AND Pbillmast.Bmc_Cacr = 'I'
                                     AND NVL (Dmc_Cancel, 'N') = 'N'
                                     AND Disbillmast.Dmd_Date >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND Disbillmast.Dmd_Date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             GROUP BY Disbillmast.Dm_No,
@@ -22186,12 +22186,12 @@ ORDER BY Pcc_Desc`;
                                     AND NVL (Mretdetl.Mrc_Cancel, 'N') = 'N'
                                     AND NVL (Dmc_Cancel, 'N') = 'N'
                                     AND Disbillmast.Dmd_Date >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND mretmast.mrc_slno = mretdetl.mrc_slno
                                     AND NVL (MretMAST.Mrc_Cancel, 'N') = 'N'
                                     AND Disbillmast.Dmd_Date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                     'dd/MM/yyyy hh24:mi:ss')
                                     AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                             GROUP BY Disbillmast.Dm_No,
@@ -22207,7 +22207,7 @@ ORDER BY Pcc_Desc`;
                     HAVING SUM (Amt) <> 0
                     ORDER BY Dmd_Date`;
     try {
-      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(sql, {fromDate, toDate}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       //       callBack(null, );
       return result.rows;
     } catch (error) {

@@ -1,4 +1,4 @@
-const {getTmcConnection, getTmcCronConnection, getKmcConnection, oracleConnectionClose, restartPools} = require("./oradbconfig");
+const {getTmcConnection, getTmcCronConnection, oracleConnectionClose, restartPools} = require("./oradbconfig");
 
 const RETRY_ERRORS = ["DPI-1080", "DPI-1010", "ORA-03113", "ORA-03114", "ORA-00028", "ORA-12537", "ORA-12541", "ORA-12545", "NJS-040", "NJS-003", "NJS-511"];
 
@@ -16,7 +16,7 @@ function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-async function execute(getConnection, sql, bind = {}, options = {}) {
+async function execute(poolName, getConnection, sql, bind = {}, options = {}) {
   const MAX_RETRY = 3;
 
   let attempt = 0;
@@ -41,9 +41,9 @@ async function execute(getConnection, sql, bind = {}, options = {}) {
         throw err;
       }
 
-      console.log("Restarting Oracle Pools...");
+      console.log(`Restarting Oracle Pool: ${poolName}...`);
 
-      await restartPools();
+      await restartPools(poolName);
 
       // Wait for the new pools to become fully ready
       await sleep(3000);
@@ -64,6 +64,8 @@ async function execute(getConnection, sql, bind = {}, options = {}) {
 
 async function executeTmc(sql, bind = {}, options = {}) {
   return execute(
+    "TMC",
+
     getTmcConnection,
 
     sql,
@@ -75,21 +77,26 @@ async function executeTmc(sql, bind = {}, options = {}) {
 }
 
 // EXECUTE KMC SQL
-async function executeKmc(sql, bind = {}, options = {}) {
-  return execute(
-    getKmcConnection,
-
-    sql,
-
-    bind,
-
-    options,
-  );
-}
+// KMC pool is currently disabled (see config/oradbconfig.js) - not in use.
+// async function executeKmc(sql, bind = {}, options = {}) {
+//   return execute(
+//     "KMC",
+//
+//     getKmcConnection,
+//
+//     sql,
+//
+//     bind,
+//
+//     options,
+//   );
+// }
 
 //EXECUTE CRON
 async function executeCron(sql, bind = {}, options = {}) {
   return execute(
+    "TMC_CRON",
+
     getTmcCronConnection,
 
     sql,
@@ -136,7 +143,7 @@ async function executeTransaction(getConnection, callback) {
 
 module.exports = {
   executeTmc,
-  executeKmc,
+  // executeKmc,
   executeCron,
   executeTransaction,
   executeMany,

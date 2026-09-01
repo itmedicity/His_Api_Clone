@@ -228,7 +228,7 @@ const login = async (req, res) => {
 
     user.usc_pass = undefined;
 
-    const token = sign({result: user}, "@dhj$&$(*)dndkm76$%#jdn(^$6GH%^#73*#*", {expiresIn: "12h"});
+    const token = sign({result: user}, process.env.JWT_KEY, {expiresIn: "12h"});
 
     return res.json({
       success: 1,

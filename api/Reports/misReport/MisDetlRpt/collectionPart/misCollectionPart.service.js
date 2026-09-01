@@ -32,10 +32,10 @@ module.exports = {
                                             AND Billmast.Cu_code = Customer.Cu_code(+)
                                             AND Billmast.BMC_COLLcnCODE IS NOT NULL
                                             AND BMD_COLLDATE >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND BMD_COLLDATE <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                             AND Bmc_cacr IN ('R')
@@ -63,10 +63,10 @@ module.exports = {
                                             AND Billmast.Cu_code = Customer.Cu_code(+)
                                             AND Billmast.BMC_COLLcnCODE IS NULL
                                             AND Bmd_date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Bmd_date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND BILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                             AND Bmc_cacr IN ('R')
@@ -95,10 +95,10 @@ module.exports = {
                                             AND Billmast.BMC_COLLUSCODE = Users.Us_code
                                             AND Billmast.Cu_code = Customer.Cu_code(+)
                                             AND Refundbillmast.RFD_RETDATE >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Refundbillmast.RFD_RETDATE <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Refundbillmast.Rfc_cacr IN ('R')
                                             AND Refundbillmast.Roc_Slno IS NULL
@@ -130,10 +130,10 @@ module.exports = {
                                             AND refundbillmast.RFC_RETcnCODE IS NULL
                                             AND Billmast.Cu_code = Customer.Cu_code(+)
                                             AND Refundbillmast.Rfd_date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Refundbillmast.Rfd_date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Refundbillmast.Rfc_cacr IN ('R')
                                             AND Refundbillmast.Roc_Slno IS NULL
@@ -166,10 +166,10 @@ module.exports = {
                                             AND Opbillrefundmast.Roc_Slno = Refundbillmast.Roc_Slno
                                             AND Refundbillmast.Rfc_Cu_code = Customer.Cu_code(+)
                                             AND Refundbillmast.RFD_RETDATE >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Refundbillmast.RFD_RETDATE <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Refundbillmast.Rfc_cacr IN ('R')
                                             AND Refundbillmast.Roc_Slno IS NOT NULL
@@ -201,10 +201,10 @@ module.exports = {
                                             AND Opbillrefundmast.Roc_Slno = Refundbillmast.Roc_Slno
                                             AND Refundbillmast.Rfc_Cu_code = Customer.Cu_code(+)
                                             AND Refundbillmast.Rfd_date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Refundbillmast.Rfd_date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Refundbillmast.Rfc_cacr IN ('R')
                                             AND Refundbillmast.Roc_Slno IS NOT NULL
@@ -222,7 +222,7 @@ module.exports = {
                                     A.UserName
                             HAVING SUM (A.Amt) <> 0`;
     try {
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await conn_ora.execute(sql, {fromDate, toDate}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       // await result.resultSet?.getRows((err, rows) => {
       // })
       //       callBack(null, result.rows);
@@ -276,10 +276,10 @@ module.exports = {
                                         AND NVL (X.Mrc_cancel, 'N') <> 'Y'
                                         AND (NVL (BMN_RTCREDIT, 0)) <> 0
                                         AND X.Mrd_date >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND X.Mrd_date <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND X.MH_CODE IN (SELECT MH_CODE FROM multihospital)) A
                         GROUP BY A.Ptc_ptname,
@@ -290,7 +290,7 @@ module.exports = {
                         HAVING SUM (A.Amt) <> 0
                         ORDER BY A.Pt_no`;
     try {
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await conn_ora.execute(sql, {fromDate, toDate}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       //   await result.resultSet?.getRows((err, rows) => {
       // });
       return result.rows;
@@ -334,9 +334,9 @@ module.exports = {
                                                     WHERE NVL (dpc_cancel, 'N') = 'N')
                                 AND Dmc_cacr = 'R'
                                 AND Dmd_date >=
-                                    TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                    TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                                 AND Dmd_date <=
-                                    TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                    TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                                 AND NVL (Dmc_cancel, 'N') = 'N'
                                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         GROUP BY Ptc_ptname,
@@ -346,7 +346,7 @@ module.exports = {
                                 Usc_Name
                         HAVING SUM (NVL (Dmn_credit, 0)) <> 0`;
     try {
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await conn_ora.execute(sql, {fromDate, toDate}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       //   await result.resultSet?.getRows((err, rows) => {
       // });
       return result.rows;
@@ -391,10 +391,10 @@ module.exports = {
                                 AND Pbillmast.Cu_code = Customer.Cu_code(+)
                                 AND NVL (Bmn_credit, 0) <> 0
                                 AND Bmd_date >=
-                                    TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                    TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                                 AND Pbillmast.BMC_COLLCNCODE IS NULL
                                 AND Bmd_date <=
-                                    TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                    TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                                 AND pbillmast.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 AND Bmc_cacr = 'R'
                                 AND NVL (Bmc_cancel, 'N') <> 'Y'
@@ -406,7 +406,7 @@ module.exports = {
                         HAVING SUM (NVL (Bmn_credit, 0)) <> 0
                         ORDER BY Pbillmast.Pt_no`;
     try {
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await conn_ora.execute(sql, {fromDate, toDate}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       //   await result.resultSet?.getRows((err, rows) => {
       // });
       //       callBack(null, );
@@ -450,10 +450,10 @@ module.exports = {
                                 AND Pbillmast.Cu_code = Customer.Cu_code(+)
                                 AND NVL (Bmn_credit, 0) <> 0
                                 AND BMD_COLLDATE >=
-                                    TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                    TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                                 AND Pbillmast.BMC_COLLCNCODE IS NOT NULL
                                 AND BMD_COLLDATE <=
-                                    TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                    TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                                 AND pbillmast.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 AND Bmc_cacr = 'R'
                                 AND NVL (Bmc_cancel, 'N') <> 'Y'
@@ -465,7 +465,7 @@ module.exports = {
                         HAVING SUM (NVL (Bmn_credit, 0)) <> 0
                         ORDER BY Pbillmast.Pt_no`;
     try {
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await conn_ora.execute(sql, {fromDate, toDate}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       //   await result.resultSet?.getRows((err, rows) => {
       // });
       //       callBack(null, );
@@ -519,10 +519,10 @@ module.exports = {
                                         AND NVL (X.Mrc_cancel, 'N') = 'N'
                                         AND (NVL (BMN_RTCREDIT, 0)) <> 0
                                         AND X.MRD_RETDATE >=
-                                            TO_DATE ('${fromDate}',
+                                            TO_DATE (:fromDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND X.MRD_RETDATE <=
-                                            TO_DATE ('${toDate}',
+                                            TO_DATE (:toDate,
                                                         'dd/MM/yyyy hh24:mi:ss')
                                         AND X.MH_CODE IN (SELECT MH_CODE FROM multihospital)) A
                         GROUP BY A.Ptc_ptname,
@@ -532,7 +532,7 @@ module.exports = {
                                 A.UserName
                         HAVING SUM (A.Amt) <> 0`;
     try {
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await conn_ora.execute(sql, {fromDate, toDate}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       //   await result.resultSet?.getRows((err, rows) => {
       // });
       //       callBack(null, );
@@ -587,10 +587,10 @@ module.exports = {
                                             AND NVL (Disbillmast.Dmc_cancel, 'N') = 'N'
                                             AND NVL (Dmn_ptpayable, 0) <> 0
                                             AND Disbillmast.Dmd_date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Disbillmast.Dmd_date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                     GROUP BY Ptc_ptname,
@@ -631,17 +631,17 @@ module.exports = {
                                             AND Disbillmast.Cu_code = Customer.Cu_code(+)
                                             AND Ipreceipt.Dmc_slno = Disbillmast.Dmc_slno
                                             AND Disbillmast.Dmd_date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Disbillmast.Dmd_date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND Ipreceipt.Dmc_type IN ('C', 'R')
                                             AND IRD_DATE >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND IRD_DATE <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND ipreceipt.IPC_MHCODE IN
                                                     (SELECT MH_CODE FROM multihospital)
@@ -674,10 +674,10 @@ module.exports = {
                                             AND billmast.bmc_cacr IN ('C', 'R')
                                             AND billmast.RPN_PTPAYABLE > 0
                                             AND billmast.bmd_DATE >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND billmast.bmd_DATE <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND billmast.mh_code IN (SELECT MH_CODE FROM multihospital)
                                             AND NVL (billmast.bmc_cancel, 'N') <> 'C'
@@ -718,10 +718,10 @@ module.exports = {
                                             AND refundbillmast.RPN_RTPTPAYABLE > 0
                                             AND NVL (refundbillmast.ROC_SLNO, 'N') = 'N'
                                             AND refundbillmast.rfd_DATE >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND refundbillmast.rfd_DATE <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                     GROUP BY Ptc_ptname,
                                             billmast.Pt_no,
@@ -749,10 +749,10 @@ module.exports = {
                                             AND receiptmast.cu_code = customer.cu_code(+)
                                             AND receiptmast.RPC_CACR IN ('C', 'R')
                                             AND receiptmast.RpD_DATE >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND receiptmast.Rpd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND receiptmast.Us_code = Users.Us_code
                                             AND receiptmast.mh_code IN (SELECT MH_CODE FROM multihospital)
@@ -796,10 +796,10 @@ module.exports = {
                                                     TRUNC (NVL (RFD_RETDATE, SYSDATE + 1))
                                             AND refundreceiptmast.RPN_RTPTPAYABLE > 0
                                             AND refundreceiptmast.RfD_DATE >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND refundreceiptmast.Rfd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND NVL (refundreceiptmast.rfc_cancel, 'N') = 'P'
                                     GROUP BY Ptc_ptname,
@@ -834,10 +834,10 @@ module.exports = {
                                                     TRUNC (NVL (BMD_COLLDATE, SYSDATE + 1))
                                             AND pbillmast.RPN_PTPAYABLE > 0
                                             AND pbillmast.Bmd_date >=
-                                                    TO_DATE ('${fromDate}',
+                                                    TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND pbillmast.Bmd_Date <=
-                                                    TO_DATE ('${toDate}',
+                                                    TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                     GROUP BY Ptc_ptname,
                                             pbillmast.Pt_no,
@@ -881,10 +881,10 @@ module.exports = {
                                                 TRUNC (NVL (mretmast.MRD_RETDATE, SYSDATE + 1))
                                             AND mretmast.RPN_RTPTPAYABLE > 0
                                             AND mretmast.Mrd_date >=
-                                                TO_DATE ('${fromDate}',
+                                                TO_DATE (:fromDate,
                                                             'dd/MM/yyyy hh24:mi:ss')
                                             AND mretmast.Mrd_Date <=
-                                                TO_DATE ('${toDate}',
+                                                TO_DATE (:toDate,
                                                             'dd/MM/yyyy hh24:mi:ss')) A
                             GROUP BY Ptname,
                                     ptno,
@@ -896,7 +896,7 @@ module.exports = {
                             HAVING SUM (NVL (Amt, 0)) <> 0
                             ORDER BY 3, 1`;
     try {
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await conn_ora.execute(sql, {fromDate, toDate}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       //   await result.resultSet?.getRows((err, rows) => {
       // });
       //       callBack(null, );
@@ -925,9 +925,9 @@ module.exports = {
                                 AND Opadvance.Us_code = Users.Us_code
                                 AND NVL (Arc_cancel, 'N') = 'N'
                                 AND Ard_date >=
-                                    TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                    TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                                 AND Ard_date <=
-                                    TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                    TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                                 AND OPADVANCE.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         GROUP BY Ptc_ptname,
                                 Opadvance.Pt_no,
@@ -944,9 +944,9 @@ module.exports = {
                                 AND Phadvanceentry.Us_code = Users.Us_code
                                 AND (NVL (Arc_cancel, 'N') = 'N')
                                 AND Ard_date >=
-                                    TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                    TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                                 AND Ard_date <=
-                                    TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                    TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                                 AND PHADVANCEENTRY.ARC_MHCODE IN (SELECT MH_CODE FROM multihospital)
                         GROUP BY Patient.Ptc_ptname,
                                 Phadvanceentry.Pt_no,
@@ -967,9 +967,9 @@ module.exports = {
                                 AND IPadmiss.Pt_no = Patient.Pt_no
                                 AND (NVL (Arc_cancel, 'N') = 'N')
                                 AND Ard_date >=
-                                    TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                    TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                                 AND Ard_date <=
-                                    TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                    TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                                 AND IPADVANCE.IAC_MHCODE IN (SELECT MH_CODE FROM multihospital)
                         GROUP BY Patient.Ptc_ptname,
                                 Patient.Pt_no,
@@ -986,16 +986,16 @@ module.exports = {
                                 AND Advanceentry.Us_code = Users.Us_code
                                 AND (NVL (Arc_cancel, 'N') = 'N')
                                 AND Ard_date >=
-                                    TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                    TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                                 AND Ard_Date <=
-                                    TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                    TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                                 AND ADVANCEENTRY.ARC_MHCODE IN (SELECT MH_CODE FROM multihospital)
                         GROUP BY Ptc_ptname,
                                 Advanceentry.Pt_no,
                                 Ar_no,
                                 Usc_name`;
     try {
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await conn_ora.execute(sql, {fromDate, toDate}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       //   await result.resultSet?.getRows((err, rows) => {
       // });
       //       callBack(null, );
@@ -1028,12 +1028,12 @@ module.exports = {
                             AND X.Us_code = Z.Us_code(+)
                             AND NVL (X.Rcc_cancel, 'N') = 'N'
                             AND X.Rcd_date >=
-                                TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                             AND X.Rcd_date <=
-                                TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                             AND X.MH_CODE IN (SELECT MH_CODE FROM multihospital)`;
     try {
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await conn_ora.execute(sql, {fromDate, toDate}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       //   await result.resultSet?.getRows((err, rows) => {
       // });
       //       callBack(null, );
@@ -1065,11 +1065,11 @@ module.exports = {
                     WHERE     X.Cu_code = Y.Cu_code
                             AND X.Us_code = Z.Us_code(+)
                             AND NVL (X.Rcc_cancel, 'N') = 'N'
-                            AND X.Rfd_Date >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
-                            AND X.Rfd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                            AND X.Rfd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                            AND X.Rfd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                             AND X.MH_CODE IN (SELECT MH_CODE FROM multihospital)`;
     try {
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await conn_ora.execute(sql, {fromDate, toDate}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       //   await result.resultSet?.getRows((err, rows) => {
       // });
       //       callBack(null, );

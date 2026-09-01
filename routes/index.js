@@ -65,6 +65,7 @@ const bisQuotationData = require("../api/Version_1/BIS/bis_quotation/bis_quotati
 
 //COLLECTION REPORTS TMCH
 const collectionTmc = require("../api/Reports/CollectionReports/CollectionTmc/collectionTmc.router");
+const collectionOraUsers = require("../api/Reports/CollectionReports/OraUsers/oraUsers.router");
 
 //AMS Antibiotic
 const amsAntibioticData = require("../api/Ams/Ams.router");
@@ -174,6 +175,7 @@ module.exports = (app) => {
 
   //COLLECTION REPORTS TMCH
   app.use("/api/collectionOnlyQmt", collectionTmc);
+  app.use("/api/collectionOraUsers", collectionOraUsers);
   app.use("/api/storeReport", storeReport);
 
   /**

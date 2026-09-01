@@ -26,16 +26,16 @@ module.exports = {
                         PBILLDETL.ITN_MRP,
                         PBILLDETL.BDN_AMOUNT,
                         MEDDESC.ITC_DESC
-                     FROM PBILLDETL 
+                     FROM PBILLDETL
                         LEFT JOIN MEDDESC ON MEDDESC.IT_CODE=PBILLDETL.IT_CODE
-                     WHERE PBILLDETL.BMD_DATE >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
-                        AND PBILLDETL.BMD_DATE <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                     WHERE PBILLDETL.BMD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                        AND PBILLDETL.BMD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                         AND PBILLDETL.BDC_CANCEL = 'N'
-                        AND PBILLDETL.OU_CODE IN  ('${ouCode}')
+                        AND PBILLDETL.OU_CODE = :ouCode
                        ) MONTHTABLE
                      GROUP BY OU_CODE,IT_CODE,BMD_DATE,ITC_DESC
                      ORDER BY ITC_DESC`;
-      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(sql, {fromDate, toDate, ouCode}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       return await result.resultSet?.getRows((err, rows) => rows);
     } catch (error) {
       console.log(error);
@@ -55,13 +55,13 @@ module.exports = {
                         TO_CHAR(VSD_DATE , 'YYYY-MM') MONTHS,
                         VS_NO
                     FROM VISITMAST
-                    WHERE VISITMAST.VSD_DATE >= TO_DATE ('${fromDate}','dd/MM/yyyy hh24:mi:ss') 
-                        AND  VISITMAST.VSD_DATE <= TO_DATE ('${toDate}','dd/MM/yyyy hh24:mi:ss')
-                        AND VISITMAST.VSC_PTFLAG = 'N' 
-                        AND VISITMAST.VSC_CANCEL IS NULL) A 
-                    GROUP BY MONTHS  
+                    WHERE VISITMAST.VSD_DATE >= TO_DATE (:fromDate,'dd/MM/yyyy hh24:mi:ss')
+                        AND  VISITMAST.VSD_DATE <= TO_DATE (:toDate,'dd/MM/yyyy hh24:mi:ss')
+                        AND VISITMAST.VSC_PTFLAG = 'N'
+                        AND VISITMAST.VSC_CANCEL IS NULL) A
+                    GROUP BY MONTHS
                     ORDER BY MONTHS`;
-      const result = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await executeTmc(sql, {fromDate, toDate}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       return result.rows;
     } catch (error) {
       console.log(error);

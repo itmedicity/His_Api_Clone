@@ -1,5 +1,6 @@
 // @ts-nocheck
 const {oracledb, getTmcConnection, oracleConnectionClose} = require("../../../../../config/oradbconfig");
+const {buildInClause} = require("../../../../../utls/controller-helperFun");
 
 module.exports = {
   creditInsuranceBillDetlPart1: async (data) => {
@@ -59,7 +60,7 @@ module.exports = {
     let conn_ora = await getTmcConnection();
 
     // const ipNumberList = data.ptno.join(',');
-    const ipNumberList = (data?.ptno?.length > 0 && data?.ptno?.join(",")) || null;
+    const ipNumberList = buildInClause(data?.ptno, "ip");
     const fromDate = data.from;
     const toDate = data.to;
 
@@ -87,10 +88,10 @@ module.exports = {
                                                     FROM DISBILLPAYEEALLOC
                                                     WHERE NVL (dpc_cancel, 'N') = 'N')
                                 AND Dmc_cacr = 'R'
-                                AND Dmd_date >=TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
-                                AND Dmd_date <=TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                AND Dmd_date >=TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                                AND Dmd_date <=TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                                 AND NVL (Dmc_cancel, 'N') = 'N'
-                                AND Disbillmast.IP_NO IN (${ipNumberList})
+                                AND Disbillmast.IP_NO IN ${ipNumberList.clause}
                                 AND DISBILLMAST.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                         GROUP BY Ptc_ptname,
                                 Disbillmast.Pt_no,
@@ -99,7 +100,11 @@ module.exports = {
                                 Usc_Name
                         HAVING SUM (NVL (Dmn_credit, 0)) <> 0`;
     try {
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await conn_ora.execute(
+        sql,
+        {...ipNumberList.binds, fromDate, toDate},
+        {outFormat: oracledb.OUT_FORMAT_OBJECT},
+      );
       // callBack(null, );
       return result.rows;
     } catch (error) {
@@ -113,7 +118,7 @@ module.exports = {
     let conn_ora = await getTmcConnection();
 
     // const ipNumberList = data.ptno.join(',');
-    const ipNumberList = (data?.ptno?.length > 0 && data?.ptno?.join(",")) || null;
+    const ipNumberList = buildInClause(data?.ptno, "ip");
     const fromDate = data.from;
     const toDate = data.to;
 
@@ -143,14 +148,14 @@ module.exports = {
                                 AND Pbillmast.Cu_code = Customer.Cu_code(+)
                                 AND NVL (Bmn_credit, 0) <> 0
                                 AND Bmd_date >=
-                                    TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                    TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                                 AND Pbillmast.BMC_COLLCNCODE IS NULL
                                 AND Bmd_date <=
-                                    TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                    TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                                 AND pbillmast.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 AND Bmc_cacr = 'R'
                                 AND NVL (Bmc_cancel, 'N') <> 'Y'
-                                AND PBILLMAST.IP_NO IN (${ipNumberList})
+                                AND PBILLMAST.IP_NO IN ${ipNumberList.clause}
                         GROUP BY Ptc_ptname,
                                 Pbillmast.Pt_no,
                                 Bm_no,
@@ -159,7 +164,11 @@ module.exports = {
                         HAVING SUM (NVL (Bmn_credit, 0)) <> 0
                         ORDER BY Pbillmast.Pt_no`;
     try {
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await conn_ora.execute(
+        sql,
+        {...ipNumberList.binds, fromDate, toDate},
+        {outFormat: oracledb.OUT_FORMAT_OBJECT},
+      );
       // callBack(null, );
       return result.rows;
     } catch (error) {
@@ -173,7 +182,7 @@ module.exports = {
     let conn_ora = await getTmcConnection();
 
     // const ipNumberList = data.ptno.join(',');
-    const ipNumberList = (data?.ptno?.length > 0 && data?.ptno?.join(",")) || null;
+    const ipNumberList = buildInClause(data?.ptno, "ip");
     const fromDate = data.from;
     const toDate = data.to;
 
@@ -195,14 +204,14 @@ module.exports = {
                                 AND Pbillmast.Cu_code = Customer.Cu_code(+)
                                 AND NVL (Bmn_credit, 0) <> 0
                                 AND BMD_COLLDATE >=
-                                    TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                    TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                                 AND Pbillmast.BMC_COLLCNCODE IS NOT NULL
                                 AND BMD_COLLDATE <=
-                                    TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                    TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                                 AND pbillmast.MH_CODE IN (SELECT MH_CODE FROM multihospital)
                                 AND Bmc_cacr = 'R'
                                 AND NVL (Bmc_cancel, 'N') <> 'Y'
-                                AND PBILLMAST.IP_NO IN (${ipNumberList})
+                                AND PBILLMAST.IP_NO IN ${ipNumberList.clause}
                         GROUP BY Ptc_ptname,
                                 Pbillmast.Pt_no,
                                 Bm_no,
@@ -211,7 +220,11 @@ module.exports = {
                         HAVING SUM (NVL (Bmn_credit, 0)) <> 0
                         ORDER BY Pbillmast.Pt_no`;
     try {
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await conn_ora.execute(
+        sql,
+        {...ipNumberList.binds, fromDate, toDate},
+        {outFormat: oracledb.OUT_FORMAT_OBJECT},
+      );
       // callBack(null, );
       return result.rows;
     } catch (error) {
@@ -282,7 +295,7 @@ module.exports = {
     let conn_ora = await getTmcConnection();
 
     // const ipNumberList = data.ptno.join(',');
-    const ipNumberList = (data?.ptno?.length > 0 && data?.ptno?.join(",")) || null;
+    const ipNumberList = buildInClause(data?.ptno, "ip");
     const fromDate = data.from;
     const toDate = data.to;
 
@@ -296,11 +309,11 @@ module.exports = {
                                 AND Opadvance.Us_code = Users.Us_code
                                 AND NVL (Arc_cancel, 'N') = 'N'
                                 AND Ard_date >=
-                                    TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                    TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                                 AND Ard_date <=
-                                    TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                    TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                                 AND OPADVANCE.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-                                AND OPADVANCE.IP_NO IN (${ipNumberList})
+                                AND OPADVANCE.IP_NO IN ${ipNumberList.clause}
                         GROUP BY Ptc_ptname,
                                 Opadvance.Pt_no,
                                 Ar_no,
@@ -320,17 +333,21 @@ module.exports = {
                                 AND IPadmiss.Pt_no = Patient.Pt_no
                                 AND (NVL (Arc_cancel, 'N') = 'N')
                                 AND Ard_date >=
-                                    TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                    TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
                                 AND Ard_date <=
-                                    TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                                    TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                                 AND IPADVANCE.IAC_MHCODE IN (SELECT MH_CODE FROM multihospital)
-                                AND Ipadmiss.IP_NO IN (${ipNumberList})
+                                AND Ipadmiss.IP_NO IN ${ipNumberList.clause}
                         GROUP BY Patient.Ptc_ptname,
                                 Patient.Pt_no,
                                 Ar_no,
                                 Usc_name`;
     try {
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await conn_ora.execute(
+        sql,
+        {...ipNumberList.binds, fromDate, toDate},
+        {outFormat: oracledb.OUT_FORMAT_OBJECT},
+      );
       // callBack(null, );
       return result.rows;
     } catch (error) {
@@ -344,7 +361,7 @@ module.exports = {
     let conn_ora = await getTmcConnection();
 
     // const ipNumberList = data.ptno.join(',');
-    const ipNumberList = (data?.ptno?.length > 0 && data?.ptno?.join(",")) || null;
+    const ipNumberList = buildInClause(data?.ptno, "ip");
     const fromDate = data.from;
     const toDate = data.to;
 
@@ -362,13 +379,17 @@ module.exports = {
                             AND X.Us_code = Z.Us_code(+)
                             AND NVL (X.Rcc_cancel, 'N') = 'N'
                             AND R.RCC_SLNO(+) = X.RCC_SLNO
-                            AND X.Rcd_date >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
-                            AND X.Rcd_date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                            AND X.Rcd_date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                            AND X.Rcd_date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                             AND X.MH_CODE IN (SELECT MH_CODE FROM multihospital)
-                            AND R.IP_NO  IN (${ipNumberList})
+                            AND R.IP_NO  IN ${ipNumberList.clause}
                             GROUP BY X.Rc_no,Rcn_cash,Rcn_chk,Rcn_dd,Rcn_Card,RCN_NEFT,Rcc_Bank,Cuc_name,Usc_name`;
     try {
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await conn_ora.execute(
+        sql,
+        {...ipNumberList.binds, fromDate, toDate},
+        {outFormat: oracledb.OUT_FORMAT_OBJECT},
+      );
       // callBack(null, );
       return result.rows;
     } catch (error) {
@@ -382,7 +403,7 @@ module.exports = {
     let conn_ora = await getTmcConnection();
 
     // const ipNumberList = data.ptno.join(',');
-    const ipNumberList = (data?.ptno?.length > 0 && data?.ptno?.join(",")) || null;
+    const ipNumberList = buildInClause(data?.ptno, "ip");
     const fromDate = data.from;
     const toDate = data.to;
 
@@ -400,12 +421,16 @@ module.exports = {
                             AND X.Us_code = Z.Us_code(+)
                             AND R.RCC_SLNO(+) = X.RCC_SLNO
                             AND NVL (X.Rcc_cancel, 'N') = 'N'
-                            AND R.IP_NO IN (${ipNumberList})
-                            AND X.Rfd_Date >= TO_DATE ('${fromDate}', 'dd/MM/yyyy hh24:mi:ss')
-                            AND X.Rfd_Date <= TO_DATE ('${toDate}', 'dd/MM/yyyy hh24:mi:ss')
+                            AND R.IP_NO IN ${ipNumberList.clause}
+                            AND X.Rfd_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')
+                            AND X.Rfd_Date <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
                             AND X.MH_CODE IN (SELECT MH_CODE FROM multihospital)`;
     try {
-      const result = await conn_ora.execute(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const result = await conn_ora.execute(
+        sql,
+        {...ipNumberList.binds, fromDate, toDate},
+        {outFormat: oracledb.OUT_FORMAT_OBJECT},
+      );
       // callBack(null, );
       return result.rows;
     } catch (error) {

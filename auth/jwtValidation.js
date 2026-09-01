@@ -5,7 +5,7 @@ module.exports = {
         if (token.startsWith("Bearer")) {
             // Remove Bearer from string
             token = token.slice(7);
-            jwt.verify(token, "@dhj$&$(*)dndkm76$%#jdn(^$6GH%^#73*#*", (err, decoded) => {
+            jwt.verify(token, process.env.JWT_KEY, (err, decoded) => {
                 if (err) {
                     console.log(err)
                     return res.json({

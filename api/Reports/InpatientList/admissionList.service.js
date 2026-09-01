@@ -309,7 +309,8 @@ module.exports = {
                     WHERE IPRECEIPT.DMC_SLNO =  IPADMISS.DMC_SLNO
                     AND IRC_CANCEL IS NULL
                     AND IRD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh24:mi:ss')  
-                    AND  IRD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')`;
+                    AND  IRD_DATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh24:mi:ss')
+                    GROUP BY IPADMISS.IP_NO,IPADMISS.IPD_DATE`;
       const result = await executeTmc(
         sql,
         {
