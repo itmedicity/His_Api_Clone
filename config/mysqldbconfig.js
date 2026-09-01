@@ -1,5 +1,12 @@
 const mysql = require("mysql2/promise");
 
+// A pooled connection that goes silently dead (idle timeout on the MySQL
+// server, a network/firewall drop with no TCP RST) has no other way to
+// surface as an error - without this, a query on it just hangs forever with
+// no log line, and only a full process restart (which recreates the pool)
+// clears it.
+const QUERY_TIMEOUT_MS = 30000;
+
 const baseConfig = {
   host: process.env.DB_HOST,
   port: Number(process.env.DB_PORT || 3306),
@@ -13,6 +20,7 @@ const baseConfig = {
   timezone: "+00:00",
   enableKeepAlive: true,
   keepAliveInitialDelay: 10000,
+  connectTimeout: 10000,
 };
 
 const pools = {
@@ -42,13 +50,21 @@ pools.meliora.on("connection", setupSession);
 pools.bis.on("connection", setupSession);
 pools.ellider.on("connection", setupSession);
 
+// A dead background connection can emit 'error' on the pool outside of any
+// query's promise chain. Node throws unhandled EventEmitter 'error' events
+// as an uncaughtException, which would take down the whole process - these
+// listeners turn that into a logged, non-fatal event instead.
+pools.meliora.on("error", (err) => console.error("[mysql:meliora] pool error:", err));
+pools.bis.on("error", (err) => console.error("[mysql:bis] pool error:", err));
+pools.ellider.on("error", (err) => console.error("[mysql:ellider] pool error:", err));
+
 /* --------------------------------------------------
    Query Helpers - single query
 -------------------------------------------------- */
 async function query(poolName, sql, params = []) {
   const pool = pools[poolName];
   if (!pool) throw new Error(`Unknown pool: ${poolName}`);
-  const [rows] = await pool.query(sql, params);
+  const [rows] = await pool.query({sql, values: params, timeout: QUERY_TIMEOUT_MS});
   return rows;
 }
 
@@ -69,7 +85,7 @@ async function transaction(poolName, queries = []) {
 
     const results = [];
     for (const q of queries) {
-      const [res] = await conn.query(q.sql, q.values || []);
+      const [res] = await conn.query({sql: q.sql, values: q.values || [], timeout: QUERY_TIMEOUT_MS});
       results.push(res);
     }
 
