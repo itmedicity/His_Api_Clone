@@ -1,4 +1,4 @@
-const {getPODetails, getPendingPODetails, getItemGrnDetails, getPODetailsBySupplier, getItemDetails} = require("./purchase.service");
+const { getPODetails, getPendingPODetails, getItemGrnDetails, getPODetailsBySupplier, getItemDetails } = require("./purchase.service");
 
 module.exports = {
   getPODetails: async (req, res) => {
