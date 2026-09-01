@@ -43,7 +43,7 @@ app.use(compression());
 // CORS CONFIGURATION
 app.use(
   cors({
-    origin: ["http://localhost:3000", "https://mis.tmchospital.com"],
+    origin: process.env.CORS_ORIGINS.split(",").map((origin) => origin.trim()),
     credentials: false,
   }),
 );
