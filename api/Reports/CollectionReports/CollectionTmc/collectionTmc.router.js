@@ -1,8 +1,9 @@
 const {checkToken} = require("../../../../auth/jwtValidation");
 const router = require("express").Router();
-const getCollectionReports = require("./collectionTmc.controller");
+const {getCollectionReports, getUserWiseCollectionSummary} = require("./collectionTmc.controller");
 
 router.get("/getUnsettledAmountUserWise", checkToken, getCollectionReports);
+router.get("/getUserWiseCollectionSummary", checkToken, getUserWiseCollectionSummary);
 // router.post("/collection", checkToken, collectionReports);
 
 module.exports = router;
