@@ -3,7 +3,7 @@ const router = require("express").Router();
 const {getCollectionReports, getUserWiseCollectionSummary} = require("./collectionGrouped.controller");
 
 router.get("/getUnsettledAmountUserWise", checkToken, getCollectionReports);
-router.get("/getUserWiseCollectionSummary", checkToken, getUserWiseCollectionSummary);
+router.post("/getUserWiseCollectionSummary", checkToken, getUserWiseCollectionSummary);
 // router.post("/collection", checkToken, collectionReports);
 
 module.exports = router;

@@ -1,0 +1,29 @@
+Tables referenced in collection.sql.js
+(D:\0-MIS_CLONE\Development\Ellider_Mis_Api\api\Reports\CollectionReports\CollectionGrouped\collection.sql.js)
+
+Table               | Used in
+--------------------|----------------------------------------------------------------
+BILLMAST            | sql_one, sql_advSettldBill, sql_billmastCollection
+USERS               | almost every query (join for us_code/usc_name)
+CUSTOMER            | sql_one
+USERCLINICS         | sql_one (subquery)
+DISBILLMAST         | sql_ipBill, sql_ipReceiptCollection, sql_ipReceiptPrevCollection, sql_advSettldIp
+OPBILLMAST          | sql_opBillConsolidated, sql_advSettldOp
+RECEIPTMAST         | sql_opBillReceipt
+PBILLMAST           | sql_posBilling, sql_advSettldPharmacy
+PHADVANCEENTRY      | sql_advPharmacy
+REFUNDADVANCE       | sql_advPharmacy
+IPADVANCE           | sql_advIp
+IPRECEIPT           | sql_advIp, sql_ipReceiptCollection, sql_ipReceiptPrevCollection
+ADVANCEENTRY        | sql_advBilling
+ADVANCERETURN       | sql_advBilling
+OPADVANCE           | sql_advOp
+REFUNDOPADVANCE     | sql_advOp
+RECPCOLLECTIONMAST  | sql_creditBillCollection
+MRETMAST            | sql_refundPharmacy
+REFUNDBILLMAST      | sql_refundBillmast
+REFUNDRECEIPTMAST   | sql_refundReceipt
+IPREFUNDMAST        | sql_refundIp
+IPRECEIPTREFUND     | sql_refundIpReceipt
+
+Total: 21 distinct tables (all Oracle; no MySQL usage in this file), plus USERS joined in nearly every query as the cashier lookup.

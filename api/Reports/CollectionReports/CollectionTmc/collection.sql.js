@@ -68,6 +68,7 @@ const sql_one = `SELECT SUM (0) AS Cash,
                         Billmast.IP_NO,
                         BILLMAST.BMC_IPOP`;
 
+// TMCH - ONLY
 // ---------------------------------------------------------------------------
 // User Wise Collection — Summary section (Phase 1)
 // Each query below is adapted from the matching numbered query in
@@ -81,7 +82,7 @@ const sql_one = `SELECT SUM (0) AS Cash,
 
 // Source: query 46 — base cashier list so every active user appears even with zero activity
 const sql_usersList = `SELECT INITCAP (usc_name) AS usc_name, us_code FROM users ORDER BY usc_name`;
-
+// ALL - TMCH , TSSH ,GROUPED
 // Source: query 42 — IP Bill revenue (Disbillmast). The "IP Bill refund" branch is deliberately
 // excluded: real-data verification (Najam/Pradeepkumar/Rajeshkumar/Sinic, 01/12/2025) showed the
 // legacy report keeps refunds in a separate "Refund" section entirely, undiminished, rather than
@@ -95,12 +96,14 @@ const sql_ipBill = `SELECT INITCAP (users.usc_name) AS usc_name, users.us_code,
                         SUM (NVL (DMN_ROUND, 0)) RoundOff
                     FROM Disbillmast, USERS
                   WHERE     Disbillmast.US_CODE = USERS.US_CODE
-                        AND Dmc_cacr IN ('C', 'R')
+                        AND Dmc_cacr NOT IN ('C', 'R')
+                        AND NOT EXISTS (SELECT 1 FROM MEDIWARE.GTT_EXCLUDE_IP gtt WHERE gtt.IP_NO = Disbillmast.IP_NO AND gtt.STATUS = 1)
                         AND NVL (Disbillmast.Dmc_cancel, 'N') = 'N'
                         AND Disbillmast.Dmd_date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh:mi:ss AM')
                         AND disbillmast.dmd_date <= TO_DATE (:toDate, 'dd/MM/yyyy hh:mi:ss AM')
                         AND DISBILLMAST.MH_CODE = :mhCode
                 GROUP BY USC_NAME, users.us_code`;
+// 'NOT IN'  FOR TMCH , 'IN' FOR TSSH AND GROUPED
 
 // Source: query 44 — Consolidate OP Billing revenue (Opbillmast). Refund branch excluded — see
 // the note on sql_ipBill above (refunds belong to a separate, undiminished "Refund" section).
@@ -121,6 +124,7 @@ const sql_opBillConsolidated = `SELECT INITCAP (users.usc_name) AS usc_name, use
                         AND OPBILLMAST.MH_CODE = :mhCode
                 GROUP BY USC_NAME, users.us_code
                 HAVING SUM (NVL (OPN_NETAMT, 0)) <> 0`;
+// TMCH ONLY
 
 // Source: query 45 — OP Billing revenue (Receiptmast, both same-day and collected-on-a-different-
 // day branches — that COLLCNCODE split is a legitimate billing distinction, unlike the refund
@@ -163,7 +167,7 @@ const sql_opBillReceipt = `SELECT usc_name, us_code,
                       GROUP BY 'OP Billing', USERS.USC_NAME, users.us_code
                       HAVING SUM (NVL (RPN_NETAMT, 0)) <> 0
                     ) GROUP BY usc_name, us_code`;
-
+// TMCH ONLY
 // Source: query 38 — Pharmacy Billing revenue (Pbillmast, both billing branches). Refund branches
 // (Mretmast) excluded — see the note on sql_ipBill above.
 const sql_posBilling = `SELECT usc_name, us_code,
@@ -212,7 +216,7 @@ const sql_posBilling = `SELECT usc_name, us_code,
                       GROUP BY 'Pharmacy Billing', USC_NAME, users.us_code
                       HAVING SUM (NVL (BMN_NETAMT, 0)) <> 0
                     ) GROUP BY usc_name, us_code`;
-
+// TMCH ONLY
 // Source: query 24 — Pharmacy Advance collected net of Pharmacy Advance Refund
 const sql_advPharmacy = `SELECT usc_name, us_code, SUM (billcount) billcount, SUM (cash) cash, SUM (cheque) cheque, SUM (card) card, SUM (bank) bank, SUM (credit) credit
                     FROM (
@@ -242,7 +246,7 @@ const sql_advPharmacy = `SELECT usc_name, us_code, SUM (billcount) billcount, SU
                       GROUP BY USERS.US_CODE, USERS.USC_NAME
                       HAVING SUM (NVL (REFUNDADVANCE.RFN_AMT, 0)) > 0
                     ) GROUP BY usc_name, us_code`;
-
+// TMCH - ONLY
 // Source: query 28 — IP Advance collected net of IP Advance Refund
 const sql_advIp = `SELECT usc_name, us_code, SUM (billcount) billcount, SUM (cash) cash, SUM (cheque) cheque, SUM (card) card, SUM (bank) bank, SUM (credit) credit
                     FROM (
@@ -255,19 +259,22 @@ const sql_advIp = `SELECT usc_name, us_code, SUM (billcount) billcount, SUM (cas
                       WHERE     IPADVANCE.US_CODE = USERS.US_CODE
                             AND NVL (IPADVANCE.ARC_CANCEL, 'N') = 'N'
                             AND ARC_TYPE IN ('C', 'Q', 'D', 'R')
+                            AND NOT EXISTS (SELECT 1 FROM MEDIWARE.GTT_EXCLUDE_IP gtt WHERE gtt.IP_NO = IPADVANCE.IP_NO AND gtt.STATUS = 1)
                             AND IPADVANCE.ARD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh:mi:ss AM')
                             AND IPADVANCE.IAC_MHCODE = :mhCode
                             AND ipadvance.ard_date <= TO_DATE (:toDate, 'dd/MM/yyyy hh:mi:ss AM')
                       GROUP BY 'IP Advance', USC_NAME, users.us_code
                       UNION ALL
                         SELECT 'IP Advance Refund' bltype, INITCAP (users.usc_name) AS usc_name, USERS.US_CODE,
-                              COUNT (irc_slno) AS Billcount, SUM (NVL (IRN_BALANCE, 0)) * -1 As Cash,
+                              COUNT (IPRECEIPT.irc_slno) AS Billcount, SUM (NVL (IPRECEIPT.IRN_BALANCE, 0)) * -1 As Cash,
                               SUM (NVL (IPRECEIPT.IRN_REFCHEQ, 0)) * -1 As CHEQUE, SUM (NVL (IPRECEIPT.IRN_REFCARD, 0)) * -1 As Card,
                               SUM (0) * -1 As Bank, SUM (0) * -1 As Credit
-                          FROM IPRECEIPT, USERS
-                        WHERE     DMC_TYPE = 'A'
+                          FROM IPRECEIPT, USERS,DISBILLMAST
+                        WHERE     IPRECEIPT.DMC_TYPE = 'A'
                               AND IPRECEIPT.IRD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh:mi:ss AM')
                               AND ipreceipt.ird_date <= TO_DATE (:toDate, 'dd/MM/yyyy hh:mi:ss AM')
+                              AND DISBILLMAST.DMC_SLNO = IPRECEIPT.DMC_SLNO
+                              AND NOT EXISTS (SELECT 1 FROM MEDIWARE.GTT_EXCLUDE_IP gtt WHERE gtt.IP_NO = DISBILLMAST.IP_NO AND gtt.STATUS = 1)
                               AND NVL (IRC_CANCEL, 'N') = 'N'
                               AND IPRECEIPT.US_CODE = USERS.US_CODE
                               AND ipreceipt.IPC_MHCODE = :mhCode
@@ -276,6 +283,8 @@ const sql_advIp = `SELECT usc_name, us_code, SUM (billcount) billcount, SUM (cas
                             OR SUM (NVL (IPRECEIPT.IRN_REFCARD, 0)) > 0
                             OR SUM (NVL (IPRECEIPT.IRN_REFCHEQ, 0)) > 0
                     ) GROUP BY usc_name, us_code`;
+
+// 'NOT IN'  FOR TMCH , 'IN' FOR TSSH AND GROUPED
 
 // Source: query 29 — general Billing Advance collected net of Billing Advance Refund
 const sql_advBilling = `SELECT usc_name, us_code, SUM (billcount) billcount, SUM (cash) cash, SUM (cheque) cheque, SUM (card) card, SUM (bank) bank, SUM (credit) credit
@@ -304,6 +313,8 @@ const sql_advBilling = `SELECT usc_name, us_code, SUM (billcount) billcount, SUM
                       GROUP BY users.US_CODE, users.USC_NAME
                     ) GROUP BY usc_name, us_code`;
 
+// TMCH - ONLY  -- NO EFFECT
+
 // Source: query 32 — OP Advance collected net of OP Advance Refund
 const sql_advOp = `SELECT usc_name, us_code, SUM (billcount) billcount, SUM (cash) cash, SUM (cheque) cheque, SUM (card) card, SUM (credit) credit, SUM (bank) bank
                     FROM (
@@ -313,7 +324,8 @@ const sql_advOp = `SELECT usc_name, us_code, SUM (billcount) billcount, SUM (cas
                             SUM (NVL (ARN_CARD, 0)) CARD, SUM (0) CREDIT,
                             SUM (DECODE (NVL (Opc_Banktranstype, 'N'), 'B', NVL (Arn_Cheque, 0), 0)) AS Bank
                         FROM OPADVANCE, USERS
-                      WHERE     OPADVANCE.US_CODE = USERS.US_CODE
+                      WHERE OPADVANCE.US_CODE = USERS.US_CODE
+                            AND NOT EXISTS (SELECT 1 FROM MEDIWARE.GTT_EXCLUDE_IP gtt WHERE gtt.IP_NO = OPADVANCE.IP_NO AND gtt.STATUS = 1)
                             AND NVL (ARC_CANCEL, 'N') = 'N'
                             AND ARC_TYPE IN ('C', 'Q', 'D', 'R')
                             AND ARD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh:mi:ss AM')
@@ -326,9 +338,11 @@ const sql_advOp = `SELECT usc_name, us_code, SUM (billcount) billcount, SUM (cas
                               SUM (DECODE (REFUNDOPADVANCE.rfc_cacr, 'Q', REFUNDOPADVANCE.rfn_amt, 0)) * -1 As cheque,
                               SUM (DECODE (REFUNDOPADVANCE.rfc_cacr, 'R', REFUNDOPADVANCE.rfn_amt, 0)) * -1 As Card,
                               SUM (0) * -1 As Credit, SUM (0) * -1 As Bank
-                          FROM REFUNDOPADVANCE, USERS
-                        WHERE     REFUNDOPADVANCE.RFD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh:mi:ss AM')
+                          FROM REFUNDOPADVANCE, USERS,OPADVANCE
+                        WHERE REFUNDOPADVANCE.RFD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh:mi:ss AM')
                               AND refundopadvance.rfd_date <= TO_DATE (:toDate, 'dd/MM/yyyy hh:mi:ss AM')
+                              AND OPADVANCE.AR_SLNO = REFUNDOPADVANCE.AR_SLNO
+                               AND NOT EXISTS (SELECT 1 FROM MEDIWARE.GTT_EXCLUDE_IP gtt WHERE gtt.IP_NO = OPADVANCE.IP_NO AND gtt.STATUS = 1)
                               AND NVL (REFUNDOPADVANCE.RFC_CANCEL, 'N') = 'N'
                               AND REFUNDOPADVANCE.US_CODE = USERS.US_CODE
                               AND REFUNDOPADVANCE.MH_CODE = :mhCode
@@ -339,6 +353,8 @@ const sql_advOp = `SELECT usc_name, us_code, SUM (billcount) billcount, SUM (cas
                                   + SUM (DECODE (REFUNDOPADVANCE.rfc_cacr, 'D', REFUNDOPADVANCE.rfn_amt, 0)) > 0
                     ) GROUP BY usc_name, us_code`;
 
+// 'NOT IN'  FOR TMCH , 'IN' FOR TSSH AND GROUPED
+
 // Source: query 25 — advance settled against a Billmast bill (both branches: billed-and-settled
 // same visit, and settled today against a bill collected by a different cashier/day)
 const sql_advSettldBill = `SELECT usc_name, us_code, SUM (amount) amount
@@ -347,6 +363,7 @@ const sql_advSettldBill = `SELECT usc_name, us_code, SUM (amount) amount
                         FROM billmast, users
                       WHERE     billmast.us_code = users.us_code
                             AND NVL (bmn_advamount, 0) > 0
+                            AND NOT EXISTS (SELECT 1 FROM MEDIWARE.GTT_EXCLUDE_IP gtt WHERE gtt.IP_NO = BILLMAST.IP_NO AND gtt.STATUS = 1)
                             AND NVL (billmast.bmc_cancel, 'N') = 'N'
                             AND billmast.BMC_COLLCNCODE IS NULL
                             AND billmast.BMD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh:mi:ss AM')
@@ -358,6 +375,7 @@ const sql_advSettldBill = `SELECT usc_name, us_code, SUM (amount) amount
                           FROM billmast, users
                         WHERE     billmast.BMC_COLLUSCODE = users.us_code
                               AND NVL (bmn_advamount, 0) > 0
+                              AND NOT EXISTS (SELECT 1 FROM MEDIWARE.GTT_EXCLUDE_IP gtt WHERE gtt.IP_NO = BILLMAST.IP_NO AND gtt.STATUS = 1)
                               AND NVL (billmast.bmc_cancel, 'N') = 'N'
                               AND billmast.BMC_COLLCNCODE IS NOT NULL
                               AND billmast.BMD_COLLDATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh:mi:ss AM')
@@ -366,16 +384,21 @@ const sql_advSettldBill = `SELECT usc_name, us_code, SUM (amount) amount
                       GROUP BY 'Bill Advance Stld', users.usc_name, USERS.us_code
                     ) GROUP BY usc_name, us_code`;
 
+// 'NOT IN'  FOR TMCH , 'IN' FOR TSSH AND GROUPED
+
 // Source: query 26 — advance settled against an IP (Disbillmast) bill
 const sql_advSettldIp = `SELECT 'IP Bill Stld' bltype, INITCAP (users.usc_name) AS usc_name, users.us_code, SUM (NVL (Dmn_advance, 0)) AMOUNT
                     FROM Disbillmast, USERS
                   WHERE     Disbillmast.US_CODE = USERS.US_CODE
                         AND NVL (Disbillmast.Dmc_cancel, 'N') = 'N'
+                        AND DISBILLMAST.IP_NO IN (:ipNos)
                         AND NVL (Dmn_advance, 0) > 0
                         AND Disbillmast.Dmd_date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh:mi:ss AM')
                         AND disbillmast.dmd_date <= TO_DATE (:toDate, 'dd/MM/yyyy hh:mi:ss AM')
                         AND DISBILLMAST.MH_CODE = :mhCode
                 GROUP BY 'IP Bill Stld', USC_NAME, users.us_code`;
+
+// 'NOT IN'  FOR TMCH , 'IN' FOR TSSH AND GROUPED
 
 // Source: query 33 — advance settled against an OP (Opbillmast) bill
 const sql_advSettldOp = `SELECT 'OP Advance Stld' bltype, INITCAP (users.usc_name) AS usc_name, users.us_code, SUM (NVL (Opn_advance, 0)) AMOUNT
@@ -388,6 +411,8 @@ const sql_advSettldOp = `SELECT 'OP Advance Stld' bltype, INITCAP (users.usc_nam
                         AND OPBILLMAST.MH_CODE = :mhCode
                 GROUP BY 'OP Advance Stld', USC_NAME, users.us_code`;
 
+// TMCH ONLY
+
 // Source: query 35 — advance settled against a Pharmacy (Pbillmast) bill (both branches)
 const sql_advSettldPharmacy = `SELECT usc_name, us_code, SUM (amount) amount
                     FROM (
@@ -397,6 +422,7 @@ const sql_advSettldPharmacy = `SELECT usc_name, us_code, SUM (amount) amount
                             AND NVL (BMC_CANCEL, 'N') = 'N'
                             AND pbillmast.BMC_COLLCNCODE IS NULL
                             AND NVL (bmn_advamount, 0) > 0
+                            AND NOT EXISTS (SELECT 1 FROM MEDIWARE.GTT_EXCLUDE_IP gtt WHERE gtt.IP_NO = PBILLMAST.IP_NO AND gtt.STATUS = 1)
                             AND BMD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh:mi:ss AM')
                             AND bmd_date <= TO_DATE (:toDate, 'dd/MM/yyyy hh:mi:ss AM')
                             AND PBILLMAST.MH_CODE = :mhCode
@@ -406,6 +432,7 @@ const sql_advSettldPharmacy = `SELECT usc_name, us_code, SUM (amount) amount
                           FROM pbillmast, USERS
                         WHERE     pbillmast.BMC_COLLUSCODE = USERS.US_CODE
                               AND pbillmast.BMC_COLLCNCODE IS NOT NULL
+                              AND NOT EXISTS (SELECT 1 FROM MEDIWARE.GTT_EXCLUDE_IP gtt WHERE gtt.IP_NO = PBILLMAST.IP_NO AND gtt.STATUS = 1)
                               AND NVL (BMC_CANCEL, 'N') = 'N'
                               AND NVL (bmn_advamount, 0) > 0
                               AND pbillmast.BMD_COLLDATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh:mi:ss AM')
@@ -413,6 +440,8 @@ const sql_advSettldPharmacy = `SELECT usc_name, us_code, SUM (amount) amount
                               AND PBILLMAST.MH_CODE = :mhCode
                       GROUP BY 'Pharmacy Advance Stld', USC_NAME, users.us_code
                     ) GROUP BY usc_name, us_code`;
+
+// 'NOT IN'  FOR TMCH , 'IN' FOR TSSH AND GROUPED
 
 // Source: query 30 — IP bill payment-method breakdown (ipreceipt), for bills raised within the
 // requested period. Includes irn_discount ("condiscount" in the original) — per the legacy
@@ -430,12 +459,15 @@ const sql_ipReceiptCollection = `SELECT INITCAP (users.usc_name) AS usc_name, us
                         AND Ipreceipt.Dmc_slno = Disbillmast.Dmc_slno
                         AND Disbillmast.Dmd_date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh:mi:ss AM')
                         AND disbillmast.dmd_date <= TO_DATE (:toDate, 'dd/MM/yyyy hh:mi:ss AM')
+                        AND NOT EXISTS (SELECT 1 FROM MEDIWARE.GTT_EXCLUDE_IP gtt WHERE gtt.IP_NO = Disbillmast.IP_NO AND gtt.STATUS = 1)
                         AND Ipreceipt.Dmc_type IN ('C', 'R')
                         AND IRD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh:mi:ss AM')
                         AND DISBILLMAST.MH_CODE = :mhCode
                         AND ird_date <= TO_DATE (:toDate, 'dd/MM/yyyy hh:mi:ss AM')
                         AND NVL (Irc_cancel, 'N') = 'N'
                 GROUP BY USC_NAME, users.us_code`;
+
+// 'NOT IN'  FOR TMCH , 'IN' FOR TSSH AND GROUPED
 
 // Source: query 36 — Prev Collection: IP bills dated before fromDate, collected within the requested range
 const sql_ipReceiptPrevCollection = `SELECT usc_name, us_code, SUM (cash) cash, SUM (cheque) cheque, SUM (card) card, SUM (bank) bank
@@ -449,6 +481,7 @@ const sql_ipReceiptPrevCollection = `SELECT usc_name, us_code, SUM (cash) cash, 
                       WHERE     Ipreceipt.Us_code = Users.Us_code
                             AND Ipreceipt.Dmc_slno = Disbillmast.Dmc_slno
                             AND Disbillmast.Dmd_date < TO_DATE (:fromDate, 'dd/MM/yyyy hh:mi:ss AM')
+                            AND NOT EXISTS (SELECT 1 FROM MEDIWARE.GTT_EXCLUDE_IP gtt WHERE gtt.IP_NO = Disbillmast.IP_NO AND gtt.STATUS = 1)
                             AND Ipreceipt.Dmc_type IN ('C', 'R')
                             AND IRD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh:mi:ss AM')
                             AND ird_date <= TO_DATE (:toDate, 'dd/MM/yyyy hh:mi:ss AM')
@@ -457,11 +490,13 @@ const sql_ipReceiptPrevCollection = `SELECT usc_name, us_code, SUM (cash) cash, 
                       GROUP BY 'IP Bill', USC_NAME, users.us_code
                     ) GROUP BY usc_name, us_code`;
 
+// 'NOT IN'  FOR TMCH , 'IN' FOR TSSH AND GROUPED
+
 // Source: query 40 — Billmast payment-method breakdown, plus Billmast's own Billcount/Amount
 // split by BMC_IPOP ('I'/'O') since Billmast is itself a revenue source for IP and OP bills,
 // distinct from Disbillmast/Opbillmast/Receiptmast (confirmed against real data — Akhila@12174,
 // 01/12/2025). Refundbillmast branches excluded — see the note on sql_ipBill above.
-const sql_billmastCollection = `SELECT usc_name, us_code, bmc_ipop,
+const sql_billmastCollection = ` SELECT usc_name, us_code, bmc_ipop,
                         SUM (cash) cash, SUM (card) card, SUM (cheque) cheque, SUM (credit) credit,
                         SUM (bank) bank, SUM (roundoff) roundoff, SUM (billcount) billcount, SUM (amount) amount
                     FROM (
@@ -499,6 +534,8 @@ const sql_billmastCollection = `SELECT usc_name, us_code, bmc_ipop,
                       GROUP BY USERS.us_code, users.usc_name, BILLMAST.BMC_IPOP
                       HAVING SUM (NVL (billmast.BMN_NETAMT, 0)) <> 0
                     ) GROUP BY usc_name, us_code, bmc_ipop`;
+
+// 'NOT IN'  FOR TMCH , 'IN' FOR TSSH AND GROUPED
 
 // ---------------------------------------------------------------------------
 // User Wise Collection — Credit Bill Collection section (Phase 2)
@@ -540,6 +577,8 @@ const sql_creditBillCollection = `SELECT usc_name, us_code, SUM (cash) cash, SUM
                             OR SUM (NVL (Rfn_Chk, 0) + NVL (Rfn_Dd, 0)) <> 0
                             OR SUM (NVL (Rfn_Card, 0)) <> 0
                     ) GROUP BY usc_name, us_code`;
+
+// TMCH ONLY
 
 // ---------------------------------------------------------------------------
 // User Wise Collection — Refund section (Phase 3)
@@ -589,6 +628,8 @@ const sql_refundPharmacy = `SELECT usc_name, us_code, SUM (billcount) billcount,
                       GROUP BY users.usc_name, users.us_code
                     ) GROUP BY usc_name, us_code`;
 
+// TMCH ONLY
+
 // Source: query 5 (Refundbillmast) — general Billmast refund. Excel's Refund section attributes
 // this to its "OP#"/"OP Amt" columns (confirmed against real data — Pradeepkumar/Rajeshkumar,
 // 01/12/2025 — 'I'-type rows on this table are excluded entirely; only 'C' and 'R' count).
@@ -628,6 +669,8 @@ const sql_refundBillmast = `SELECT usc_name, us_code, SUM (billcount) billcount,
                               AND REFUNDBILLMAST.MH_CODE = :mhCode
                       GROUP BY users.usc_name, users.us_code
                     ) GROUP BY usc_name, us_code`;
+
+// TMCH ONLY
 
 // Source: query 10 (Refundreceiptmast) — OP refund via receipt. Combined with sql_refundBillmast,
 // closes the Refund section's OP#/OP Amt/Cash exactly against the section footer (confirmed
@@ -671,6 +714,8 @@ const sql_refundReceipt = `SELECT usc_name, us_code, SUM (billcount) billcount, 
                       GROUP BY users.usc_name, users.us_code
                     ) GROUP BY usc_name, us_code`;
 
+// TMCH ONLY
+
 // Source: query 14 (Iprefundmast) — IP bill refund, credit-type only per the original query
 // (no cash/card fields on this table). Feeds the Refund section's IP#/IP Amt/Credit. Both this
 // table and IPRECEIPTrefund below are empty in this database as of this writing, so this could
@@ -685,12 +730,15 @@ const sql_refundIp = `SELECT usc_name, us_code, SUM (billcount) billcount, SUM (
                         FROM Iprefundmast, Users
                       WHERE     iprefundmast.us_code = users.us_code
                             AND Iprefundmast.Ric_Cacr = 'R'
+                            AND NOT EXISTS (SELECT 1 FROM MEDIWARE.GTT_EXCLUDE_IP gtt WHERE gtt.IP_NO = Iprefundmast.IP_NO AND gtt.STATUS = 1)
                             AND NVL (Iprefundmast.Ric_Cancel, 'N') = 'N'
                             AND IPREFUNDMAST.MH_CODE = :mhCode
                             AND Iprefundmast.Rid_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh:mi:ss AM')
                             AND iprefundmast.rid_date <= TO_DATE (:toDate, 'dd/MM/yyyy hh:mi:ss AM')
                       GROUP BY USERS.US_CODE, users.usc_name
                     ) GROUP BY usc_name, us_code`;
+
+// 'NOT IN'  FOR TMCH , 'IN' FOR TSSH AND GROUPED
 
 // Source: IPRECEIPTrefund — cash-type IP bill refund (companion to sql_refundIp's credit-type
 // Iprefundmast). Same empty-table caveat as above.
@@ -702,12 +750,15 @@ const sql_refundIpReceipt = `SELECT usc_name, us_code, SUM (billcount) billcount
                         FROM IPRECEIPTrefund, users
                       WHERE     ipreceiptrefund.us_code = users.us_code
                             AND IRF_CACR IN ('C')
+                            AND NOT EXISTS (SELECT 1 FROM MEDIWARE.GTT_EXCLUDE_IP gtt WHERE gtt.IP_NO = IPRECEIPTrefund.IP_NO AND gtt.STATUS = 1)
                             AND NVL (IRF_CANCEL, 'N') = 'N'
                             AND ipreceiptrefund.IRC_MHCODE = :mhCode
                             AND IRF_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh:mi:ss AM')
                             AND irf_date <= TO_DATE (:toDate, 'dd/MM/yyyy hh:mi:ss AM')
                       GROUP BY users.us_code, users.usc_name
                     ) GROUP BY usc_name, us_code`;
+
+// 'NOT IN'  FOR TMCH , 'IN' FOR TSSH AND GROUPED
 
 module.exports = {
   sql_one,

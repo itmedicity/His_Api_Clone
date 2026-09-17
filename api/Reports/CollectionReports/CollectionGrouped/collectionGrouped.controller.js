@@ -1,28 +1,16 @@
 const {getTmcConnection, oracleConnectionClose} = require("../../../../config/oradbconfig");
+const {insertIntoGTT} = require("../../../../utls/controller-helperFun");
 const {
   collectionReports001,
   getUsersList,
   getIpBill,
-  getOpBillConsolidated,
-  getOpBillReceipt,
-  getPosBilling,
-  getAdvPharmacy,
   getAdvIp,
-  getAdvBilling,
   getAdvOp,
   getAdvSettldBill,
-  getAdvSettldIp,
-  getAdvSettldOp,
   getAdvSettldPharmacy,
   getIpReceiptCollection,
   getIpReceiptPrevCollection,
-  getBillmastCollection,
   mergeUserWiseCollection,
-  getCreditBillCollection,
-  buildCreditBillCollection,
-  getRefundPharmacy,
-  getRefundBillmast,
-  getRefundReceipt,
   getRefundIp,
   getRefundIpReceipt,
   buildRefundSection,
@@ -53,34 +41,27 @@ const getCollectionReports = async (req, res) => {
 };
 
 // User Wise Collection — Summary section (Phase 1)
+// CollectionGrouped includes only the groupedPatient slice (tmch_status='1' from
+// /admission/getIpNumber, sent as `groupedPatient` — see IncomeReportsTmch.jsx) so its totals
+// plus CollectionTmc's and CollectionTssh's totals reconstruct CollectionQmt's unfiltered totals
+// exactly.
 const getUserWiseCollectionSummary = async (req, res) => {
   let conn;
-  const {fromDate, toDate, mhCode} = req.query;
+  const {fromDate, toDate, mhCode, groupedPatient} = req.body;
   const bind = {fromDate, toDate, mhCode: mhCode || "00"};
 
   try {
     conn = await getTmcConnection();
+    await insertIntoGTT(conn, (groupedPatient || []).map((ip) => ({ip, status: 3})));
 
     const usersRows = await getUsersList(conn);
     const ipBillRows = await getIpBill(conn, bind);
-    const opBillConsolidatedRows = await getOpBillConsolidated(conn, bind);
-    const opBillReceiptRows = await getOpBillReceipt(conn, bind);
-    const posBillingRows = await getPosBilling(conn, bind);
-    const advPharmacyRows = await getAdvPharmacy(conn, bind);
     const advIpRows = await getAdvIp(conn, bind);
-    const advBillingRows = await getAdvBilling(conn, bind);
     const advOpRows = await getAdvOp(conn, bind);
     const advSettldBillRows = await getAdvSettldBill(conn, bind);
-    const advSettldIpRows = await getAdvSettldIp(conn, bind);
-    const advSettldOpRows = await getAdvSettldOp(conn, bind);
     const advSettldPharmacyRows = await getAdvSettldPharmacy(conn, bind);
     const ipReceiptCollectionRows = await getIpReceiptCollection(conn, bind);
     const ipReceiptPrevCollectionRows = await getIpReceiptPrevCollection(conn, bind);
-    const billmastCollectionRows = await getBillmastCollection(conn, bind);
-    const creditBillCollectionRows = await getCreditBillCollection(conn, bind);
-    const refundPharmacyRows = await getRefundPharmacy(conn, bind);
-    const refundBillmastRows = await getRefundBillmast(conn, bind);
-    const refundReceiptRows = await getRefundReceipt(conn, bind);
     const refundIpRows = await getRefundIp(conn, bind);
     const refundIpReceiptRows = await getRefundIpReceipt(conn, bind);
 
@@ -89,29 +70,18 @@ const getUserWiseCollectionSummary = async (req, res) => {
     const data = mergeUserWiseCollection(
       usersRows,
       ipBillRows,
-      opBillConsolidatedRows,
-      opBillReceiptRows,
-      posBillingRows,
-      advPharmacyRows,
       advIpRows,
-      advBillingRows,
       advOpRows,
       advSettldBillRows,
-      advSettldIpRows,
-      advSettldOpRows,
       advSettldPharmacyRows,
       ipReceiptCollectionRows,
       ipReceiptPrevCollectionRows,
-      billmastCollectionRows,
     );
-    const creditBillCollection = buildCreditBillCollection(creditBillCollectionRows);
-    const refund = buildRefundSection(
-      refundPharmacyRows,
-      refundBillmastRows,
-      refundReceiptRows,
-      refundIpRows,
-      refundIpReceiptRows,
-    );
+    // RECPCOLLECTIONMAST (Credit Bill Collection), Pbillmast/Billmast payment breakdown, and
+    // Pharmacy/Billmast refunds have no GTT_EXCLUDE_IP filter in this slice's SQL, so they carry
+    // no data here — their full contribution stays under CollectionTmc.
+    const creditBillCollection = [];
+    const refund = buildRefundSection(refundIpRows, refundIpReceiptRows);
 
     return res.status(200).json({
       success: 1,

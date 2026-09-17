@@ -1,4 +1,5 @@
 const {getTmcConnection, oracleConnectionClose} = require("../../../../config/oradbconfig");
+const {insertIntoGTT} = require("../../../../utls/controller-helperFun");
 const {
   collectionReports001,
   getUsersList,
@@ -53,13 +54,17 @@ const getCollectionReports = async (req, res) => {
 };
 
 // User Wise Collection — Summary section (Phase 1)
+// CollectionTmc excludes every admitted IP patient (rmIpNumber ∪ groupedPatient, sent as `ptno`
+// by the frontend — see IncomeReportsTmch.jsx) so its totals plus CollectionTssh's and
+// CollectionGrouped's totals reconstruct CollectionQmt's unfiltered totals exactly.
 const getUserWiseCollectionSummary = async (req, res) => {
   let conn;
-  const {fromDate, toDate, mhCode} = req.query;
+  const {fromDate, toDate, mhCode, ptno} = req.body;
   const bind = {fromDate, toDate, mhCode: mhCode || "00"};
 
   try {
     conn = await getTmcConnection();
+    await insertIntoGTT(conn, (ptno || []).map((ip) => ({ip, status: 1})));
 
     const usersRows = await getUsersList(conn);
     const ipBillRows = await getIpBill(conn, bind);
