@@ -309,9 +309,9 @@ const sql_advOp = `SELECT usc_name, us_code, SUM (billcount) billcount, SUM (cas
                     FROM (
                       SELECT 'OP Advance' bltype, INITCAP (users.usc_name) AS usc_name, users.us_code,
                             COUNT (AR_SLNO) Billcount, SUM (NVL (ARN_CASH, 0)) CASH,
-                            SUM (DECODE (NVL (Opc_Banktranstype, 'N'), 'D', NVL (Arn_Cheque, 0), 0)) CHEQUE,
+                            SUM (DECODE (NVL (Opc_Banktranstype, 'N'), 'D', NVL (Arn_Cheque, 0), 'B', NVL (Arn_Cheque, 0), 0)) CHEQUE,
                             SUM (NVL (ARN_CARD, 0)) CARD, SUM (0) CREDIT,
-                            SUM (DECODE (NVL (Opc_Banktranstype, 'N'), 'B', NVL (Arn_Cheque, 0), 0)) AS Bank
+                            SUM (0) AS Bank
                         FROM OPADVANCE, USERS
                       WHERE     OPADVANCE.US_CODE = USERS.US_CODE
                             AND NVL (ARC_CANCEL, 'N') = 'N'

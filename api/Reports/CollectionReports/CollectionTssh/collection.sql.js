@@ -88,7 +88,7 @@ const sql_ipBill = `SELECT INITCAP (users.usc_name) AS usc_name, users.us_code,
                         SUM (NVL (DMN_ROUND, 0)) RoundOff
                     FROM Disbillmast, USERS
                   WHERE     Disbillmast.US_CODE = USERS.US_CODE
-                        AND Dmc_cacr NOT IN ('C', 'R')
+                        AND Dmc_cacr IN ('C', 'R')
                         AND EXISTS (SELECT 1 FROM MEDIWARE.GTT_EXCLUDE_IP gtt WHERE gtt.IP_NO = Disbillmast.IP_NO AND gtt.STATUS = 2)
                         AND NVL (Disbillmast.Dmc_cancel, 'N') = 'N'
                         AND Disbillmast.Dmd_date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh:mi:ss AM')
@@ -138,9 +138,9 @@ const sql_advOp = `SELECT usc_name, us_code, SUM (billcount) billcount, SUM (cas
                     FROM (
                       SELECT 'OP Advance' bltype, INITCAP (users.usc_name) AS usc_name, users.us_code,
                             COUNT (AR_SLNO) Billcount, SUM (NVL (ARN_CASH, 0)) CASH,
-                            SUM (DECODE (NVL (Opc_Banktranstype, 'N'), 'D', NVL (Arn_Cheque, 0), 0)) CHEQUE,
+                            SUM (DECODE (NVL (Opc_Banktranstype, 'N'), 'D', NVL (Arn_Cheque, 0), 'B', NVL (Arn_Cheque, 0), 0)) CHEQUE,
                             SUM (NVL (ARN_CARD, 0)) CARD, SUM (0) CREDIT,
-                            SUM (DECODE (NVL (Opc_Banktranstype, 'N'), 'B', NVL (Arn_Cheque, 0), 0)) AS Bank
+                            SUM (0) AS Bank
                         FROM OPADVANCE, USERS
                       WHERE OPADVANCE.US_CODE = USERS.US_CODE
                             AND EXISTS (SELECT 1 FROM MEDIWARE.GTT_EXCLUDE_IP gtt WHERE gtt.IP_NO = OPADVANCE.IP_NO AND gtt.STATUS = 2)
@@ -199,6 +199,18 @@ const sql_advSettldBill = `SELECT usc_name, us_code, SUM (amount) amount
                               AND BILLMAST.MH_CODE = :mhCode
                       GROUP BY 'Bill Advance Stld', users.usc_name, USERS.us_code
                     ) GROUP BY usc_name, us_code`;
+
+// Source: query 26 — advance settled against an IP (Disbillmast) bill, restricted to rmIpNumber.
+const sql_advSettldIp = `SELECT 'IP Bill Stld' bltype, INITCAP (users.usc_name) AS usc_name, users.us_code, SUM (NVL (Dmn_advance, 0)) AMOUNT
+                    FROM Disbillmast, USERS
+                  WHERE     Disbillmast.US_CODE = USERS.US_CODE
+                        AND NVL (Disbillmast.Dmc_cancel, 'N') = 'N'
+                        AND EXISTS (SELECT 1 FROM MEDIWARE.GTT_EXCLUDE_IP gtt WHERE gtt.IP_NO = DISBILLMAST.IP_NO AND gtt.STATUS = 2)
+                        AND NVL (Dmn_advance, 0) > 0
+                        AND Disbillmast.Dmd_date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh:mi:ss AM')
+                        AND disbillmast.dmd_date <= TO_DATE (:toDate, 'dd/MM/yyyy hh:mi:ss AM')
+                        AND DISBILLMAST.MH_CODE = :mhCode
+                GROUP BY 'IP Bill Stld', USC_NAME, users.us_code`;
 
 // Source: query 35 — advance settled against a Pharmacy (Pbillmast) bill (both branches),
 // restricted to rmIpNumber.
@@ -311,6 +323,7 @@ module.exports = {
   sql_advIp,
   sql_advOp,
   sql_advSettldBill,
+  sql_advSettldIp,
   sql_advSettldPharmacy,
   sql_ipReceiptCollection,
   sql_ipReceiptPrevCollection,

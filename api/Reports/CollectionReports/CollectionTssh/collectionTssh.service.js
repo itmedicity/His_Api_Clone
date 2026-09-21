@@ -7,6 +7,7 @@ const {
   sql_advIp,
   sql_advOp,
   sql_advSettldBill,
+  sql_advSettldIp,
   sql_advSettldPharmacy,
   sql_ipReceiptCollection,
   sql_ipReceiptPrevCollection,
@@ -36,6 +37,7 @@ const getIpBill = async (conn, bind) => runQuery(conn, sql_ipBill, bind);
 const getAdvIp = async (conn, bind) => runQuery(conn, sql_advIp, bind);
 const getAdvOp = async (conn, bind) => runQuery(conn, sql_advOp, bind);
 const getAdvSettldBill = async (conn, bind) => runQuery(conn, sql_advSettldBill, bind);
+const getAdvSettldIp = async (conn, bind) => runQuery(conn, sql_advSettldIp, bind);
 const getAdvSettldPharmacy = async (conn, bind) => runQuery(conn, sql_advSettldPharmacy, bind);
 const getIpReceiptCollection = async (conn, bind) => runQuery(conn, sql_ipReceiptCollection, bind);
 const getIpReceiptPrevCollection = async (conn, bind) => runQuery(conn, sql_ipReceiptPrevCollection, bind);
@@ -144,7 +146,7 @@ const getOrCreateRow = (userMap, row) => {
 };
 
 /**
- * Merges the 7 Phase-1 query result sets (IP-restricted slice — everything else dropped, see
+ * Merges the 8 Phase-1 query result sets (IP-restricted slice — everything else dropped, see
  * the module header) into one row per cashier (us_code).
  */
 const mergeUserWiseCollection = (
@@ -153,6 +155,7 @@ const mergeUserWiseCollection = (
   advIpRows,
   advOpRows,
   advSettldBillRows,
+  advSettldIpRows,
   advSettldPharmacyRows,
   ipReceiptCollectionRows,
   ipReceiptPrevCollectionRows,
@@ -187,7 +190,7 @@ const mergeUserWiseCollection = (
     }
   }
 
-  for (const rows of [advSettldBillRows, advSettldPharmacyRows]) {
+  for (const rows of [advSettldBillRows, advSettldIpRows, advSettldPharmacyRows]) {
     for (const row of rows) {
       const target = getOrCreateRow(userMap, row);
       if (!target) continue;
@@ -232,6 +235,7 @@ module.exports = {
   getAdvIp,
   getAdvOp,
   getAdvSettldBill,
+  getAdvSettldIp,
   getAdvSettldPharmacy,
   getIpReceiptCollection,
   getIpReceiptPrevCollection,

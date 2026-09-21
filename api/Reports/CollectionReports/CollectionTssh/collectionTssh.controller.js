@@ -7,6 +7,7 @@ const {
   getAdvIp,
   getAdvOp,
   getAdvSettldBill,
+  getAdvSettldIp,
   getAdvSettldPharmacy,
   getIpReceiptCollection,
   getIpReceiptPrevCollection,
@@ -59,6 +60,7 @@ const getUserWiseCollectionSummary = async (req, res) => {
     const advIpRows = await getAdvIp(conn, bind);
     const advOpRows = await getAdvOp(conn, bind);
     const advSettldBillRows = await getAdvSettldBill(conn, bind);
+    const advSettldIpRows = await getAdvSettldIp(conn, bind);
     const advSettldPharmacyRows = await getAdvSettldPharmacy(conn, bind);
     const ipReceiptCollectionRows = await getIpReceiptCollection(conn, bind);
     const ipReceiptPrevCollectionRows = await getIpReceiptPrevCollection(conn, bind);
@@ -73,6 +75,7 @@ const getUserWiseCollectionSummary = async (req, res) => {
       advIpRows,
       advOpRows,
       advSettldBillRows,
+      advSettldIpRows,
       advSettldPharmacyRows,
       ipReceiptCollectionRows,
       ipReceiptPrevCollectionRows,
