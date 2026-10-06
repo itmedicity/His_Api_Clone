@@ -230,4 +230,61 @@ ORDER BY I.DMD_DATE
     }
   },
 
+
+  getBedStatusReport: async () => {
+    const sql = `SELECT
+                 B.NS_CODE,
+                 B.NURSING_STATION,
+                 B.OUTLET_NAME,
+                 NVL(B.BED_COUNT, 0) AS BED_COUNT,
+                 NVL(B.OCCUPIED_BEDS, 0) AS OCCUPIED_BEDS,
+                 NVL(I.ADMITTED_PATIENTS, 0) AS ADMITTED_PATIENTS,
+                 NVL(B.AVAILABLE_BEDS, 0) AS AVAILABLE_BEDS,
+                 NVL(B.NOT_READY, 0) AS NOT_READY,
+                 NVL(B.DISCHARGED,0) AS DISCHARGED
+             FROM
+             (
+                 SELECT
+                     NS.NSC_DESC AS NURSING_STATION,
+                     OU.OUC_DESC AS OUTLET_NAME,
+                     COUNT(BD.BD_CODE) AS BED_COUNT,
+                     SUM(CASE WHEN BD.BDC_OCCUP = 'O' THEN 1 ELSE 0 END) AS OCCUPIED_BEDS,
+                     SUM(CASE WHEN BD.BDC_OCCUP = 'A' THEN 1 ELSE 0 END) AS AVAILABLE_BEDS,
+                     SUM(CASE WHEN BD.BDC_OCCUP = 'N' THEN 1 ELSE 0 END) AS NOT_READY,
+                     SUM(CASE WHEN BD.BDC_OCCUP = 'T' THEN 1 ELSE 0 END) AS DISCHARGED,
+                     NS.NS_CODE
+                 FROM NURSTATION NS
+                 LEFT JOIN OUTLET OU ON NS.OU_CODE = OU.OU_CODE
+                 LEFT JOIN BED BD  ON NS.NS_CODE = BD.NS_CODE
+                 LEFT JOIN ROOMTYPE RT ON BD.RT_CODE = RT.RT_CODE
+                 WHERE NS.NSC_STATUS = 'Y'
+                   AND BD.BDC_STATUS = 'Y'
+                 GROUP BY
+                     NS.NSC_DESC,
+                     OU.OUC_DESC,
+                     NS.NS_CODE
+             ) B
+             LEFT JOIN
+             (
+                 SELECT
+                     BD.NS_CODE,
+                     COUNT(I.IP_NO) AS ADMITTED_PATIENTS
+                 FROM IPADMISS I
+                 LEFT JOIN BED BD  ON I.BD_CODE = BD.BD_CODE
+                 WHERE I.IPD_DISC IS NULL
+                   AND I.IPC_PTFLAG = 'N'
+                 GROUP BY BD.NS_CODE
+             ) I
+             ON B.NS_CODE = I.NS_CODE
+             ORDER BY B.OUTLET_NAME, B.NURSING_STATION`;
+    try {
+      const result = await executeTmc(sql, {}, { outFormat: oracledb.OUT_FORMAT_OBJECT });
+      // callBack(null, result.rows);
+      return result.rows;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  },
+
 };
