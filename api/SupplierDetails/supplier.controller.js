@@ -77,6 +77,7 @@ module.exports = {
           return res.status(200).json({
             success: 1,
             message: "No Data Found",
+            data: [],
           });
         }
 
