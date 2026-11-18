@@ -63,6 +63,13 @@ const getQmtReport = async (req, res) => {
     const getIpRefundDetlSection_seven = await qmtService.getIpRefundDetlSection_seven(conn, body);
     const getWriteoffamnt = await qmtService.getWriteoffamnt(conn, body);
 
+    // Rows present in the legacy MIS report
+    const getIpOpSettled = await qmtService.getIpOpSettled(conn, body);
+    const getIpOpCredit_one = await qmtService.getIpOpCredit_one(conn, body);
+    const getIpOpCredit_two = await qmtService.getIpOpCredit_two(conn, body);
+    const getIpPackageAdjustment = await qmtService.getIpPackageAdjustment(conn, body);
+    const getGrossAmtFlag = await qmtService.getGrossAmtFlag();
+
     const result = {
       income: {
         getTheaterIncome: getTheaterIncome,
@@ -124,6 +131,15 @@ const getQmtReport = async (req, res) => {
       },
       writeOff: {
         getWriteoffamnt: getWriteoffamnt,
+      },
+      legacyRows: {
+        getIpOpSettled: getIpOpSettled,
+        getIpOpCredit_one: getIpOpCredit_one,
+        getIpOpCredit_two: getIpOpCredit_two,
+        getIpPackageAdjustment: getIpPackageAdjustment,
+      },
+      settings: {
+        grossAmtFlag: getGrossAmtFlag?.[0]?.FLAG || "N",
       },
       masterData: {
         getMisincexpmast: getMisincexpmast,
