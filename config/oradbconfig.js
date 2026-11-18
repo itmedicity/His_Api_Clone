@@ -7,7 +7,13 @@ oracledb.outFormat = oracledb.OUT_FORMAT_OBJECT;
 // libraries already on PATH (C:\app\...\11.2.0\dbhome_1 / D:\app\...\11.2.0\client_1).
 // oracledb 7.x's Thick mode requires Oracle Client 19.1+ (DPI-1050 on this
 // 11.2 client), so this is pinned to 6.9.0 — the last line supporting it.
+
+// old
 oracledb.initOracleClient();
+
+// oracledb.initOracleClient({
+//   libDir: process.env.ORACLE_CLIENT_PATH,
+// });
 
 const pools = {
   TMC: null,
@@ -223,7 +229,7 @@ async function waitUntilIdle(poolName, timeout = 30000) {
 // TMC_CRON) only rebuilds that pool now, instead of tearing down every pool
 // (including TMC, which serves live traffic) like the old restartPools()
 // used to.
-const restartState = Object.fromEntries(Object.keys(CONFIG).map((name) => [name, {promise: null, isRestarting: false, lastRestart: null}]));
+const restartState = Object.fromEntries(Object.keys(CONFIG).map((name) => [name, { promise: null, isRestarting: false, lastRestart: null }]));
 
 // RESTART A SINGLE NAMED POOL
 async function restartPool(name) {
