@@ -370,7 +370,11 @@ const getIpincomeSection_one = async (conn_ora, bind) => {
                                     SUM (NVL (Rdn_Disamt, 0)) Discount
                                 FROM DISRMRENTDETL
                                 JOIN CTE_DISBILL DM ON DISRMRENTDETL.Dmc_Slno = DM.Dmc_Slno
-                                JOIN Disroomdetl ON Disrmrentdetl.Rm_Slno = Disroomdetl.Rm_Slno
+                                JOIN (SELECT Dmc_Slno, Rm_Slno, Rt_Code, Bd_Code,
+                                             MAX (Dmc_Hour) Dmc_Hour,
+                                             MAX (Dmc_Minhourtaken) Dmc_Minhourtaken
+                                        FROM Disroomdetl
+                                    GROUP BY Dmc_Slno, Rm_Slno, Rt_Code, Bd_Code) Disroomdetl ON Disrmrentdetl.Rm_Slno = Disroomdetl.Rm_Slno
                                 LEFT JOIN Misincexpdtl ON DISRMRENTDETL.pc_code = Misincexpdtl.pc_code
                                 LEFT JOIN Misincexpgroup ON Misincexpdtl.dg_grcode = Misincexpgroup.dg_grcode
                                 WHERE Disrmrentdetl.Rt_Code = Disroomdetl.Rt_Code

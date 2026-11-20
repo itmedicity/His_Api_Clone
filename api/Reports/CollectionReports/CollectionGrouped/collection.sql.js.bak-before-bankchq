@@ -1,0 +1,332 @@
+const sql_one = `SELECT SUM (0) AS Cash,
+                        SUM (0) AS Card,
+                        SUM (0) AS Chq,
+                        SUM (DECODE (billmast.bmc_cacr, 'R', Billmast.BMN_CREDIT, 0))
+                            AS Credit,
+                        SUM (0) AS Bank,
+                        SUM (0) RoundOff,
+                        SUM (DECODE (billmast.bmc_cacr, 'R', Billmast.BMN_CREDIT, 0))
+                            AS Amount,
+                        INITCAP (users.usc_name) AS usc_name,
+                        users.us_code,
+                        Billmast.IP_NO,
+                        BILLMAST.BMC_IPOP,
+                        COUNT (bmc_slno) AS billcount
+                    FROM Billmast, Users, customer
+                  WHERE Billmast.US_CODE = Users.US_CODE AND BILLMAST.BMC_COLLUSCODE IS NULL
+                        AND billmast.US_CODE IN
+                                (SELECT USERS.us_code
+                                  FROM USERS, userclinics
+                                  WHERE     USERS.USC_STATUS = 'Y'
+                                        AND users.us_code = userclinics.us_code
+                                        AND userclinics.mh_code = '')
+                        AND billmast.BMC_CACR = 'R'
+                        AND NVL (Billmast.BMC_CANCEL, 'N') = 'N'
+                        AND customer.cu_code = billmast.cu_code
+                        AND customer.cuc_insurance = 'H'
+                        AND billmast.BMD_DATE >=TO_DATE (:fromDate, 'dd/MM/yyyy hh:mi:ss AM')
+                        AND BILLMAST.MH_CODE IN ('00')
+                        AND billmast.bmd_date <=TO_DATE (:toDate, 'dd/MM/yyyy hh:mi:ss AM')
+                GROUP BY USERS.us_code,
+                        users.usc_name,
+                        Billmast.IP_NO,
+                        BILLMAST.BMC_IPOP
+                UNION ALL
+                  SELECT SUM (0) AS Cash,
+                        SUM (0) AS Card,
+                        SUM (0) AS Chq,
+                        SUM (DECODE (billmast.bmc_cacr, 'R', Billmast.BMN_CREDIT, 0))
+                            AS Credit,
+                        SUM (0) AS Bank,
+                        SUM (0) RoundOff,
+                        SUM (DECODE (billmast.bmc_cacr, 'R', Billmast.BMN_CREDIT, 0))
+                            AS Amount,
+                        INITCAP (users.usc_name) AS usc_name,
+                        users.us_code,
+                        Billmast.IP_NO,
+                        BILLMAST.BMC_IPOP,
+                        COUNT (bmc_slno) AS billcount
+                    FROM Billmast, Users, customer
+                  WHERE Billmast.BMC_COLLUSCODE = Users.US_CODE
+                        AND billmast.BMC_COLLUSCODE IN
+                                (SELECT USERS.us_code
+                                  FROM USERS, userclinics
+                                  WHERE     USERS.USC_STATUS = 'Y'
+                                        AND users.us_code = userclinics.us_code
+                                        AND userclinics.mh_code = '')
+                        AND billmast.BMC_CACR = 'R'
+                        AND NVL (Billmast.BMC_CANCEL, 'N') = 'N'
+                        AND customer.cu_code = billmast.cu_code
+                        AND customer.cuc_insurance = 'H'
+                        AND billmast.BMD_COLLDATE >=
+                                TO_DATE (:fromDate, 'dd/MM/yyyy hh:mi:ss AM')
+                        AND BILLMAST.MH_CODE IN ('00')
+                        AND billmast.BMD_COLLDATE <=
+                                TO_DATE (:toDate, 'dd/MM/yyyy hh:mi:ss AM')
+                GROUP BY USERS.us_code,
+                        users.usc_name,
+                        Billmast.IP_NO,
+                        BILLMAST.BMC_IPOP`;
+
+// GROUPED — IN (groupedPatient) slice of CollectionQmt, via MEDIWARE.GTT_EXCLUDE_IP STATUS = 3
+// (populated by collectionGrouped.controller.js before these queries run). Only the queries that
+// carry a GTT_EXCLUDE_IP membership check are kept here — every other query from
+// CollectionTmc/collection.sql.js (OP-only and null-effect tagged tables, plus the BOTH-tagged
+// tables the manual SQL correction left unfiltered) is intentionally omitted; their full
+// contribution stays wholly under CollectionTmc. sql_one and sql_usersList are kept unchanged
+// (no IP_NO column involved).
+
+// Source: query 46 — base cashier list so every active user appears even with zero activity
+const sql_usersList = `SELECT INITCAP (usc_name) AS usc_name, us_code FROM users ORDER BY usc_name`;
+
+// Source: query 42 — IP Bill revenue (Disbillmast), restricted to groupedPatient (STATUS = 3).
+const sql_ipBill = `SELECT INITCAP (users.usc_name) AS usc_name, users.us_code,
+                        COUNT (Dmc_slno) Billcount, SUM (NVL (DMN_NETAMT, 0)) AMOUNT,
+                        SUM (NVL (Disbillmast.DMN_SALESTAXCH, 0) + NVL (Disbillmast.DMN_SALESTAXCR, 0)
+                            + NVL (Disbillmast.DMN_CESSCH, 0) + NVL (Disbillmast.DMN_CESSCR, 0)) Tax,
+                        SUM ((NVL (DMN_FINALCREDIT, 0)) + (NVL (dmn_copayded_credit, 0))) Credit,
+                        SUM (NVL (DMN_ROUND, 0)) RoundOff
+                    FROM Disbillmast, USERS
+                  WHERE     Disbillmast.US_CODE = USERS.US_CODE
+                        AND Dmc_cacr IN ('C', 'R')
+                        AND EXISTS (SELECT 1 FROM MEDIWARE.GTT_EXCLUDE_IP gtt WHERE gtt.IP_NO = Disbillmast.IP_NO AND gtt.STATUS = 3)
+                        AND NVL (Disbillmast.Dmc_cancel, 'N') = 'N'
+                        AND Disbillmast.Dmd_date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh:mi:ss AM')
+                        AND disbillmast.dmd_date <= TO_DATE (:toDate, 'dd/MM/yyyy hh:mi:ss AM')
+                        AND DISBILLMAST.MH_CODE = :mhCode
+                GROUP BY USC_NAME, users.us_code`;
+
+// Source: query 28 — IP Advance collected net of IP Advance Refund, restricted to groupedPatient.
+const sql_advIp = `SELECT usc_name, us_code, SUM (billcount) billcount, SUM (cash) cash, SUM (cheque) cheque, SUM (card) card, SUM (bank) bank, SUM (credit) credit
+                    FROM (
+                      SELECT 'IP Advance' bltype, INITCAP (users.usc_name) AS usc_name, users.us_code,
+                            COUNT (AR_SLNO) Billcount, SUM (DECODE (ARC_CANCEL, 'C', 0, NVL (ARN_CASH, 0))) CASH,
+                            SUM (DECODE (ARC_CANCEL, 'C', 0, NVL (ARN_CHEQUE, 0))) CHEQUE,
+                            SUM (DECODE (ARC_CANCEL, 'C', 0, NVL (ARN_CARD, 0))) Card,
+                            SUM (DECODE (ARC_CANCEL, 'C', 0, NVL (ARN_NEFT, 0))) AS Bank, SUM (0) CREDIT
+                        FROM IPADVANCE, USERS
+                      WHERE     IPADVANCE.US_CODE = USERS.US_CODE
+                            AND NVL (IPADVANCE.ARC_CANCEL, 'N') = 'N'
+                            AND ARC_TYPE IN ('C', 'Q', 'D', 'R')
+                            AND EXISTS (SELECT 1 FROM MEDIWARE.GTT_EXCLUDE_IP gtt WHERE gtt.IP_NO = IPADVANCE.IP_NO AND gtt.STATUS = 3)
+                            AND IPADVANCE.ARD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh:mi:ss AM')
+                            AND IPADVANCE.IAC_MHCODE = :mhCode
+                            AND ipadvance.ard_date <= TO_DATE (:toDate, 'dd/MM/yyyy hh:mi:ss AM')
+                      GROUP BY 'IP Advance', USC_NAME, users.us_code
+                      UNION ALL
+                        SELECT 'IP Advance Refund' bltype, INITCAP (users.usc_name) AS usc_name, USERS.US_CODE,
+                              COUNT (IPRECEIPT.irc_slno) AS Billcount, SUM (NVL (IPRECEIPT.IRN_BALANCE, 0)) * -1 As Cash,
+                              SUM (NVL (IPRECEIPT.IRN_REFCHEQ, 0)) * -1 As CHEQUE, SUM (NVL (IPRECEIPT.IRN_REFCARD, 0)) * -1 As Card,
+                              SUM (0) * -1 As Bank, SUM (0) * -1 As Credit
+                          FROM IPRECEIPT, USERS,DISBILLMAST
+                        WHERE     IPRECEIPT.DMC_TYPE = 'A'
+                              AND IPRECEIPT.IRD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh:mi:ss AM')
+                              AND ipreceipt.ird_date <= TO_DATE (:toDate, 'dd/MM/yyyy hh:mi:ss AM')
+                              AND DISBILLMAST.DMC_SLNO = IPRECEIPT.DMC_SLNO
+                              AND EXISTS (SELECT 1 FROM MEDIWARE.GTT_EXCLUDE_IP gtt WHERE gtt.IP_NO = DISBILLMAST.IP_NO AND gtt.STATUS = 3)
+                              AND NVL (IRC_CANCEL, 'N') = 'N'
+                              AND IPRECEIPT.US_CODE = USERS.US_CODE
+                              AND ipreceipt.IPC_MHCODE = :mhCode
+                      GROUP BY USERS.US_CODE, USERS.USC_NAME
+                      HAVING     SUM (NVL (IRN_BALANCE, 0)) > 0
+                            OR SUM (NVL (IPRECEIPT.IRN_REFCARD, 0)) > 0
+                            OR SUM (NVL (IPRECEIPT.IRN_REFCHEQ, 0)) > 0
+                    ) GROUP BY usc_name, us_code`;
+
+// Source: query 32 — OP Advance collected net of OP Advance Refund, restricted to groupedPatient.
+const sql_advOp = `SELECT usc_name, us_code, SUM (billcount) billcount, SUM (cash) cash, SUM (cheque) cheque, SUM (card) card, SUM (credit) credit, SUM (bank) bank
+                    FROM (
+                      SELECT 'OP Advance' bltype, INITCAP (users.usc_name) AS usc_name, users.us_code,
+                            COUNT (AR_SLNO) Billcount, SUM (NVL (ARN_CASH, 0)) CASH,
+                            SUM (DECODE (NVL (Opc_Banktranstype, 'N'), 'D', NVL (Arn_Cheque, 0), 0)) CHEQUE,
+                            SUM (NVL (ARN_CARD, 0)) CARD, SUM (0) CREDIT,
+                            SUM (DECODE (NVL (Opc_Banktranstype, 'N'), 'B', NVL (Arn_Cheque, 0), 0)) AS Bank
+                        FROM OPADVANCE, USERS
+                      WHERE OPADVANCE.US_CODE = USERS.US_CODE
+                            AND EXISTS (SELECT 1 FROM MEDIWARE.GTT_EXCLUDE_IP gtt WHERE gtt.IP_NO = OPADVANCE.IP_NO AND gtt.STATUS = 3)
+                            AND NVL (ARC_CANCEL, 'N') = 'N'
+                            AND ARC_TYPE IN ('C', 'Q', 'D', 'R')
+                            AND ARD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh:mi:ss AM')
+                            AND ard_date <= TO_DATE (:toDate, 'dd/MM/yyyy hh:mi:ss AM')
+                            AND OPADVANCE.MH_CODE = :mhCode
+                      GROUP BY 'OP Advance', USC_NAME, users.us_code
+                      UNION ALL
+                        SELECT 'OP Advance Refund' bltype, INITCAP (users.usc_name) AS usc_name, USERS.US_CODE,
+                              COUNT (rfc_slno) AS Billcount, SUM (DECODE (REFUNDOPADVANCE.rfc_cacr, 'C', REFUNDOPADVANCE.rfn_amt, 0)) * -1 As Cash,
+                              SUM (DECODE (REFUNDOPADVANCE.rfc_cacr, 'Q', REFUNDOPADVANCE.rfn_amt, 0)) * -1 As cheque,
+                              SUM (DECODE (REFUNDOPADVANCE.rfc_cacr, 'R', REFUNDOPADVANCE.rfn_amt, 0)) * -1 As Card,
+                              SUM (0) * -1 As Credit, SUM (0) * -1 As Bank
+                          FROM REFUNDOPADVANCE, USERS,OPADVANCE
+                        WHERE REFUNDOPADVANCE.RFD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh:mi:ss AM')
+                              AND refundopadvance.rfd_date <= TO_DATE (:toDate, 'dd/MM/yyyy hh:mi:ss AM')
+                              AND OPADVANCE.AR_SLNO = REFUNDOPADVANCE.AR_SLNO
+                               AND EXISTS (SELECT 1 FROM MEDIWARE.GTT_EXCLUDE_IP gtt WHERE gtt.IP_NO = OPADVANCE.IP_NO AND gtt.STATUS = 3)
+                              AND NVL (REFUNDOPADVANCE.RFC_CANCEL, 'N') = 'N'
+                              AND REFUNDOPADVANCE.US_CODE = USERS.US_CODE
+                              AND REFUNDOPADVANCE.MH_CODE = :mhCode
+                      GROUP BY USERS.US_CODE, USERS.USC_NAME
+                      HAVING     SUM (DECODE (REFUNDOPADVANCE.rfc_cacr, 'C', REFUNDOPADVANCE.rfn_amt, 0)) > 0
+                            OR SUM (DECODE (REFUNDOPADVANCE.rfc_cacr, 'R', REFUNDOPADVANCE.rfn_amt, 0)) > 0
+                            OR SUM (DECODE (REFUNDOPADVANCE.rfc_cacr, 'Q', REFUNDOPADVANCE.rfn_amt, 0))
+                                  + SUM (DECODE (REFUNDOPADVANCE.rfc_cacr, 'D', REFUNDOPADVANCE.rfn_amt, 0)) > 0
+                    ) GROUP BY usc_name, us_code`;
+
+// Source: query 25 — advance settled against a Billmast bill (both branches), restricted to
+// groupedPatient.
+const sql_advSettldBill = `SELECT usc_name, us_code, SUM (amount) amount
+                    FROM (
+                      SELECT 'Bill Advance Stld' bltype, INITCAP (users.usc_name) AS usc_name, users.us_code, SUM (NVL (bmn_advamount, 0)) AMOUNT
+                        FROM billmast, users
+                      WHERE     billmast.us_code = users.us_code
+                            AND NVL (bmn_advamount, 0) > 0
+                            AND EXISTS (SELECT 1 FROM MEDIWARE.GTT_EXCLUDE_IP gtt WHERE gtt.IP_NO = BILLMAST.IP_NO AND gtt.STATUS = 3)
+                            AND NVL (billmast.bmc_cancel, 'N') = 'N'
+                            AND billmast.BMC_COLLCNCODE IS NULL
+                            AND billmast.BMD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh:mi:ss AM')
+                            AND billmast.bmd_date <= TO_DATE (:toDate, 'dd/MM/yyyy hh:mi:ss AM')
+                            AND BILLMAST.MH_CODE = :mhCode
+                      GROUP BY 'Bill Advance Stld', users.usc_name, USERS.us_code
+                      UNION ALL
+                        SELECT 'Bill Advance Stld' bltype, INITCAP (users.usc_name) AS usc_name, users.us_code, SUM (NVL (bmn_advamount, 0)) AMOUNT
+                          FROM billmast, users
+                        WHERE     billmast.BMC_COLLUSCODE = users.us_code
+                              AND NVL (bmn_advamount, 0) > 0
+                              AND EXISTS (SELECT 1 FROM MEDIWARE.GTT_EXCLUDE_IP gtt WHERE gtt.IP_NO = BILLMAST.IP_NO AND gtt.STATUS = 3)
+                              AND NVL (billmast.bmc_cancel, 'N') = 'N'
+                              AND billmast.BMC_COLLCNCODE IS NOT NULL
+                              AND billmast.BMD_COLLDATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh:mi:ss AM')
+                              AND billmast.BMD_COLLDATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh:mi:ss AM')
+                              AND BILLMAST.MH_CODE = :mhCode
+                      GROUP BY 'Bill Advance Stld', users.usc_name, USERS.us_code
+                    ) GROUP BY usc_name, us_code`;
+
+// Source: query 26 — advance settled against an IP (Disbillmast) bill, restricted to groupedPatient.
+const sql_advSettldIp = `SELECT 'IP Bill Stld' bltype, INITCAP (users.usc_name) AS usc_name, users.us_code, SUM (NVL (Dmn_advance, 0)) AMOUNT
+                    FROM Disbillmast, USERS
+                  WHERE     Disbillmast.US_CODE = USERS.US_CODE
+                        AND NVL (Disbillmast.Dmc_cancel, 'N') = 'N'
+                        AND EXISTS (SELECT 1 FROM MEDIWARE.GTT_EXCLUDE_IP gtt WHERE gtt.IP_NO = DISBILLMAST.IP_NO AND gtt.STATUS = 3)
+                        AND NVL (Dmn_advance, 0) > 0
+                        AND Disbillmast.Dmd_date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh:mi:ss AM')
+                        AND disbillmast.dmd_date <= TO_DATE (:toDate, 'dd/MM/yyyy hh:mi:ss AM')
+                        AND DISBILLMAST.MH_CODE = :mhCode
+                GROUP BY 'IP Bill Stld', USC_NAME, users.us_code`;
+
+// Source: query 35 — advance settled against a Pharmacy (Pbillmast) bill (both branches),
+// restricted to groupedPatient.
+const sql_advSettldPharmacy = `SELECT usc_name, us_code, SUM (amount) amount
+                    FROM (
+                      SELECT 'Pharmacy Advance Stld' bltype, INITCAP (users.usc_name) AS usc_name, users.us_code, SUM (NVL (bmn_advamount, 0)) AMOUNT
+                        FROM pbillmast, USERS
+                      WHERE     pbillmast.US_CODE = USERS.US_CODE
+                            AND NVL (BMC_CANCEL, 'N') = 'N'
+                            AND pbillmast.BMC_COLLCNCODE IS NULL
+                            AND NVL (bmn_advamount, 0) > 0
+                            AND EXISTS (SELECT 1 FROM MEDIWARE.GTT_EXCLUDE_IP gtt WHERE gtt.IP_NO = PBILLMAST.IP_NO AND gtt.STATUS = 3)
+                            AND BMD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh:mi:ss AM')
+                            AND bmd_date <= TO_DATE (:toDate, 'dd/MM/yyyy hh:mi:ss AM')
+                            AND PBILLMAST.MH_CODE = :mhCode
+                      GROUP BY 'Pharmacy Advance Stld', USC_NAME, users.us_code
+                      UNION ALL
+                        SELECT 'Pharmacy Advance Stld' bltype, INITCAP (users.usc_name) AS usc_name, users.us_code, SUM (NVL (bmn_advamount, 0)) AMOUNT
+                          FROM pbillmast, USERS
+                        WHERE     pbillmast.BMC_COLLUSCODE = USERS.US_CODE
+                              AND pbillmast.BMC_COLLCNCODE IS NOT NULL
+                              AND EXISTS (SELECT 1 FROM MEDIWARE.GTT_EXCLUDE_IP gtt WHERE gtt.IP_NO = PBILLMAST.IP_NO AND gtt.STATUS = 3)
+                              AND NVL (BMC_CANCEL, 'N') = 'N'
+                              AND NVL (bmn_advamount, 0) > 0
+                              AND pbillmast.BMD_COLLDATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh:mi:ss AM')
+                              AND pbillmast.BMD_COLLDATE <= TO_DATE (:toDate, 'dd/MM/yyyy hh:mi:ss AM')
+                              AND PBILLMAST.MH_CODE = :mhCode
+                      GROUP BY 'Pharmacy Advance Stld', USC_NAME, users.us_code
+                    ) GROUP BY usc_name, us_code`;
+
+// Source: query 30 — IP bill payment-method breakdown (ipreceipt), restricted to groupedPatient.
+const sql_ipReceiptCollection = `SELECT INITCAP (users.usc_name) AS usc_name, users.us_code,
+                        SUM (NVL (Ipreceipt.irn_amount, 0) - NVL (Ipreceipt.irn_balance, 0)) Cash,
+                        SUM (NVL (Ipreceipt.irn_cheque, 0) - NVL (Ipreceipt.IRN_REFCHEQ, 0)) Cheque,
+                        SUM (NVL (Ipreceipt.irn_card, 0) - NVL (Ipreceipt.irn_refcard, 0)) Card,
+                        SUM (NVL (IRN_NEFT, 0)) Bank, SUM (NVL (ipreceipt.irn_discount, 0)) condiscount
+                    FROM ipreceipt, USERS, Disbillmast
+                  WHERE     Ipreceipt.Us_code = Users.Us_code
+                        AND Ipreceipt.Dmc_slno = Disbillmast.Dmc_slno
+                        AND Disbillmast.Dmd_date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh:mi:ss AM')
+                        AND disbillmast.dmd_date <= TO_DATE (:toDate, 'dd/MM/yyyy hh:mi:ss AM')
+                        AND EXISTS (SELECT 1 FROM MEDIWARE.GTT_EXCLUDE_IP gtt WHERE gtt.IP_NO = Disbillmast.IP_NO AND gtt.STATUS = 3)
+                        AND Ipreceipt.Dmc_type IN ('C', 'R')
+                        AND IRD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh:mi:ss AM')
+                        AND DISBILLMAST.MH_CODE = :mhCode
+                        AND ird_date <= TO_DATE (:toDate, 'dd/MM/yyyy hh:mi:ss AM')
+                        AND NVL (Irc_cancel, 'N') = 'N'
+                GROUP BY USC_NAME, users.us_code`;
+
+// Source: query 36 — Prev Collection: IP bills dated before fromDate, collected within the
+// requested range, restricted to groupedPatient.
+const sql_ipReceiptPrevCollection = `SELECT usc_name, us_code, SUM (cash) cash, SUM (cheque) cheque, SUM (card) card, SUM (bank) bank
+                    FROM (
+                      SELECT 'IP Bill' bltype, INITCAP (users.usc_name) AS usc_name, users.us_code,
+                            SUM (NVL (Ipreceipt.irn_amount, 0) - NVL (Ipreceipt.irn_balance, 0)) Cash,
+                            SUM (NVL (Ipreceipt.irn_cheque, 0) - NVL (Ipreceipt.IRN_REFCHEQ, 0)) Cheque,
+                            SUM (NVL (Ipreceipt.irn_card, 0) - NVL (Ipreceipt.irn_refcard, 0)) Card,
+                            SUM (NVL (Ipreceipt.irn_neft, 0)) Bank
+                        FROM ipreceipt, USERS, Disbillmast
+                      WHERE     Ipreceipt.Us_code = Users.Us_code
+                            AND Ipreceipt.Dmc_slno = Disbillmast.Dmc_slno
+                            AND Disbillmast.Dmd_date < TO_DATE (:fromDate, 'dd/MM/yyyy hh:mi:ss AM')
+                            AND EXISTS (SELECT 1 FROM MEDIWARE.GTT_EXCLUDE_IP gtt WHERE gtt.IP_NO = Disbillmast.IP_NO AND gtt.STATUS = 3)
+                            AND Ipreceipt.Dmc_type IN ('C', 'R')
+                            AND IRD_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh:mi:ss AM')
+                            AND ird_date <= TO_DATE (:toDate, 'dd/MM/yyyy hh:mi:ss AM')
+                            AND NVL (Irc_cancel, 'N') = 'N'
+                            AND DISBILLMAST.MH_CODE = :mhCode
+                      GROUP BY 'IP Bill', USC_NAME, users.us_code
+                    ) GROUP BY usc_name, us_code`;
+
+// Source: query 14 (Iprefundmast) — IP bill refund, restricted to groupedPatient.
+const sql_refundIp = `SELECT usc_name, us_code, SUM (billcount) billcount, SUM (amount) amount, SUM (credit) credit
+                    FROM (
+                      SELECT INITCAP (users.usc_name) usc_name, USERS.US_CODE, COUNT (iprefundmast.ric_slno) Billcount,
+                            SUM (NVL (Iprefundmast.Rin_credit, 0)) + SUM (NVL (Iprefundmast.rin_copayded_credit, 0)) AMOUNT,
+                            SUM (NVL (Iprefundmast.Rin_credit, 0)) + SUM (NVL (Iprefundmast.rin_copayded_credit, 0)) Credit
+                        FROM Iprefundmast, Users
+                      WHERE     iprefundmast.us_code = users.us_code
+                            AND Iprefundmast.Ric_Cacr = 'R'
+                            AND EXISTS (SELECT 1 FROM MEDIWARE.GTT_EXCLUDE_IP gtt WHERE gtt.IP_NO = Iprefundmast.IP_NO AND gtt.STATUS = 3)
+                            AND NVL (Iprefundmast.Ric_Cancel, 'N') = 'N'
+                            AND IPREFUNDMAST.MH_CODE = :mhCode
+                            AND Iprefundmast.Rid_Date >= TO_DATE (:fromDate, 'dd/MM/yyyy hh:mi:ss AM')
+                            AND iprefundmast.rid_date <= TO_DATE (:toDate, 'dd/MM/yyyy hh:mi:ss AM')
+                      GROUP BY USERS.US_CODE, users.usc_name
+                    ) GROUP BY usc_name, us_code`;
+
+// Source: IPRECEIPTrefund — cash-type IP bill refund, restricted to groupedPatient.
+const sql_refundIpReceipt = `SELECT usc_name, us_code, SUM (billcount) billcount, SUM (cash) cash, SUM (card) card, SUM (cheque) cheque
+                    FROM (
+                      SELECT INITCAP (users.usc_name) usc_name, users.us_code, COUNT (*) Billcount,
+                            SUM (NVL (IPRECEIPTrefund.irf_cash, 0)) cash, SUM (NVL (IPRECEIPTrefund.irf_card, 0)) card,
+                            SUM (NVL (IPRECEIPTrefund.irf_cheque, 0)) cheque
+                        FROM IPRECEIPTrefund, users
+                      WHERE     ipreceiptrefund.us_code = users.us_code
+                            AND IRF_CACR IN ('C')
+                            AND EXISTS (SELECT 1 FROM MEDIWARE.GTT_EXCLUDE_IP gtt WHERE gtt.IP_NO = IPRECEIPTrefund.IP_NO AND gtt.STATUS = 3)
+                            AND NVL (IRF_CANCEL, 'N') = 'N'
+                            AND ipreceiptrefund.IRC_MHCODE = :mhCode
+                            AND IRF_DATE >= TO_DATE (:fromDate, 'dd/MM/yyyy hh:mi:ss AM')
+                            AND irf_date <= TO_DATE (:toDate, 'dd/MM/yyyy hh:mi:ss AM')
+                      GROUP BY users.us_code, users.usc_name
+                    ) GROUP BY usc_name, us_code`;
+
+module.exports = {
+  sql_one,
+  sql_usersList,
+  sql_ipBill,
+  sql_advIp,
+  sql_advOp,
+  sql_advSettldBill,
+  sql_advSettldIp,
+  sql_advSettldPharmacy,
+  sql_ipReceiptCollection,
+  sql_ipReceiptPrevCollection,
+  sql_refundIp,
+  sql_refundIpReceipt,
+};

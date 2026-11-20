@@ -2,6 +2,7 @@ const {getTmcConnection, oracleConnectionClose} = require("../../../../config/or
 const {insertIntoGTT, controllerHelper, getGttPatientList} = require("../../../../utls/controller-helperFun");
 const {getIpNumberFromPreviousDayCollection} = require("../../misReportTmch/misReportTMCH/collectionTmch.service");
 const qmtService = require("./tmch.service");
+const legacyService = require("../qmt/qmt.service");
 const groupedService = require("../tssh/tssh.service");
 
 const ipPreviousDayCollection = async (conn, bind) => {
@@ -115,6 +116,11 @@ const getTmchReport = async (req, res) => {
     const getUnsettledAmount = await qmtService.getCollectionPortion_eight(conn, body);
     const getIpRefundDetlSection_seven = await qmtService.getIpRefundDetlSection_seven(conn, body);
     const getWriteoffamnt = await qmtService.getWriteoffamnt(conn, body);
+    const getIpOpSettled = await legacyService.getIpOpSettled(conn, body);
+    const getIpOpCredit_one = await legacyService.getIpOpCredit_one(conn, body);
+    const getIpOpCredit_two = await legacyService.getIpOpCredit_two(conn, body);
+    const getIpPackageAdjustment = await legacyService.getIpPackageAdjustment(conn, body);
+    const getGrossAmtFlag = await legacyService.getGrossAmtFlag();
     const IpConsolidated_Discount = await qmtService.getDiscount_three(conn, body);
     const getTypeDiscount = await qmtService.getTypeDiscount(conn, body);
     // PHARMACY INCOME
@@ -205,6 +211,15 @@ const getTmchReport = async (req, res) => {
       },
       writeOff: {
         getWriteoffamnt: getWriteoffamnt,
+      },
+      legacyRows: {
+        getIpOpSettled: getIpOpSettled,
+        getIpOpCredit_one: getIpOpCredit_one,
+        getIpOpCredit_two: getIpOpCredit_two,
+        getIpPackageAdjustment: getIpPackageAdjustment,
+      },
+      settings: {
+        grossAmtFlag: getGrossAmtFlag?.[0]?.FLAG || "N",
       },
       masterData: {
         getMisincexpmast: getMisincexpmast,

@@ -13,7 +13,7 @@ module.exports = {
                 bill_user,
                 usc_default_mhcode
             FROM USERS`;
-      const resutl = await executeTmc(sql, {outFormat: oracledb.OUT_FORMAT_OBJECT});
+      const resutl = await executeTmc(sql, {}, {outFormat: oracledb.OUT_FORMAT_OBJECT});
       return resutl.rows;
     } catch (error) {
       console.log(error);
