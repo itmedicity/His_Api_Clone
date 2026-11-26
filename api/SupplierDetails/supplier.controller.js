@@ -1,4 +1,5 @@
-const { getSupplierList, getActiveSupplierList, getCommonReport, getBedStatusReport, getCreditReceipt, getBedCleaningReport, getrequisitionCommonReport } = require("./supplier.service");
+const { getSupplierList, getActiveSupplierList, getCommonReport, getBedStatusReport, getCreditReceipt, getBedCleaningReport,
+  getrequisitionCommonReport, getwaitingReport, icureadmissionitingReport } = require("./supplier.service");
 module.exports = {
   getSupplierList: async (req, res) => {
     try {
@@ -154,6 +155,57 @@ module.exports = {
     try {
       const body = req.body;
       const data = await getrequisitionCommonReport(body);
+
+      if (!data) {
+        return res.status(200).json({
+          success: 1,
+          message: "No Data Found",
+          data: [],
+        });
+      }
+
+      return res.status(200).json({
+        success: 2,
+        message: "Fetched GRN Datas",
+        data: data,
+      });
+    } catch (error) {
+      return res.status(200).json({
+        success: 0,
+        message: error,
+      });
+    }
+  },
+
+  getwaitingReport: async (req, res) => {
+    try {
+      const body = req.body;
+      const data = await getwaitingReport(body);
+
+      if (!data) {
+        return res.status(200).json({
+          success: 1,
+          message: "No Data Found",
+          data: [],
+        });
+      }
+
+      return res.status(200).json({
+        success: 2,
+        message: "Fetched GRN Datas",
+        data: data,
+      });
+    } catch (error) {
+      return res.status(200).json({
+        success: 0,
+        message: error,
+      });
+    }
+  },
+  icureadmissionitingReport: async (req, res) => {
+    try {
+      const body = req.body;
+      const data = await icureadmissionitingReport(body);
 
       if (!data) {
         return res.status(200).json({

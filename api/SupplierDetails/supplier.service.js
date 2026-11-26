@@ -178,6 +178,17 @@ module.exports = {
             LPAD(MOD(ABS(ROUND((I.IPD_DISC - DD.REQ_DATE) * 86400)), 60), 2, '0')
     END AS "TAT_ANOUN_DISENTRY",
 
+      -- 8. TAT_ANOUN_TODISBILL
+    CASE 
+        WHEN DD.REQ_DATE IS NULL OR I.IPD_DISC IS NULL THEN NULL
+        ELSE 
+            CASE WHEN I.IPD_DISC < DD.REQ_DATE THEN '-' ELSE '' END ||
+            CASE WHEN TRUNC(ABS(ROUND((I.IPD_DISC - DD.REQ_DATE) * 86400)) / 3600) < 10 THEN '0' ELSE '' END ||
+            TRUNC(ABS(ROUND((I.IPD_DISC - DD.REQ_DATE) * 86400)) / 3600) || ':' ||
+            LPAD(TRUNC(MOD(ABS(ROUND((I.IPD_DISC - DD.REQ_DATE) * 86400)), 3600) / 60), 2, '0') || ':' ||
+            LPAD(MOD(ABS(ROUND((DD.REQ_DATE - I.DMD_DATE) * 86400)), 60), 2, '0')
+    END AS "TAT_ANOUN_TODISBILL",
+
     -- 9. TAT_DISENTRY_DISBILL
     CASE 
         WHEN I.IPD_DISC IS NULL OR I.DMD_DATE IS NULL THEN NULL
@@ -583,6 +594,17 @@ WHERE HK.REQ_DATE >= TO_DATE(:FROM_DATE, 'DD/MM/YYYY HH24:MI:SS')
             LPAD(MOD(ABS(ROUND((I.IPD_DISC - DD.REQ_DATE) * 86400)), 60), 2, '0')
     END AS "TAT_ANOUN_DISENTRY",
 
+        -- 8. TAT_ANOUN_TODISBILL
+    CASE 
+        WHEN DD.REQ_DATE IS NULL OR I.IPD_DISC IS NULL THEN NULL
+        ELSE 
+            CASE WHEN I.IPD_DISC < DD.REQ_DATE THEN '-' ELSE '' END ||
+            CASE WHEN TRUNC(ABS(ROUND((I.IPD_DISC - DD.REQ_DATE) * 86400)) / 3600) < 10 THEN '0' ELSE '' END ||
+            TRUNC(ABS(ROUND((I.IPD_DISC - DD.REQ_DATE) * 86400)) / 3600) || ':' ||
+            LPAD(TRUNC(MOD(ABS(ROUND((I.IPD_DISC - DD.REQ_DATE) * 86400)), 3600) / 60), 2, '0') || ':' ||
+            LPAD(MOD(ABS(ROUND((DD.REQ_DATE - I.DMD_DATE) * 86400)), 60), 2, '0')
+    END AS "TAT_ANOUN_TODISBILL",
+
     -- 9. TAT_DISENTRY_DISBILL
     CASE 
         WHEN I.IPD_DISC IS NULL OR I.DMD_DATE IS NULL THEN NULL
@@ -701,6 +723,168 @@ ORDER BY I.DMD_DATE
       const uniqueRows = [];
       (result.rows || []).forEach((row, idx) => {
         const key = row.ADMISS_NO || row.PATIENT_NO + '_' + row.ADMIS_DATE_TIME;
+        if (key) {
+          if (!seen.has(key)) {
+            seen.add(key);
+            uniqueRows.push({ ...row, SLNO: uniqueRows.length + 1 });
+          }
+        } else {
+          uniqueRows.push({ ...row, SLNO: uniqueRows.length + 1 });
+        }
+      });
+
+      return uniqueRows;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  },
+  getwaitingReport: async (data) => {
+    const from = data.census_datefrom ? parseISO(data.census_datefrom) : null;
+    const to = data.census_dateto ? parseISO(data.census_dateto) : null;
+
+    // Format to Oracle format
+    const FROM_DATE = from ? format(from, "dd/MM/yyyy HH:mm:ss") : null;
+    const TO_DATE = to ? format(to, "dd/MM/yyyy HH:mm:ss") : null;
+
+    const sql = `
+           SELECT V.PT_NO  AS "PTNO", 
+            P.PTC_PTNAME AS PATIENT_NAME,
+            D.DOC_NAME  AS"DOCTOR", 
+            S.SPC_DESC AS"SPECIALITY_NAME", 
+            TO_CHAR (V.VSD_DATE,'DD/MM/YYYY HH24:MI:SS')AS"VISITDATE", 
+            TO_CHAR (CLINICAL.OPPATIENTCONSULT.CONSULT_START_DATE,'DD/MM/YYYY HH24:MI:SS') AS"CONSULTSTART_TIME", 
+            CASE 
+                WHEN V.VSD_DATE IS NULL OR CLINICAL.OPPATIENTCONSULT.CONSULT_START_DATE IS NULL THEN NULL
+            ELSE 
+                CASE WHEN CLINICAL.OPPATIENTCONSULT.CONSULT_START_DATE < V.VSD_DATE THEN '-' ELSE '' END ||
+                CASE WHEN TRUNC(ABS(ROUND((CLINICAL.OPPATIENTCONSULT.CONSULT_START_DATE - V.VSD_DATE) * 86400)) / 3600) < 10 THEN '0' ELSE '' END ||
+                TRUNC(ABS(ROUND((CLINICAL.OPPATIENTCONSULT.CONSULT_START_DATE - V.VSD_DATE) * 86400)) / 3600) || ':' ||
+                LPAD(TRUNC(MOD(ABS(ROUND((CLINICAL.OPPATIENTCONSULT.CONSULT_START_DATE - V.VSD_DATE) * 86400)), 3600) / 60), 2, '0') || ':' ||
+                LPAD(MOD(ABS(ROUND((CLINICAL.OPPATIENTCONSULT.CONSULT_START_DATE - V.VSD_DATE) * 86400)), 60), 2, '0')
+    END AS "TAT_ANSMT_MEDRET_REQ",
+            ROUND( ( CLINICAL.OPPATIENTCONSULT.CONSULT_START_DATE - V.VSD_DATE) * 1440) AS"CONSULT_INITIAL_TIME"
+   FROM   VISITMAST V
+            LEFT JOIN CLINICAL.OPPATIENTCONSULT  ON  V.VSC_SLNO=CLINICAL.OPPATIENTCONSULT.VSC_SLNO 
+            LEFT JOIN CLINICAL.NURSE_ASSESSMENT ON V.VSC_SLNO=NURSE_ASSESSMENT.VSC_SLNO
+            INNER JOIN  DOCTOR  D ON CLINICAL.OPPATIENTCONSULT.DO_CODE = D.DO_CODE
+            LEFT JOIN SPECIALITY S ON D.SP_CODE=S.SP_CODE
+            LEFT JOIN PATIENT P ON V.PT_NO=P.PT_NO
+   WHERE (V.VSC_PTFLAG = 'N')
+           AND V.VSC_CANCEL IS NUll
+           AND TRUNC(CLINICAL.OPPATIENTCONSULT.VSD_DATE) >= TO_DATE(:FROM_DATE, 'DD/MM/YYYY HH24:MI:SS')
+           AND TRUNC(CLINICAL.OPPATIENTCONSULT.VSD_DATE) <= TO_DATE(:TO_DATE, 'DD/MM/YYYY HH24:MI:SS')
+GROUP BY V.PT_NO,
+         V.VSD_DATE,
+         CLINICAL.OPPATIENTCONSULT.CONSULT_START_DATE,
+         D.DOC_NAME,
+         S.SPC_DESC,
+         P.PTC_PTNAME 
+   ORDER BY S.SPC_DESC,D.DOC_NAME ASC
+  `;
+
+    try {
+      const result = await executeTmc(
+        sql,
+        {
+          FROM_DATE: FROM_DATE,
+          TO_DATE: TO_DATE,
+        },
+        { outFormat: oracledb.OUT_FORMAT_OBJECT },
+      );
+
+      const seen = new Set();
+      const uniqueRows = [];
+      (result.rows || []).forEach((row) => {
+        const key = row.PTNO && row.VISITDATE ? `${row.PTNO}_${row.VISITDATE}_${row.DOCTOR || ''}` : null;
+        if (key) {
+          if (!seen.has(key)) {
+            seen.add(key);
+            uniqueRows.push({ ...row, SLNO: uniqueRows.length + 1 });
+          }
+        } else {
+          uniqueRows.push({ ...row, SLNO: uniqueRows.length + 1 });
+        }
+      });
+
+      return uniqueRows;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  },
+  icureadmissionitingReport: async (data) => {
+    const from = data.census_datefrom ? parseISO(data.census_datefrom) : null;
+    const to = data.census_dateto ? parseISO(data.census_dateto) : null;
+
+    // Format to Oracle format
+    const FROM_DATE = from ? format(from, "dd/MM/yyyy") + " 00:00:00" : null;
+    const TO_DATE = to ? format(to, "dd/MM/yyyy") + " 23:59:59" : null;
+
+    const sql = `
+       WITH ICU_MOVEMENTS AS
+(
+    SELECT I.IP_NO,
+           I.PT_NO,
+           I.PTC_PTNAME,
+           D.DOC_NAME,
+           DP.DPC_DESC,
+           N.NSC_DESC,
+           B.BDC_NO,
+           R.RMD_OCCUPDATE,
+           R.RMD_RELESEDATE,
+           LEAD(R.RMD_OCCUPDATE)
+             OVER
+             ( PARTITION BY I.IP_NO
+                ORDER BY R.RMD_OCCUPDATE ) AS NEXT_ICU_OCCUPANCY
+    FROM IPADMISS I
+         JOIN RMALL R  ON I.IP_NO = R.IP_NO
+         JOIN BED B  ON R.BD_CODE = B.BD_CODE
+         JOIN ROOMTYPE RT  ON B.RT_CODE = RT.RT_CODE  AND R.RMC_RTCODE = RT.RT_CODE
+         LEFT JOIN DOCTOR D  ON I.DO_CODE = D.DO_CODE
+         LEFT JOIN SPECIALITY S  ON D.SP_CODE = S.SP_CODE
+         LEFT JOIN DEPARTMENT DP  ON S.DP_CODE = DP.DP_CODE
+         LEFT JOIN NURSTATION N ON B.NS_CODE=N.NS_CODE
+    WHERE I.IPC_PTFLAG = 'N'
+      AND RT.ICU = 'Y'
+)
+SELECT IP_NO,
+       PT_NO,
+       PTC_PTNAME,
+       DOC_NAME,
+       DPC_DESC,
+       NSC_DESC,
+       BDC_NO,
+       TO_CHAR(RMD_OCCUPDATE,'DD/MM/YYYY HH24:MI')      AS ICU_ALLOCAT_TIME,
+       TO_CHAR(RMD_RELESEDATE,'DD/MM/YYYY HH24:MI')     AS ICU_RELEASE_TIME,
+       TO_CHAR(NEXT_ICU_OCCUPANCY,'DD/MM/YYYY HH24:MI') AS READMIT_TIME,
+       ROUND((NEXT_ICU_OCCUPANCY - RMD_RELESEDATE) * 48,2)
+           AS HOURS_TO_READMIT
+FROM ICU_MOVEMENTS
+WHERE RMD_RELESEDATE IS NOT NULL
+  AND NEXT_ICU_OCCUPANCY IS NOT NULL
+  AND NEXT_ICU_OCCUPANCY > RMD_RELESEDATE
+  AND NEXT_ICU_OCCUPANCY <= RMD_RELESEDATE + 2
+  AND RMD_RELESEDATE >= to_date(:FROM_DATE, 'dd/MM/yyyy hh24:mi:ss')
+  AND RMD_RELESEDATE <= to_date(:TO_DATE, 'dd/MM/yyyy hh24:mi:ss')
+ORDER BY PT_NO,
+         RMD_RELESEDATE
+  `;
+
+    try {
+      const result = await executeTmc(
+        sql,
+        {
+          FROM_DATE: FROM_DATE,
+          TO_DATE: TO_DATE,
+        },
+        { outFormat: oracledb.OUT_FORMAT_OBJECT },
+      );
+
+      const seen = new Set();
+      const uniqueRows = [];
+      (result.rows || []).forEach((row) => {
+        const key = row.IP_NO && row.ICU_RELEASE_TIME ? `${row.IP_NO}_${row.ICU_RELEASE_TIME}_${row.READMIT_TIME || ''}` : null;
         if (key) {
           if (!seen.has(key)) {
             seen.add(key);
